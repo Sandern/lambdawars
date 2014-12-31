@@ -63,6 +63,9 @@
     <Filter Include="Source Files\Recast">
       <UniqueIdentifier>{df3c06d2-fde5-40b3-9f87-969b7f232920}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Recast\DispBuild">
+      <UniqueIdentifier>{c77b4706-8f41-48ce-bfcd-1ab1b6f75049}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="spawn_helper.nut">
@@ -1981,6 +1984,18 @@
     <ClCompile Include="..\shared\recast\recast_loadmap.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\public\disp_common.cpp">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\public\disp_powerinfo.cpp">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\public\dispcoll_common.cpp">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\public\builddisp.cpp">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3845,6 +3860,24 @@
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_loadmap.h">
       <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\disp_common.h">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\disp_powerinfo.h">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\disp_tesselate.h">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\disp_vertindex.h">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\dispcoll_common.h">
+      <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\builddisp.h">
+      <Filter>Source Files\Recast\DispBuild</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

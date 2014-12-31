@@ -77,8 +77,8 @@ void CRecastMesh::ResetCommonSettings()
 
 	m_cellSize = 8.0f; //0.3f * scale;
 	m_cellHeight = 6.0f; //0.2f * scale;
-	m_agentHeight = 0.8f * scale;
-	m_agentRadius = 0.6f * scale;
+	m_agentHeight = 72.0f; // => Soldier/human
+	m_agentRadius = 18.5f; // => Soldier/human
 	m_agentMaxClimb = 0.9f * scale;
 	m_agentMaxSlope = 45.0f;
 	m_regionMinSize = 8;// * scale;
@@ -211,6 +211,8 @@ void CRecastMesh::LoadTestData()
 //-----------------------------------------------------------------------------
 bool CRecastMesh::Build()
 {
+	double fStartTime = Plat_FloatTime();
+
 	ResetCommonSettings();
 
 	BuildContext ctx;
@@ -513,6 +515,8 @@ bool CRecastMesh::Build()
 	// At this point the navigation mesh data is ready, you can access it from m_pmesh.
 	// See duDebugDrawPolyMesh or dtCreateNavMeshData as examples how to access the data.
 
+	DevMsg( "CRecastMesh: Generated navigation mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
+
 	return true;
 }
 
@@ -568,14 +572,16 @@ void CRecastMesh::DebugRender()
 
 	DebugDrawMesh dd;
 
-	const float texScale = 1.0f / (m_cellSize * 10.0f);
-
-	if( recast_draw_trimeshslope.GetBool() )
+#if defined(_DEBUG) || defined(CALC_GEOM_NORMALS)
+	if( recast_draw_trimeshslope.GetBool() && m_normals )
 	{
+		const float texScale = 1.0f / (m_cellSize * 10.0f);
+
 		duDebugDrawTriMeshSlope(&dd, m_verts, m_nverts,
 								m_tris, m_normals, m_ntris,
 								0.7, texScale);
 	}
+#endif // CALC_GEOM_NORMALS
 
 	if( recast_draw_contours.GetBool() && m_cset != NULL )
 	{

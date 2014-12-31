@@ -225,6 +225,18 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <None Include="vscript_server.nut" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\public\builddisp.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\public\dispcoll_common.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\public\disp_common.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\public\disp_powerinfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\shared\baseprojectile.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLight.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLightContainer.cpp" />
@@ -1011,6 +1023,12 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="toolframework_server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\public\builddisp.h" />
+    <ClInclude Include="..\..\public\dispcoll_common.h" />
+    <ClInclude Include="..\..\public\disp_common.h" />
+    <ClInclude Include="..\..\public\disp_powerinfo.h" />
+    <ClInclude Include="..\..\public\disp_tesselate.h" />
+    <ClInclude Include="..\..\public\disp_vertindex.h" />
     <ClInclude Include="..\shared\baseprojectile.h" />
     <ClInclude Include="..\shared\deferred\CDefLight.h" />
     <ClInclude Include="..\shared\deferred\CDefLightContainer.h" />

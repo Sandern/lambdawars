@@ -13,6 +13,8 @@
 
 #include <recast/Recast.h>
 
+//#define CALC_GEOM_NORMALS
+
 class CRecastMesh
 {
 public:
@@ -21,12 +23,14 @@ public:
 
 
 	virtual void LoadTestData();
-	virtual bool LoadMapData();
 	virtual void ResetCommonSettings();
 
 	virtual bool Build();
 	virtual bool Load();
 	virtual bool Reset();
+
+	virtual bool GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
+	virtual bool LoadMapData();
 
 #ifdef CLIENT_DLL
 	virtual void DebugRender();

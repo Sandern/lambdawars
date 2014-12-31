@@ -8,11 +8,125 @@
 //=============================================================================//
 #include "cbase.h"
 #include "recast/recast_mesh.h"
+#include "builddisp.h"
 
 #include <filesystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+//-----------------------------------------------------------------------------
+// Purpose: Load displacment verts and triangles
+//-----------------------------------------------------------------------------
+bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
+{
+	BSPHeader_t *header = (BSPHeader_t *)fileContent;
+
+	dvertex_t *vertices = (dvertex_t *)((char *)fileContent + header->lumps[LUMP_VERTEXES].fileofs);
+	dedge_t *edges = (dedge_t *)((char *)fileContent + header->lumps[LUMP_EDGES].fileofs);
+	int *surfedge = (int *)((char *)fileContent + header->lumps[LUMP_SURFEDGES].fileofs);
+	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
+	int nFaces = (header->lumps[LUMP_FACES].filelen) / sizeof(dface_t);
+
+	ddispinfo_t *dispInfoArray = (ddispinfo_t *)((char *)fileContent + header->lumps[LUMP_DISPINFO].fileofs);
+	int nDispInfo = (header->lumps[LUMP_DISPINFO].filelen) / sizeof(ddispinfo_t);
+	CDispVert *dispVerts = (CDispVert *)((char *)fileContent + header->lumps[LUMP_DISP_VERTS].fileofs);
+	CDispTri *dispTri = (CDispTri *)((char *)fileContent + header->lumps[LUMP_DISP_TRIS].fileofs);
+
+	// Build mapping from index to face
+	int nMemSize = nFaces * sizeof(unsigned short);
+	unsigned short *dispIndexToFaceIndex = (unsigned short*)stackalloc( nMemSize );
+	V_memset( dispIndexToFaceIndex, 0xFF, nMemSize );
+	
+    for ( int i = 0; i < nFaces; i++ )
+    {
+        if ( faces[i].dispinfo == -1 || faces[i].dispinfo >= nDispInfo )
+            continue;
+
+		dispIndexToFaceIndex[faces[i].dispinfo] = (unsigned short)i;
+    }
+
+	int iCurVert = 0;
+	int iCurTri = 0;
+	for( int dispInfoIdx = 0; dispInfoIdx < nDispInfo; dispInfoIdx++ )
+	{
+		ddispinfo_t &dispInfo = dispInfoArray[dispInfoIdx];
+		int nVerts = NUM_DISP_POWER_VERTS( dispInfo.power );
+		int nTris = NUM_DISP_POWER_TRIS( dispInfo.power );
+
+		// Find the face of this dispinfo
+		unsigned short nFaceIndex = dispIndexToFaceIndex[dispInfoIdx];
+		if ( nFaceIndex == 0xFFFF )
+			continue;
+
+		CCoreDispInfo coreDisp;
+		CCoreDispSurface *pDispSurf = coreDisp.GetSurface();
+		pDispSurf->SetPointStart( dispInfo.startPosition );
+		pDispSurf->SetContents( dispInfo.contents );
+	
+		coreDisp.InitDispInfo( dispInfo.power, dispInfo.minTess, dispInfo.smoothingAngle, dispVerts + iCurVert, dispTri + iCurTri, 0, NULL );
+
+		dface_t *pFaces = &faces[ nFaceIndex ];
+		pDispSurf->SetHandle( nFaceIndex );
+
+		if ( pFaces->numedges > 4 )
+			continue;
+
+		Vector surfPoints[4];
+		pDispSurf->SetPointCount( pFaces->numedges );
+		int j;
+		for ( j = 0; j < pFaces->numedges; j++ )
+		{
+			int eIndex = surfedge[pFaces->firstedge+j];
+			if ( eIndex < 0 )
+			{
+				VectorCopy( vertices[edges[-eIndex].v[1]].point, surfPoints[j] );
+			}
+			else
+			{
+				VectorCopy( vertices[edges[eIndex].v[0]].point, surfPoints[j] );
+			}
+		}
+
+		for ( j = 0; j < 4; j++ )
+		{
+			pDispSurf->SetPoint( j, surfPoints[j] );
+		}
+
+		pDispSurf->FindSurfPointStartIndex();
+		pDispSurf->AdjustSurfPointData();
+
+		// Create the displacement from the set data
+		coreDisp.Create();
+
+		iCurVert += nVerts;
+		iCurTri += nTris;
+
+		// Create geometry for recast navigation mesh this data
+		int iStartingVertIndex = verts.Count() / 3;
+
+		int numVerts = coreDisp.GetSize();
+		CoreDispVert_t *pVert = coreDisp.GetDispVertList();
+		for (int i = 0; i < numVerts; ++i )
+		{
+			const Vector &dispVert = pVert[i].m_Vert;
+			verts.AddToTail( dispVert[0] );
+			verts.AddToTail( dispVert[2] );
+			verts.AddToTail( dispVert[1] );
+		}
+
+		unsigned short *pIndex = coreDisp.GetRenderIndexList();
+		int numIndices = coreDisp.GetRenderIndexCount();
+		for ( int i = 0; i < numIndices - 2; ++i )
+		{
+			triangles.AddToTail( iStartingVertIndex + pIndex[ i ] );
+			triangles.AddToTail( iStartingVertIndex + pIndex[ i + 1 ] );
+			triangles.AddToTail( iStartingVertIndex + pIndex[ i + 2 ] );
+		}
+	}
+
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -25,30 +139,28 @@ bool CRecastMesh::LoadMapData()
 	// nav filename is derived from map filename
 	char filename[256];
 #ifdef CLIENT_DLL
-	Q_snprintf( filename, sizeof( filename ), "%s", STRING( engine->GetLevelName() ) );
+	V_snprintf( filename, sizeof( filename ), "%s", STRING( engine->GetLevelName() ) );
 	V_StripExtension( filename, filename, 256 );
-	Q_snprintf( filename, sizeof( filename ), "%s.bsp", filename );
+	V_snprintf( filename, sizeof( filename ), "%s.bsp", filename );
 	//Msg("CLIENT LOADING NAV MESH: %s\n", filename);
 #else
-	Q_snprintf( filename, sizeof( filename ), "maps\\%s.bsp", STRING( gpGlobals->mapname ) );
+	V_snprintf( filename, sizeof( filename ), "maps\\%s.bsp", STRING( gpGlobals->mapname ) );
 #endif // CLIENT_DLL
 
-	void *fileBuffer = NULL;
-	int length = filesystem->ReadFileEx( filename, "GAME", &fileBuffer, false, false );
-
-#if 0
 	CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::READ_ONLY );
 	if ( !filesystem->ReadFile( filename, "MOD", fileBuffer ) )	// this ignores .nav files embedded in the .bsp ...
 	{
 		Warning("Recast LoadMapData: unable to read bsp");
 		return false;
 	}
-#endif // 0
 
-	BSPHeader_t *header = (BSPHeader_t *)fileBuffer;
+	int length = fileBuffer.TellMaxPut();
+	void *fileContent = fileBuffer.Base();
+
+	BSPHeader_t *header = (BSPHeader_t *)fileContent;
 
 	// Load vertices
-	dvertex_t *vertices = (dvertex_t *)((char *)fileBuffer + header->lumps[LUMP_VERTEXES].fileofs);
+	dvertex_t *vertices = (dvertex_t *)((char *)fileContent + header->lumps[LUMP_VERTEXES].fileofs);
 	int nvertsLump = (header->lumps[LUMP_VERTEXES].filelen) / sizeof(dvertex_t);
 	for( int i = 0; i < nvertsLump; i++ )
 	{
@@ -58,14 +170,13 @@ bool CRecastMesh::LoadMapData()
 	}
 
 	// Load edges and Surfedge array
-	dedge_t *edges = (dedge_t *)((char *)fileBuffer + header->lumps[LUMP_EDGES].fileofs);
+	dedge_t *edges = (dedge_t *)((char *)fileContent + header->lumps[LUMP_EDGES].fileofs);
 	//int nEdges = (header->lumps[LUMP_EDGES].filelen) / sizeof(dedge_t);
-
-	int *surfedge = (int *)((char *)fileBuffer + header->lumps[LUMP_SURFEDGES].fileofs);
+	int *surfedge = (int *)((char *)fileContent + header->lumps[LUMP_SURFEDGES].fileofs);
 	//int nSurfEdges = (header->lumps[LUMP_SURFEDGES].filelen) / sizeof(int);
 
 	// Load triangles, parse from faces
-	dface_t *faces = (dface_t *)((char *)fileBuffer + header->lumps[LUMP_FACES].fileofs);
+	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
 	int nFaces = (header->lumps[LUMP_FACES].filelen) / sizeof(dface_t);
 	Msg("nFaces: %d\n", nFaces);
 	for( int i = 0; i < nFaces; i++ )
@@ -89,8 +200,6 @@ bool CRecastMesh::LoadMapData()
 			x /= (float)(faces[i].numedges * 2);
 			y /= (float)(faces[i].numedges * 2);
 			z /= (float)(faces[i].numedges * 2);
-
-			//Msg("Face %d origin: %f %f %f\n", i, x, y, z);
 
 			int connectingVertIdx = verts.Count() / 3;
 			verts.AddToTail( x );
@@ -120,15 +229,7 @@ bool CRecastMesh::LoadMapData()
 		}
 	}
 
-	// Load displacment verts and triangles
-	ddispinfo_t *dispInfo = (ddispinfo_t *)((char *)fileBuffer + header->lumps[LUMP_DISPINFO].fileofs);
-	int nDispInfo = (header->lumps[LUMP_DISPINFO].filelen) / sizeof(ddispinfo_t);
-	CDispVert *dispVerts = (CDispVert *)((char *)fileBuffer + header->lumps[LUMP_DISP_VERTS].fileofs);
-
-	for( int i = 0; i < nDispInfo; i++ )
-	{
-		int nVerts = NUM_DISP_POWER_VERTS( dispInfo[i].power );
-	}
+	GenerateDispVertsAndTris( fileContent, verts, triangles );
 	
 	// Copy result
 	m_nverts = verts.Count() / 3;
@@ -139,6 +240,7 @@ bool CRecastMesh::LoadMapData()
 	m_tris = new int[triangles.Count()];
 	V_memcpy( m_tris, triangles.Base(), triangles.Count() * sizeof(int) );
 
+#if defined(_DEBUG)
 	for( int i = 0; i < triangles.Count(); i++ )
 	{
 		if( triangles[i] < 0 || triangles[i] >= m_nverts )
@@ -146,9 +248,11 @@ bool CRecastMesh::LoadMapData()
 			Warning("Triangle %d has invalid vertex index: %d\n", i, triangles[i] );
 		}
 	}
+#endif // _DEBUG
 
 	Msg( "Recast Load map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, m_nverts, m_ntris, length, header->m_nVersion );
 
+#if defined(_DEBUG) || defined(CALC_GEOM_NORMALS)
 	// Calculate normals.
 	m_normals = new float[m_ntris*3];
 	for (int i = 0; i < m_ntris*3; i += 3)
@@ -175,6 +279,7 @@ bool CRecastMesh::LoadMapData()
 			n[2] *= d;
 		}
 	}
+#endif // CALC_GEOM_NORMALS
 
 	return true;
 }
