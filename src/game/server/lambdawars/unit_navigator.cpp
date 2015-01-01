@@ -916,6 +916,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 		}
 		else
 		{
+#if 0
 			// Add density from nav mesh (don't drop off cliffs when we don't want too)
 			// Note that we don't do this for special waypoints (climbing/dropping/etc)
 			if( ShouldConsiderNavMesh() )
@@ -934,6 +935,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 					vAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
 				}
 			}
+#endif // 0
 
 			if( m_Seeds.Count() )
 			{
@@ -1087,6 +1089,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeVelocity", VPROF_BUDGETGROUP_UNITS );
 
+#if 0
 	// Don't go out of "ignore nav areas" mode until we found a valid nav area.
 	if( m_bNoNavAreasNearby )
 	{
@@ -1097,7 +1100,7 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 			m_bNoNavAreasNearby = false;
 		}
 	}
-
+#endif // 0
 	// By default we are moving into the direction of the next waypoint
 	// We now calculate the velocity based on current velocity, flow, density, etc
 	Vector vBestVel, vVelocity;

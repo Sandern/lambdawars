@@ -60,7 +60,15 @@ public:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRecastMesh::CRecastMesh() : m_keepInterResults(true)
+CRecastMesh::CRecastMesh() : 
+	m_keepInterResults(true),
+	m_triareas(0),
+	m_solid(0),
+	m_chf(0),
+	m_cset(0),
+	m_pmesh(0),
+	m_dmesh(0),
+	m_navMesh(0)
 {
 	m_verts = NULL;
 	m_nverts = 0;
@@ -79,17 +87,23 @@ CRecastMesh::~CRecastMesh()
 
 }
 
+// Test settings temporary
+static ConVar recast_cellsize("recast_cellsize", "10.0", FCVAR_REPLICATED);
+static ConVar recast_cellheight("recast_cellheight", "10.0", FCVAR_REPLICATED);
+static ConVar recast_maxclimb("recast_maxclimb", "18.0", FCVAR_REPLICATED);
+static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void CRecastMesh::ResetCommonSettings()
 {
-	m_cellSize = 30.0f;
-	m_cellHeight = 20.0f;
+	m_cellSize = recast_cellsize.GetFloat();
+	m_cellHeight = recast_cellheight.GetFloat();
 	m_agentHeight = 72.0f; // => Soldier/human
 	m_agentRadius = 18.5f; // => Soldier/human
-	m_agentMaxClimb = 18.0f; // => default unit step height
-	m_agentMaxSlope = 47.5f; // Default slope for units
+	m_agentMaxClimb = recast_maxclimb.GetFloat(); //18.0f; // => default unit step height
+	m_agentMaxSlope = recast_maxslope.GetFloat(); // Default slope for units
 	m_regionMinSize = 8;
 	m_regionMergeSize = 20;
 	m_edgeMaxLen = 12000.0f;
@@ -222,7 +236,8 @@ bool CRecastMesh::Build()
 {
 	double fStartTime = Plat_FloatTime();
 
-	ResetCommonSettings();
+	Reset(); // Clean any existing data
+	ResetCommonSettings(); // Reset parameters
 
 	BuildContext ctx;
 
@@ -272,7 +287,7 @@ bool CRecastMesh::Build()
 	rcCalcBounds( verts, nverts, m_cfg.bmin, m_cfg.bmax );
 	rcCalcGridSize(m_cfg.bmin, m_cfg.bmax, m_cfg.cs, &m_cfg.width, &m_cfg.height);
 
-	Msg("walkableHeight: %d, walkableClimb: %d, walkableRadius: %d\n", m_cfg.walkableHeight, m_cfg.walkableClimb, m_cfg.walkableRadius);
+	Msg("walkableHeight: %d, walkableClimb: %d, walkableRadius: %d, walkableSlopeAngle: %f\n", m_cfg.walkableHeight, m_cfg.walkableClimb, m_cfg.walkableRadius, m_cfg.walkableSlopeAngle);
 	Msg("Grid size: bmin: %f %f %f bmax: %f %f %f, width: %d, height: %d\n", m_cfg.bmin[0], m_cfg.bmin[1], m_cfg.bmin[2],
 		m_cfg.bmax[0], m_cfg.bmax[1], m_cfg.bmax[2], m_cfg.width, m_cfg.height);
 
@@ -665,6 +680,7 @@ bool CRecastMesh::Reset()
 	if( m_tris != NULL )
 	{
 		delete m_tris;
+		m_tris = NULL;
 		m_ntris = 0;
 	}
 
@@ -672,6 +688,49 @@ bool CRecastMesh::Reset()
 	{
 		delete m_normals;
 		m_normals = NULL;
+	}
+
+	// Cleanup Nav mesh data
+	if( m_triareas )
+	{
+		delete [] m_triareas;
+		m_triareas = 0;
+	}
+
+	if( m_solid )
+	{
+		rcFreeHeightField(m_solid);
+		m_solid = 0;
+	}
+
+	if( m_chf )
+	{
+		rcFreeCompactHeightfield(m_chf);
+		m_chf = 0;
+	}
+
+	if( m_cset )
+	{
+		rcFreeContourSet(m_cset);
+		m_cset = 0;
+	}
+
+	if( m_pmesh )
+	{
+		rcFreePolyMesh(m_pmesh);
+		m_pmesh = 0;
+	}
+
+	if( m_dmesh )
+	{
+		rcFreePolyMeshDetail(m_dmesh);
+		m_dmesh = 0;
+	}
+
+	if( m_navMesh )
+	{
+		dtFreeNavMesh(m_navMesh);
+		m_navMesh = 0;
 	}
 
 	return true;
@@ -700,7 +759,7 @@ void CRecastMesh::DebugRender()
 
 		duDebugDrawTriMeshSlope(&dd, m_verts, m_nverts,
 								m_tris, m_normals, m_ntris,
-								0.7, texScale);
+								m_agentMaxSlope, texScale);
 	}
 #endif // CALC_GEOM_NORMALS
 
@@ -841,3 +900,15 @@ void ResetRecastMesh()
 	s_pRecastMesh->Reset();
 }
 
+#ifdef CLIENT_DLL
+CON_COMMAND_F( recast_rebuild, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( recast_rebuild_server, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+	s_pRecastMesh->Load();
+
+#ifdef CLIENT_DLL
+	engine->ServerCmd("recast_rebuild_server\n");
+#endif // CLIENT_DLL
+}

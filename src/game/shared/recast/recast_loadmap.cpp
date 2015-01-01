@@ -184,7 +184,6 @@ bool CRecastMesh::LoadMapData()
 	// Load triangles, parse from faces
 	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
 	int nFaces = (header->lumps[LUMP_FACES].filelen) / sizeof(dface_t);
-	//Msg("nFaces: %d\n", nFaces);
 	for( int i = 0; i < nFaces; i++ )
 	{
 		if ( faces[i].dispinfo == -1 )
@@ -229,10 +228,10 @@ bool CRecastMesh::LoadMapData()
 				triangles.AddToTail( connectingVertIdx );
 			}
 		}
-		else
+		/*else
 		{
 			// Displacement
-		}
+		}*/
 	}
 
 	GenerateDispVertsAndTris( fileContent, verts, triangles );
