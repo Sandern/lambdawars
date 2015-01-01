@@ -84,11 +84,11 @@ CRecastMesh::~CRecastMesh()
 //-----------------------------------------------------------------------------
 void CRecastMesh::ResetCommonSettings()
 {
-	m_cellSize = 10.0f;
-	m_cellHeight = 8.0f;
+	m_cellSize = 30.0f;
+	m_cellHeight = 20.0f;
 	m_agentHeight = 72.0f; // => Soldier/human
 	m_agentRadius = 18.5f; // => Soldier/human
-	m_agentMaxClimb = 36.0f; //18.0f; // => default unit step height
+	m_agentMaxClimb = 18.0f; // => default unit step height
 	m_agentMaxSlope = 47.5f; // Default slope for units
 	m_regionMinSize = 8;
 	m_regionMergeSize = 20;

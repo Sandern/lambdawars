@@ -38,7 +38,7 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 	unsigned short *dispIndexToFaceIndex = (unsigned short*)stackalloc( nMemSize );
 	V_memset( dispIndexToFaceIndex, 0xFF, nMemSize );
 	
-    for ( int i = 0; i < nFaces; i++ )
+    for( int i = 0; i < nFaces; i++ )
     {
         if ( faces[i].dispinfo == -1 || faces[i].dispinfo >= nDispInfo )
             continue;
@@ -56,7 +56,7 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 
 		// Find the face of this dispinfo
 		unsigned short nFaceIndex = dispIndexToFaceIndex[dispInfoIdx];
-		if ( nFaceIndex == 0xFFFF )
+		if( nFaceIndex == 0xFFFF )
 			continue;
 
 		CCoreDispInfo coreDisp;
@@ -69,13 +69,13 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 		dface_t *pFaces = &faces[ nFaceIndex ];
 		pDispSurf->SetHandle( nFaceIndex );
 
-		if ( pFaces->numedges > 4 )
+		if( pFaces->numedges > 4 )
 			continue;
 
 		Vector surfPoints[4];
 		pDispSurf->SetPointCount( pFaces->numedges );
 		int j;
-		for ( j = 0; j < pFaces->numedges; j++ )
+		for( j = 0; j < pFaces->numedges; j++ )
 		{
 			int eIndex = surfedge[pFaces->firstedge+j];
 			if ( eIndex < 0 )
@@ -88,13 +88,16 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 			}
 		}
 
-		for ( j = 0; j < 4; j++ )
+		for( j = 0; j < 4; j++ )
 		{
 			pDispSurf->SetPoint( j, surfPoints[j] );
 		}
 
 		pDispSurf->FindSurfPointStartIndex();
 		pDispSurf->AdjustSurfPointData();
+
+		if( pDispSurf->GetPointCount() != 4 )
+			continue;
 
 		// Create the displacement from the set data
 		coreDisp.Create();
@@ -117,11 +120,15 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 
 		unsigned short *pIndex = coreDisp.GetRenderIndexList();
 		int numIndices = coreDisp.GetRenderIndexCount();
-		for ( int i = 0; i < numIndices - 2; ++i )
+
+		int i = 0;
+		while( i + 2 < numIndices )
 		{
 			triangles.AddToTail( iStartingVertIndex + pIndex[ i ] );
 			triangles.AddToTail( iStartingVertIndex + pIndex[ i + 1 ] );
 			triangles.AddToTail( iStartingVertIndex + pIndex[ i + 2 ] );
+
+			i += 3;
 		}
 	}
 

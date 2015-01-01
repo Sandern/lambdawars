@@ -16,7 +16,11 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+// Modified for Lambda Wars
+
 #include "cbase.h"
+
+#include "view.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -26,6 +30,8 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+static ConVar recast_debug_culldist("recast_debug_culldist", "2048.0");
 
 void duDebugDrawTriMesh(duDebugDraw* dd, const float* verts, int /*nverts*/,
 						const int* tris, const float* normals, int ntris,
@@ -96,6 +102,9 @@ void duDebugDrawTriMeshSlope(duDebugDraw* dd, const float* verts, int /*nverts*/
 	float uva[2];
 	float uvb[2];
 	float uvc[2];
+
+	const Vector &vCullOrigin = MainViewOrigin();
+	float fCullDist = recast_debug_culldist.GetFloat();
 	
 	dd->texture(true);
 
@@ -121,6 +130,10 @@ void duDebugDrawTriMeshSlope(duDebugDraw* dd, const float* verts, int /*nverts*/
 			const float* va = &verts[tris[i+0]*3];
 			const float* vb = &verts[tris[i+1]*3];
 			const float* vc = &verts[tris[i+2]*3];
+
+			Vector vTest( va[0], va[2], va[1] );
+			if( vTest.DistTo( vCullOrigin ) > fCullDist )
+				continue;
 		
 			int ax = 0, ay = 0;
 			if (rcAbs(norm[1]) > rcAbs(norm[ax]))
@@ -143,44 +156,6 @@ void duDebugDrawTriMeshSlope(duDebugDraw* dd, const float* verts, int /*nverts*/
 		}
 		dd->end();
 	}
-
-#if 0
-	dd->begin(DU_DRAW_TRIS);
-	for (int i = 0; i < ntris*3; i += 3)
-	{
-		const float* norm = &normals[i];
-		unsigned int color;
-		unsigned char a = (unsigned char)(220*(2+norm[0]+norm[1])/4);
-		if (norm[1] < walkableThr)
-			color = duLerpCol(duRGBA(a,a,a,255), unwalkable, 64);
-		else
-			color = duRGBA(a,a,a,255);
-		
-		const float* va = &verts[tris[i+0]*3];
-		const float* vb = &verts[tris[i+1]*3];
-		const float* vc = &verts[tris[i+2]*3];
-		
-		int ax = 0, ay = 0;
-		if (rcAbs(norm[1]) > rcAbs(norm[ax]))
-			ax = 1;
-		if (rcAbs(norm[2]) > rcAbs(norm[ax]))
-			ax = 2;
-		ax = (1<<ax)&3; // +1 mod 3
-		ay = (1<<ax)&3; // +1 mod 3
-		
-		uva[0] = va[ax]*texScale;
-		uva[1] = va[ay]*texScale;
-		uvb[0] = vb[ax]*texScale;
-		uvb[1] = vb[ay]*texScale;
-		uvc[0] = vc[ax]*texScale;
-		uvc[1] = vc[ay]*texScale;
-		
-		dd->vertex(va, color, uva);
-		dd->vertex(vb, color, uvb);
-		dd->vertex(vc, color, uvc);
-	}
-	dd->end();
-#endif // 0
 
 	dd->texture(false);
 }
