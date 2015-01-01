@@ -142,7 +142,6 @@ bool CRecastMesh::LoadMapData()
 	V_snprintf( filename, sizeof( filename ), "%s", STRING( engine->GetLevelName() ) );
 	V_StripExtension( filename, filename, 256 );
 	V_snprintf( filename, sizeof( filename ), "%s.bsp", filename );
-	//Msg("CLIENT LOADING NAV MESH: %s\n", filename);
 #else
 	V_snprintf( filename, sizeof( filename ), "maps\\%s.bsp", STRING( gpGlobals->mapname ) );
 #endif // CLIENT_DLL
@@ -178,7 +177,7 @@ bool CRecastMesh::LoadMapData()
 	// Load triangles, parse from faces
 	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
 	int nFaces = (header->lumps[LUMP_FACES].filelen) / sizeof(dface_t);
-	Msg("nFaces: %d\n", nFaces);
+	//Msg("nFaces: %d\n", nFaces);
 	for( int i = 0; i < nFaces; i++ )
 	{
 		if ( faces[i].dispinfo == -1 )

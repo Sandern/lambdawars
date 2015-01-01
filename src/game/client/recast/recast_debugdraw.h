@@ -16,6 +16,8 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+// Note: Contains modifications for drawing using Source Engine MeshBuilder
+
 #ifndef RECAST_DEBUGDRAW_H
 #define RECAST_DEBUGDRAW_H
 
@@ -42,7 +44,7 @@ struct duDebugDraw
 	/// Begin drawing primitives.
 	///  @param prim [in] primitive type to draw, one of rcDebugDrawPrimitives.
 	///  @param size [in] size of a primitive, applies to point size and line width only.
-	virtual void begin(duDebugDrawPrimitives prim, float size = 1.0f) = 0;
+	virtual void begin(duDebugDrawPrimitives prim, int num = 0, float size = 1.0f) = 0;
 
 	/// Submit a vertex
 	///  @param pos [in] position of the verts.

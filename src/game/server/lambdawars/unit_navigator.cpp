@@ -50,6 +50,8 @@
 #include "nav_pathfind.h"
 #include "hl2wars_nav_pathfind.h"
 
+#include "recast/recast_mesh.h"
+
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
 #endif // ENABLE_PYTHON
@@ -58,7 +60,7 @@
 #include "tier0/memdbgon.h"
 
 // Settings
-ConVar unit_reactivepath("unit_reactivepath", "1", 0, "Optimize the current path each update.");
+ConVar unit_reactivepath("unit_reactivepath", "0", 0, "Optimize the current path each update."); // TODO: Update for recast mesh
 ConVar unit_reactivepath_maxlookahead("unit_reactivepath_maxlookahead", "2048.0", 0, "Max distance a path is optimized each update.");
 ConVar unit_reactivepath_maxwaypointsahead("unit_reactivepath_maxwaypointsahead", "5", 0, "Max number of waypoints being looked ahead.");
 ConVar unit_nonavigator("unit_nonavigator", "0", 0, "Do not perform navigation");
@@ -2722,6 +2724,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	if( !unit_route_navmesh_paths.GetBool() )
 		return NULL;
 
+#if 0
 	CNavArea *startArea, *goalArea, *closestArea;
 
 	// Use GetAbsOrigin here. Nav area selection falls back to nearest nav.
@@ -2807,6 +2810,16 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	// Fall back
 	Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
 	return new UnitBaseWaypoint( vGoalPos );
+#else
+	CRecastMesh *pNavMesh = GetRecastNavMesh();
+
+	const Vector &vStart = GetAbsOrigin(); 
+	UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos );
+	if( pFoundPath )
+		return pFoundPath;
+
+	return new UnitBaseWaypoint( vGoalPos );
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------

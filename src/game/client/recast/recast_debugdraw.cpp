@@ -72,7 +72,7 @@ void duDebugDrawCylinderWire(struct duDebugDraw* dd, float minx, float miny, flo
 {
 	if (!dd) return;
 	
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	duAppendCylinderWire(dd, minx,miny,minz, maxx,maxy,maxz, col);
 	dd->end();
 }
@@ -82,7 +82,7 @@ void duDebugDrawBoxWire(struct duDebugDraw* dd, float minx, float miny, float mi
 {
 	if (!dd) return;
 	
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	duAppendBoxWire(dd, minx,miny,minz, maxx,maxy,maxz, col);
 	dd->end();
 }
@@ -93,7 +93,7 @@ void duDebugDrawArc(struct duDebugDraw* dd, const float x0, const float y0, cons
 {
 	if (!dd) return;
 	
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	duAppendArc(dd, x0,y0,z0, x1,y1,z1, h, as0, as1, col);
 	dd->end();
 }
@@ -104,7 +104,7 @@ void duDebugDrawArrow(struct duDebugDraw* dd, const float x0, const float y0, co
 {
 	if (!dd) return;
 	
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	duAppendArrow(dd, x0,y0,z0, x1,y1,z1, as0, as1, col);
 	dd->end();
 }
@@ -114,7 +114,7 @@ void duDebugDrawCircle(struct duDebugDraw* dd, const float x, const float y, con
 {
 	if (!dd) return;
 	
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	duAppendCircle(dd, x,y,z, r, col);
 	dd->end();
 }
@@ -124,7 +124,7 @@ void duDebugDrawCross(struct duDebugDraw* dd, const float x, const float y, cons
 {
 	if (!dd) return;
 	
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	duAppendCross(dd, x,y,z, size, col);
 	dd->end();
 }
@@ -155,7 +155,7 @@ void duDebugDrawGridXZ(struct duDebugDraw* dd, const float ox, const float oy, c
 {
 	if (!dd) return;
 
-	dd->begin(DU_DRAW_LINES, lineWidth);
+	dd->begin(DU_DRAW_LINES, 0, lineWidth);
 	for (int i = 0; i <= h; ++i)
 	{
 		dd->vertex(ox,oy,oz+i*size, col);
@@ -596,7 +596,7 @@ void duDisplayList::draw(struct duDebugDraw* dd)
 	if (!dd) return;
 	if (!m_size) return;
 	dd->depthMask(m_depthMask);
-	dd->begin(m_prim, m_primSize);
+	dd->begin(m_prim, 0, m_primSize);
 	for (int i = 0; i < m_size; ++i)
 		dd->vertex(&m_pos[i*3], m_color[i]);
 	dd->end();

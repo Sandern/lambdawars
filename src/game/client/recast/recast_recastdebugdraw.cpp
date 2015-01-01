@@ -101,6 +101,50 @@ void duDebugDrawTriMeshSlope(duDebugDraw* dd, const float* verts, int /*nverts*/
 
 	const unsigned int unwalkable = duRGBA(192,128,0,255);
 	
+	int nTrisLeft = ntris;
+	while( nTrisLeft > 0 )
+	{
+		int nBatchDraw = nTrisLeft > 1000 ? 1000 : nTrisLeft; 
+		nTrisLeft -= nBatchDraw;
+
+		dd->begin(DU_DRAW_TRIS, nBatchDraw);
+		for (int i = nTrisLeft*3; i < (nTrisLeft+nBatchDraw)*3; i += 3)
+		{
+			const float* norm = &normals[i];
+			unsigned int color;
+			unsigned char a = (unsigned char)(220*(2+norm[0]+norm[1])/4);
+			if (norm[1] < walkableThr)
+				color = duLerpCol(duRGBA(a,a,a,255), unwalkable, 64);
+			else
+				color = duRGBA(a,a,a,255);
+		
+			const float* va = &verts[tris[i+0]*3];
+			const float* vb = &verts[tris[i+1]*3];
+			const float* vc = &verts[tris[i+2]*3];
+		
+			int ax = 0, ay = 0;
+			if (rcAbs(norm[1]) > rcAbs(norm[ax]))
+				ax = 1;
+			if (rcAbs(norm[2]) > rcAbs(norm[ax]))
+				ax = 2;
+			ax = (1<<ax)&3; // +1 mod 3
+			ay = (1<<ax)&3; // +1 mod 3
+		
+			uva[0] = va[ax]*texScale;
+			uva[1] = va[ay]*texScale;
+			uvb[0] = vb[ax]*texScale;
+			uvb[1] = vb[ay]*texScale;
+			uvc[0] = vc[ax]*texScale;
+			uvc[1] = vc[ay]*texScale;
+		
+			dd->vertex(va, color, uva);
+			dd->vertex(vb, color, uvb);
+			dd->vertex(vc, color, uvc);
+		}
+		dd->end();
+	}
+
+#if 0
 	dd->begin(DU_DRAW_TRIS);
 	for (int i = 0; i < ntris*3; i += 3)
 	{
@@ -136,6 +180,7 @@ void duDebugDrawTriMeshSlope(duDebugDraw* dd, const float* verts, int /*nverts*/
 		dd->vertex(vc, color, uvc);
 	}
 	dd->end();
+#endif // 0
 
 	dd->texture(false);
 }
@@ -343,7 +388,7 @@ static void drawLayerPortals(duDebugDraw* dd, const rcHeightfieldLayer* layer)
 	const int segs[4*4] = {0,0,0,1, 0,1,1,1, 1,1,1,0, 1,0,0,0};
 	
 	// Layer portals
-	dd->begin(DU_DRAW_LINES, 2.0f);
+	dd->begin(DU_DRAW_LINES, 0, 2.0f);
 	for (int y = 0; y < h; ++y)
 	{
 		for (int x = 0; x < w; ++x)
@@ -446,7 +491,7 @@ void duDebugDrawLayerContours(duDebugDraw* dd, const struct rcLayerContourSet& l
 	
 	const int offs[2*4] = {-1,0, 0,1, 1,0, 0,-1};
 
-	dd->begin(DU_DRAW_LINES, 2.0f);
+	dd->begin(DU_DRAW_LINES, 0, 2.0f);
 	
 	for (int i = 0; i < lcset.nconts; ++i)
 	{
@@ -489,7 +534,7 @@ void duDebugDrawLayerContours(duDebugDraw* dd, const struct rcLayerContourSet& l
 	}
 	dd->end();
 	
-	dd->begin(DU_DRAW_POINTS, 4.0f);	
+	dd->begin(DU_DRAW_POINTS, 0, 4.0f);	
 	
 	for (int i = 0; i < lcset.nconts; ++i)
 	{
@@ -559,7 +604,7 @@ void duDebugDrawLayerPolyMesh(duDebugDraw* dd, const struct rcLayerPolyMesh& lme
 	
 	// Draw neighbours edges
 	const unsigned int coln = duRGBA(0,48,64,32);
-	dd->begin(DU_DRAW_LINES, 1.5f);
+	dd->begin(DU_DRAW_LINES, 0, 1.5f);
 	for (int i = 0; i < lmesh.npolys; ++i)
 	{
 		const unsigned short* p = &lmesh.polys[i*nvp*2];
@@ -584,7 +629,7 @@ void duDebugDrawLayerPolyMesh(duDebugDraw* dd, const struct rcLayerPolyMesh& lme
 	
 	// Draw boundary edges
 	const unsigned int colb = duRGBA(0,48,64,220);
-	dd->begin(DU_DRAW_LINES, 2.5f);
+	dd->begin(DU_DRAW_LINES, 0, 2.5f);
 	for (int i = 0; i < lmesh.npolys; ++i)
 	{
 		const unsigned short* p = &lmesh.polys[i*nvp*2];
@@ -636,7 +681,7 @@ void duDebugDrawLayerPolyMesh(duDebugDraw* dd, const struct rcLayerPolyMesh& lme
 	}
 	dd->end();
 	
-	dd->begin(DU_DRAW_POINTS, 3.0f);
+	dd->begin(DU_DRAW_POINTS, 0, 3.0f);
 	const unsigned int colv = duRGBA(0,0,0,220);
 	for (int i = 0; i < lmesh.nverts; ++i)
 	{
@@ -696,7 +741,7 @@ void duDebugDrawRegionConnections(duDebugDraw* dd, const rcContourSet& cset, con
 
 	unsigned int color = duRGBA(0,0,0,196);
 
-	dd->begin(DU_DRAW_LINES, 2.0f);
+	dd->begin(DU_DRAW_LINES, 0, 2.0f);
 
 	for (int i = 0; i < cset.nconts; ++i)
 	{
@@ -719,7 +764,7 @@ void duDebugDrawRegionConnections(duDebugDraw* dd, const rcContourSet& cset, con
 
 	unsigned char a = (unsigned char)(alpha * 255.0f);
 
-	dd->begin(DU_DRAW_POINTS, 7.0f);
+	dd->begin(DU_DRAW_POINTS, 0, 7.0f);
 
 	for (int i = 0; i < cset.nconts; ++i)
 	{
@@ -741,7 +786,7 @@ void duDebugDrawRawContours(duDebugDraw* dd, const rcContourSet& cset, const flo
 	
 	const unsigned char a = (unsigned char)(alpha*255.0f);
 	
-	dd->begin(DU_DRAW_LINES, 2.0f);
+	dd->begin(DU_DRAW_LINES, 0, 2.0f);
 			
 	for (int i = 0; i < cset.nconts; ++i)
 	{
@@ -767,7 +812,7 @@ void duDebugDrawRawContours(duDebugDraw* dd, const rcContourSet& cset, const flo
 	}
 	dd->end();
 
-	dd->begin(DU_DRAW_POINTS, 2.0f);	
+	dd->begin(DU_DRAW_POINTS, 0, 2.0f);	
 
 	for (int i = 0; i < cset.nconts; ++i)
 	{
@@ -804,7 +849,7 @@ void duDebugDrawContours(duDebugDraw* dd, const rcContourSet& cset, const float 
 	
 	const unsigned char a = (unsigned char)(alpha*255.0f);
 	
-	dd->begin(DU_DRAW_LINES, 2.5f);
+	dd->begin(DU_DRAW_LINES, 0, 2.5f);
 	
 	for (int i = 0; i < cset.nconts; ++i)
 	{
@@ -831,7 +876,7 @@ void duDebugDrawContours(duDebugDraw* dd, const rcContourSet& cset, const float 
 	}
 	dd->end();
 
-	dd->begin(DU_DRAW_POINTS, 3.0f);
+	dd->begin(DU_DRAW_POINTS, 0, 3.0f);
 	
 	for (int i = 0; i < cset.nconts; ++i)
 	{
@@ -866,10 +911,9 @@ void duDebugDrawPolyMesh(duDebugDraw* dd, const struct rcPolyMesh& mesh)
 	const float ch = mesh.ch;
 	const float* orig = mesh.bmin;
 	
-	dd->begin(DU_DRAW_TRIS);
-	
 	for (int i = 0; i < mesh.npolys; ++i)
 	{
+		dd->begin(DU_DRAW_TRIS, nvp-2);
 		const unsigned short* p = &mesh.polys[i*nvp*2];
 		
 		unsigned int color;
@@ -896,14 +940,14 @@ void duDebugDrawPolyMesh(duDebugDraw* dd, const struct rcPolyMesh& mesh)
 				dd->vertex(x,y,z, color);
 			}
 		}
+		dd->end();
 	}
-	dd->end();
-
+	
 	// Draw neighbours edges
 	const unsigned int coln = duRGBA(0,48,64,32);
-	dd->begin(DU_DRAW_LINES, 1.5f);
 	for (int i = 0; i < mesh.npolys; ++i)
 	{
+		dd->begin(DU_DRAW_LINES, nvp, 1.5f);
 		const unsigned short* p = &mesh.polys[i*nvp*2];
 		for (int j = 0; j < nvp; ++j)
 		{
@@ -921,14 +965,15 @@ void duDebugDrawPolyMesh(duDebugDraw* dd, const struct rcPolyMesh& mesh)
 				dd->vertex(x, y, z, coln);
 			}
 		}
+		dd->end();
 	}
-	dd->end();
+	
 	
 	// Draw boundary edges
 	const unsigned int colb = duRGBA(0,48,64,220);
-	dd->begin(DU_DRAW_LINES, 2.5f);
 	for (int i = 0; i < mesh.npolys; ++i)
 	{
+		dd->begin(DU_DRAW_LINES, nvp, 2.5f);
 		const unsigned short* p = &mesh.polys[i*nvp*2];
 		for (int j = 0; j < nvp; ++j)
 		{
@@ -949,10 +994,10 @@ void duDebugDrawPolyMesh(duDebugDraw* dd, const struct rcPolyMesh& mesh)
 				dd->vertex(x, y, z, col);
 			}
 		}
+		dd->end();
 	}
-	dd->end();
 	
-	dd->begin(DU_DRAW_POINTS, 3.0f);
+	dd->begin(DU_DRAW_POINTS, mesh.nverts, 3.0f);
 	const unsigned int colv = duRGBA(0,0,0,220);
 	for (int i = 0; i < mesh.nverts; ++i)
 	{
@@ -992,7 +1037,7 @@ void duDebugDrawPolyMeshDetail(duDebugDraw* dd, const struct rcPolyMeshDetail& d
 	dd->end();
 
 	// Internal edges.
-	dd->begin(DU_DRAW_LINES, 1.0f);
+	dd->begin(DU_DRAW_LINES, 0, 1.0f);
 	const unsigned int coli = duRGBA(0,0,0,64);
 	for (int i = 0; i < dmesh.nmeshes; ++i)
 	{
@@ -1024,7 +1069,7 @@ void duDebugDrawPolyMeshDetail(duDebugDraw* dd, const struct rcPolyMeshDetail& d
 	dd->end();
 	
 	// External edges.
-	dd->begin(DU_DRAW_LINES, 2.0f);
+	dd->begin(DU_DRAW_LINES, 0, 2.0f);
 	const unsigned int cole = duRGBA(0,0,0,64);
 	for (int i = 0; i < dmesh.nmeshes; ++i)
 	{
@@ -1052,7 +1097,7 @@ void duDebugDrawPolyMeshDetail(duDebugDraw* dd, const struct rcPolyMeshDetail& d
 	}
 	dd->end();
 	
-	dd->begin(DU_DRAW_POINTS, 3.0f);
+	dd->begin(DU_DRAW_POINTS, 0, 3.0f);
 	const unsigned int colv = duRGBA(0,0,0,64);
 	for (int i = 0; i < dmesh.nmeshes; ++i)
 	{

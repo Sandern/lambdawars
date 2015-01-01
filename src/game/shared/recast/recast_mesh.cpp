@@ -14,6 +14,15 @@
 #include "recast/recast_debugdrawmesh.h"
 #endif // CLIENT_DLL
 
+#include "detour/DetourNavMesh.h"
+#include "detour/DetourNavMeshBuilder.h"
+#include "detour/DetourNavMeshQuery.h"
+#include "detour/DetourCommon.h"
+
+#ifndef CLIENT_DLL
+#include "unit_navigator.h"
+#endif // CLIENT_DLL
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -58,6 +67,8 @@ CRecastMesh::CRecastMesh() : m_keepInterResults(true)
 	m_tris = NULL;
 	m_ntris = 0;
 	m_normals = NULL;
+
+	m_navQuery = dtAllocNavMeshQuery();
 }
 
 //-----------------------------------------------------------------------------
@@ -73,21 +84,19 @@ CRecastMesh::~CRecastMesh()
 //-----------------------------------------------------------------------------
 void CRecastMesh::ResetCommonSettings()
 {
-	const float scale = 100.0f;
-
-	m_cellSize = 8.0f; //0.3f * scale;
-	m_cellHeight = 6.0f; //0.2f * scale;
+	m_cellSize = 10.0f;
+	m_cellHeight = 8.0f;
 	m_agentHeight = 72.0f; // => Soldier/human
 	m_agentRadius = 18.5f; // => Soldier/human
-	m_agentMaxClimb = 0.9f * scale;
-	m_agentMaxSlope = 45.0f;
-	m_regionMinSize = 8;// * scale;
-	m_regionMergeSize = 20;// * scale;
-	m_edgeMaxLen = 120.0f * scale;
-	m_edgeMaxError = 1.3f;// * scale;
+	m_agentMaxClimb = 36.0f; //18.0f; // => default unit step height
+	m_agentMaxSlope = 47.5f; // Default slope for units
+	m_regionMinSize = 8;
+	m_regionMergeSize = 20;
+	m_edgeMaxLen = 12000.0f;
+	m_edgeMaxError = 1.3f;
 	m_vertsPerPoly = 6.0f;
-	m_detailSampleDist = 6.0f * scale;
-	m_detailSampleMaxError = 1.0f * scale;
+	m_detailSampleDist = 600.0f;
+	m_detailSampleMaxError = 100.0f;
 	m_partitionType = SAMPLE_PARTITION_WATERSHED;
 }
 
@@ -515,6 +524,118 @@ bool CRecastMesh::Build()
 	// At this point the navigation mesh data is ready, you can access it from m_pmesh.
 	// See duDebugDrawPolyMesh or dtCreateNavMeshData as examples how to access the data.
 
+	// At this point the navigation mesh data is ready, you can access it from m_pmesh.
+	// See duDebugDrawPolyMesh or dtCreateNavMeshData as examples how to access the data.
+	
+	//
+	// (Optional) Step 8. Create Detour data from Recast poly mesh.
+	//
+	
+	// The GUI may allow more max points per polygon than Detour can handle.
+	// Only build the detour navmesh if we do not exceed the limit.
+	if (m_cfg.maxVertsPerPoly <= DT_VERTS_PER_POLYGON)
+	{
+		unsigned char* navData = 0;
+		int navDataSize = 0;
+
+		// Update poly flags from areas.
+		for (int i = 0; i < m_pmesh->npolys; ++i)
+		{
+			if (m_pmesh->areas[i] == RC_WALKABLE_AREA)
+				m_pmesh->areas[i] = SAMPLE_POLYAREA_GROUND;
+				
+			if (m_pmesh->areas[i] == SAMPLE_POLYAREA_GROUND ||
+				m_pmesh->areas[i] == SAMPLE_POLYAREA_GRASS ||
+				m_pmesh->areas[i] == SAMPLE_POLYAREA_ROAD)
+			{
+				m_pmesh->flags[i] = SAMPLE_POLYFLAGS_WALK;
+			}
+			else if (m_pmesh->areas[i] == SAMPLE_POLYAREA_WATER)
+			{
+				m_pmesh->flags[i] = SAMPLE_POLYFLAGS_SWIM;
+			}
+			else if (m_pmesh->areas[i] == SAMPLE_POLYAREA_DOOR)
+			{
+				m_pmesh->flags[i] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
+			}
+		}
+
+
+		dtNavMeshCreateParams params;
+		memset(&params, 0, sizeof(params));
+		params.verts = m_pmesh->verts;
+		params.vertCount = m_pmesh->nverts;
+		params.polys = m_pmesh->polys;
+		params.polyAreas = m_pmesh->areas;
+		params.polyFlags = m_pmesh->flags;
+		params.polyCount = m_pmesh->npolys;
+		params.nvp = m_pmesh->nvp;
+		params.detailMeshes = m_dmesh->meshes;
+		params.detailVerts = m_dmesh->verts;
+		params.detailVertsCount = m_dmesh->nverts;
+		params.detailTris = m_dmesh->tris;
+		params.detailTriCount = m_dmesh->ntris;
+#if 0
+		params.offMeshConVerts = m_geom->getOffMeshConnectionVerts();
+		params.offMeshConRad = m_geom->getOffMeshConnectionRads();
+		params.offMeshConDir = m_geom->getOffMeshConnectionDirs();
+		params.offMeshConAreas = m_geom->getOffMeshConnectionAreas();
+		params.offMeshConFlags = m_geom->getOffMeshConnectionFlags();
+		params.offMeshConUserID = m_geom->getOffMeshConnectionId();
+		params.offMeshConCount = m_geom->getOffMeshConnectionCount();
+#else
+		// Not sure what this is..
+#endif // 0
+		params.walkableHeight = m_agentHeight;
+		params.walkableRadius = m_agentRadius;
+		params.walkableClimb = m_agentMaxClimb;
+		rcVcopy(params.bmin, m_pmesh->bmin);
+		rcVcopy(params.bmax, m_pmesh->bmax);
+		params.cs = m_cfg.cs;
+		params.ch = m_cfg.ch;
+		params.buildBvTree = true;
+		
+		if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
+		{
+			ctx.log(RC_LOG_ERROR, "Could not build Detour navmesh.");
+			return false;
+		}
+		
+		m_navMesh = dtAllocNavMesh();
+		if (!m_navMesh)
+		{
+			dtFree(navData);
+			ctx.log(RC_LOG_ERROR, "Could not create Detour navmesh");
+			return false;
+		}
+		
+		dtStatus status;
+		
+		status = m_navMesh->init(navData, navDataSize, DT_TILE_FREE_DATA);
+		if (dtStatusFailed(status))
+		{
+			dtFree(navData);
+			ctx.log(RC_LOG_ERROR, "Could not init Detour navmesh");
+			return false;
+		}
+		
+		status = m_navQuery->init(m_navMesh, 2048);
+		if (dtStatusFailed(status))
+		{
+			ctx.log(RC_LOG_ERROR, "Could not init Detour navmesh query");
+			return false;
+		}
+	}
+	
+	ctx.stopTimer(RC_TIMER_TOTAL);
+
+	// Show performance stats.
+	//duLogBuildTimes(ctx, ctx.getAccumulatedTime(RC_TIMER_TOTAL));
+	ctx.log(RC_LOG_PROGRESS, ">> Polymesh: %d vertices  %d polygons", m_pmesh->nverts, m_pmesh->npolys);
+	
+	//m_totalBuildTimeMs = m_ctx->getAccumulatedTime(RC_TIMER_TOTAL)/1000.0f;
+
+
 	DevMsg( "CRecastMesh: Generated navigation mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
 
 	return true;
@@ -602,6 +723,78 @@ void CRecastMesh::DebugRender()
 }
 #endif // CLIENT_DLL
 
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd )
+{
+	UnitBaseWaypoint *pResultPath = NULL;
+
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+#define MAX_POLYS 256
+	dtPolyRef m_polys[MAX_POLYS];
+	int m_npolys;
+
+	dtPolyRef startRef;
+	dtPolyRef endRef;
+
+	float spos[3];
+	spos[0] = vStart[0];
+	spos[1] = vStart[2];
+	spos[2] = vStart[1];
+
+	float epos[3];
+	epos[0] = vEnd[0];
+	epos[1] = vEnd[2];
+	epos[2] = vEnd[1];
+
+	float polyPickExt[3];
+	polyPickExt[0] = 2;
+	polyPickExt[1] = 4;
+	polyPickExt[2] = 2;
+
+	int m_straightPathOptions = 0;
+	float m_straightPath[MAX_POLYS*3];
+	unsigned char m_straightPathFlags[MAX_POLYS];
+	dtPolyRef m_straightPathPolys[MAX_POLYS];
+	int m_nstraightPath;
+
+	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
+	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+
+	m_navQuery->findPath(startRef, endRef, spos, epos, &m_filter, m_polys, &m_npolys, MAX_POLYS);
+	m_nstraightPath = 0;
+	if (m_npolys)
+	{
+		// In case of partial path, make sure the end point is clamped to the last polygon.
+		float epos2[3];
+		dtVcopy(epos2, epos);
+		if (m_polys[m_npolys-1] != endRef)
+			m_navQuery->closestPointOnPoly(m_polys[m_npolys-1], epos, epos2, 0);
+				
+		m_navQuery->findStraightPath(spos, epos2, m_polys, m_npolys,
+										m_straightPath, m_straightPathFlags,
+										m_straightPathPolys, &m_nstraightPath, MAX_POLYS, m_straightPathOptions);
+
+		pResultPath = new UnitBaseWaypoint( vEnd );
+		for (int i = m_nstraightPath - 1; i >= 0; i--)
+		{
+			Vector pos( m_straightPath[i*3], m_straightPath[i*3+2], m_straightPath[i*3+1] );
+
+			UnitBaseWaypoint *pNewPath = new UnitBaseWaypoint( pos );
+			pNewPath->SetNext( pResultPath );
+			pResultPath = pNewPath;
+		}
+	}
+
+	return pResultPath;
+}
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -647,3 +840,4 @@ void ResetRecastMesh()
 {
 	s_pRecastMesh->Reset();
 }
+
