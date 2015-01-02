@@ -9,6 +9,7 @@
 #include "cbase.h"
 #include "recast/recast_mesh.h"
 #include "builddisp.h"
+#include "gamebspfile.h"
 
 #include <filesystem.h>
 
@@ -138,6 +139,114 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
+{
+	BSPHeader_t *header = (BSPHeader_t *)fileContent;
+
+	// Find the static prop game lump
+	dgamelump_t *staticPropLumpHeader = NULL;
+	dgamelumpheader_t *gamelumpheader = (dgamelumpheader_t *)((char *)fileContent + header->lumps[LUMP_GAME_LUMP].fileofs);
+	for( int i = 0; i < gamelumpheader->lumpCount; i++ )
+	{
+		dgamelump_t *gamelump = (dgamelump_t *)((char *)gamelumpheader + sizeof( dgamelumpheader_t ) + (i * sizeof( dgamelump_t )));
+		if( gamelump->id == GAMELUMP_STATIC_PROPS )
+		{
+			if( gamelump->version == GAMELUMP_STATIC_PROPS_VERSION )
+			{
+				staticPropLumpHeader = gamelump;
+			}
+			else
+			{
+				Warning("CRecastMesh::GenerateStaticPropData: Found static prop lump with version %d, but expected %d!\n", gamelump->version, GAMELUMP_STATIC_PROPS_VERSION );
+			}
+			break;
+		}
+	}
+
+	if( staticPropLumpHeader )
+	{
+		// Read models
+		CUtlBuffer staticPropData( (void *)((char *)fileContent + staticPropLumpHeader->fileofs), staticPropLumpHeader->filelen, CUtlBuffer::READ_ONLY );
+		int dictEntries = staticPropData.GetInt();
+		Msg("Listening %d static prop dict entries\n", dictEntries);
+		StaticPropDictLump_t staticPropDictLump;
+		for( int i = 0; i < dictEntries; i++ )
+		{
+			staticPropData.Get( &staticPropDictLump, sizeof( staticPropDictLump ) );
+			Msg("%d: %s\n", i, staticPropDictLump.m_Name);
+		}
+		//staticPropLump->
+
+		// Read static prop leafs
+		int leafEntries = staticPropData.GetInt();
+		StaticPropLeafLump_t staticPropLeaf;
+		Msg("Listening %d static prop leaf entries\n", leafEntries);
+		for( int i = 0; i < leafEntries; i++ )
+		{
+			staticPropData.Get( &staticPropLeaf, sizeof( staticPropLeaf ) );
+		}
+
+		// Read static props
+		int staticPropEntries = staticPropData.GetInt();
+		Msg("Listening %d static prop entries\n", staticPropEntries);
+		StaticPropLump_t staticProp;
+		for( int i = 0; i < staticPropEntries; i++ )
+		{
+			staticPropData.Get( &staticProp, sizeof( staticProp ) );
+			Msg("%d: %f %f %f\n", i, staticProp.m_Origin.x, staticProp.m_Origin.y, staticProp.m_Origin.z);
+		}
+	}
+	else
+	{
+		Warning("CRecastMesh::GenerateStaticPropData: Could not find static prop lump!\n");
+	}
+
+	// Prop hulls?
+#if 0
+	dvertex_t *prophullverts = (dvertex_t *)((char *)fileContent + header->lumps[LUMP_PROPHULLVERTS].fileofs);
+	int nprophullverts = (header->lumps[LUMP_PROPHULLVERTS].filelen) / sizeof(dvertex_t);
+
+	//dprophull_t *prophull = (dprophull_t *)((char *)fileContent + header->lumps[LUMP_PROPHULLS].fileofs);
+	int nprophull = (header->lumps[LUMP_PROPHULLS].filelen) / sizeof(dprophull_t);
+
+	dprophulltris_t *prophulltris = (dprophulltris_t *)((char *)fileContent + header->lumps[LUMP_PROPTRIS].fileofs);
+	int nprophulltris = (header->lumps[LUMP_PROPTRIS].filelen) / sizeof(dprophulltris_t);
+
+	Msg("nprophullverts: %d, nprophull: %d, nprophulltris: %d\n", nprophullverts, nprophull, nprophulltris);
+
+	// Add vertices
+	int iStartingVertIndex = verts.Count() / 3;
+	for( int i = 0; i < nprophullverts; i++ )
+	{
+		const Vector &v = prophullverts[i].point;
+		verts.AddToTail( v[0] );
+		verts.AddToTail( v[2] );
+		verts.AddToTail( v[1] );
+	}
+
+	// Add triangles
+	for( int i = 0; i < nprophulltris; i++ )
+	{
+		const dprophulltris_t &pht = prophulltris[i];
+
+		int idx = pht.m_nIndexStart;
+		while( idx < pht.m_nIndexCount )
+		{
+			triangles.AddToTail( iStartingVertIndex + idx );
+			triangles.AddToTail( iStartingVertIndex + idx + 1 );
+			triangles.AddToTail( iStartingVertIndex + idx + 2 );
+
+			idx += 3;
+		}
+	}
+#endif // 0
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CRecastMesh::LoadMapData()
 {
 	CUtlVector<float> verts;
@@ -235,7 +344,8 @@ bool CRecastMesh::LoadMapData()
 	}
 
 	GenerateDispVertsAndTris( fileContent, verts, triangles );
-	
+	GenerateStaticPropData( fileContent, verts, triangles );
+
 	// Copy result
 	m_nverts = verts.Count() / 3;
 	m_verts = new float[verts.Count()];

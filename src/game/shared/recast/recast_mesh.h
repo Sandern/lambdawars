@@ -32,6 +32,7 @@ public:
 	virtual bool Reset();
 
 	virtual bool GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
+	virtual bool GenerateStaticPropData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 	virtual bool LoadMapData();
 
 #ifdef CLIENT_DLL
