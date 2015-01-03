@@ -85,9 +85,6 @@
     <Filter Include="Source Files\cef">
       <UniqueIdentifier>{39090810-52f3-42d7-a821-48b9b5a8ef1d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\keeper">
-      <UniqueIdentifier>{d0e45501-f79a-40bc-a719-61ae334aea16}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\deferred">
       <UniqueIdentifier>{32fb2f2f-f447-4cdd-aca6-d9454b560296}</UniqueIdentifier>
     </Filter>
@@ -2032,9 +2029,6 @@
     </ClCompile>
     <ClCompile Include="..\shared\nav_edit.cpp">
       <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\keeper\tilebase.cpp">
-      <Filter>Source Files\keeper</Filter>
     </ClCompile>
     <ClCompile Include="lambdawars\vgui\wars_model_panel.cpp">
       <Filter>Source Files\wars\vgui</Filter>
@@ -4779,9 +4773,6 @@
     </ClInclude>
     <ClInclude Include="lambdawars\vgui_video_general.h">
       <Filter>Source Files\wars\vgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\keeper\tilebase.h">
-      <Filter>Source Files\keeper</Filter>
     </ClInclude>
     <ClInclude Include="lambdawars\vgui\surface_passthru.h">
       <Filter>Source Files\wars\vgui</Filter>
