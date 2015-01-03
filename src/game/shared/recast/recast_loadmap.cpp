@@ -10,6 +10,7 @@
 #include "recast/recast_mesh.h"
 #include "builddisp.h"
 #include "gamebspfile.h"
+#include "datacache/imdlcache.h"
 
 #include <filesystem.h>
 
@@ -139,6 +140,28 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+static void LoadStaticProp( const char *pModelName, CUtlVector<float> &modelVerts, CUtlVector<int> &modelTris )
+{
+	MDLHandle_t h = mdlcache->FindMDL( pModelName );
+	if( h == MDLHANDLE_INVALID )
+	{
+		Warning("LoadStaticProp: unable to get mdl handle for %s\n", pModelName);
+		return;
+	}
+
+	vertexFileHeader_t *vertexData = mdlcache->GetVertexData( h );
+	if( !vertexData )
+	{
+		Warning("LoadStaticProp: unable to get vertexData for %s\n", pModelName);
+		return;
+	}
+
+	Msg( "Num vertices for %s: %d\n", pModelName, vertexData->numLODVertexes[0] );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
 {
 	BSPHeader_t *header = (BSPHeader_t *)fileContent;
@@ -170,12 +193,19 @@ bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &
 		int dictEntries = staticPropData.GetInt();
 		Msg("Listening %d static prop dict entries\n", dictEntries);
 		StaticPropDictLump_t staticPropDictLump;
+
+		CUtlVector< CUtlVector< float > > modelVerts;
+		CUtlVector< CUtlVector< int > > modelTris;
+		modelVerts.EnsureCapacity( dictEntries );
+		modelTris.EnsureCapacity( dictEntries );
+
 		for( int i = 0; i < dictEntries; i++ )
 		{
 			staticPropData.Get( &staticPropDictLump, sizeof( staticPropDictLump ) );
 			Msg("%d: %s\n", i, staticPropDictLump.m_Name);
+
+			LoadStaticProp( staticPropDictLump.m_Name, modelVerts[i], modelTris[i] );
 		}
-		//staticPropLump->
 
 		// Read static prop leafs
 		int leafEntries = staticPropData.GetInt();
@@ -188,13 +218,48 @@ bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &
 
 		// Read static props
 		int staticPropEntries = staticPropData.GetInt();
-		Msg("Listening %d static prop entries\n", staticPropEntries);
+		int propsWithCollision = 0;
+		int propsWithCollisionBB = 0;
 		StaticPropLump_t staticProp;
 		for( int i = 0; i < staticPropEntries; i++ )
 		{
 			staticPropData.Get( &staticProp, sizeof( staticProp ) );
-			Msg("%d: %f %f %f\n", i, staticProp.m_Origin.x, staticProp.m_Origin.y, staticProp.m_Origin.z);
+
+			matrix3x4_t rotationMatrix; // model to world transformation
+			AngleMatrix( staticProp.m_Angles, staticProp.m_Origin, rotationMatrix);
+
+			int j;
+			//Vector worldPos;
+
+			switch( staticProp.m_Solid )
+			{
+			case SOLID_VPHYSICS:
+				propsWithCollision++;
+
+				j = 0;
+				while( j < modelTris[staticProp.m_PropType].Count() )
+				{
+					// Add transformed vertices
+					//VectorTransform( vertPos, rotationMatrix, worldPos );
+
+					// Add tris based on the vertices added
+
+					j += 3;
+				}
+				break;
+			case SOLID_BBOX:
+				propsWithCollisionBB++;
+				break;
+			case SOLID_NONE:
+				break;
+			default:
+				Warning("CRecastMesh::GenerateStaticPropData: Unexpected collision for static prop\n");
+			}
+
+			//Msg("%d: %f %f %f\n", i, staticProp.m_Origin.x, staticProp.m_Origin.y, staticProp.m_Origin.z);
 		}
+
+		Msg("Listened %d static prop entries, of which %d have vphysics, and %d bbox\n", staticPropEntries, propsWithCollision, propsWithCollisionBB);
 	}
 	else
 	{
