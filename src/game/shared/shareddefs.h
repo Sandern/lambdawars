@@ -13,6 +13,10 @@
 
 #include "bittools.h"
 
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
+#include "srcpy_boostpython.h"
+#endif // HL2WARS_DLL && ENABLE_PYTHON
+
 #define TICK_INTERVAL			(gpGlobals->interval_per_tick)
 
 
@@ -659,6 +663,10 @@ struct FireBulletsInfo_t
 	CBaseEntity *m_pAttacker;
 	CBaseEntity *m_pAdditionalIgnoreEnt;
 	bool m_bPrimaryAttack;
+
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
+	boost::python::object m_Attributes;
+#endif // HL2WARS_DLL && ENABLE_PYTHON
 };
 
 //-----------------------------------------------------------------------------

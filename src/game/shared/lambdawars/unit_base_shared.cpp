@@ -712,6 +712,7 @@ void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 			CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, vecDir, tr.endpos );
 			dmgInfo.ScaleDamageForce( info.m_flDamageForceScale );
 			dmgInfo.SetAmmoType( info.m_iAmmoType );
+			dmgInfo.SetAttributes( info.m_Attributes );
 
 			(dynamic_cast<CBaseEntity *>(tr.m_pEnt))->DispatchTraceAttack( dmgInfo, vecDir, &tr );
 
