@@ -209,7 +209,10 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
 
 	if( !m_bEnableGPU )
+	{
 		command_line->AppendSwitch( CefString( "disable-gpu" ) );
+		command_line->AppendSwitch( CefString( "disable-gpu-compositing" ) );
+	}
 
 	if( g_debug_cef.GetBool() )
 		DevMsg("Cef Command line arguments: %s\n", command_line->GetCommandLineString().ToString().c_str());
