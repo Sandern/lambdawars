@@ -18,6 +18,7 @@
 #include "tier0/memdbgon.h"
 
 extern ConVar deferred_lighting_enabled;
+extern ConVar cl_flora_disable;
 
 void ReadVideoCfgExt()
 {
@@ -27,8 +28,11 @@ void ReadVideoCfgExt()
 
 	if( pConfig->LoadFromFile( filesystem, "cfg/videoext.txt", "MOD" ) || pConfig->LoadFromFile( filesystem, "cfg/videoext_default.txt", "MOD" ) )
 	{
-		//deferred_lighting_enabled.SetValue(
-		//	pConfig->GetBool( "setting.deferred_lighting", deferred_lighting_enabled.GetBool() ) );
+		deferred_lighting_enabled.SetValue(
+			pConfig->GetBool( "setting.deferred_lighting", deferred_lighting_enabled.GetBool() ) );
+
+		cl_flora_disable.SetValue(
+			pConfig->GetBool( "setting.flora_disable", cl_flora_disable.GetBool() ) );
 	}
 
 	pConfig->deleteThis();
@@ -40,7 +44,8 @@ void SaveVideoCfgExt()
 	if( !pConfig )
 		return;
 
-	//pConfig->SetBool( "setting.deferred_lighting", deferred_lighting_enabled.GetBool() );
+	pConfig->SetBool( "setting.deferred_lighting", deferred_lighting_enabled.GetBool() );
+	pConfig->SetBool( "setting.flora_disable", cl_flora_disable.GetBool() );
 
 	pConfig->SaveToFile( filesystem, "cfg/videoext.txt", "MOD");
 

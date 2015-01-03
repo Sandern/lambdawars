@@ -15,6 +15,7 @@
 #include "vgui/ISurface.h"
 #include "modes.h"
 #include "videocfg/videocfg.h"
+#include "videocfgext.h"
 #include "VGenericConfirmation.h"
 #include "nb_header_footer.h"
 #include "materialsystem/materialsystem_config.h"
@@ -26,6 +27,9 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+extern ConVar deferred_lighting_enabled;
+extern ConVar cl_flora_disable;
 
 using namespace vgui;
 using namespace BaseModUI;
@@ -107,6 +111,7 @@ BaseClass(parent, panelName)
 	m_drpQueuedMode = NULL;
 	m_drpShaderDetail = NULL;
 	m_drpCPUDetail = NULL;
+	m_drpLighting = NULL;
 
 	m_btnUseRecommended = NULL;
 	m_btnCancel = NULL;
@@ -190,6 +195,8 @@ void Video::SetupActivateData( void )
 
 	CGameUIConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
 	m_bLockMouse = in_lock_mouse_to_window.GetBool();
+
+	m_bDeferredLighting = deferred_lighting_enabled.GetBool();
 }
 
 //=============================================================================
@@ -649,6 +656,20 @@ void Video::Activate( bool bRecommendedSettings )
 		}
 	}
 
+	if( m_drpLighting )
+	{
+		if( deferred_lighting_enabled.GetBool() )
+			m_drpLighting->SetCurrentSelection( "DeferredLighting" );
+		else
+			m_drpLighting->SetCurrentSelection( "StandardLighting" );
+		
+		FlyoutMenu *pFlyout = m_drpLighting->GetCurrentFlyout();
+		if ( pFlyout )
+		{
+			pFlyout->SetListener( this );
+		}
+	}
+
 	UpdateFooter();
 	
 	if ( !bRecommendedSettings )
@@ -755,6 +776,12 @@ void Video::OnThink()
 	if( !m_drpCPUDetail )
 	{
 		m_drpCPUDetail = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpCPUDetail" ) );
+		needsActivate = true;
+	}
+
+	if( !m_drpLighting )
+	{
+		m_drpLighting = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpLighting" ) );
 		needsActivate = true;
 	}
 
@@ -883,6 +910,7 @@ void Video::OnCommand(const char *command)
 		SetControlVisible( "DrpQueuedMode", true );
 		SetControlVisible( "DrpShaderDetail", true );
 		SetControlVisible( "DrpCPUDetail", true );
+		SetControlVisible( "DrpLighting", true );
 
 		if ( m_drpAntialias )
 		{
@@ -1040,6 +1068,16 @@ void Video::OnCommand(const char *command)
 	else if ( !Q_strcmp( command, "CPUDetailLow" ) )
 	{
 		m_iCPUDetail = 0;
+		m_bDirtyValues = true;
+	}
+	else if ( !Q_strcmp( command, "DeferredLighting" ) )
+	{
+		m_bDeferredLighting = true;
+		m_bDirtyValues = true;
+	}
+	else if ( !Q_strcmp( command, "StandardLighting" ) )
+	{
+		m_bDeferredLighting = false;
 		m_bDirtyValues = true;
 	}
 	else if( Q_stricmp( "UseRecommended", command ) == 0 )
@@ -1371,6 +1409,9 @@ void Video::ApplyChanges()
 	CGameUIConVarRef in_lock_mouse_to_window( "in_lock_mouse_to_window" );
 	in_lock_mouse_to_window.SetValue( m_bLockMouse );
 
+	bool bLightingModeChanged = deferred_lighting_enabled.GetBool() != m_bDeferredLighting;
+	deferred_lighting_enabled.SetValue( m_bDeferredLighting );
+
 	// Make sure there is a resolution change
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 	if ( config.m_VideoMode.m_Width != m_iResolutionWidth || 
@@ -1397,6 +1438,21 @@ void Video::ApplyChanges()
 	int nAspectRatioMode = GetScreenAspectMode( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height );
 	UpdateCurrentVideoConfig( config.m_VideoMode.m_Width, config.m_VideoMode.m_Height, nAspectRatioMode, !config.Windowed(), config.NoWindowBorder() );
 #endif
+
+#ifdef HL2WARS_DLL
+	SaveVideoCfgExt();
+#endif // HL2WARS_DLL
+
+	if( bLightingModeChanged )
+	{
+		GenericConfirmation* confirmation = 
+			static_cast<GenericConfirmation*>( CBaseModPanel::GetSingleton().OpenWindow( WT_GENERICCONFIRMATION, CBaseModPanel::GetSingleton().OpenWindow( WT_MAINMENU, NULL ), false ) );
+		GenericConfirmation::Data_t data;
+		data.pWindowTitle = "#GameUI_RestartChanges_Title";
+		data.pMessageText = "#GameUI_RestartChanges";
+		data.bOkButtonEnabled = true;
+		confirmation->SetUsageData(data);
+	}
 }
 
 void Video::OnNotifyChildFocus( vgui::Panel* child )

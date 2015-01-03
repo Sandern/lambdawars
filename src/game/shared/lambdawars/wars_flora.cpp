@@ -34,6 +34,7 @@
 extern "C"
 {
 #ifdef WIN32
+#define RPC_NO_WINDOWS_H
 #include <Rpc.h>
 #undef GetObject
 #else
@@ -47,6 +48,7 @@ extern "C"
 #ifndef CLIENT_DLL
 #define VarArgs UTIL_VarArgs
 #else
+ConVar cl_flora_disable( "cl_flora_disable", "0" );
 ConVar cl_flora_animate( "cl_wars_flora_animate", "1", FCVAR_ARCHIVE );
 ConVar cl_flora_avoid_units( "cl_wars_flora_avoid_units", "1", FCVAR_ARCHIVE );
 ConVar cl_flora_sway_speed( "cl_wars_flora_sway_speed", "10" );
@@ -677,6 +679,9 @@ const char *CWarsFlora::ParseEntity( const char *pEntData )
 void CWarsFlora::SpawnMapFlora()
 {
 #ifdef CLIENT_DLL
+	if( cl_flora_disable.GetBool() )
+		return;
+
 	if( GetDeferredManager()->IsDeferredRenderingEnabled() == false )
 		return;
 
