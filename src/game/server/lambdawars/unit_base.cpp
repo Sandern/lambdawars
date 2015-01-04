@@ -907,7 +907,8 @@ void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 	{
 		SetEnemy( pBest );
 	}
-	else if( bEnemyLost )
+
+	if( bEnemyLost && !m_bHasEnemy )
 	{
 		DispatchEnemyLost();
 	}
