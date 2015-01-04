@@ -318,8 +318,10 @@ public:
 
 	// Enemy management
 	void				SetEnemy( CBaseEntity *pEnt );
+	void				SetEnemyEx( CBaseEntity *pEnt, bool supressevents = false );
 	void				UpdateEnemy( UnitBaseSense &senses );
-	void				CheckEnemyAlive( void );
+	bool				CheckEnemyLost( bool supressevents = false );
+	void				DispatchEnemyLost( void );
 	virtual bool		PassesDamageFilter( const CTakeDamageInfo &info );
 
 	// Enemy/attack related
@@ -687,6 +689,11 @@ inline Class_T CUnitBase::Classify ( void )
 inline float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUnit )
 {
 	return TargetDistance( WorldSpaceCenter(), pEnemy, bConsiderSizeUnit );
+}
+
+inline void CUnitBase::SetEnemy( CBaseEntity *pEnt )
+{
+	return SetEnemyEx( pEnt );
 }
 
 #ifdef ENABLE_PYTHON

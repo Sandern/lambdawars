@@ -1434,13 +1434,14 @@ void register_CUnitBase_class(){
                 , ( bp::arg("pPlayer") ) );
         
         }
-        { //::CUnitBase::CheckEnemyAlive
+        { //::CUnitBase::CheckEnemyLost
         
-            typedef void ( ::CUnitBase::*CheckEnemyAlive_function_type )(  ) ;
+            typedef bool ( ::CUnitBase::*CheckEnemyLost_function_type )( bool ) ;
             
             CUnitBase_exposer.def( 
-                "CheckEnemyAlive"
-                , CheckEnemyAlive_function_type( &::CUnitBase::CheckEnemyAlive ) );
+                "CheckEnemyLost"
+                , CheckEnemyLost_function_type( &::CUnitBase::CheckEnemyLost )
+                , ( bp::arg("supressevents")=(bool)(false) ) );
         
         }
         { //::CUnitBase::Classify
@@ -1483,6 +1484,15 @@ void register_CUnitBase_class(){
             CUnitBase_exposer.def( 
                 "DispatchBurstFinished"
                 , DispatchBurstFinished_function_type( &::CUnitBase::DispatchBurstFinished ) );
+        
+        }
+        { //::CUnitBase::DispatchEnemyLost
+        
+            typedef void ( ::CUnitBase::*DispatchEnemyLost_function_type )(  ) ;
+            
+            CUnitBase_exposer.def( 
+                "DispatchEnemyLost"
+                , DispatchEnemyLost_function_type( &::CUnitBase::DispatchEnemyLost ) );
         
         }
         { //::CUnitBase::DispatchOutOfAmmo
@@ -2164,6 +2174,16 @@ void register_CUnitBase_class(){
                 "SetDefaultEyeOffset"
                 , SetDefaultEyeOffset_function_type( &::CUnitBase::SetDefaultEyeOffset )
                 , ( bp::arg("pCustomOfset")=bp::object() ) );
+        
+        }
+        { //::CUnitBase::SetEnemyEx
+        
+            typedef void ( ::CUnitBase::*SetEnemyEx_function_type )( ::CBaseEntity *,bool ) ;
+            
+            CUnitBase_exposer.def( 
+                "SetEnemyEx"
+                , SetEnemyEx_function_type( &::CUnitBase::SetEnemyEx )
+                , ( bp::arg("pEnt"), bp::arg("supressevents")=(bool)(false) ) );
         
         }
         { //::CUnitBase::SetEnterOffset

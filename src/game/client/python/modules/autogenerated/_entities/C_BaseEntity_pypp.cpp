@@ -746,6 +746,15 @@ void register_C_BaseEntity_class(){
                 , AllowNavIgnore_function_type( &::C_BaseEntity::AllowNavIgnore ) );
         
         }
+        { //::C_BaseEntity::AlwaysNavIgnore
+        
+            typedef bool ( ::C_BaseEntity::*AlwaysNavIgnore_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "AlwaysNavIgnore"
+                , AlwaysNavIgnore_function_type( &::C_BaseEntity::AlwaysNavIgnore ) );
+        
+        }
         { //::C_BaseEntity::ApplyAbsVelocityImpulse
         
             typedef void ( ::C_BaseEntity::*ApplyAbsVelocityImpulse_function_type )( ::Vector const & ) ;

@@ -72,6 +72,7 @@ public:
 
 private:
 	int 			LookForUnits( int iDistance );
+	void			UpdateRememberedSeen();
 
 public:
 	float m_fSenseDistance;

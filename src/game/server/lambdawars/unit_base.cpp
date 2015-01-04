@@ -827,7 +827,7 @@ bool CUnitBase::HasRangeAttackLOSTarget( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
+void CUnitBase::SetEnemyEx( CBaseEntity *pEnemy, bool supressevents )
 {
 	if( !pEnemy || (pEnemy->IsUnit() && !pEnemy->IsAlive()) )
 	{
@@ -839,10 +839,10 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 			m_fLastEnemyChangeTime = gpGlobals->curtime;
 
 #ifdef ENABLE_PYTHON
-			SrcPySystem()->Run<const char *>( 
-				SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
-				"OnEnemyLost"
-			);
+			if( !supressevents )
+			{
+				DispatchEnemyLost();
+			}
 #endif // ENABLE_PYTHON
 		}
 		return;
@@ -857,9 +857,25 @@ void CUnitBase::SetEnemy( CBaseEntity *pEnemy )
 	m_fLastEnemyChangeTime = gpGlobals->curtime;
 
 #ifdef ENABLE_PYTHON
-	SrcPySystem()->Run<const char *, boost::python::object>( 
+	if( !supressevents )
+	{
+		SrcPySystem()->Run<const char *, boost::python::object>( 
+			SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
+			"OnNewEnemy", pEnemy->GetPyHandle()
+		);
+	}
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CUnitBase::DispatchEnemyLost( void )
+{
+#ifdef ENABLE_PYTHON
+	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetPyInstance() ), 
-		"OnNewEnemy", pEnemy->GetPyHandle()
+		"OnEnemyLost"
 	);
 #endif // ENABLE_PYTHON
 }
@@ -871,24 +887,36 @@ void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 {
 	VPROF_BUDGET( "CUnitBase::UpdateEnemy", VPROF_BUDGETGROUP_UNITS );
 
-	CheckEnemyAlive();
+	// Supress enemy lost event, so we can choose to only fire the OnNewEnemy event
+	bool bEnemyLost = CheckEnemyLost( true );
 
 	CBaseEntity *pEnemy = GetEnemy();
 	CBaseEntity *pBest = senses.GetNearestEnemy();
-	if( pBest == pEnemy )
-		return;
 
-	// Don't change enemy if very nearby
-	if( pBest && pEnemy && pEnemy->GetAbsOrigin().DistToSqr( pBest->GetAbsOrigin() ) < m_fEnemyChangeToleranceSqr )
-		return;
+	if( pBest && pEnemy )
+	{
+		if( pBest == pEnemy )
+			return;
 
-	SetEnemy(pBest);
+		// Don't change enemy if very nearby
+		if( pBest && pEnemy && pEnemy->GetAbsOrigin().DistToSqr( pBest->GetAbsOrigin() ) < m_fEnemyChangeToleranceSqr )
+			return;
+	}
+
+	if( pBest )
+	{
+		SetEnemy( pBest );
+	}
+	else if( bEnemyLost )
+	{
+		DispatchEnemyLost();
+	}
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: Returns true if enemy was lost
 //-----------------------------------------------------------------------------
-void CUnitBase::CheckEnemyAlive()
+bool CUnitBase::CheckEnemyLost( bool supressevents )
 {
 	VPROF_BUDGET( "CUnitBase::UpdateEnemy", VPROF_BUDGETGROUP_UNITS );
 
@@ -896,22 +924,29 @@ void CUnitBase::CheckEnemyAlive()
 	{
 		if( !m_hEnemy || !m_hEnemy->FOWShouldShow( GetOwnerNumber() ) )
 		{
-			SetEnemy(NULL);
+			SetEnemyEx( NULL, supressevents );
+			return true;
 		}
 		else if( m_hEnemy->IsUnit() )
 		{
 			if( !m_hEnemy->IsAlive() )
 			{
-				SetEnemy(NULL);
+				SetEnemyEx( NULL, supressevents );
+				return true;
 			}
 			else
 			{
 				CUnitBase *pUnit = m_hEnemy->MyUnitPointer();
 				if( pUnit && !pUnit->CanBeSeen() )
-					SetEnemy(NULL);
+				{
+					SetEnemyEx( NULL, supressevents );
+					return true;
+				}
 			}
 		}
 	}
+
+	return false;
 }
 
 //-----------------------------------------------------------------------------
