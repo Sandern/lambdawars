@@ -1189,23 +1189,31 @@ initstdio(void)
      * GUI apps don't have valid standard streams by default.
      */
 	// Workaround http://bugs.python.org/issue17797
+	// Work-around does not work on some system, so have another work-around by always disabling this
+	// code, since we don't use stdio streams in Lambda Wars (it's always going to be redirected to Source Engine
+	// Msg/Warning functions).
+#if 0
 #ifdef MS_WINDOWS
 	if (!is_valid_fd(fd) || GetStdHandle(STD_INPUT_HANDLE) == NULL) {
 #else
     if (!is_valid_fd(fd)) {
 #endif
+#endif // 0
         std = Py_None;
         Py_INCREF(std);
+#if 0
     }
     else {
         std = create_stdio(iomod, fd, 0, "<stdin>", encoding, errors);
         if (std == NULL)
             goto error;
     } /* if (fd < 0) */
+#endif // 0
     PySys_SetObject("__stdin__", std);
     _PySys_SetObjectId(&PyId_stdin, std);
     Py_DECREF(std);
 
+#if 0
     /* Set sys.stdout */
     fd = fileno(stdout);
 #ifdef MS_WINDOWS
@@ -1213,34 +1221,41 @@ initstdio(void)
 #else
     if (!is_valid_fd(fd)) {
 #endif
+#endif // 0
         std = Py_None;
         Py_INCREF(std);
+#if 0
     }
     else {
         std = create_stdio(iomod, fd, 1, "<stdout>", encoding, errors);
         if (std == NULL)
             goto error;
     } /* if (fd < 0) */
+#endif // 0
     PySys_SetObject("__stdout__", std);
     _PySys_SetObjectId(&PyId_stdout, std);
     Py_DECREF(std);
 
 #if 1 /* Disable this if you have trouble debugging bootstrap stuff */
     /* Set sys.stderr, replaces the preliminary stderr */
+#if 0
     fd = fileno(stderr);
 #ifdef MS_WINDOWS
 	if (!is_valid_fd(fd) || GetStdHandle(STD_ERROR_HANDLE) == NULL) {
 #else
     if (!is_valid_fd(fd)) {
 #endif
+#endif // 0
         std = Py_None;
         Py_INCREF(std);
+#if 0
     }
     else {
         std = create_stdio(iomod, fd, 1, "<stderr>", encoding, "backslashreplace");
         if (std == NULL)
             goto error;
     } /* if (fd < 0) */
+#endif // 0
 
     /* Same as hack above, pre-import stderr's codec to avoid recursion
        when import.c tries to write to stderr in verbose mode. */
