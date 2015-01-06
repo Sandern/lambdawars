@@ -41,9 +41,11 @@ typedef struct WarsEntityUpdateMessage_t : public WarsMessage_t
 	long iEncodedEHandle;
 } WarsEntityUpdateMessage_t;
 
+const char *WarsNet_TranslateP2PConnectErr( int errorCode );
+
 #ifndef CLIENT_DLL
 void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent );
-void WarsNet_EndEntityUpdate();
+bool WarsNet_EndEntityUpdate();
 void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool changecallback );
 #else
 void WarsNet_Init();

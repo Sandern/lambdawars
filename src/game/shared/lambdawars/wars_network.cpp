@@ -35,7 +35,6 @@ void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent )
 		return;
 	}
 
-	//
 	s_EntityUpdateStarted = true;
 	s_wroteData = false;
 
@@ -51,11 +50,13 @@ void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent )
 	s_variableMessageData.Put( &s_baseMessageData, sizeof( s_baseMessageData ) );
 }
 
-void WarsNet_EndEntityUpdate()
+// Returns true if data was send or simply not needed.
+// false when failed and data shouldn't be marked as transmitted.
+bool WarsNet_EndEntityUpdate()
 {
 	if( !s_EntityUpdateStarted )
 	{
-		return;
+		return false;
 	}
 
 	s_EntityUpdateStarted = false;
@@ -63,7 +64,7 @@ void WarsNet_EndEntityUpdate()
 	if( !s_wroteData )
 	{
 		// Nothing to send
-		return;
+		return true;
 	}
 
 	if( wars_net_debug_send.GetBool() )
@@ -76,11 +77,11 @@ void WarsNet_EndEntityUpdate()
 	{
 		WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
 		pMessageData->buf.Put( s_variableMessageData.Base(), s_variableMessageData.TellMaxPut() );
+		return true;
 	}
-	else
-	{
-		steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( s_clientSteamID, s_variableMessageData.Base(), s_variableMessageData.TellMaxPut(), k_EP2PSendReliable );
-	}
+
+	return steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( s_clientSteamID, 
+		s_variableMessageData.Base(), s_variableMessageData.TellMaxPut(), k_EP2PSendReliable );
 }
 
 static void WarsNet_WriteType( unsigned char type )

@@ -3,6 +3,8 @@
 #include "wars_gameserver.h"
 #include "gameinterface.h"
 #include "tier1/utlbuffer.h"
+#include "srcpy_networkvar.h"
+#include "wars_network.h"
 
 #include "matchmaking/imatchframework.h"
 
@@ -24,6 +26,7 @@ CWarsGameServer::CWarsGameServer() :
 	m_bConnectedToSteam(false),
 	m_bUpdatingServer(false),
 	m_CallbackP2PSessionRequest( this, &CWarsGameServer::OnP2PSessionRequest ),
+	m_CallbackP2PSessionConnectFail( this, &CWarsGameServer::OnP2PSessionConnectFail ),
 	m_CallbackSteamServersConnected( this, &CWarsGameServer::OnSteamServersConnected ),
 	m_CallbackSteamServersDisconnected( this, &CWarsGameServer::OnSteamServersDisconnected ),
 	m_CallbackSteamServersConnectFailure( this, &CWarsGameServer::OnSteamServersConnectFailure ),
@@ -384,6 +387,34 @@ void CWarsGameServer::OnP2PSessionRequest( P2PSessionRequest_t *pCallback )
 {
 	// we'll accept a connection from anyone
 	steamgameserverapicontext->SteamGameServerNetworking()->AcceptP2PSessionWithUser( pCallback->m_steamIDRemote );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Handle errors
+//-----------------------------------------------------------------------------
+void CWarsGameServer::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallback )
+{
+	for( int i = 1; i <= gpGlobals->maxClients; i++ )
+	{
+		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
+		if( !pPlayer )
+			continue;
+
+		const CSteamID *playerSteamId = engine->GetClientSteamID( pPlayer->edict() );
+		if( !playerSteamId || !playerSteamId->IsValid() || *playerSteamId != pCallback->m_steamIDRemote )
+			continue;
+		
+		// Player specific warning
+		Warning( "Resetting Python networked vars for player %s due p2p session connect fail (%s)\n", 
+			pPlayer->GetPlayerName(), WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
+#if defined(USE_WARS_NETWORK)
+		PyNetworkVarsResetClientTransmitBits( i - 1 );
+#endif // USE_WARS_NETWORK
+		return;
+	}
+
+	// General warning
+	Warning( "CWarsGameServer::OnP2PSessionConnectFail: %d\n", WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
 }
 
 //-----------------------------------------------------------------------------

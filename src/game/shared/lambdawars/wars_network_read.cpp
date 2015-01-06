@@ -245,9 +245,13 @@ void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data )
 class CWarsNet
 {
 public:
-	CWarsNet() : m_CallbackP2PSessionRequest( this, &CWarsNet::OnP2PSessionRequest ) {}
+	CWarsNet() : m_CallbackP2PSessionRequest( this, &CWarsNet::OnP2PSessionRequest ),
+		m_CallbackP2PSessionConnectFail( this, &CWarsNet::OnP2PSessionConnectFail )
+	{
+	}
 
 	STEAM_CALLBACK( CWarsNet, OnP2PSessionRequest, P2PSessionRequest_t, m_CallbackP2PSessionRequest );
+	STEAM_CALLBACK( CWarsNet, OnP2PSessionConnectFail, P2PSessionConnectFail_t, m_CallbackP2PSessionConnectFail );
 };
 
 static CWarsNet *s_pWarsNet = NULL;
@@ -259,6 +263,15 @@ void CWarsNet::OnP2PSessionRequest( P2PSessionRequest_t *pCallback )
 {
 	// we'll accept a connection from anyone
 	steamapicontext->SteamNetworking()->AcceptP2PSessionWithUser( pCallback->m_steamIDRemote );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Handle errors
+//-----------------------------------------------------------------------------
+void CWarsNet::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallback )
+{
+
+	Warning( "CWarsNet::OnP2PSessionConnectFail: %s\n", WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
 }
 
 void WarsNet_Init()

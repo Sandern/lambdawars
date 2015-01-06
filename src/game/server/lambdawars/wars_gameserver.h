@@ -52,6 +52,8 @@ private:
 	STEAM_GAMESERVER_CALLBACK( CWarsGameServer, OnPolicyResponse, GSPolicyResponse_t, m_CallbackPolicyResponse );
 
 	STEAM_GAMESERVER_CALLBACK( CWarsGameServer, OnP2PSessionRequest, P2PSessionRequest_t, m_CallbackP2PSessionRequest );
+	STEAM_GAMESERVER_CALLBACK( CWarsGameServer, OnP2PSessionConnectFail, P2PSessionConnectFail_t, m_CallbackP2PSessionConnectFail );
+	
 
 	bool m_bConnectedToSteam;
 	EGameServerState m_State;

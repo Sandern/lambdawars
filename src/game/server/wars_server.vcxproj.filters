@@ -1966,6 +1966,9 @@
     <ClCompile Include="..\shared\lambdawars\wars_network.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\lambdawars\wars_network_shared.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
