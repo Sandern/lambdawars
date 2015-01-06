@@ -12,7 +12,7 @@
 #endif
 
 #ifdef HL2WARS_DLL
-#define USE_WARS_NETWORK
+//#define USE_WARS_NETWORK
 #endif // HL2WARS_DLL
 
 #include "srcpy_boostpython.h"

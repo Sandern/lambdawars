@@ -529,10 +529,12 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, edict_t *pClientEdict )
 #else
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
-		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
+		CPythonNetworkVarBase *pNetVar = pEnt->m_utlPyNetworkVars.Element( i );
+		if( !pNetVar->ShouldUpdateClient( pEnt, iClient ) )
 			continue;
 
 		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iClient );
+		pNetVar->m_PlayerUpdateBits.Clear(iClient);
 	}
 #endif // USE_WARS_NETWORK
 }

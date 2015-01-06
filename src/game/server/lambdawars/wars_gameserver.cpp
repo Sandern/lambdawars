@@ -405,10 +405,13 @@ void CWarsGameServer::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallbac
 			continue;
 		
 		// Player specific warning
+#if defined(USE_WARS_NETWORK)
 		Warning( "Resetting Python networked vars for player %s due p2p session connect fail (%s)\n", 
 			pPlayer->GetPlayerName(), WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
-#if defined(USE_WARS_NETWORK)
 		PyNetworkVarsResetClientTransmitBits( i - 1 );
+#else
+		Warning( "CWarsGameServer::OnP2PSessionConnectFail player %s: %s\n", 
+			pPlayer->GetPlayerName(), WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
 #endif // USE_WARS_NETWORK
 		return;
 	}
