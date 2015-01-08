@@ -180,7 +180,7 @@ inline bool UnitBaseSense::HasEnemy( CBaseEntity *pEnemy )
 
 inline bool UnitBaseSense::HasOther( CBaseEntity *pOther )
 {
-	for( int i = 0; i < m_SeenEnemies.Count(); i++ ) 
+	for( int i = 0; i < m_SeenOther.Count(); i++ ) 
 	{
 		if( m_SeenOther.Element(i).entity == pOther )
 			return true;
