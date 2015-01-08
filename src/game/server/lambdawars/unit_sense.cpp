@@ -64,8 +64,10 @@ void UnitBaseSense::UpdateRememberedSeen()
 {
 	// Just trash not alive entities
 	for( int i = m_SeenEnemies.Count() - 1; i >= 0; i-- )
-	{
-		if( !m_SeenEnemies[i].entity || !m_SeenEnemies[i].entity->IsAlive())
+	{	
+		if( !m_SeenEnemies[i].entity || 
+			!m_SeenEnemies[i].entity->IsAlive() ||
+			m_pOuter->IRelationType( m_SeenEnemies[i].entity ) != D_HT )
 		{
 			m_SeenEnemies.Remove( i );
 		}
@@ -73,14 +75,16 @@ void UnitBaseSense::UpdateRememberedSeen()
 
 	for( int i = m_SeenOther.Count() - 1; i >= 0; i-- )
 	{
-		if( !m_SeenOther[i].entity || !m_SeenOther[i].entity->IsAlive())
+		if( !m_SeenOther[i].entity || 
+			!m_SeenOther[i].entity->IsAlive() ||
+			m_pOuter->IRelationType( m_SeenOther[i].entity ) == D_HT )
 		{
 			m_SeenOther.Remove( i );
 		}
 	}
 
 	// Nearest is used by enemy selection, so do full test
-	if( !m_hNearestEnemy || !TestEntity( m_hNearestEnemy ) )
+	if( !m_hNearestEnemy || !TestEntity( m_hNearestEnemy ) || m_pOuter->IRelationType( m_hNearestEnemy ) != D_HT )
 	{
 		int iAttackPriority;
 		float fBestEnemyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
