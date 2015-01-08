@@ -890,6 +890,16 @@ void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 	// Supress enemy lost event, so we can choose to only fire the OnNewEnemy event
 	bool bEnemyLost = CheckEnemyLost( true );
 
+	// Enemy didn't die, but maybe is not in our enemy list anymore?
+	if( m_hEnemy && !bEnemyLost )
+	{
+		if( !senses.HasEnemy( m_hEnemy ) )
+		{
+			SetEnemyEx( NULL, true );
+			bEnemyLost = true;
+		}
+	}
+
 	CBaseEntity *pEnemy = GetEnemy();
 	CBaseEntity *pBest = senses.GetNearestEnemy();
 
