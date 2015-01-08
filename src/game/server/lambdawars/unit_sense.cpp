@@ -65,9 +65,9 @@ void UnitBaseSense::UpdateRememberedSeen()
 	// Just trash not alive entities
 	for( int i = m_SeenEnemies.Count() - 1; i >= 0; i-- )
 	{	
-		if( !m_SeenEnemies[i].entity || 
-			!m_SeenEnemies[i].entity->IsAlive() ||
-			m_pOuter->IRelationType( m_SeenEnemies[i].entity ) != D_HT )
+		CBaseEntity *pEnemy = m_SeenEnemies[i].entity;
+		if( !pEnemy || (pEnemy->IsUnit() && !pEnemy->IsAlive()) ||
+			m_pOuter->IRelationType( pEnemy ) != D_HT )
 		{
 			m_SeenEnemies.Remove( i );
 		}
@@ -75,9 +75,9 @@ void UnitBaseSense::UpdateRememberedSeen()
 
 	for( int i = m_SeenOther.Count() - 1; i >= 0; i-- )
 	{
-		if( !m_SeenOther[i].entity || 
-			!m_SeenOther[i].entity->IsAlive() ||
-			m_pOuter->IRelationType( m_SeenOther[i].entity ) == D_HT )
+		CBaseEntity *pOther = m_SeenOther[i].entity;
+		if( !pOther || (pOther->IsUnit() && !pOther->IsAlive()) ||
+			m_pOuter->IRelationType( pOther ) == D_HT )
 		{
 			m_SeenOther.Remove( i );
 		}
@@ -467,7 +467,7 @@ boost::python::list UnitBaseSense::PyGetOthers( const char *unittype )
 				continue;
 
 			const char *pOtherUnitType = pOtherUnit->GetUnitType();
-			if( pOtherUnitType && Q_stricmp( unittype , pOtherUnitType ) != 0 )
+			if( pOtherUnitType && V_stricmp( unittype , pOtherUnitType ) != 0 )
 				continue;
 		}
 
