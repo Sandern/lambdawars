@@ -98,7 +98,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)client.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
