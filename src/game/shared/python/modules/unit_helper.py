@@ -100,10 +100,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         # Combat unit anim state (human like)
         cls = mb.class_('UnitAnimState')
         cls.include()
-        cls.calldefs().virtuality = 'not virtual' 
-        #cls.mem_fun('Update').include()
-        #cls.mem_fun('TranslateActivity').include()
-        #cls.mem_fun('CalcMainActivity').include()
+        cls.calldefs().virtuality = 'not virtual'
         
         cls.var('m_pActivityMap').exclude()
         
@@ -155,10 +152,15 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_fCombatStateTime').rename('combatstatetime')
         cls.var('m_bCombatStateIfEnemy').rename('combatstateifenemy')
         
+        # Extensible version of above, with a few more overrible methods (ugly :()
+        cls = mb.class_('UnitAnimStateEx')
+        cls.include()
+        cls.mem_fun('Update').virtuality = 'virtual'
+        
         # Vehicle Anim State
         cls = mb.class_('UnitVehicleAnimState')
         cls.include()
-        cls.calldefs().virtuality = 'not virtual' 
+        cls.calldefs().virtuality = 'not virtual'
         
         cls.var('m_iVehicleSteer').rename('vehiclesteer')
         cls.var('m_iVehicleFLSpin').rename('vehicleflspin')
