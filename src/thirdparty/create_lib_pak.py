@@ -34,6 +34,9 @@ with open(response_path,'wt') as fp:
         for file in files:
             fp.write(os.path.join(root[len_cd:].replace("/","\\"),file) + "\n")
                     
+if os.path.exists('pythonlib_dir.vpk'):
+    os.remove('pythonlib_dir.vpk')
+                    
 with open(script_path, 'w') as fp:
     fp.write(basescript)
     fp.write('cd %s\n' % os.getcwd())
