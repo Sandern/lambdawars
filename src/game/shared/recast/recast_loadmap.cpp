@@ -11,6 +11,7 @@
 #include "builddisp.h"
 #include "gamebspfile.h"
 #include "datacache/imdlcache.h"
+#include "optimize.h"
 
 #include <filesystem.h>
 
@@ -138,25 +139,49 @@ bool CRecastMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float>
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: get model vcollide_t
 //-----------------------------------------------------------------------------
-static void LoadStaticProp( const char *pModelName, CUtlVector<float> &modelVerts, CUtlVector<int> &modelTris )
+vcollide_t *LoadModelPhysCollide( const char *pModelName )
 {
-	MDLHandle_t h = mdlcache->FindMDL( pModelName );
-	if( h == MDLHANDLE_INVALID )
+	const model_t *pModel = modelinfo->FindOrLoadModel( pModelName );
+	if( !pModel )
 	{
-		Warning("LoadStaticProp: unable to get mdl handle for %s\n", pModelName);
-		return;
+		Warning("LoadModelPhysCollide: unable to load model %s\n", pModelName);
+		return NULL;
 	}
 
-	vertexFileHeader_t *vertexData = mdlcache->GetVertexData( h );
-	if( !vertexData )
+	return modelinfo->GetVCollide( pModel );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Add vertices and triangles of a collision model to mesh
+//-----------------------------------------------------------------------------
+static void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, CUtlVector<float> &verts, CUtlVector<int> &triangles )
+{
+	int k;
+	Vector *outVerts;
+	int vertCount = physcollision->CreateDebugMesh( pCollisionModel, &outVerts );
+
+	int iStartingVertIndex = verts.Count() / 3;
+	for ( k = 0; k < vertCount; k++ )
 	{
-		Warning("LoadStaticProp: unable to get vertexData for %s\n", pModelName);
-		return;
+		Vector out;
+		VectorTransform( outVerts[k].Base(), transform, out.Base() );
+		verts.AddToTail( out[0] );
+		verts.AddToTail( out[2] );
+		verts.AddToTail( out[1] );
 	}
 
-	Msg( "Num vertices for %s: %d\n", pModelName, vertexData->numLODVertexes[0] );
+	k = 0;
+	while( k < vertCount )
+	{
+		triangles.AddToTail( iStartingVertIndex + k );
+		triangles.AddToTail( iStartingVertIndex + k + 1 );
+		triangles.AddToTail( iStartingVertIndex + k + 2 );
+		k += 3;
+	}
+
+	physcollision->DestroyDebugMesh( vertCount, outVerts );
 }
 
 //-----------------------------------------------------------------------------
@@ -194,17 +219,21 @@ bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &
 		Msg("Listening %d static prop dict entries\n", dictEntries);
 		StaticPropDictLump_t staticPropDictLump;
 
-		CUtlVector< CUtlVector< float > > modelVerts;
-		CUtlVector< CUtlVector< int > > modelTris;
-		modelVerts.EnsureCapacity( dictEntries );
-		modelTris.EnsureCapacity( dictEntries );
+		CUtlVector<vcollide_t *> modelsVCollides;
+		modelsVCollides.EnsureCapacity( dictEntries );
 
 		for( int i = 0; i < dictEntries; i++ )
 		{
 			staticPropData.Get( &staticPropDictLump, sizeof( staticPropDictLump ) );
 			Msg("%d: %s\n", i, staticPropDictLump.m_Name);
 
-			LoadStaticProp( staticPropDictLump.m_Name, modelVerts[i], modelTris[i] );
+			vcollide_t *vcollide = LoadModelPhysCollide( staticPropDictLump.m_Name );
+			if( !vcollide )
+			{
+				modelsVCollides.AddToTail( NULL );
+				continue;
+			}
+			modelsVCollides.AddToTail( vcollide );
 		}
 
 		// Read static prop leafs
@@ -225,30 +254,30 @@ bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &
 		{
 			staticPropData.Get( &staticProp, sizeof( staticProp ) );
 
-			matrix3x4_t rotationMatrix; // model to world transformation
-			AngleMatrix( staticProp.m_Angles, staticProp.m_Origin, rotationMatrix);
+			vcollide_t *vcollide = modelsVCollides[staticProp.m_PropType];
+
+			matrix3x4_t transform; // model to world transformation
+			AngleMatrix( staticProp.m_Angles, staticProp.m_Origin, transform);
 
 			int j;
-			//Vector worldPos;
 
 			switch( staticProp.m_Solid )
 			{
 			case SOLID_VPHYSICS:
 				propsWithCollision++;
 
-				j = 0;
-				while( j < modelTris[staticProp.m_PropType].Count() )
+				if( vcollide )
 				{
-					// Add transformed vertices
-					//VectorTransform( vertPos, rotationMatrix, worldPos );
-
-					// Add tris based on the vertices added
-
-					j += 3;
+					for( j = 0; j < vcollide->solidCount; j++ )
+					{
+						AddCollisionModelToMesh( transform,  
+							modelsVCollides[staticProp.m_PropType]->solids[j], verts, triangles );
+					}
 				}
 				break;
 			case SOLID_BBOX:
 				propsWithCollisionBB++;
+				// TODO?
 				break;
 			case SOLID_NONE:
 				break;
@@ -265,46 +294,6 @@ bool CRecastMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &
 	{
 		Warning("CRecastMesh::GenerateStaticPropData: Could not find static prop lump!\n");
 	}
-
-	// Prop hulls?
-#if 0
-	dvertex_t *prophullverts = (dvertex_t *)((char *)fileContent + header->lumps[LUMP_PROPHULLVERTS].fileofs);
-	int nprophullverts = (header->lumps[LUMP_PROPHULLVERTS].filelen) / sizeof(dvertex_t);
-
-	//dprophull_t *prophull = (dprophull_t *)((char *)fileContent + header->lumps[LUMP_PROPHULLS].fileofs);
-	int nprophull = (header->lumps[LUMP_PROPHULLS].filelen) / sizeof(dprophull_t);
-
-	dprophulltris_t *prophulltris = (dprophulltris_t *)((char *)fileContent + header->lumps[LUMP_PROPTRIS].fileofs);
-	int nprophulltris = (header->lumps[LUMP_PROPTRIS].filelen) / sizeof(dprophulltris_t);
-
-	Msg("nprophullverts: %d, nprophull: %d, nprophulltris: %d\n", nprophullverts, nprophull, nprophulltris);
-
-	// Add vertices
-	int iStartingVertIndex = verts.Count() / 3;
-	for( int i = 0; i < nprophullverts; i++ )
-	{
-		const Vector &v = prophullverts[i].point;
-		verts.AddToTail( v[0] );
-		verts.AddToTail( v[2] );
-		verts.AddToTail( v[1] );
-	}
-
-	// Add triangles
-	for( int i = 0; i < nprophulltris; i++ )
-	{
-		const dprophulltris_t &pht = prophulltris[i];
-
-		int idx = pht.m_nIndexStart;
-		while( idx < pht.m_nIndexCount )
-		{
-			triangles.AddToTail( iStartingVertIndex + idx );
-			triangles.AddToTail( iStartingVertIndex + idx + 1 );
-			triangles.AddToTail( iStartingVertIndex + idx + 2 );
-
-			idx += 3;
-		}
-	}
-#endif // 0
 
 	return true;
 }

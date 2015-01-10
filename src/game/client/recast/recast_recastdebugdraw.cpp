@@ -32,6 +32,7 @@
 #include "tier0/memdbgon.h"
 
 static ConVar recast_debug_culldist("recast_debug_culldist", "2048.0");
+static ConVar recast_polymesh_alpha("recast_polymesh_alpha", "128");
 
 void duDebugDrawTriMesh(duDebugDraw* dd, const float* verts, int /*nverts*/,
 						const int* tris, const float* normals, int ntris,
@@ -885,6 +886,8 @@ void duDebugDrawPolyMesh(duDebugDraw* dd, const struct rcPolyMesh& mesh)
 	const float cs = mesh.cs;
 	const float ch = mesh.ch;
 	const float* orig = mesh.bmin;
+
+	int alpha = recast_polymesh_alpha.GetInt();
 	
 	for (int i = 0; i < mesh.npolys; ++i)
 	{
@@ -893,9 +896,9 @@ void duDebugDrawPolyMesh(duDebugDraw* dd, const struct rcPolyMesh& mesh)
 		
 		unsigned int color;
 		if (mesh.areas[i] == RC_WALKABLE_AREA)
-			color = duRGBA(0,192,255,64);
+			color = duRGBA(0,192,255,alpha);
 		else if (mesh.areas[i] == RC_NULL_AREA)
-			color = duRGBA(0,0,0,64);
+			color = duRGBA(0,0,0,alpha);
 		else
 			color = duIntToCol(mesh.areas[i], 255);
 		
