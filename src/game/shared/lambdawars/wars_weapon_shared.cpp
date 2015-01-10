@@ -92,7 +92,7 @@ void CWarsWeapon::PrimaryAttack( void )
 	{
 #ifdef CLIENT_DLL
 		// MUST call sound before removing a round from the clip of a CMachineGun
-		WeaponSound(SINGLE, m_flNextPrimaryAttack);
+		WeaponSound(SINGLE_NPC, m_flNextPrimaryAttack);
 #endif // CLIENT_DLL
 		m_flNextPrimaryAttack = m_flNextPrimaryAttack + m_fFireRate;
 		shots += 1;

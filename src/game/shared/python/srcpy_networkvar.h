@@ -11,6 +11,10 @@
 #pragma once
 #endif
 
+#ifdef HL2WARS_DLL
+//#define USE_WARS_NETWORK
+#endif // HL2WARS_DLL
+
 #include "srcpy_boostpython.h"
 
 extern ConVar g_debug_pynetworkvar;
@@ -47,6 +51,8 @@ public:
 	void Remove( CBaseEntity *pEnt );
 
 	void NetworkStateChanged( void );
+
+	virtual bool ShouldUpdateClient( CBaseEntity *pEnt, int iClient );
 	virtual void NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient ) {}
 
 	// For optimization purposes. Returns if the data is in the unmodified state at construction.

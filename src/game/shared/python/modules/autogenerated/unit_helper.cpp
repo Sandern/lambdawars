@@ -279,6 +279,187 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
 };
 
+struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx > {
+
+    UnitAnimStateEx_wrapper(::boost::python::api::object outer, ::UnitAnimConfig & animconfig )
+    : UnitAnimStateEx( outer, animconfig )
+      , bp::wrapper< UnitAnimStateEx >(){
+        // constructor
+    
+    }
+
+    virtual void Update( float eyeYaw, float eyePitch ) {
+        PY_OVERRIDE_CHECK( UnitAnimStateEx, Update )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimStateEx, Update )
+        bp::override func_Update = this->get_override( "Update" );
+        if( func_Update.ptr() != Py_None )
+            try {
+                func_Update( eyeYaw, eyePitch );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitAnimStateEx::Update( eyeYaw, eyePitch );
+            }
+        else
+            this->UnitAnimStateEx::Update( eyeYaw, eyePitch );
+    }
+    
+    void default_Update( float eyeYaw, float eyePitch ) {
+        UnitAnimStateEx::Update( eyeYaw, eyePitch );
+    }
+
+    void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
+        UnitAnimState::ComputePoseParam_BodyPitch( pStudioHdr );
+    }
+
+    void ComputePoseParam_BodyYaw(  ){
+        UnitAnimState::ComputePoseParam_BodyYaw(  );
+    }
+
+    void ComputePoseParam_Lean(  ){
+        UnitAnimState::ComputePoseParam_Lean(  );
+    }
+
+    void ComputePoseParam_MoveYaw( ::CStudioHdr * pStudioHdr ){
+        UnitAnimState::ComputePoseParam_MoveYaw( pStudioHdr );
+    }
+
+    int ConvergeAngles( float goal, float maxrate, float maxgap, float dt, float & current ){
+        return UnitAnimState::ConvergeAngles( goal, maxrate, maxgap, dt, current );
+    }
+
+    void EndSpecificActivity(  ){
+        UnitAnimState::EndSpecificActivity(  );
+    }
+
+    ::Activity GetCurrentMainSequenceActivity(  ) const {
+        return UnitAnimState::GetCurrentMainSequenceActivity(  );
+    }
+
+    float GetEyeYaw(  ) const {
+        return UnitAnimState::GetEyeYaw(  );
+    }
+
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual bool HasAimPoseParameters(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
+        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
+        if( func_HasAimPoseParameters.ptr() != Py_None )
+            try {
+                return func_HasAimPoseParameters(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::HasAimPoseParameters(  );
+            }
+        else
+            return this->UnitBaseAnimState::HasAimPoseParameters(  );
+    }
+    
+    bool default_HasAimPoseParameters(  ) {
+        return UnitBaseAnimState::HasAimPoseParameters( );
+    }
+
+    virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
+        PY_OVERRIDE_CHECK( UnitAnimState, OnEndSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnEndSpecificActivity )
+        bp::override func_OnEndSpecificActivity = this->get_override( "OnEndSpecificActivity" );
+        if( func_OnEndSpecificActivity.ptr() != Py_None )
+            try {
+                return func_OnEndSpecificActivity( specificactivity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitAnimState::OnEndSpecificActivity( specificactivity );
+            }
+        else
+            return this->UnitAnimState::OnEndSpecificActivity( specificactivity );
+    }
+    
+    ::Activity default_OnEndSpecificActivity( ::Activity specificactivity ) {
+        return UnitAnimState::OnEndSpecificActivity( specificactivity );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
+    }
+
+    void ResetGroundSpeed(  ){
+        UnitAnimState::ResetGroundSpeed(  );
+    }
+
+    virtual void RestartMainSequence(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
+        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
+        if( func_RestartMainSequence.ptr() != Py_None )
+            try {
+                func_RestartMainSequence(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::RestartMainSequence(  );
+            }
+        else
+            this->UnitBaseAnimState::RestartMainSequence(  );
+    }
+    
+    void default_RestartMainSequence(  ) {
+        UnitBaseAnimState::RestartMainSequence( );
+    }
+
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
+    }
+
+    float TimeSinceLastAnimationStateClear(  ) const {
+        return UnitAnimState::TimeSinceLastAnimationStateClear(  );
+    }
+
+    void UpdateLayerSequenceGeneric( int iLayer, bool & bEnabled, float & flCurCycle, int & iSequence, bool bWaitAtEnd, float fBlendIn=1.500000059604644775390625e-1f, float fBlendOut=1.500000059604644775390625e-1f, bool bMoveBlend=false, float fPlaybackRate=1.0e+0f, bool bUpdateCycle=true ){
+        UnitAnimState::UpdateLayerSequenceGeneric( iLayer, bEnabled, flCurCycle, iSequence, bWaitAtEnd, fBlendIn, fBlendOut, bMoveBlend, fPlaybackRate, bUpdateCycle );
+    }
+
+};
+
 struct UnitBaseLocomotion_wrapper : UnitBaseLocomotion, bp::wrapper< UnitBaseLocomotion > {
 
     UnitBaseLocomotion_wrapper(UnitBaseLocomotion const & arg )
@@ -1567,6 +1748,87 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
     }
 
+    bp::class_< UnitAnimStateEx_wrapper, bp::bases< UnitAnimState >, boost::noncopyable >( "UnitAnimStateEx", bp::init< bp::api::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) )    
+        .def( 
+            "Update"
+            , (void ( ::UnitAnimStateEx::* )( float,float ) )(&::UnitAnimStateEx::Update)
+            , (void ( UnitAnimStateEx_wrapper::* )( float,float ) )(&UnitAnimStateEx_wrapper::default_Update)
+            , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) )    
+        .def( 
+            "ComputePoseParam_BodyPitch"
+            , (void ( UnitAnimStateEx_wrapper::* )( ::CStudioHdr * ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_BodyPitch)
+            , ( bp::arg("pStudioHdr") ) )    
+        .def( 
+            "ComputePoseParam_BodyYaw"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_BodyYaw) )    
+        .def( 
+            "ComputePoseParam_Lean"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_Lean) )    
+        .def( 
+            "ComputePoseParam_MoveYaw"
+            , (void ( UnitAnimStateEx_wrapper::* )( ::CStudioHdr * ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_MoveYaw)
+            , ( bp::arg("pStudioHdr") ) )    
+        .def( 
+            "ConvergeAngles"
+            , (int ( UnitAnimStateEx_wrapper::* )( float,float,float,float,float & ) )(&UnitAnimStateEx_wrapper::ConvergeAngles)
+            , ( bp::arg("goal"), bp::arg("maxrate"), bp::arg("maxgap"), bp::arg("dt"), bp::arg("current") ) )    
+        .def( 
+            "EndSpecificActivity"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::EndSpecificActivity) )    
+        .def( 
+            "GetCurrentMainSequenceActivity"
+            , (::Activity ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::GetCurrentMainSequenceActivity) )    
+        .def( 
+            "GetEyeYaw"
+            , (float ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::GetEyeYaw) )    
+        .def( 
+            "GetOuterAbsVelocity"
+            , (void ( UnitAnimStateEx_wrapper::* )( ::Vector & ) const)(&UnitAnimStateEx_wrapper::GetOuterAbsVelocity)
+            , ( bp::arg("vel") ) )    
+        .def( 
+            "GetOuterXYSpeed"
+            , (float ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::GetOuterXYSpeed) )    
+        .def( 
+            "GetRenderAngles"
+            , (::QAngle const & ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::GetRenderAngles)
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "HasAimPoseParameters"
+            , (bool ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::HasAimPoseParameters)
+            , (bool ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_HasAimPoseParameters) )    
+        .def( 
+            "OnEndSpecificActivity"
+            , (::Activity ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnEndSpecificActivity)
+            , (::Activity ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnEndSpecificActivity)
+            , ( bp::arg("specificactivity") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::OnNewModel)
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_OnNewModel) )    
+        .def( 
+            "ResetGroundSpeed"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ResetGroundSpeed) )    
+        .def( 
+            "RestartMainSequence"
+            , (void ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::RestartMainSequence)
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_RestartMainSequence) )    
+        .def( 
+            "SelectWeightedSequence"
+            , (int ( ::UnitBaseAnimState::* )( ::Activity ) )(&::UnitBaseAnimState::SelectWeightedSequence)
+            , (int ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_SelectWeightedSequence)
+            , ( bp::arg("activity") ) )    
+        .def( 
+            "SetOuterPoseParameter"
+            , (void ( UnitAnimStateEx_wrapper::* )( int,float ) )(&UnitAnimStateEx_wrapper::SetOuterPoseParameter)
+            , ( bp::arg("iParam"), bp::arg("flValue") ) )    
+        .def( 
+            "TimeSinceLastAnimationStateClear"
+            , (float ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::TimeSinceLastAnimationStateClear) )    
+        .def( 
+            "UpdateLayerSequenceGeneric"
+            , (void ( UnitAnimStateEx_wrapper::* )( int,bool &,float &,int &,bool,float,float,bool,float,bool ) )(&UnitAnimStateEx_wrapper::UpdateLayerSequenceGeneric)
+            , ( bp::arg("iLayer"), bp::arg("bEnabled"), bp::arg("flCurCycle"), bp::arg("iSequence"), bp::arg("bWaitAtEnd"), bp::arg("fBlendIn")=1.500000059604644775390625e-1f, bp::arg("fBlendOut")=1.500000059604644775390625e-1f, bp::arg("bMoveBlend")=(bool)(false), bp::arg("fPlaybackRate")=1.0e+0f, bp::arg("bUpdateCycle")=(bool)(true) ) );
+
     { //::UnitBaseLocomotion
         typedef bp::class_< UnitBaseLocomotion_wrapper, bp::bases< UnitComponent > > UnitBaseLocomotion_exposer_t;
         UnitBaseLocomotion_exposer_t UnitBaseLocomotion_exposer = UnitBaseLocomotion_exposer_t( "UnitBaseLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
@@ -2718,6 +2980,187 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
 
     void SetOuterPoseParameter( int iParam, float flValue ){
         UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
+    }
+
+};
+
+struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx > {
+
+    UnitAnimStateEx_wrapper(::boost::python::api::object outer, ::UnitAnimConfig & animconfig )
+    : UnitAnimStateEx( outer, animconfig )
+      , bp::wrapper< UnitAnimStateEx >(){
+        // constructor
+    
+    }
+
+    virtual void Update( float eyeYaw, float eyePitch ) {
+        PY_OVERRIDE_CHECK( UnitAnimStateEx, Update )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimStateEx, Update )
+        bp::override func_Update = this->get_override( "Update" );
+        if( func_Update.ptr() != Py_None )
+            try {
+                func_Update( eyeYaw, eyePitch );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitAnimStateEx::Update( eyeYaw, eyePitch );
+            }
+        else
+            this->UnitAnimStateEx::Update( eyeYaw, eyePitch );
+    }
+    
+    void default_Update( float eyeYaw, float eyePitch ) {
+        UnitAnimStateEx::Update( eyeYaw, eyePitch );
+    }
+
+    void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
+        UnitAnimState::ComputePoseParam_BodyPitch( pStudioHdr );
+    }
+
+    void ComputePoseParam_BodyYaw(  ){
+        UnitAnimState::ComputePoseParam_BodyYaw(  );
+    }
+
+    void ComputePoseParam_Lean(  ){
+        UnitAnimState::ComputePoseParam_Lean(  );
+    }
+
+    void ComputePoseParam_MoveYaw( ::CStudioHdr * pStudioHdr ){
+        UnitAnimState::ComputePoseParam_MoveYaw( pStudioHdr );
+    }
+
+    int ConvergeAngles( float goal, float maxrate, float maxgap, float dt, float & current ){
+        return UnitAnimState::ConvergeAngles( goal, maxrate, maxgap, dt, current );
+    }
+
+    void EndSpecificActivity(  ){
+        UnitAnimState::EndSpecificActivity(  );
+    }
+
+    ::Activity GetCurrentMainSequenceActivity(  ) const {
+        return UnitAnimState::GetCurrentMainSequenceActivity(  );
+    }
+
+    float GetEyeYaw(  ) const {
+        return UnitAnimState::GetEyeYaw(  );
+    }
+
+    void GetOuterAbsVelocity( ::Vector & vel ) const {
+        UnitBaseAnimState::GetOuterAbsVelocity( vel );
+    }
+
+    float GetOuterXYSpeed(  ) const {
+        return UnitBaseAnimState::GetOuterXYSpeed(  );
+    }
+
+    virtual bool HasAimPoseParameters(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
+        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
+        if( func_HasAimPoseParameters.ptr() != Py_None )
+            try {
+                return func_HasAimPoseParameters(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::HasAimPoseParameters(  );
+            }
+        else
+            return this->UnitBaseAnimState::HasAimPoseParameters(  );
+    }
+    
+    bool default_HasAimPoseParameters(  ) {
+        return UnitBaseAnimState::HasAimPoseParameters( );
+    }
+
+    virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
+        PY_OVERRIDE_CHECK( UnitAnimState, OnEndSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnEndSpecificActivity )
+        bp::override func_OnEndSpecificActivity = this->get_override( "OnEndSpecificActivity" );
+        if( func_OnEndSpecificActivity.ptr() != Py_None )
+            try {
+                return func_OnEndSpecificActivity( specificactivity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitAnimState::OnEndSpecificActivity( specificactivity );
+            }
+        else
+            return this->UnitAnimState::OnEndSpecificActivity( specificactivity );
+    }
+    
+    ::Activity default_OnEndSpecificActivity( ::Activity specificactivity ) {
+        return UnitAnimState::OnEndSpecificActivity( specificactivity );
+    }
+
+    virtual void OnNewModel(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, OnNewModel )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, OnNewModel )
+        bp::override func_OnNewModel = this->get_override( "OnNewModel" );
+        if( func_OnNewModel.ptr() != Py_None )
+            try {
+                func_OnNewModel(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::OnNewModel(  );
+            }
+        else
+            this->UnitBaseAnimState::OnNewModel(  );
+    }
+    
+    void default_OnNewModel(  ) {
+        UnitBaseAnimState::OnNewModel( );
+    }
+
+    void ResetGroundSpeed(  ){
+        UnitAnimState::ResetGroundSpeed(  );
+    }
+
+    virtual void RestartMainSequence(  ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
+        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
+        if( func_RestartMainSequence.ptr() != Py_None )
+            try {
+                func_RestartMainSequence(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitBaseAnimState::RestartMainSequence(  );
+            }
+        else
+            this->UnitBaseAnimState::RestartMainSequence(  );
+    }
+    
+    void default_RestartMainSequence(  ) {
+        UnitBaseAnimState::RestartMainSequence( );
+    }
+
+    virtual int SelectWeightedSequence( ::Activity activity ) {
+        PY_OVERRIDE_CHECK( UnitBaseAnimState, SelectWeightedSequence )
+        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, SelectWeightedSequence )
+        bp::override func_SelectWeightedSequence = this->get_override( "SelectWeightedSequence" );
+        if( func_SelectWeightedSequence.ptr() != Py_None )
+            try {
+                return func_SelectWeightedSequence( activity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+            }
+        else
+            return this->UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+    
+    int default_SelectWeightedSequence( ::Activity activity ) {
+        return UnitBaseAnimState::SelectWeightedSequence( activity );
+    }
+
+    void SetOuterPoseParameter( int iParam, float flValue ){
+        UnitBaseAnimState::SetOuterPoseParameter( iParam, flValue );
+    }
+
+    float TimeSinceLastAnimationStateClear(  ) const {
+        return UnitAnimState::TimeSinceLastAnimationStateClear(  );
+    }
+
+    void UpdateLayerSequenceGeneric( int iLayer, bool & bEnabled, float & flCurCycle, int & iSequence, bool bWaitAtEnd, float fBlendIn=1.500000059604644775390625e-1f, float fBlendOut=1.500000059604644775390625e-1f, bool bMoveBlend=false, float fPlaybackRate=1.0e+0f, bool bUpdateCycle=true ){
+        UnitAnimState::UpdateLayerSequenceGeneric( iLayer, bEnabled, flCurCycle, iSequence, bWaitAtEnd, fBlendIn, fBlendOut, bMoveBlend, fPlaybackRate, bUpdateCycle );
     }
 
 };
@@ -4642,6 +5085,87 @@ BOOST_PYTHON_MODULE(unit_helper){
         
         }
     }
+
+    bp::class_< UnitAnimStateEx_wrapper, bp::bases< UnitAnimState >, boost::noncopyable >( "UnitAnimStateEx", bp::init< bp::api::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) )    
+        .def( 
+            "Update"
+            , (void ( ::UnitAnimStateEx::* )( float,float ) )(&::UnitAnimStateEx::Update)
+            , (void ( UnitAnimStateEx_wrapper::* )( float,float ) )(&UnitAnimStateEx_wrapper::default_Update)
+            , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) )    
+        .def( 
+            "ComputePoseParam_BodyPitch"
+            , (void ( UnitAnimStateEx_wrapper::* )( ::CStudioHdr * ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_BodyPitch)
+            , ( bp::arg("pStudioHdr") ) )    
+        .def( 
+            "ComputePoseParam_BodyYaw"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_BodyYaw) )    
+        .def( 
+            "ComputePoseParam_Lean"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_Lean) )    
+        .def( 
+            "ComputePoseParam_MoveYaw"
+            , (void ( UnitAnimStateEx_wrapper::* )( ::CStudioHdr * ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_MoveYaw)
+            , ( bp::arg("pStudioHdr") ) )    
+        .def( 
+            "ConvergeAngles"
+            , (int ( UnitAnimStateEx_wrapper::* )( float,float,float,float,float & ) )(&UnitAnimStateEx_wrapper::ConvergeAngles)
+            , ( bp::arg("goal"), bp::arg("maxrate"), bp::arg("maxgap"), bp::arg("dt"), bp::arg("current") ) )    
+        .def( 
+            "EndSpecificActivity"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::EndSpecificActivity) )    
+        .def( 
+            "GetCurrentMainSequenceActivity"
+            , (::Activity ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::GetCurrentMainSequenceActivity) )    
+        .def( 
+            "GetEyeYaw"
+            , (float ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::GetEyeYaw) )    
+        .def( 
+            "GetOuterAbsVelocity"
+            , (void ( UnitAnimStateEx_wrapper::* )( ::Vector & ) const)(&UnitAnimStateEx_wrapper::GetOuterAbsVelocity)
+            , ( bp::arg("vel") ) )    
+        .def( 
+            "GetOuterXYSpeed"
+            , (float ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::GetOuterXYSpeed) )    
+        .def( 
+            "GetRenderAngles"
+            , (::QAngle const & ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::GetRenderAngles)
+            , bp::return_value_policy< bp::copy_const_reference >() )    
+        .def( 
+            "HasAimPoseParameters"
+            , (bool ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::HasAimPoseParameters)
+            , (bool ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_HasAimPoseParameters) )    
+        .def( 
+            "OnEndSpecificActivity"
+            , (::Activity ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnEndSpecificActivity)
+            , (::Activity ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnEndSpecificActivity)
+            , ( bp::arg("specificactivity") ) )    
+        .def( 
+            "OnNewModel"
+            , (void ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::OnNewModel)
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_OnNewModel) )    
+        .def( 
+            "ResetGroundSpeed"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ResetGroundSpeed) )    
+        .def( 
+            "RestartMainSequence"
+            , (void ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::RestartMainSequence)
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_RestartMainSequence) )    
+        .def( 
+            "SelectWeightedSequence"
+            , (int ( ::UnitBaseAnimState::* )( ::Activity ) )(&::UnitBaseAnimState::SelectWeightedSequence)
+            , (int ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_SelectWeightedSequence)
+            , ( bp::arg("activity") ) )    
+        .def( 
+            "SetOuterPoseParameter"
+            , (void ( UnitAnimStateEx_wrapper::* )( int,float ) )(&UnitAnimStateEx_wrapper::SetOuterPoseParameter)
+            , ( bp::arg("iParam"), bp::arg("flValue") ) )    
+        .def( 
+            "TimeSinceLastAnimationStateClear"
+            , (float ( UnitAnimStateEx_wrapper::* )(  ) const)(&UnitAnimStateEx_wrapper::TimeSinceLastAnimationStateClear) )    
+        .def( 
+            "UpdateLayerSequenceGeneric"
+            , (void ( UnitAnimStateEx_wrapper::* )( int,bool &,float &,int &,bool,float,float,bool,float,bool ) )(&UnitAnimStateEx_wrapper::UpdateLayerSequenceGeneric)
+            , ( bp::arg("iLayer"), bp::arg("bEnabled"), bp::arg("flCurCycle"), bp::arg("iSequence"), bp::arg("bWaitAtEnd"), bp::arg("fBlendIn")=1.500000059604644775390625e-1f, bp::arg("fBlendOut")=1.500000059604644775390625e-1f, bp::arg("bMoveBlend")=(bool)(false), bp::arg("fPlaybackRate")=1.0e+0f, bp::arg("bUpdateCycle")=(bool)(true) ) );
 
     { //::UnitBaseLocomotion
         typedef bp::class_< UnitBaseLocomotion_wrapper, bp::bases< UnitComponent > > UnitBaseLocomotion_exposer_t;

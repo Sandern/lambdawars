@@ -2557,7 +2557,7 @@ void C_BaseEntity::NotifyShouldTransmit( ShouldTransmitState_t state )
 			UnlinkFromHierarchy();
 
 			// We're no longer being sent by the server. Become dormant.
-			if( GetFOWFlags() == 0 || (GetFOWFlags() & FOWFLAG_HIDDEN) || !ShouldDraw() )
+			if( !IsDormant() && (GetFOWFlags() == 0 || (GetFOWFlags() & FOWFLAG_HIDDEN) || !ShouldDraw()) )
 				SetDormant( true );
 			//else
 			//	UpdateVisibility();	// Although we should show in the fog of war, the nodraw flags might still have changed.

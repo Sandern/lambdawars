@@ -1236,6 +1236,28 @@ void register_CHL2WarsPlayer_class(){
                 , EyePosition_function_type( &::CHL2WarsPlayer::EyePosition ) );
         
         }
+        { //::CHL2WarsPlayer::FindEntityClassForward
+        
+            typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*FindEntityClassForward_function_type )( char * ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "FindEntityClassForward"
+                , FindEntityClassForward_function_type( &::CHL2WarsPlayer::FindEntityClassForward )
+                , ( bp::arg("classname") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CHL2WarsPlayer::FindEntityForward
+        
+            typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*FindEntityForward_function_type )( bool ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "FindEntityForward"
+                , FindEntityForward_function_type( &::CHL2WarsPlayer::FindEntityForward )
+                , ( bp::arg("fHull") )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::CHL2WarsPlayer::FindUnit
         
             typedef int ( ::CHL2WarsPlayer::*FindUnit_function_type )( ::CBaseEntity * ) ;

@@ -2391,6 +2391,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 
     bp::class_< FireBulletsInfo_t_wrapper >( "FireBulletsInfo_t", bp::init< >() )    
         .def( bp::init< int, Vector const &, Vector const &, Vector const &, float, int, bp::optional< bool > >(( bp::arg("nShots"), bp::arg("vecSrc"), bp::arg("vecDir"), bp::arg("vecSpread"), bp::arg("flDistance"), bp::arg("nAmmoType"), bp::arg("bPrimaryAttack")=(bool)(true) )) )    
+        .def_readwrite( "attributes", &FireBulletsInfo_t::m_Attributes )    
         .def_readwrite( "primaryattack", &FireBulletsInfo_t::m_bPrimaryAttack )    
         .def_readwrite( "damage", &FireBulletsInfo_t::m_flDamage )    
         .def_readwrite( "damageforcescale", &FireBulletsInfo_t::m_flDamageForceScale )    
@@ -5581,6 +5582,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 
     bp::class_< FireBulletsInfo_t_wrapper >( "FireBulletsInfo_t", bp::init< >() )    
         .def( bp::init< int, Vector const &, Vector const &, Vector const &, float, int, bp::optional< bool > >(( bp::arg("nShots"), bp::arg("vecSrc"), bp::arg("vecDir"), bp::arg("vecSpread"), bp::arg("flDistance"), bp::arg("nAmmoType"), bp::arg("bPrimaryAttack")=(bool)(true) )) )    
+        .def_readwrite( "attributes", &FireBulletsInfo_t::m_Attributes )    
         .def_readwrite( "primaryattack", &FireBulletsInfo_t::m_bPrimaryAttack )    
         .def_readwrite( "damage", &FireBulletsInfo_t::m_flDamage )    
         .def_readwrite( "damageforcescale", &FireBulletsInfo_t::m_flDamageForceScale )    

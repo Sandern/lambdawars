@@ -17,7 +17,6 @@
 #endif // CLIENT_DLL
 
 #ifdef HL2WARS_DLL
-#define USE_WARS_NETWORK
 #include "wars_network.h"
 #endif // HL2WARS_DLL
 
@@ -117,6 +116,20 @@ void CPythonNetworkVarBase::Remove( CBaseEntity *pEnt )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CPythonNetworkVarBase::ShouldUpdateClient( CBaseEntity *pEnt, int iClient )
+{
+	if( m_PlayerUpdateBits.Get( iClient ) == false )
+		return false;
+
+	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
+		return false ;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CPythonNetworkVarBase::NetworkStateChanged( void )
 {
 	m_PlayerUpdateBits.SetAll();
@@ -168,11 +181,6 @@ bp::object CPythonNetworkVar::Str()
 //-----------------------------------------------------------------------------
 void CPythonNetworkVar::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
-		return;
-
-	m_PlayerUpdateBits.Clear(iClient);
-
 #ifdef USE_WARS_NETWORK
 	WarsNet_WriteEntityData( m_Name.String(), Get(), m_bChangedCallback );
 #else
@@ -276,11 +284,6 @@ bp::object CPythonNetworkArray::Str()
 //-----------------------------------------------------------------------------
 void CPythonNetworkArray::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
-		return;
-
-	m_PlayerUpdateBits.Clear(iClient);
-
 #ifdef USE_WARS_NETWORK
 	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal, m_bChangedCallback );
 #else
@@ -397,12 +400,6 @@ bp::object CPythonNetworkDict::Str()
 //-----------------------------------------------------------------------------
 void CPythonNetworkDict::NetworkVarsUpdateClient( CBaseEntity *pEnt, int iClient )
 {
-	if( m_pPySendProxy && !m_pPySendProxy->ShouldSend( pEnt, iClient ) )
-		return;
-
-	m_PlayerUpdateBits.Clear(iClient);
-
-
 #ifdef USE_WARS_NETWORK
 	WarsNet_WriteEntityData( m_Name.String(), m_dataInternal, m_bChangedCallback );
 #else
@@ -509,23 +506,35 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, edict_t *pClientEdict )
 		return;
 
 #ifdef USE_WARS_NETWORK
+	CUtlVector<int> updatedVars;
 	WarsNet_StartEntityUpdate( pClientEdict, pEnt );
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
-		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
+		CPythonNetworkVarBase *pNetVar = pEnt->m_utlPyNetworkVars.Element( i );
+		if( !pNetVar->ShouldUpdateClient( pEnt, iClient ) )
 			continue;
 
 		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iClient );
-		// TODO
+		updatedVars.AddToTail( i );
 	}
-	WarsNet_EndEntityUpdate();
+	if( WarsNet_EndEntityUpdate() )
+	{
+		// Send succeeded, clear the vars now.
+		for( int i = 0; i < updatedVars.Count(); i++ )
+		{
+			CPythonNetworkVarBase *pNetVar = pEnt->m_utlPyNetworkVars.Element( updatedVars[i] );
+			pNetVar->m_PlayerUpdateBits.Clear(iClient);
+		}
+	}
 #else
 	for( int i = 0; i < pEnt->m_utlPyNetworkVars.Count(); i++ )
 	{
-		if( pEnt->m_utlPyNetworkVars.Element( i )->m_PlayerUpdateBits.Get( iClient ) == false )
+		CPythonNetworkVarBase *pNetVar = pEnt->m_utlPyNetworkVars.Element( i );
+		if( !pNetVar->ShouldUpdateClient( pEnt, iClient ) )
 			continue;
 
 		pEnt->m_utlPyNetworkVars.Element( i )->NetworkVarsUpdateClient( pEnt, iClient );
+		pNetVar->m_PlayerUpdateBits.Clear(iClient);
 	}
 #endif // USE_WARS_NETWORK
 }

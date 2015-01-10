@@ -880,6 +880,15 @@ void register_CBaseEntity_class(){
                 , AllowNavIgnore_function_type( &::CBaseEntity::AllowNavIgnore ) );
         
         }
+        { //::CBaseEntity::AlwaysNavIgnore
+        
+            typedef bool ( ::CBaseEntity::*AlwaysNavIgnore_function_type )(  ) ;
+            
+            CBaseEntity_exposer.def( 
+                "AlwaysNavIgnore"
+                , AlwaysNavIgnore_function_type( &::CBaseEntity::AlwaysNavIgnore ) );
+        
+        }
         { //::CBaseEntity::AppendContextToCriteria
         
             typedef void ( ::CBaseEntity::*AppendContextToCriteria_function_type )( ::ResponseRules::CriteriaSet &,char const * ) ;

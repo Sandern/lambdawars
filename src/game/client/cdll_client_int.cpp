@@ -715,6 +715,66 @@ void DisplayBoneSetupEnts()
 #endif
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Process lambda wars messages
+//-----------------------------------------------------------------------------
+#ifdef HL2WARS_DLL
+void ProcessWarsMessages()
+{
+	// Receive/Process client messages
+	if( warsextension )
+	{
+		warsextension->ReceiveSteamP2PMessages( steamapicontext->SteamNetworking() );
+
+		// Process client messages
+		WarsMessageData_t *messageData = warsextension->ClientMessageHead();
+		while( messageData )
+		{
+			EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
+
+			boost::python::dict kwargs;
+			boost::python::object signal;
+			uint32 publicIP = 0;
+			uint32 gamePort = 0;
+			CSteamID serverSteamID;
+
+			switch( eMsg )
+			{
+				case k_EMsgClientRequestGameAccepted:
+
+					if( messageData->buf.TellMaxPut() >= sizeof(WarsAcceptGameMessage_t) )
+					{
+						WarsAcceptGameMessage_t *acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
+
+						publicIP = acceptMessageData->publicIP;
+						gamePort = acceptMessageData->gamePort;
+						serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
+					}
+					
+					kwargs["sender"] = boost::python::object();
+					kwargs["publicip"] = publicIP;
+					kwargs["gameport"] = gamePort;
+					kwargs["serversteamid"] = serverSteamID;
+					signal = SrcPySystem()->Get("lobby_gameserver_accept", "core.signals", true);
+					SrcPySystem()->CallSignal( signal, kwargs );
+					break;
+				case k_EMsgClientRequestGameDenied:
+					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
+					break;
+				case k_EMsgClient_PyEntityUpdate:
+					WarsNet_ReceiveEntityUpdate( messageData->buf );
+					break;
+				default:
+					Warning("Unknown client message type %d\n", eMsg); 
+					break;
+			}
+
+			warsextension->NextClientMessage();
+			messageData = warsextension->ClientMessageHead();
+		}
+	}
+}
+#endif // HL2WARS_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: engine to client .dll interface
@@ -1519,58 +1579,9 @@ void CHLClient::HudUpdate( bool bActive )
 	// I can check into this further.
 	C_BaseTempEntity::CheckDynamicTempEnts();
 
-	// Receive/Process client messages
-	if( warsextension )
-	{
-		warsextension->ReceiveSteamP2PMessages( steamapicontext->SteamNetworking() );
-
-		// Process client messages
-		WarsMessageData_t *messageData = warsextension->ClientMessageHead();
-		while( messageData )
-		{
-			EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
-
-			boost::python::dict kwargs;
-			boost::python::object signal;
-			uint32 publicIP = 0;
-			uint32 gamePort = 0;
-			CSteamID serverSteamID;
-
-			switch( eMsg )
-			{
-				case k_EMsgClientRequestGameAccepted:
-
-					if( messageData->buf.TellMaxPut() >= sizeof(WarsAcceptGameMessage_t) )
-					{
-						WarsAcceptGameMessage_t *acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
-
-						publicIP = acceptMessageData->publicIP;
-						gamePort = acceptMessageData->gamePort;
-						serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
-					}
-					
-					kwargs["sender"] = boost::python::object();
-					kwargs["publicip"] = publicIP;
-					kwargs["gameport"] = gamePort;
-					kwargs["serversteamid"] = serverSteamID;
-					signal = SrcPySystem()->Get("lobby_gameserver_accept", "core.signals", true);
-					SrcPySystem()->CallSignal( signal, kwargs );
-					break;
-				case k_EMsgClientRequestGameDenied:
-					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
-					break;
-				case k_EMsgClient_PyEntityUpdate:
-					WarsNet_ReceiveEntityUpdate( messageData->buf );
-					break;
-				default:
-					Warning("Unknown client message type %d\n", eMsg); 
-					break;
-			}
-
-			warsextension->NextClientMessage();
-			messageData = warsextension->ClientMessageHead();
-		}
-	}
+#ifdef HL2WARS_DLL
+	ProcessWarsMessages();
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -2776,6 +2787,13 @@ void CHLClient::FrameStageNotify( ClientFrameStage_t curStage )
 	case FRAME_NET_UPDATE_START:
 		{
 			VPROF( "CHLClient::FrameStageNotify FRAME_NET_UPDATE_START" );
+
+#ifdef HL2WARS_DLL
+			// Make sure pending messages are processed, needed to ensure we received Python network variables
+			// before entity creation.
+			ProcessWarsMessages();
+#endif // HL2WARS_DLL
+
 			// disabled all recomputations while we update entities
 			C_BaseEntity::EnableAbsRecomputations( false );
 			C_BaseEntity::SetAbsQueriesValid( false );

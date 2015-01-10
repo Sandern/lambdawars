@@ -34,7 +34,10 @@ void UnitBaseSense::PerformSensing()
 	VPROF_BUDGET( "UnitBaseSense::PerformSensing", VPROF_BUDGETGROUP_UNITS );
 
 	if( m_fNextSenseTime > gpGlobals->curtime )
+	{
+		UpdateRememberedSeen();
 		return;
+	}
 
 	if( m_fSenseDistance == -1 )
 		Look( GetOuter()->GetViewDistance() );
@@ -51,6 +54,64 @@ void UnitBaseSense::ForcePerformSensing()
 {
 	m_fNextSenseTime = 0.0f;
 	PerformSensing();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Trash dead units to prevent from reselecting not alive units
+//			This is called when no full update of sensing is done.
+//-----------------------------------------------------------------------------
+void UnitBaseSense::UpdateRememberedSeen()
+{
+	// Just trash not alive entities
+	for( int i = m_SeenEnemies.Count() - 1; i >= 0; i-- )
+	{	
+		CBaseEntity *pEnemy = m_SeenEnemies[i].entity;
+		if( !pEnemy || (pEnemy->IsUnit() && !pEnemy->IsAlive()) ||
+			m_pOuter->IRelationType( pEnemy ) != D_HT )
+		{
+			m_SeenEnemies.Remove( i );
+		}
+	}
+
+	for( int i = m_SeenOther.Count() - 1; i >= 0; i-- )
+	{
+		CBaseEntity *pOther = m_SeenOther[i].entity;
+		if( !pOther || (pOther->IsUnit() && !pOther->IsAlive()) ||
+			m_pOuter->IRelationType( pOther ) == D_HT )
+		{
+			m_SeenOther.Remove( i );
+		}
+	}
+
+	// Nearest is used by enemy selection, so do full test
+	if( !m_hNearestEnemy || !TestEntity( m_hNearestEnemy ) || m_pOuter->IRelationType( m_hNearestEnemy ) != D_HT )
+	{
+		int iAttackPriority;
+		float fBestEnemyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
+		int iBestAttackPriority = -1000;
+
+		for( int i = 0; i < m_SeenEnemies.Count(); i++ )
+		{
+			if( !m_SeenEnemies[i].entity->IsUnit() )
+				continue;
+
+			// Test if best nearest enemy
+			iAttackPriority = m_SeenEnemies[i].entity->MyUnitPointer()->GetAttackPriority();
+			if( iAttackPriority > iBestAttackPriority 
+				|| (iAttackPriority == iBestAttackPriority && m_SeenEnemies[i].distancesqr < fBestEnemyDist) )
+			{
+				fBestEnemyDist = m_SeenEnemies[i].distancesqr;
+				m_hNearestEnemy = m_SeenEnemies[i].entity;
+				iBestAttackPriority = iAttackPriority;
+			}
+		}
+	}
+
+	// Just clear nearest friendly and attacked friendly (less important)
+	if( m_hNearestFriendly && !TestEntity( m_hNearestFriendly ) )
+		m_hNearestFriendly = NULL;
+	if( m_hNearestAttackedFriendly && !TestEntity( m_hNearestAttackedFriendly ) )
+		m_hNearestAttackedFriendly = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -406,7 +467,7 @@ boost::python::list UnitBaseSense::PyGetOthers( const char *unittype )
 				continue;
 
 			const char *pOtherUnitType = pOtherUnit->GetUnitType();
-			if( pOtherUnitType && Q_stricmp( unittype , pOtherUnitType ) != 0 )
+			if( pOtherUnitType && V_stricmp( unittype , pOtherUnitType ) != 0 )
 				continue;
 		}
 

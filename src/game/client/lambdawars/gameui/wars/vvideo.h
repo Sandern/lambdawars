@@ -97,6 +97,7 @@ private:
 	DropDownMenu		*m_drpQueuedMode;
 	DropDownMenu		*m_drpShaderDetail;
 	DropDownMenu		*m_drpCPUDetail;
+	DropDownMenu		*m_drpLighting;
 
 	CNB_Header_Footer *m_pHeaderFooter;
 
@@ -129,6 +130,7 @@ private:
 	int		m_iCPUDetail;
 	int		m_flFilmGrain;
 	bool	m_bLockMouse;
+	bool	m_bDeferredLighting;
 
 	float	m_flFilmGrainInitialValue;
 

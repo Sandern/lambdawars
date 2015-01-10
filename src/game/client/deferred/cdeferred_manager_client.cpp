@@ -1,6 +1,7 @@
 
 #include "cbase.h"
 #include "videocfg/videocfg.h"
+#include "videocfgext.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/imaterialvar.h"
@@ -9,8 +10,7 @@
 
 #include "vgui_controls/messagebox.h"
 
-// Temporary
-static ConVar deferred_lighting( "deferred_lighting", "0", FCVAR_USERINFO );
+ConVar deferred_lighting_enabled( "deferred_lighting_enabled", "1" );
 
 static CDeferredManagerClient __g_defmanager;
 CDeferredManagerClient *GetDeferredManager()
@@ -43,10 +43,13 @@ bool CDeferredManagerClient::Init()
 {
 	AssertMsg( g_pCurrentViewRender == NULL, "viewrender already allocated?!" );
 
+	// Make sure deferred lighting setting is read out at this point
+	ReadVideoCfgExt();
+
 	const bool bLowPerfSystem = GetGPULevel() <= GPU_LEVEL_LOW || GetGPUMemLevel() <= GPU_MEM_LEVEL_LOW || GetCPULevel() <= CPU_LEVEL_LOW;
 
 	const int iDeferredLevel = CommandLine() ? CommandLine()->ParmValue("-deferred", 1) : 1;
-	const bool bAllowDeferred = !bLowPerfSystem && (!CommandLine() || CommandLine()->FindParm("-disabledeferred") == 0);
+	const bool bAllowDeferred = deferred_lighting_enabled.GetBool() && !bLowPerfSystem && (!CommandLine() || CommandLine()->FindParm("-disabledeferred") == 0);
 	const bool bForceDeferred = CommandLine() && CommandLine()->FindParm("-forcedeferred") != 0;
 	bool bSM30 = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 95;
 
@@ -63,7 +66,6 @@ bool CDeferredManagerClient::Init()
 		if ( bGotDefShaderDll )
 		{
 			m_bDefRenderingEnabled = true;
-			deferred_lighting.SetValue( 1 );
 
 			GetDeferredExt()->EnableDeferredLighting();
 
@@ -546,6 +548,10 @@ void CDeferredManagerClient::InitializeDeferredMaterials()
 #if DEBUG
 	for ( int i = 0; i < DEF_MAT_COUNT; i++ )
 	{
+#if DEFCFG_ENABLE_RADIOSITY == 0
+		if( i >= DEF_MAT_LIGHT_RADIOSITY_GLOBAL || i <= DEF_MAT_LIGHT_RADIOSITY_BLEND )
+			continue;
+#endif
 		Assert( m_pKV_Def[ i ] != NULL );
 		Assert( m_pMat_Def[ i ] != NULL );
 	}

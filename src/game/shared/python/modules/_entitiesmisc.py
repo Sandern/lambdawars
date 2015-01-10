@@ -359,6 +359,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.var('m_bPrimaryAttack').rename('primaryattack')
         cls.var('m_flDamage').rename('damage')
         cls.var('m_iPlayerDamage' if self.settings.branch == 'source2013' else 'm_flPlayerDamage').rename('playerdamage')
+        cls.var('m_Attributes').rename('attributes')
         
         # CShotManipulator
         cls = mb.class_('CShotManipulator')

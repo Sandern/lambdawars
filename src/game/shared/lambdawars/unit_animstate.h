@@ -422,4 +422,14 @@ inline bool UnitAnimState::HasActivity( Activity actDesired )
 	return SelectWeightedSequence( TranslateActivity( actDesired ) ) > 0; 
 }
 
+// Extensible version for Python with Update overridable..
+class UnitAnimStateEx : public UnitAnimState
+{
+public:
+#ifdef ENABLE_PYTHON
+	UnitAnimStateEx( boost::python::object outer, UnitAnimConfig &animconfig ) : UnitAnimState( outer, animconfig ) {}
+#endif // ENABLE_PYTHON
+	virtual void Update( float eyeYaw, float eyePitch ) { UnitAnimState::Update( eyeYaw, eyePitch ); }
+};
+
 #endif // UNIT_ANIMSTATE_H

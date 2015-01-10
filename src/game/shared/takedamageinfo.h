@@ -14,11 +14,9 @@
 
 #include "networkvar.h" // todo: change this when DECLARE_CLASS is moved into a better location.
 
-#ifdef HL2WARS_DLL
-#ifdef ENABLE_PYTHON
+#if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
 #include "srcpy_boostpython.h"
-#endif // ENABLE_PYTHON
-#endif // HL2WARS_DLL
+#endif // HL2WARS_DLL && ENABLE_PYTHON
 
 // Used to initialize m_flBaseDamage to something that we know pretty much for sure
 // hasn't been modified by a user. 

@@ -436,6 +436,11 @@ inline bool IsEntityWalkable( CBaseEntity *entity, unsigned int flags )
 
 	if (FClassnameIs( entity, "player" ))
 		return false;
+	
+#ifdef HL2WARS_DLL
+	if (FClassnameIs( entity, "func_map_boundary" ))
+		return false;
+#endif // HL2WARS_DLL
 
 	// if we hit a door, assume its walkable because it will open when we touch it
 	if (FClassnameIs( entity, "func_door*" ))

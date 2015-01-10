@@ -801,6 +801,42 @@ void CHL2WarsPlayer::SetupVisibility( CBaseEntity *pViewEntity, unsigned char *p
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Returns the nearest COLLIBALE entity in front of the player
+//			that has a clear line of sight with the given classname
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+CBaseEntity* CHL2WarsPlayer::FindEntityClassForward( char *classname )
+{
+	if( GetMouseData().m_hEnt ) 
+	{
+		CBaseEntity *pHit = GetMouseData().m_hEnt;
+		if( FClassnameIs( pHit, classname ) )
+		{
+			return pHit;
+		}
+	}
+	return BaseClass::FindEntityClassForward( classname );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns the nearest COLLIBALE entity in front of the player
+//			that has a clear line of sight. If HULL is true, the trace will
+//			hit the collision hull of entities. Otherwise, the trace will hit
+//			hitboxes.
+// Input  :
+// Output :
+//-----------------------------------------------------------------------------
+CBaseEntity* CHL2WarsPlayer::FindEntityForward( bool fHull )
+{
+	if( GetMouseData().m_hEnt ) 
+	{
+		return GetMouseData().m_hEnt;
+	}
+	return BaseClass::FindEntityForward( fHull );
+}
+
 //================================================================================
 // TEAM HANDLING
 //================================================================================

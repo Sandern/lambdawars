@@ -184,6 +184,10 @@ public:
 	void					SetIsRequestingFullUpdate( bool bRequestingFullUpdate ) { m_bRequestingFullUpdate = bRequestingFullUpdate; }
 	bool					IsRequestingFullUpdate( void ) { return m_bRequestingFullUpdate; }
 
+	// picker debug utility functions
+	virtual CBaseEntity*	FindEntityClassForward( char *classname );
+	virtual CBaseEntity*	FindEntityForward( bool fHull );
+
 private:
     void					OnLeftMouseButtonPressedInternal( const MouseTraceData_t &data );
 	void					OnLeftMouseButtonDoublePressedInternal( const MouseTraceData_t &data );

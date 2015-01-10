@@ -53,7 +53,7 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 			if( fTargetZ > GetAbsOrigin().z )
 			{
 				// Calculate needed up movement
-				MoveCommand.upmove = Max( 0.0f, Min(
+				MoveCommand.upmove = Max( -MoveCommand.maxspeed, Min(
 					(fTargetZ - GetAbsOrigin().z) / MoveCommand.interval,
 					MoveCommand.maxspeed
 				) );
@@ -62,7 +62,7 @@ void UnitBaseAirNavigator::Update( UnitAirMoveCommand &MoveCommand )
 				if( m_LastGoalStatus == CHS_CLIMBDEST )
 					MoveCommand.forwardmove = MoveCommand.sidemove = 0.0f;
 			}
-			else if( bIsAtMinDesiredHeight )
+			else if( fTargetZ > GetAbsOrigin().z && bIsAtMinDesiredHeight )
 			{
 				// Avoid going down again
 				MoveCommand.upmove = 1.0f;
