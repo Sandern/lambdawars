@@ -2459,9 +2459,6 @@
     <ClCompile Include="recast\recast_debugdrawmesh.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\recast\recast_loadmap.cpp">
-      <Filter>Source Files\Recast</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\public\disp_common.cpp">
       <Filter>Source Files\Recast\DispBuild</Filter>
     </ClCompile>
@@ -2473,6 +2470,9 @@
     </ClCompile>
     <ClCompile Include="..\..\public\builddisp.cpp">
       <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_mapmesh.cpp">
+      <Filter>Source Files\Recast</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -4990,9 +4990,6 @@
     <ClInclude Include="recast\recast_debugdrawmesh.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
-    <ClInclude Include="..\shared\recast\recast_loadmap.h">
-      <Filter>Source Files\Recast</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\public\disp_common.h">
       <Filter>Source Files\Recast\DispBuild</Filter>
     </ClInclude>
@@ -5010,6 +5007,9 @@
     </ClInclude>
     <ClInclude Include="..\..\public\builddisp.h">
       <Filter>Source Files\Recast\DispBuild</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_mapmesh.h">
+      <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

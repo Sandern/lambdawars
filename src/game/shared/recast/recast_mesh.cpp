@@ -8,6 +8,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "recast/recast_mesh.h"
+#include "recast/recast_mapmesh.h"
 
 #ifdef CLIENT_DLL
 #include "recast/recast_recastdebugdraw.h"
@@ -70,12 +71,6 @@ CRecastMesh::CRecastMesh() :
 	m_dmesh(0),
 	m_navMesh(0)
 {
-	m_verts = NULL;
-	m_nverts = 0;
-	m_tris = NULL;
-	m_ntris = 0;
-	m_normals = NULL;
-
 	m_navQuery = dtAllocNavMeshQuery();
 }
 
@@ -147,6 +142,7 @@ static void PrintDebugSpans( const char *pStepName, rcHeightfield& solid )
 	Msg( "%s: %d walkable areas\n", pStepName, nWalkableAreas );
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: Build cube
 //-----------------------------------------------------------------------------
@@ -228,6 +224,7 @@ void CRecastMesh::LoadTestData()
 		}
 	}
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -246,16 +243,17 @@ bool CRecastMesh::Build()
 	int m_partitionType = SAMPLE_PARTITION_WATERSHED;
 
 	//LoadTestData();
-	if( !LoadMapData() )
+	CMapMesh *pMapMesh = new CMapMesh();
+	if( !pMapMesh->Load() )
 	{
 		Warning("CRecastMesh::Load: failed to load map data!\n");
 		return false;
 	}
 
-	const int nverts = m_nverts;
-	float* verts = m_verts;
-	const int ntris = m_ntris;
-	int* tris = m_tris;
+	const int nverts = pMapMesh->GetNumVerts();
+	const float *verts = pMapMesh->GetVerts();
+	const int ntris = pMapMesh->GetNumTris();
+	const int *tris = pMapMesh->GetTris();
 
 	//
 	// Step 1. Initialize build config.
@@ -669,27 +667,6 @@ bool CRecastMesh::Load()
 //-----------------------------------------------------------------------------
 bool CRecastMesh::Reset()
 {
-	// Clear map geometry data
-	if( m_verts != NULL )
-	{
-		delete m_verts;
-		m_verts = NULL;
-		m_nverts = 0;
-	}
-
-	if( m_tris != NULL )
-	{
-		delete m_tris;
-		m_tris = NULL;
-		m_ntris = 0;
-	}
-
-	if( m_normals != NULL )
-	{
-		delete m_normals;
-		m_normals = NULL;
-	}
-
 	// Cleanup Nav mesh data
 	if( m_triareas )
 	{

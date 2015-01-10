@@ -13,8 +13,6 @@
 
 #include <recast/Recast.h>
 
-#define CALC_GEOM_NORMALS
-
 class UnitBaseWaypoint;
 
 class CRecastMesh
@@ -24,16 +22,12 @@ public:
 	~CRecastMesh();
 
 	// Load/build 
-	virtual void LoadTestData();
+	//virtual void LoadTestData();
 	virtual void ResetCommonSettings();
 
 	virtual bool Build();
 	virtual bool Load();
 	virtual bool Reset();
-
-	virtual bool GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
-	virtual bool GenerateStaticPropData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
-	virtual bool LoadMapData();
 
 #ifdef CLIENT_DLL
 	virtual void DebugRender();
@@ -98,11 +92,11 @@ private:
 	class dtNavMesh* m_navMesh;
 	class dtNavMeshQuery* m_navQuery;
 
-	float* m_verts;
+	/*float* m_verts;
 	int m_nverts;
 	int* m_tris;
 	int m_ntris;
-	float* m_normals;
+	float* m_normals;*/
 };
 
 CRecastMesh *GetRecastNavMesh();

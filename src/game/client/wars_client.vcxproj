@@ -293,7 +293,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_usermessage.cpp" />
     <ClCompile Include="..\shared\python\srcpy_gamerules.cpp" />
     <ClCompile Include="..\shared\python\srcpy_te.cpp" />
-    <ClCompile Include="..\shared\recast\recast_loadmap.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mapmesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
     <ClCompile Include="cef\src_cef_local_handler.cpp" />
@@ -1517,7 +1517,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_materials.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
     <ClInclude Include="..\shared\python\srcpy_steam.h" />
-    <ClInclude Include="..\shared\recast\recast_loadmap.h" />
+    <ClInclude Include="..\shared\recast\recast_mapmesh.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="cef\src_cef_avatar_handler.h" />
     <ClInclude Include="cef\src_cef_local_handler.h" />
