@@ -724,13 +724,13 @@ void ProcessWarsMessages()
 	// Receive/Process client messages
 	if( warsextension )
 	{
-		warsextension->ReceiveSteamP2PMessages( steamapicontext->SteamNetworking() );
+		warsextension->ReceiveClientSteamP2PMessages( steamapicontext->SteamNetworking() );
 
 		// Process client messages
 		WarsMessageData_t *messageData = warsextension->ClientMessageHead();
 		while( messageData )
 		{
-			EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
+			EMessageClient eMsg = (EMessageClient)( *(uint32*)messageData->buf.Base() );
 
 			boost::python::dict kwargs;
 			boost::python::object signal;

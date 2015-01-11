@@ -363,6 +363,8 @@ void SplitAreasAtBB( const Vector &mins, const Vector &maxs )
 		ids.AddToTail(area->GetID());
 		//TheNavMesh->StripNavigationAreas();
 	}
+
+	CNavArea::ClearCachedPath(); 
 }
 
 //-----------------------------------------------------------------------------
