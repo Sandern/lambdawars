@@ -40,6 +40,11 @@ public:
 	void DebugRender();
 #endif // CLIENT_DLL
 
+protected:
+#ifndef CLIENT_DLL
+	const char *GetFilename( void ) const;
+#endif // CLIENT_DLL
+
 private:
 	CUtlDict< CRecastMesh *, int > m_Meshes;
 };

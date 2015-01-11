@@ -280,6 +280,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_matchmaking.cpp" />
     <ClCompile Include="..\shared\python\srcpy_sound.cpp" />
     <ClCompile Include="..\shared\python\srcpy_util.cpp" />
+    <ClCompile Include="..\shared\recast\recast_file.cpp" />
     <ClCompile Include="..\shared\recast\recast_mapmesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
@@ -1069,6 +1070,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_entities.h" />
     <ClInclude Include="..\shared\python\srcpy_class_shared.h" />
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
+    <ClInclude Include="..\shared\recast\recast_file.h" />
     <ClInclude Include="..\shared\recast\recast_mapmesh.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="..\shared\recast\recast_mgr.h" />

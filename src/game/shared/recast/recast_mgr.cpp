@@ -39,17 +39,6 @@ CRecastMgr::~CRecastMgr()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CRecastMgr::Load()
-{
-	CRecastMesh *pMesh = new CRecastMesh();
-	pMesh->Load();
-	m_Meshes.Insert( "soldier", pMesh );
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 void CRecastMgr::Reset()
 {
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
@@ -86,17 +75,19 @@ int CRecastMgr::FindMeshIndex( const char *name )
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Build()
 {
+	// Clear any existing mesh
+	Reset();
+
+	// Create meshes
+	CRecastMesh *pMesh = new CRecastMesh();
+	pMesh->SetName( "soldier" );
+	if( pMesh->Build() )
+	{
+		m_Meshes.Insert( pMesh->GetName(), pMesh );
+	}
+
 	return true;
 }
-
-//-----------------------------------------------------------------------------
-// Purpose: Saves the generated navigation meshes
-//-----------------------------------------------------------------------------
-bool CRecastMgr::Save()
-{
-	return true;
-}
-
 #endif // CLIENT_DLL
 
 #ifdef CLIENT_DLL
@@ -114,15 +105,18 @@ void CRecastMgr::DebugRender()
 }
 #endif // CLIENT_DLL
 
-#ifdef CLIENT_DLL
-CON_COMMAND_F( recast_rebuild, "", FCVAR_CHEAT )
-#else
-CON_COMMAND_F( recast_rebuild_server, "", FCVAR_CHEAT )
-#endif // CLIENT_DLL
+#ifndef CLIENT_DLL
+CON_COMMAND_F( recast_build, "", FCVAR_CHEAT )
 {
-	s_RecastMgr.Load();
-
-#ifdef CLIENT_DLL
-	engine->ServerCmd("recast_rebuild_server\n");
-#endif // CLIENT_DLL
+	s_RecastMgr.Build();
+	s_RecastMgr.Save();
 }
+
+CON_COMMAND_F( recast_save, "", FCVAR_CHEAT )
+{
+	s_RecastMgr.Save();
+
+	// Something like that:
+	//engine->ClientCmd("recast_reload\n");
+}
+#endif // CLIENT_DLL

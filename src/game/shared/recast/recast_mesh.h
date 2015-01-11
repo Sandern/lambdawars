@@ -21,13 +21,20 @@ public:
 	CRecastMesh();
 	~CRecastMesh();
 
+	const char *GetName();
+	void SetName( const char *name );
+
 	// Load/build 
 	//virtual void LoadTestData();
 	virtual void ResetCommonSettings();
 
 	virtual bool Build();
-	virtual bool Load();
+	virtual bool Load( CUtlBuffer &fileBuffer );
 	virtual bool Reset();
+
+#ifndef CLIENT_DLL
+	virtual bool Save( CUtlBuffer &fileBuffer );
+#endif // CLIENT_DLL
 
 #ifdef CLIENT_DLL
 	virtual void DebugRender();
@@ -81,6 +88,9 @@ protected:
 	int m_partitionType;
 
 private:
+	CUtlString m_Name;
+	
+	// Data used during build
 	unsigned char* m_triareas;
 	rcHeightfield* m_solid;
 	rcCompactHeightfield* m_chf;
@@ -89,8 +99,19 @@ private:
 	rcConfig m_cfg;	
 	rcPolyMeshDetail* m_dmesh;
 
+	// Data used for path finding
 	class dtNavMesh* m_navMesh;
 	class dtNavMeshQuery* m_navQuery;
 };
+
+inline const char *CRecastMesh::GetName()
+{
+	return m_Name.Get();
+}
+
+inline void CRecastMesh::SetName( const char *name )
+{
+	m_Name.Set( name );
+}
 
 #endif // RECAST_MESH_H

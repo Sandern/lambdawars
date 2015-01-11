@@ -71,6 +71,7 @@ CRecastMesh::CRecastMesh() :
 	m_dmesh(0),
 	m_navMesh(0)
 {
+	m_Name.Set("default");
 	m_navQuery = dtAllocNavMeshQuery();
 }
 
@@ -657,14 +658,6 @@ bool CRecastMesh::Build()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CRecastMesh::Load()
-{
-	return Build();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 bool CRecastMesh::Reset()
 {
 	// Cleanup Nav mesh data
@@ -718,6 +711,7 @@ ConVar recast_draw_trimeshslope("recast_draw_trimeshslope", "0");
 ConVar recast_draw_contours("recast_draw_contours", "0");
 ConVar recast_draw_polymesh("recast_draw_polymesh", "0");
 ConVar recast_draw_polymeshdetail("recast_draw_polymeshdetail", "0");
+ConVar recast_draw_navmesh("recast_draw_navmesh", "0");
 
 //-----------------------------------------------------------------------------
 // Purpose: Draws the mesh
@@ -745,17 +739,21 @@ void CRecastMesh::DebugRender()
 		duDebugDrawContours(&dd, *m_cset);
 	}
 
-	if( recast_draw_polymesh.GetBool() )
+	if( recast_draw_polymesh.GetBool() && m_pmesh != NULL )
 	{
 		duDebugDrawPolyMesh(&dd, *m_pmesh);
 	}
 
-	if( recast_draw_polymeshdetail.GetBool() )
+	if( recast_draw_polymeshdetail.GetBool() && m_dmesh != NULL )
 	{
 		duDebugDrawPolyMeshDetail(&dd, *m_dmesh);
 	}
 
-	//duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+	if( recast_draw_navmesh.GetBool() && m_navMesh != NULL )
+	{
+		// TODO
+		//duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+	}
 }
 #endif // CLIENT_DLL
 
