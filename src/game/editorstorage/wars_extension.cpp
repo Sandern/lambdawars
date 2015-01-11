@@ -119,7 +119,7 @@ KeyValues *CWarsExtension::PopServerCommandQueue()
 //-----------------------------------------------------------------------------
 // Steam P2P messages
 //-----------------------------------------------------------------------------
-void CWarsExtension::ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking )
+void CWarsExtension::ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking, int channel, CUtlVector<WarsMessageData_t> &messageQueue )
 {
 	if( !pSteamNetworking )
 		return;
@@ -128,7 +128,7 @@ void CWarsExtension::ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking
 	uint32 cubMsgSize;
 	CSteamID steamIDRemote;
 
-	while ( pSteamNetworking->IsP2PPacketAvailable( &cubMsgSize ) )
+	while ( pSteamNetworking->IsP2PPacketAvailable( &cubMsgSize, channel ) )
 	{
 		if ( pchRecvBuf )
 			free( pchRecvBuf );
@@ -136,7 +136,7 @@ void CWarsExtension::ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking
 		pchRecvBuf = (char *)malloc( cubMsgSize );
 
 		// see if there is any data waiting on the socket
-		if ( !pSteamNetworking->ReadP2PPacket( pchRecvBuf, cubMsgSize, &cubMsgSize, &steamIDRemote ) )
+		if ( !pSteamNetworking->ReadP2PPacket( pchRecvBuf, cubMsgSize, &cubMsgSize, &steamIDRemote, channel ) )
 			break;
 
 		if ( cubMsgSize < sizeof( uint32 ) )
@@ -145,30 +145,23 @@ void CWarsExtension::ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking
 			continue;
 		}
 
-		EMessage eMsg = (EMessage)( *(uint32*)pchRecvBuf );
-		if( eMsg >= k_EMsgClientFirstMsg )
-		{
-			if( serverengine && serverengine->IsDedicatedServer() ) 
-			{
-				Warning("CWarsExtension: Received client message on dedicated server. Discarding...");
-			}
-			else
-			{
-				m_hQueuedClientP2PMessages.AddToTail();
-				m_hQueuedClientP2PMessages.Tail().steamIDRemote = steamIDRemote;
-				m_hQueuedClientP2PMessages.Tail().buf.Put( pchRecvBuf, cubMsgSize );
-			}
-		}
-		else
-		{
-			m_hQueuedServerP2PMessages.AddToTail();
-			m_hQueuedServerP2PMessages.Tail().steamIDRemote = steamIDRemote;
-			m_hQueuedServerP2PMessages.Tail().buf.Put( pchRecvBuf, cubMsgSize );
-		}
+		messageQueue.AddToTail();
+		messageQueue.Tail().steamIDRemote = steamIDRemote;
+		messageQueue.Tail().buf.Put( pchRecvBuf, cubMsgSize );
 	}
 
 	if ( pchRecvBuf )
 		free( pchRecvBuf );
+}
+
+void CWarsExtension::ReceiveClientSteamP2PMessages( ISteamNetworking *pSteamNetworking )
+{
+	ReceiveSteamP2PMessages( pSteamNetworking, WARSNET_CLIENT_CHANNEL, m_hQueuedClientP2PMessages );
+}
+
+void CWarsExtension::ReceiveServerSteamP2PMessages( ISteamNetworking *pSteamNetworking )
+{
+	ReceiveSteamP2PMessages( pSteamNetworking, WARSNET_SERVER_CHANNEL, m_hQueuedServerP2PMessages );
 }
 
 WarsMessageData_t *CWarsExtension::ServerMessageHead()

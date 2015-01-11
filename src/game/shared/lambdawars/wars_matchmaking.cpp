@@ -57,7 +57,7 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 	{
 		if( !steamapicontext->SteamNetworking() )
 			return;
-		steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable );
+		steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable, WARSNET_SERVER_CHANNEL );
 	}
 #endif // CLIENT_DLL
 }

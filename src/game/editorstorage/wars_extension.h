@@ -31,7 +31,9 @@ public:
 	virtual KeyValues *PopServerCommandQueue();
 
 	// Receiving Steam P2P messages
-	virtual void ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking );
+	virtual void ReceiveClientSteamP2PMessages( ISteamNetworking *pSteamNetworking );
+	virtual void ReceiveServerSteamP2PMessages( ISteamNetworking *pSteamNetworking );
+
 	virtual WarsMessageData_t *ServerMessageHead();
 	virtual bool NextServerMessage();
 	virtual WarsMessageData_t *InsertServerMessage();
@@ -42,6 +44,9 @@ public:
 	// Hack to tell client we are paused (engine->IsPaused is broken...)
 	virtual void SetPaused( bool bPaused ) { m_bPaused = bPaused; }
 	virtual bool IsPaused() { return m_bPaused; }
+
+private:
+	virtual void ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking, int channel, CUtlVector<WarsMessageData_t> &messageQueue );
 
 private:
 	// Wars Editor commands

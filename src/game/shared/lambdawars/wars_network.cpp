@@ -81,7 +81,7 @@ bool WarsNet_EndEntityUpdate()
 	}
 
 	return steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( s_clientSteamID, 
-		s_variableMessageData.Base(), s_variableMessageData.TellMaxPut(), k_EP2PSendReliable );
+		s_variableMessageData.Base(), s_variableMessageData.TellMaxPut(), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 }
 
 static void WarsNet_WriteType( unsigned char type )

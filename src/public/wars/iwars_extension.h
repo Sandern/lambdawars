@@ -8,24 +8,31 @@
 #include "utlvector.h"
 #include "utlbuffer.h"
 #include "steam/steamclientpublic.h"
+#include "inetchannelinfo.h"
 
 class KeyValues;
 class ISteamNetworking;
 
-// Network message types
-enum EMessage
-{
-	// Server messages
-	k_EMsgServerRequestGame = 0,
-	k_EMsgLocalServerRequestGame,
-	k_EMsgIsLobbyGameActive,
+// Source Engine switches to Steam P2P api for sending data
+// when behind a firewall, so we can't use the default channel.
+// Make sure we are above the used channels.
+#define WARSNET_SERVER_CHANNEL INetChannelInfo::TOTAL + 10
+#define WARSNET_CLIENT_CHANNEL INetChannelInfo::TOTAL + 11
 
-	// Client Messages
-	k_EMsgClientFirstMsg = 5000,
-	k_EMsgClientRequestGameAccepted = k_EMsgClientFirstMsg,
+// Network message types
+enum EMessageClient
+{
+	k_EMsgClientRequestGameAccepted = 0,
 	k_EMsgClientRequestGameDenied,
 	k_EMsgClient_PyEntityClasses,
 	k_EMsgClient_PyEntityUpdate,
+};
+
+enum EMessageServer
+{
+	k_EMsgServerRequestGame = 0,
+	k_EMsgLocalServerRequestGame,
+	k_EMsgIsLobbyGameActive,
 };
 
 typedef struct WarsMessageData_t
@@ -51,7 +58,8 @@ public:
 	virtual KeyValues *PopServerCommandQueue() = 0;
 
 	// Receiving Steam P2P messages
-	virtual void ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking ) = 0;
+	virtual void ReceiveClientSteamP2PMessages( ISteamNetworking *pSteamNetworking ) = 0;
+	virtual void ReceiveServerSteamP2PMessages( ISteamNetworking *pSteamNetworking ) = 0;
 	virtual WarsMessageData_t *ServerMessageHead() = 0;
 	virtual bool NextServerMessage() = 0;
 	virtual WarsMessageData_t *InsertServerMessage() = 0;

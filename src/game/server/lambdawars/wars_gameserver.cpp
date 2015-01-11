@@ -63,13 +63,13 @@ void CWarsGameServer::ProcessMessages()
 
 	KeyValues *pData = NULL, *pGameData = NULL;
 
-	warsextension->ReceiveSteamP2PMessages( steamgameserverapicontext->SteamGameServerNetworking() );
+	warsextension->ReceiveServerSteamP2PMessages( steamgameserverapicontext->SteamGameServerNetworking() );
 
 	// Process server messages
 	WarsMessageData_t *messageData = warsextension->ServerMessageHead();
 	while( messageData )
 	{
-		EMessage eMsg = (EMessage)( *(uint32*)messageData->buf.Base() );
+		EMessageServer eMsg = (EMessageServer)( *(uint32*)messageData->buf.Base() );
 
 		static WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
 		static WarsMessage_t denyGameMsg( k_EMsgClientRequestGameDenied );
@@ -139,7 +139,7 @@ void CWarsGameServer::ProcessMessages()
 				if( GetState() != k_EGameServer_Available )
 				{
 					// Tell lobby owner the server is not available and should look for another server
-					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+					steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 				}
 				else
 				{
@@ -150,7 +150,7 @@ void CWarsGameServer::ProcessMessages()
 					if( !pGameData->ReadAsBinary( data ) )
 					{
 						Warning("k_EMsgServerRequestGame: reading game data failed\n");
-						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable );
+						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 
 					}
 					else
@@ -168,7 +168,7 @@ void CWarsGameServer::ProcessMessages()
 						acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
 
 						// Tell lobby owner the game is accepted and players can connect to the server
-						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable );
+						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 						g_ServerGameDLL.ApplyGameSettings( pGameData );
 					}
 				}
