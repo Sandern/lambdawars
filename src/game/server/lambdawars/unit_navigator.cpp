@@ -50,6 +50,7 @@
 #include "nav_pathfind.h"
 #include "hl2wars_nav_pathfind.h"
 
+#include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
 
 #ifdef ENABLE_PYTHON
@@ -2814,12 +2815,15 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
 	return new UnitBaseWaypoint( vGoalPos );
 #else
-	CRecastMesh *pNavMesh = GetRecastNavMesh();
-
-	const Vector &vStart = GetAbsOrigin(); 
-	UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos );
-	if( pFoundPath )
-		return pFoundPath;
+	int idx = RecastMgr().FindMeshIndex( "soldier" );
+	CRecastMesh *pNavMesh = RecastMgr().GetMesh( idx );
+	if( pNavMesh )
+	{
+		const Vector &vStart = GetAbsOrigin(); 
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos );
+		if( pFoundPath )
+			return pFoundPath;
+	}
 
 	return new UnitBaseWaypoint( vGoalPos );
 #endif // 0

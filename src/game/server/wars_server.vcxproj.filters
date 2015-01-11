@@ -1993,6 +1993,9 @@
     <ClCompile Include="..\shared\recast\recast_mapmesh.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_mgr.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3871,6 +3874,9 @@
       <Filter>Source Files\Recast\DispBuild</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_mapmesh.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_mgr.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>

@@ -129,7 +129,7 @@
 
 #include "wars/iwars_extension.h"
 
-#include "recast/recast_mesh.h"
+#include "recast/recast_mgr.h"
 #endif // HL2WARS_DLL
 
 // =======================================
@@ -678,8 +678,6 @@ static bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
-
-	InitRecastMesh();
 #endif // HL2WARS_DLL
 
 	// init the gamestatsupload connection
@@ -990,8 +988,6 @@ void CServerGameDLL::DLLShutdown( void )
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::DestroyFloraGrid();
-
-	DestroyRecastMesh();
 
 	WarsShutdownGameServer();
 #endif // HL2WARS_DLL
@@ -1310,7 +1306,7 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 #ifdef HL2WARS_DLL
 	CWarsFlora::SpawnMapFlora();
 
-	LoadRecastMesh();
+	RecastMgr().Load();
 #endif // HL2WARS_DLL
 
 	// No more precaching after PostEntityAllSystems!!!
@@ -1588,7 +1584,7 @@ void CServerGameDLL::LevelShutdown( void )
 	TheNavMesh->Reset();
 
 #ifdef HL2WARS_DLL
-	ResetRecastMesh();
+	RecastMgr().Reset();
 #endif // HL2WARS_DLL
 
 	g_nCurrentChapterIndex = -1;

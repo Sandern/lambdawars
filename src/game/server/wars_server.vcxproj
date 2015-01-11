@@ -282,6 +282,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_util.cpp" />
     <ClCompile Include="..\shared\recast\recast_mapmesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_server.cpp" />
     <ClCompile Include="lambdawars\unit_vehiclenavigator.cpp" />
     <ClCompile Include="lambdawars\wars_gameserver.cpp" />
@@ -1070,6 +1071,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
     <ClInclude Include="..\shared\recast\recast_mapmesh.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
+    <ClInclude Include="..\shared\recast\recast_mgr.h" />
     <ClInclude Include="deferred\cdeferred_manager_server.h" />
     <ClInclude Include="deferred\deferred_server_common.h" />
     <ClInclude Include="lambdawars\unit_vehiclenavigator.h" />

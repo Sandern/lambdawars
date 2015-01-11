@@ -91,20 +91,6 @@ private:
 
 	class dtNavMesh* m_navMesh;
 	class dtNavMeshQuery* m_navQuery;
-
-	/*float* m_verts;
-	int m_nverts;
-	int* m_tris;
-	int m_ntris;
-	float* m_normals;*/
 };
-
-CRecastMesh *GetRecastNavMesh();
-
-void InitRecastMesh();
-void DestroyRecastMesh();
-
-void LoadRecastMesh();
-void ResetRecastMesh();
 
 #endif // RECAST_MESH_H

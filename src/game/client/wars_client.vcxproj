@@ -295,6 +295,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_te.cpp" />
     <ClCompile Include="..\shared\recast\recast_mapmesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
     <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
     <ClCompile Include="cef\src_cef_local_handler.cpp" />
     <ClCompile Include="cef\src_cef_vtf_handler.cpp">
@@ -1519,6 +1520,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_steam.h" />
     <ClInclude Include="..\shared\recast\recast_mapmesh.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
+    <ClInclude Include="..\shared\recast\recast_mgr.h" />
     <ClInclude Include="cef\src_cef_avatar_handler.h" />
     <ClInclude Include="cef\src_cef_local_handler.h" />
     <ClInclude Include="cef\src_cef_vtf_handler.h" />
