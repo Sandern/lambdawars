@@ -1263,6 +1263,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     </ClCompile>
     <ClCompile Include="recast\recast_debugdraw.cpp" />
     <ClCompile Include="recast\recast_debugdrawmesh.cpp" />
+    <ClCompile Include="recast\recast_detourdebugdraw.cpp" />
     <ClCompile Include="recast\recast_recastdebugdraw.cpp" />
     <ClCompile Include="recvproxy.cpp" />
     <ClCompile Include="rendertexture.cpp">
@@ -1776,6 +1777,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="python\SurfaceBuffer.h" />
     <ClInclude Include="recast\recast_debugdraw.h" />
     <ClInclude Include="recast\recast_debugdrawmesh.h" />
+    <ClInclude Include="recast\recast_detourdebugdraw.h" />
     <ClInclude Include="recast\recast_recastdebugdraw.h" />
     <ClInclude Include="spatialentitymgr.h" />
     <ClInclude Include="vgui_avatarimage.h" />

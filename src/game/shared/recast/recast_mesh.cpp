@@ -13,6 +13,7 @@
 #ifdef CLIENT_DLL
 #include "recast/recast_recastdebugdraw.h"
 #include "recast/recast_debugdrawmesh.h"
+#include "recast/recast_detourdebugdraw.h"
 #endif // CLIENT_DLL
 
 #include "detour/DetourNavMesh.h"
@@ -751,8 +752,18 @@ void CRecastMesh::DebugRender()
 
 	if( recast_draw_navmesh.GetBool() && m_navMesh != NULL )
 	{
-		// TODO
-		//duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+		char m_navMeshDrawFlags = DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST;
+		duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+
+#if 0 // TODO: add different draw modes
+		if (m_drawMode != DRAWMODE_NAVMESH_INVIS)
+			duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+		if (m_drawMode == DRAWMODE_NAVMESH_BVTREE)
+			duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
+		if (m_drawMode == DRAWMODE_NAVMESH_NODES)
+			duDebugDrawNavMeshNodes(&dd, *m_navQuery);
+		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+#endif // 0
 	}
 }
 #endif // CLIENT_DLL

@@ -22,6 +22,7 @@
 
 #define FORMAT_BSPFILE "maps\\%s.bsp"
 #define FORMAT_NAVFILE "maps\\%s.recast"
+#define EXT_NAVFILE "recast"
 
 static const int NAVMESHSET_MAGIC = 'M'<<24 | 'S'<<16 | 'E'<<8 | 'T'; //'MSET';
 static const int NAVMESHSET_VERSION = 1;
@@ -133,7 +134,7 @@ bool CRecastMgr::Load()
 #ifdef CLIENT_DLL
 	V_snprintf( filename, sizeof( filename ), "%s", STRING( engine->GetLevelName() ) );
 	V_StripExtension( filename, filename, 256 );
-	V_snprintf( filename, sizeof( filename ), "%s.%s", filename, FORMAT_NAVFILE );
+	V_snprintf( filename, sizeof( filename ), "%s.%s", filename, EXT_NAVFILE );
 #else
 	V_snprintf( filename, sizeof( filename ), FORMAT_NAVFILE, STRING( gpGlobals->mapname ) );
 #endif // CLIENT_DLL

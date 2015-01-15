@@ -26,7 +26,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v120_xp</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -45,7 +45,7 @@
     <TargetExt>.lib</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>lib\Release\</OutDir>
+    <OutDir>..\..\..\..\..\lib\public</OutDir>
     <IntDir>obj\Release\DetourTileCache\</IntDir>
     <TargetName>DetourTileCache</TargetName>
     <TargetExt>.lib</TargetExt>

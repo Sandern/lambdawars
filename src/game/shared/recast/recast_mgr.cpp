@@ -120,3 +120,18 @@ CON_COMMAND_F( recast_save, "", FCVAR_CHEAT )
 	//engine->ClientCmd("recast_reload\n");
 }
 #endif // CLIENT_DLL
+
+#ifndef CLIENT_DLL
+CON_COMMAND_F( recast_listmeshes, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( cl_recast_listmeshes, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
+	int idx = meshes.First();
+	while( meshes.IsValidIndex( idx ) )
+	{
+		Msg( "%d: %s\n", idx, meshes.Element(idx)->GetName() );
+		idx = meshes.Next( idx );
+	}
+}

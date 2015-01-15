@@ -2480,6 +2480,9 @@
     <ClCompile Include="..\shared\recast\recast_file.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="recast\recast_detourdebugdraw.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -5021,6 +5024,9 @@
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_file.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="recast\recast_detourdebugdraw.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>

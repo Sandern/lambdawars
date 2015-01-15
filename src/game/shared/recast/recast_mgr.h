@@ -28,6 +28,7 @@ public:
 	// Accessors for Units
 	CRecastMesh *GetMesh( int index );
 	int FindMeshIndex( const char *name );
+	CUtlDict< CRecastMesh *, int > &GetMeshes();
 
 #ifndef CLIENT_DLL
 	// Generation methods
@@ -50,5 +51,10 @@ private:
 };
 
 CRecastMgr &RecastMgr();
+
+inline CUtlDict< CRecastMesh *, int > &CRecastMgr::GetMeshes()
+{
+	return m_Meshes;
+}
 
 #endif // RECAST_MGR_H
