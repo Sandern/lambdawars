@@ -400,6 +400,10 @@ bool CMapMesh::Load()
 	int *surfedge = (int *)((char *)fileContent + header->lumps[LUMP_SURFEDGES].fileofs);
 	//int nSurfEdges = (header->lumps[LUMP_SURFEDGES].filelen) / sizeof(int);
 
+	// Load texinfo
+	texinfo_s *texinfo = (texinfo_s *)((char *)fileContent + header->lumps[LUMP_TEXINFO].fileofs);
+	int nTexInfo = (header->lumps[LUMP_TEXINFO].filelen) / sizeof(texinfo_s);
+
 	// Load triangles, parse from faces
 	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
 	int nFaces = (header->lumps[LUMP_FACES].filelen) / sizeof(dface_t);
@@ -407,6 +411,16 @@ bool CMapMesh::Load()
 	{
 		if ( faces[i].dispinfo == -1 )
 		{
+			// Test texture info
+			if( faces[i].texinfo > 0 && faces[i].texinfo < nTexInfo )
+			{
+				texinfo_s &faceTexinfo = texinfo[faces[i].texinfo];
+				if( faceTexinfo.flags & (SURF_SKY2D|SURF_SKY|SURF_TRIGGER|SURF_HINT|SURF_SKIP) )
+				{
+					continue;
+				}
+			}
+
 			// Create vertex at face origin
 			float x = 0, y = 0, z = 0;
 			for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
