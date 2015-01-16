@@ -12,6 +12,10 @@
 #pragma once
 #endif
 
+const char *WarsNet_TranslateP2PConnectErr( int errorCode );
+
+#ifdef ENABLE_PYTHON
+
 #include "wars_matchmaking.h"
 
 enum WarsNetType_e {
@@ -41,8 +45,6 @@ typedef struct WarsEntityUpdateMessage_t : public WarsMessage_t
 	long iEncodedEHandle;
 } WarsEntityUpdateMessage_t;
 
-const char *WarsNet_TranslateP2PConnectErr( int errorCode );
-
 #ifndef CLIENT_DLL
 void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent );
 bool WarsNet_EndEntityUpdate();
@@ -52,5 +54,7 @@ void WarsNet_Init();
 void WarsNet_Shutdown();
 void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data );
 #endif // CLIENT_DLL
+
+#endif // ENABLE_PYTHON
 
 #endif // WARS_NETWORK_H

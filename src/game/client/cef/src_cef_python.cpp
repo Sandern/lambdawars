@@ -6,7 +6,9 @@
 
 #include "cbase.h"
 #include "src_cef_python.h"
+#ifdef ENABLE_PYTHON
 #include "srcpy.h"
+#endif // ENABLE_PYTHON
 #include "src_cef_js.h"
 #include "warscef/wars_cef_shared.h"
 
@@ -15,6 +17,8 @@
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
+
+#ifdef ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -402,3 +406,5 @@ bool PyCefFrame::operator !=( const PyCefFrame &other ) const
 		return false;
 	return m_Frame->GetIdentifier() != other.m_Frame->GetIdentifier();
 }
+
+#endif // ENABLE_PYTHON

@@ -2868,8 +2868,10 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				// Seems this information gets lost upon receiving a full update
 				FogOfWarMgr()->ResetKnownEntitiesForPlayer( iClientIdx );
 
+#ifdef ENABLE_PYTHON
 				// All Python network vars also need to be resend...
 				PyNetworkVarsResetClientTransmitBits( iClientIdx );
+#endif // ENABLE_PYTHON
 
 				pPlayer->SetIsRequestingFullUpdate( false );
 			}

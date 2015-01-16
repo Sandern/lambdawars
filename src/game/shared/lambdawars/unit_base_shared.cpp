@@ -10,7 +10,10 @@
 #include "hl2wars_shareddefs.h"
 #include "fowmgr.h"
 #include "animation.h"
+
+#ifdef ENABLE_PYTHON
 #include "srcpy.h"
+#endif // ENABLE_PYTHON
 
 #ifdef CLIENT_DLL
 	#include "c_hl2wars_player.h"
@@ -712,8 +715,9 @@ void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 			CalculateBulletDamageForce( &dmgInfo, info.m_iAmmoType, vecDir, tr.endpos );
 			dmgInfo.ScaleDamageForce( info.m_flDamageForceScale );
 			dmgInfo.SetAmmoType( info.m_iAmmoType );
+#ifdef ENABLE_PYTHON
 			dmgInfo.SetAttributes( info.m_Attributes );
-
+#endif // ENABLE_PYTHON
 			(dynamic_cast<CBaseEntity *>(tr.m_pEnt))->DispatchTraceAttack( dmgInfo, vecDir, &tr );
 
 			// Effects only, FireBullets should be called on the client.

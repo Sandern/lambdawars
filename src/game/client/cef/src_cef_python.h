@@ -10,6 +10,8 @@
 #pragma once
 #endif
 
+#ifdef ENABLE_PYTHON
+
 #include "include/internal/cef_ptr.h"
 
 // Forward declarations
@@ -53,5 +55,7 @@ public:
 private:
 	CefRefPtr<CefFrame> m_Frame;
 };
+
+#endif // ENABLE_PYTHON
 
 #endif // SRC_CEF_PYTHON_H

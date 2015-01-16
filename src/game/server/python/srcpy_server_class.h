@@ -17,9 +17,8 @@
 #endif
 
 #ifndef ENABLE_PYTHON
-	#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name )
-	#define DECLARE_PYSERVERCLASS( name )
-	#define IMPLEMENT_PYSERVERCLASS( name, networkType )
+	#define IMPLEMENT_PYSERVERCLASS_SYSTEM( name, network_name )
+	#define DECLARE_PYSERVERCLASS( name, networkType )
 	#define DECLARE_PYCLASS( name )
 #else
 

@@ -55,7 +55,9 @@ void CEditorMapMgr::ClearLoadedMap()
 		m_pKVVmf->deleteThis();
 		m_pKVVmf = NULL;
 
+#ifdef ENABLE_PYTHON
 		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
+#endif // ENABLE_PYTHON
 	}
 }
 
@@ -76,8 +78,10 @@ void CEditorMapMgr::LoadVmf( const char *pszVmf, bool bDispatchSignal )
 
 	if( ParseVmfFile( pKV ) )
 	{
+#ifdef ENABLE_PYTHON
 		if( bDispatchSignal )
 			SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("editormapchanged", "core.signals", true) );
+#endif // ENABLE_PYTHON
 	}
 
 	pKV->deleteThis();

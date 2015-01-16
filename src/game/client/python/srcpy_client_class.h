@@ -18,8 +18,7 @@
 
 #ifndef ENABLE_PYTHON
 	#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name )
-	#define DECLARE_PYCLIENTCLASS( name )
-	#define IMPLEMENT_PYCLIENTCLASS( name, networkType )
+	#define DECLARE_PYCLIENTCLASS( name, networkType )
 	#define DECLARE_PYCLASS( name )
 #else
 

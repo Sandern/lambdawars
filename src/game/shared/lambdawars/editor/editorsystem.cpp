@@ -274,10 +274,12 @@ void CEditorSystem::Select( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 void CEditorSystem::FireSelectionChangedSignal()
 {
+#ifdef ENABLE_PYTHON
 	boost::python::dict kwargs;
 	kwargs["sender"] = boost::python::object();
 	kwargs["selection"] = UtlVectorToListByValue<EHANDLE>( m_hSelectedEntities );
 	SrcPySystem()->CallSignal( SrcPySystem()->Get("editorselectionchanged", "core.signals", true), kwargs );
+#endif // ENABLE_PYTHON
 }
 
 #ifndef CLIENT_DLL

@@ -418,6 +418,7 @@ void C_HL2WarsPlayer::CamFollowGroup( const CUtlVector< EHANDLE > &m_Entities, b
 	m_bForcedFollowEntity = bForced;
 }
 
+#ifdef ENABLE_PYTHON
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -433,6 +434,7 @@ void C_HL2WarsPlayer::PyCamFollowGroup( boost::python::list pyentities, bool for
 
 	CamFollowGroup( entities, forced );
 }
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 

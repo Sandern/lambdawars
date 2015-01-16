@@ -3,8 +3,11 @@
 #include "wars_gameserver.h"
 #include "gameinterface.h"
 #include "tier1/utlbuffer.h"
-#include "srcpy_networkvar.h"
 #include "wars_network.h"
+
+#ifdef ENABLE_PYTHON
+#include "srcpy_networkvar.h"
+#endif // ENABLE_PYTHON
 
 #include "matchmaking/imatchframework.h"
 
@@ -405,7 +408,7 @@ void CWarsGameServer::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallbac
 			continue;
 		
 		// Player specific warning
-#if defined(USE_WARS_NETWORK)
+#if defined(USE_WARS_NETWORK) && defined(ENABLE_PYTHON)
 		Warning( "Resetting Python networked vars for player %s due p2p session connect fail (%s)\n", 
 			pPlayer->GetPlayerName(), WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
 		PyNetworkVarsResetClientTransmitBits( i - 1 );
