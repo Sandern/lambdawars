@@ -564,7 +564,7 @@ bool CEnvBeam::PassesTouchFilters(CBaseEntity *pOther)
 
 	if( m_TouchType != touch_player_only )
 	{
-		if( pOther->IsNPC() )
+		if( pOther->IsNPC() || pOther->IsUnit() )
 		{
 			fPassedSoFar = true;
 		}

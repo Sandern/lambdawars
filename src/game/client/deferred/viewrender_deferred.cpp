@@ -2741,7 +2741,7 @@ void CBaseWorldViewDeferred::DrawOpaqueRenderablesDeferred( bool bNoDecals )
 			if ( !pEntity )
 				continue;
 
-			if ( pEntity->IsNPC() )
+			if ( pEntity->IsNPC() || pEntity->IsUnit() )
 			{
 				arrRenderEntsNpcsFirst.AddToTail( itEntity );
 				otherRenderables.FastRemove( i );
