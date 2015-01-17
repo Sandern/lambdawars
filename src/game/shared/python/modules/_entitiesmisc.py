@@ -122,6 +122,13 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_fun('GetName').include() # For debugging purposes
 
         # Creating a networked variable
+        cls = mb.class_('CPythonNetworkVarBase')
+        cls.include()
+        cls.no_init = True
+        cls.calldefs().exclude()
+        cls.vars().exclude()
+        cls.mem_fun('NetworkStateChanged').include()
+        
         cls = mb.class_('CPythonNetworkVar')
         cls.include()
         cls.rename('NetworkVarInternal') 
