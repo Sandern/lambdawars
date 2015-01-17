@@ -106,7 +106,7 @@ void DispatchEffectToCallback( const char *pEffectName, const CEffectData &m_Eff
 		for ( PyClientEffectRegistration *pReg = PyClientEffectRegistration::s_pHead; pReg; pReg = pReg->m_pNext )
 		{
 			// If the name matches, call it
-			if ( Q_stricmp( pReg->m_EffectName, pEffectName ) == 0 )
+			if ( V_strnicmp( pReg->m_EffectName, pEffectName, sizeof( pReg->m_EffectName ) ) == 0 )
 			{
 				try {
 					 g_pPrecacheSystem->LimitResourceAccess( DISPATCH_EFFECT, pEffectName );

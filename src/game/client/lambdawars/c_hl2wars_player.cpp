@@ -161,7 +161,7 @@ bool C_HL2WarsPlayer::CreateMove( float flInputSampleTime, CUserCmd *pCmd )
 	// If we have an active ability, it overrides our mouse actions
 	CUtlVector< boost::python::object > activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i < activeAbilities.Count(); i++ )
 	{
 		SrcPySystem()->Run( SrcPySystem()->Get("_update", activeAbilities[i]) );	
 	}
@@ -559,7 +559,7 @@ void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMa
 #ifdef ENABLE_PYTHON
 	pytargetselection = UtlVectorToListByValue< EHANDLE >(targetselection);
 #endif // ENABLE_PYTHON
-	for(i=0; i<targetselection.Count(); i++)
+	for( i = 0; i < targetselection.Count(); i++ )
 	{
 #ifdef ENABLE_PYTHON
 		if( targetselection[i]->GetIUnit()->IsSelectableByPlayer(this, pytargetselection) )
@@ -714,7 +714,7 @@ void C_HL2WarsPlayer::MinimapClick( const MouseTraceData_t &mousedata )
 #ifdef ENABLE_PYTHON
 	CUtlVector< boost::python::object > activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for(int i = 0; i < activeAbilities.Count(); i++)
 	{
 		SrcPySystem()->RunT<bool, MouseTraceData_t>( SrcPySystem()->Get("OnMinimapClick", activeAbilities[i]), false, mousedata );
 	}

@@ -373,9 +373,12 @@ void C_BaseEntity::PhysicsPyDispatchThink( boost::python::object thinkFunc )
 
 	if ( thinkFunc.ptr() != Py_None )
 	{
-		try {
+		try 
+		{
 			thinkFunc();
-		} catch(boost::python::error_already_set &) {
+		} 
+		catch(boost::python::error_already_set &) 
+		{
 			PyErr_Print();
 		}
 	}

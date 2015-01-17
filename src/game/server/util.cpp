@@ -1361,7 +1361,7 @@ static void SetMinMaxSize (CBaseEntity *pEnt, const Vector& mins, const Vector& 
 			if( pEnt->GetPyInstance().ptr() != Py_None )
 			{
 				char buf[256];
-				Q_snprintf(buf, 256, "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>");
+				V_snprintf(buf, sizeof( buf ), "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>");
 				PyErr_SetString(PyExc_ValueError, buf );
 				throw boost::python::error_already_set(); 
 			}
@@ -1407,7 +1407,7 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 		if( pEntity->GetPyInstance().ptr() != Py_None )
 		{
 			char buf[256];
-			Q_snprintf(buf, 256, "%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
+			V_snprintf(buf, sizeof( buf ), "%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
 				STRING( pEntity->GetEntityName() ),
 				pEntity->GetClassname(), pModelName );
 			PyErr_SetString(PyExc_ValueError, buf );
