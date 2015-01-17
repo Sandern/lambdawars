@@ -172,7 +172,9 @@ public:
 	
 	virtual void					CamFollowEntity( CBaseEntity *pEnt, bool forced = false );
 	virtual void					CamFollowGroup( const CUtlVector< EHANDLE > &m_Entities, bool forced = false );
+#ifdef ENABLE_PYTHON
 	virtual void					PyCamFollowGroup( boost::python::list entities, bool forced = false );
+#endif // ENABLE_PYTHON
 	virtual void					CamFollowRelease( bool forced = false );
 	virtual Vector					CamCalculateGroupOrigin();
 

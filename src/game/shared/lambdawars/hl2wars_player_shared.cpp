@@ -581,11 +581,11 @@ void CHL2WarsPlayer::OnLeftMouseButtonPressed( const MouseTraceData_t &data )
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector<boost::python::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i < activeAbilities.Count(); i++ )
 	{
-		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonPressed", activeAbilities[i]), false ) || bEatMouse;
+		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonPressed", activeAbilities[i] ), false ) || bEatMouse;
 	}
 #endif // ENABLE_PYTHON
 
@@ -610,9 +610,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonDoublePressed( const MouseTraceData_t &dat
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector<boost::python::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i < activeAbilities.Count(); i++ )
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonDoublePressed", activeAbilities[i]), false ) || bEatMouse;
 	}
@@ -653,9 +653,9 @@ void CHL2WarsPlayer::OnLeftMouseButtonReleased( const MouseTraceData_t &data )
 	// If we have an active ability it overrides our mouse actions
 	bEatMouse = false;
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector<boost::python::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i< activeAbilities.Count(); i++ )
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnLeftMouseButtonReleased", activeAbilities[i]), false ) || bEatMouse;
 	}
@@ -765,9 +765,9 @@ void CHL2WarsPlayer::OnRightMouseButtonPressed( const MouseTraceData_t &data )
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector<boost::python::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i < activeAbilities.Count(); i++ )
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnRightMouseButtonPressed", activeAbilities[i]), false ) || bEatMouse;
 	}
@@ -793,9 +793,9 @@ void CHL2WarsPlayer::OnRightMouseButtonDoublePressed( const MouseTraceData_t &da
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector<boost::python::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i < activeAbilities.Count(); i++ )
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnRightMouseButtonDoublePressed", activeAbilities[i]), false ) || bEatMouse;	
 	}
@@ -834,9 +834,9 @@ void CHL2WarsPlayer::OnRightMouseButtonReleased( const MouseTraceData_t &data )
 	// If we have an active ability, it overrides our mouse actions
 	bool bEatMouse = false;
 #ifdef ENABLE_PYTHON
-	CUtlVector<bp::object> activeAbilities;
+	CUtlVector<boost::python::object> activeAbilities;
 	activeAbilities = m_vecActiveAbilities;
-	for(int i=0; i< activeAbilities.Count(); i++)
+	for( int i = 0; i< activeAbilities.Count(); i++ )
 	{
 		bEatMouse = SrcPySystem()->RunT<bool>( SrcPySystem()->Get("OnRightMouseButtonReleased", activeAbilities[i]), false ) || bEatMouse;	
 	}
@@ -1413,8 +1413,8 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 
 #ifdef ENABLE_PYTHON
 #ifdef CLIENT_DLL
-	char pLevelName[_MAX_PATH];
-	Q_FileBase(engine->GetLevelName(), pLevelName, _MAX_PATH);
+	char pLevelName[MAX_PATH];
+	V_FileBase( engine->GetLevelName(), pLevelName, sizeof( pLevelName ) );
 #else
 	const char *pLevelName = STRING(gpGlobals->mapname);
 #endif

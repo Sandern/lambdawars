@@ -63,15 +63,21 @@ public:
 	void			RemoveFromFloraGrid();
 	static void		InitFloraDataKeyValues();
 
+#ifdef ENABLE_PYTHON
 	static bool		SpawnFlora( const char *modelname, const Vector &position, const QAngle &angle, KeyValues *pExtraKV = NULL, 
 		boost::python::object fnpostspawn = boost::python::object() );
+#else
+	static bool		SpawnFlora( const char *modelname, const Vector &position, const QAngle &angle, KeyValues *pExtraKV = NULL );
+#endif // ENABLE_PYTHON
 
 	static void		RemoveFloraByUUID( const char *pUUID );
 	static void		RemoveFloraInRadius( const Vector &position, float radius, int max = -1 );
 	static CWarsFlora *FindFloraByUUID( const char *pUUID );
 	static int		CountFloraInRadius( const Vector &position, float radius );
 	static int		CountFloraInRadius( const Vector &position, float radius, CUtlVector<int> &restrictmodels );
+#ifdef ENABLE_PYTHON
 	static int		PyCountFloraInRadius( const Vector &position, float radius, boost::python::list restrictmodels = boost::python::list() );
+#endif // ENABLE_PYTHON
 	static void		DestructFloraInRadius( const Vector &position, float radius );
 	static void		IgniteFloraInRadius( const Vector &position, float radius, float lifetime = 30.0f );
 

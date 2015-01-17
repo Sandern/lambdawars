@@ -71,7 +71,8 @@ bool CTraceFilterUnitNav::ShouldHitEntity( IHandleEntity *pHandleEntity, int con
 	//	return false;
 	CBaseEntity *pEntity = (CBaseEntity *)pHandleEntity;
 
-	if ( pEntity->IsNavIgnored() || pEntity->AlwaysNavIgnore() )
+	// Ignore bone followers, so striders don't get stuck on their vphysics...
+	if ( pEntity->IsNavIgnored() || pEntity->AlwaysNavIgnore() || FClassnameIs( pEntity, "phys_bone_follower" ) )
 		return false;
 
 	if ( m_bCheckCollisionTable )

@@ -9,12 +9,16 @@
 #include "wars_network.h"
 #include "inetchannelinfo.h"
 
+#ifdef ENABLE_PYTHON
 #include "srcpy.h"
+#endif // ENABLE_PYTHON
 
 #include "wars/iwars_extension.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+#ifdef ENABLE_PYTHON
 
 ConVar wars_net_debug_send( "wars_net_debug_send", "0", FCVAR_CHEAT|FCVAR_REPLICATED );
 
@@ -251,3 +255,5 @@ void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool
 	// Write the actual data
 	WarsNet_WriteEntityDataInternal( data );
 }
+
+#endif // ENABLE_PYTHON

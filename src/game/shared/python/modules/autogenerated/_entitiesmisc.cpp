@@ -5406,7 +5406,12 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (void ( ::CMultiDamage::* )( ::CBaseEntity * ) )( &::CMultiDamage::SetTarget )
             , ( bp::arg("pTarget") ) );
 
-    bp::class_< CPythonNetworkArray >( "NetworkArrayInternal", bp::init< bp::api::object, char const *, bp::optional< bp::list, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::list(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
+    bp::class_< CPythonNetworkVarBase >( "CPythonNetworkVarBase", bp::no_init )    
+        .def( 
+            "NetworkStateChanged"
+            , (void ( ::CPythonNetworkVarBase::* )(  ) )( &::CPythonNetworkVarBase::NetworkStateChanged ) );
+
+    bp::class_< CPythonNetworkArray, bp::bases< CPythonNetworkVarBase > >( "NetworkArrayInternal", bp::init< bp::api::object, char const *, bp::optional< bp::list, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::list(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
         .def( 
             "__delitem__"
             , (void ( ::CPythonNetworkArray::* )( ::boost::python::api::object ) )( &::CPythonNetworkArray::DelItem )
@@ -5427,7 +5432,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "__str__"
             , (::boost::python::api::object ( ::CPythonNetworkArray::* )(  ) )( &::CPythonNetworkArray::Str ) );
 
-    bp::class_< CPythonNetworkDict >( "NetworkDictInternal", bp::init< bp::api::object, char const *, bp::optional< bp::dict, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::dict(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
+    bp::class_< CPythonNetworkDict, bp::bases< CPythonNetworkVarBase > >( "NetworkDictInternal", bp::init< bp::api::object, char const *, bp::optional< bp::dict, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::dict(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
         .def( 
             "__getitem__"
             , (::boost::python::api::object ( ::CPythonNetworkDict::* )( ::boost::python::api::object ) )( &::CPythonNetworkDict::GetItem )
@@ -5444,7 +5449,7 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "__str__"
             , (::boost::python::api::object ( ::CPythonNetworkDict::* )(  ) )( &::CPythonNetworkDict::Str ) );
 
-    bp::class_< CPythonNetworkVar >( "NetworkVarInternal", bp::init< bp::api::object, char const *, bp::optional< bp::api::object, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::api::object(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
+    bp::class_< CPythonNetworkVar, bp::bases< CPythonNetworkVarBase > >( "NetworkVarInternal", bp::init< bp::api::object, char const *, bp::optional< bp::api::object, bool, bool, bp::api::object > >(( bp::arg("self"), bp::arg("name"), bp::arg("data")=boost::python::api::object(), bp::arg("initstatechanged")=(bool)(false), bp::arg("changedcallback")=(bool)(false), bp::arg("sendproxy")=boost::python::api::object() )) )    
         .def( 
             "Get"
             , (::boost::python::api::object ( ::CPythonNetworkVar::* )(  ) )( &::CPythonNetworkVar::Get ) )    

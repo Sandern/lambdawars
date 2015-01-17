@@ -109,8 +109,8 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 		}
 
 #ifdef CLIENT_DLL
-		char pLevelName[_MAX_PATH];
-		V_FileBase(engine->GetLevelName(), pLevelName, _MAX_PATH);
+		char pLevelName[MAX_PATH];
+		V_FileBase( engine->GetLevelName(), pLevelName, sizeof( pLevelName ) );
 #else
 		const char *pLevelName = STRING(gpGlobals->mapname);
 #endif
@@ -227,11 +227,13 @@ void InstallGameRules()
 	// Install python gamerules
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		boost::python::object liig;
-		try {
-			liig = SrcPySystem()->Get("_LevelInitInstallGamerules", "core.gamerules.info");
+		try 
+		{
+			boost::python::object liig = SrcPySystem()->Get("_LevelInitInstallGamerules", "core.gamerules.info");
 			liig();
-		} catch(...) {
+		} 
+		catch( boost::python::error_already_set & ) 
+		{
 			PyErr_Print();
 			PyErr_Clear();
 		}

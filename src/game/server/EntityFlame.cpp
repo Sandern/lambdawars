@@ -191,7 +191,7 @@ void CEntityFlame::AttachToEntity( CBaseEntity *pTarget )
 	// For networking to the client.
 	m_hEntAttached = pTarget;
 
-	if( pTarget->IsNPC() )
+	if( pTarget->IsNPC() || pTarget->IsUnit() )
 	{
 		EmitSound( "General.BurningFlesh" );
 	}
@@ -304,7 +304,7 @@ void CEntityFlame::FlameThink( void )
 		// distance that the radius damage code uses to determine how much damage to inflict)
 		m_hEntAttached->TakeDamage( CTakeDamageInfo( this, pAttacker, m_fFlameDmgPerSecond * FLAME_DAMAGE_INTERVAL, DMG_BURN | DMG_DIRECT ) );
 		
-		if( !m_hEntAttached->IsNPC() && hl2_episodic.GetBool() )
+		if( (!m_hEntAttached->IsNPC() && !!m_hEntAttached->IsUnit()) && hl2_episodic.GetBool() )
 		{
 			const float ENTITYFLAME_MOVE_AWAY_DIST = 24.0f;
 			// Make a sound near my origin, and up a little higher (in case I'm on the ground, so NPC's still hear it)

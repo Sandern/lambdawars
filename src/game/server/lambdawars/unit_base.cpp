@@ -1182,9 +1182,12 @@ void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 			{
 #ifdef ENABLE_PYTHON
 				// Assume it's an unbound method
-				try {
+				try 
+				{
 					m_pAnimEventMap->m_AnimEventMap[idx].m_pyInstance(GetPyInstance(), pEvent);
-				} catch( boost::python::error_already_set &) {
+				} 
+				catch( boost::python::error_already_set &) 
+				{
 					PyErr_Print();
 					PyErr_Clear();
 				}

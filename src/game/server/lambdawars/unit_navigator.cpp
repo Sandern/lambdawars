@@ -1554,6 +1554,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		if( (GetPath()->m_iGoalFlags & GF_NOLOSREQUIRED) == 0 )
 		{
 			// Check LOS
+#ifdef ENABLE_PYTHON
 			if( GetPath()->m_fnCustomLOSCheck.ptr() != Py_None )
 			{
 				try
@@ -1570,7 +1571,9 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 					PyErr_Print();
 				}
 			}
-			else if( GetPath()->m_hTarget == m_pOuter->GetEnemy() )
+			else 
+#endif // ENABLE_PYTHON
+			if( GetPath()->m_hTarget == m_pOuter->GetEnemy() )
 			{
 				if( !m_pOuter->HasRangeAttackLOS( GetPath()->m_hTarget->BodyTarget( m_pOuter->GetAbsOrigin(), false ), GetPath()->m_hTarget ) )
 				{
@@ -1619,6 +1622,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		{
 			Vector vTestPos = GetPath()->m_vGoalPos;
 
+#ifdef ENABLE_PYTHON
 			if( GetPath()->m_fnCustomLOSCheck.ptr() != Py_None )
 			{
 				try
@@ -1636,6 +1640,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 				}
 			}
 			else
+#endif // ENABLE_PYTHON
 			{
 				// Check own los
 				trace_t result;

@@ -1328,7 +1328,7 @@ void CUIGameData::OnEvent( KeyValues *pEvent )
 		}
 #else
 #ifdef ENABLE_PYTHON
-		if ( !Q_stricmp( "error", pEvent->GetString( "state", "" ) ) )
+		if ( !V_stricmp( "error", pEvent->GetString( "state", "" ) ) )
 		{
 			WarsFireMMSessionJoinFailedSignal();
 		}

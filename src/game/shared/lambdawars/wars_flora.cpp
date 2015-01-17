@@ -12,7 +12,10 @@
 #include "hl2wars_util_shared.h"
 #include <filesystem.h>
 #include "vstdlib/ikeyvaluessystem.h"
+
+#ifdef ENABLE_PYTHON
 #include "srcpy.h"
+#endif // ENABLE_PYTHON
 
 #ifdef CLIENT_DLL
 #include "c_hl2wars_player.h"
@@ -920,7 +923,11 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 // Purpose: Spawn function mainly intended for editor or ingame testing
 //			The editor mode, the flora entity gets synced to the editing client
 //-----------------------------------------------------------------------------
-bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV, boost::python::object fnpostspawn )
+bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, const QAngle &vAngle, KeyValues *pExtraKV
+#ifdef ENABLE_PYTHON
+	, boost::python::object fnpostspawn 
+#endif // ENABLE_PYTHON
+	)
 {
 	bool bEditorManaged = EditorSystem()->IsActive();
 
@@ -960,6 +967,7 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 	DispatchSpawn( pEntity );
 	pEntity->Activate();
 
+#ifdef ENABLE_PYTHON
 	if( fnpostspawn != boost::python::object() )
 	{
 		try
@@ -973,6 +981,7 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 			return false;
 		}
 	}
+#endif // ENABLE_PYTHON
 
 	if( bEditorManaged )
 	{
@@ -1134,12 +1143,14 @@ int CWarsFlora::CountFloraInRadius( const Vector &vPosition, float fRadius, CUtl
 	return iCount;
 }
 
+#ifdef ENABLE_PYTHON
 int CWarsFlora::PyCountFloraInRadius( const Vector &vPosition, float fRadius, boost::python::list pyRestrictModels )
 {
 	CUtlVector<int> restrictModels;
 	ListToUtlVectorByValue<int>( pyRestrictModels, restrictModels );
 	return CountFloraInRadius( vPosition, fRadius, restrictModels );
 }
+#endif // ENABLE_PYTHON
 
 //-----------------------------------------------------------------------------
 // Purpose: 

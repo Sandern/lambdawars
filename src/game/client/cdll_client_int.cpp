@@ -732,8 +732,10 @@ void ProcessWarsMessages()
 		{
 			EMessageClient eMsg = (EMessageClient)( *(uint32*)messageData->buf.Base() );
 
+#ifdef ENABLE_PYTHON
 			boost::python::dict kwargs;
 			boost::python::object signal;
+#endif // ENABLE_PYTHON
 			uint32 publicIP = 0;
 			uint32 gamePort = 0;
 			CSteamID serverSteamID;
@@ -751,18 +753,24 @@ void ProcessWarsMessages()
 						serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
 					}
 					
+#ifdef ENABLE_PYTHON
 					kwargs["sender"] = boost::python::object();
 					kwargs["publicip"] = publicIP;
 					kwargs["gameport"] = gamePort;
 					kwargs["serversteamid"] = serverSteamID;
 					signal = SrcPySystem()->Get("lobby_gameserver_accept", "core.signals", true);
 					SrcPySystem()->CallSignal( signal, kwargs );
+#endif // ENABLE_PYTHON
 					break;
 				case k_EMsgClientRequestGameDenied:
+#ifdef ENABLE_PYTHON
 					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
+#endif // ENABLE_PYTHON
 					break;
 				case k_EMsgClient_PyEntityUpdate:
+#ifdef ENABLE_PYTHON
 					WarsNet_ReceiveEntityUpdate( messageData->buf );
+#endif // ENABLE_PYTHON
 					break;
 				default:
 					Warning("Unknown client message type %d\n", eMsg); 
@@ -1383,7 +1391,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
 
+#ifdef ENABLE_PYTHON
 	WarsNet_Init();
+#endif // ENABLE_PYTHON
 #endif // HL2WARS_DLL
 
 	m_bWasPaused = false;
@@ -1485,7 +1495,9 @@ void CHLClient::Shutdown( void )
 #ifdef HL2WARS_DLL
 	CWarsFlora::DestroyFloraGrid();
 
+#ifdef ENABLE_PYTHON
 	WarsNet_Shutdown();
+#endif // ENABLE_PYTHON
 #endif // HL2WARS_DLL
 	
 	DisconnectTier3Libraries( );

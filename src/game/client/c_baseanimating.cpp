@@ -1144,7 +1144,9 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 		SetSequence(0);
 	}
 
+#ifdef ENABLE_PYTHON
 	PyOnNewModel();
+#endif // ENABLE_PYTHON
 
 	return hdr;
 }

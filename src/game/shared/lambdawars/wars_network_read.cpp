@@ -10,11 +10,14 @@
 #include "wars_matchmaking.h"
 #include "steam/steam_api.h"
 
+#ifdef ENABLE_PYTHON
 #include "srcpy.h"
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef ENABLE_PYTHON
 ConVar wars_net_debug_receive( "wars_net_debug_receive", "0", FCVAR_CHEAT );
 
 static boost::python::object WarsNet_ReadEntityVarData( CUtlBuffer &data, bool &success );
@@ -283,3 +286,4 @@ void WarsNet_Shutdown()
 	delete s_pWarsNet;
 	s_pWarsNet = NULL;
 }
+#endif // ENABLE_PYTHON

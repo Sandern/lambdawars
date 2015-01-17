@@ -217,7 +217,9 @@ public:
 		m_fMaxMoveDist = src.m_fMaxMoveDist;
 		m_bSuccess = src.m_bSuccess;
 		m_bIsDirectPath = src.m_bIsDirectPath;
+#ifdef ENABLE_PYTHON
 		m_fnCustomLOSCheck = src.m_fnCustomLOSCheck;
+#endif // ENABLE_PYTHON
 
 		// Copy waypoints
 		if( src.m_pWaypointHead )
@@ -344,8 +346,10 @@ public:
 	float m_fMaxMoveDist;
 	bool m_bSuccess; // Can be queried after path completion by other components
 	bool m_bIsDirectPath;
+#ifdef ENABLE_PYTHON
 	boost::python::object m_fnCustomLOSCheck; // Allows using a custom Python based los check
 	boost::python::object m_pathContext; // Allows setting a context for this path. Could be anything.
+#endif // ENABLE_PYTHON
 };
 
 #define CONSIDER_SIZE 48
