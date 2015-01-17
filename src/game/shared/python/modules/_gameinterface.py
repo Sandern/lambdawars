@@ -325,7 +325,10 @@ class GameInterface(SemiSharedModuleGenerator):
             cls.include()
             cls.mem_funs().virtuality = 'not virtual'
             
-            cls.mem_fun('FindLaunchOptionByValue').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+            if self.settings.branch == 'swarm':
+                cls.mem_fun('FindLaunchOptionByValue').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+            if self.settings.branch == 'source2013':
+                cls.mem_fun('GetServerGCLobby').exclude()
             cls.mem_fun('GetAllServerClasses').exclude()
             cls.mem_fun('GetStandardSendProxies').exclude()
             cls.mem_fun('SaveInit').exclude()
