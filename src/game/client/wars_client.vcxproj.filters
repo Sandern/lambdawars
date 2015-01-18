@@ -106,6 +106,9 @@
     <Filter Include="Source Files\Recast\DispBuild">
       <UniqueIdentifier>{3036161f-9f78-4084-81a1-c23afb72b4cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Recast\fastlz">
+      <UniqueIdentifier>{1b825196-5c8e-44f0-b754-f3d0b114d30a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vscript_client.nut">
@@ -2478,6 +2481,12 @@
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
     <ClCompile Include="recast\recast_detourdebugdraw.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\recast\fastlz\fastlz.c">
+      <Filter>Source Files\Recast\fastlz</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_tilecache_helpers.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
   </ItemGroup>
@@ -5021,6 +5030,12 @@
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
     <ClInclude Include="recast\recast_detourdebugdraw.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\fastlz\fastlz.h">
+      <Filter>Source Files\Recast\fastlz</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_tilecache_helpers.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>

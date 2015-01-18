@@ -10,6 +10,10 @@
 #include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
 
+#ifndef CLIENT_DLL
+#include "recast/recast_mapmesh.h"
+#endif // CLIENT_DLL
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -27,6 +31,9 @@ CRecastMgr &RecastMgr()
 //-----------------------------------------------------------------------------
 CRecastMgr::CRecastMgr()
 {
+#ifndef CLIENT_DLL
+	m_pMapMesh = NULL;
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -47,6 +54,14 @@ void CRecastMgr::Reset()
 		pMesh->Reset();
 	}
 	m_Meshes.PurgeAndDeleteElements();
+
+#ifndef CLIENT_DLL
+	if( m_pMapMesh )
+	{
+		delete m_pMapMesh;
+		m_pMapMesh = NULL;
+	}
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -78,10 +93,18 @@ bool CRecastMgr::Build()
 	// Clear any existing mesh
 	Reset();
 
+	// Load map mesh
+	CMapMesh *pMapMesh = new CMapMesh();
+	if( !pMapMesh->Load() )
+	{
+		Warning("CRecastMesh::Load: failed to load map data!\n");
+		return false;
+	}
+
 	// Create meshes
 	CRecastMesh *pMesh = new CRecastMesh();
 	pMesh->SetName( "soldier" );
-	if( pMesh->Build() )
+	if( pMesh->Build( pMapMesh ) )
 	{
 		m_Meshes.Insert( pMesh->GetName(), pMesh );
 	}

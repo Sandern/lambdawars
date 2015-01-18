@@ -14,12 +14,39 @@
 #include <recast/Recast.h>
 
 class UnitBaseWaypoint;
+class CMapMesh;
+
+//struct LinearAllocator;
+//struct FastLZCompressor;
+//struct MeshProcess;
 
 enum SamplePartitionType
 {
 	SAMPLE_PARTITION_WATERSHED,
 	SAMPLE_PARTITION_MONOTONE,
 	SAMPLE_PARTITION_LAYERS,
+};
+
+/// These are just sample areas to use consistent values across the samples.
+/// The use should specify these base on his needs.
+enum SamplePolyAreas
+{
+	SAMPLE_POLYAREA_GROUND,
+	SAMPLE_POLYAREA_WATER,
+	SAMPLE_POLYAREA_ROAD,
+	SAMPLE_POLYAREA_DOOR,
+	SAMPLE_POLYAREA_GRASS,
+	SAMPLE_POLYAREA_JUMP,
+};
+
+enum SamplePolyFlags
+{
+	SAMPLE_POLYFLAGS_WALK		= 0x01,		// Ability to walk (ground, grass, road)
+	SAMPLE_POLYFLAGS_SWIM		= 0x02,		// Ability to swim (water).
+	SAMPLE_POLYFLAGS_DOOR		= 0x04,		// Ability to move through doors.
+	SAMPLE_POLYFLAGS_JUMP		= 0x08,		// Ability to jump.
+	SAMPLE_POLYFLAGS_DISABLED	= 0x10,		// Disabled polygon
+	SAMPLE_POLYFLAGS_ALL		= 0xffff	// All abilities.
 };
 
 class CRecastMesh
@@ -39,7 +66,7 @@ public:
 	virtual bool Reset();
 
 #ifndef CLIENT_DLL
-	virtual bool Build();
+	virtual bool Build( CMapMesh *pMapMesh );
 	virtual bool Save( CUtlBuffer &fileBuffer );
 #endif // CLIENT_DLL
 
@@ -51,30 +78,6 @@ public:
 	// Path find functions
 	virtual UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd );
 #endif // CLIENT_DLL
-
-public:
-
-	/// These are just sample areas to use consistent values across the samples.
-	/// The use should specify these base on his needs.
-	enum SamplePolyAreas
-	{
-		SAMPLE_POLYAREA_GROUND,
-		SAMPLE_POLYAREA_WATER,
-		SAMPLE_POLYAREA_ROAD,
-		SAMPLE_POLYAREA_DOOR,
-		SAMPLE_POLYAREA_GRASS,
-		SAMPLE_POLYAREA_JUMP,
-	};
-
-	enum SamplePolyFlags
-	{
-		SAMPLE_POLYFLAGS_WALK		= 0x01,		// Ability to walk (ground, grass, road)
-		SAMPLE_POLYFLAGS_SWIM		= 0x02,		// Ability to swim (water).
-		SAMPLE_POLYFLAGS_DOOR		= 0x04,		// Ability to move through doors.
-		SAMPLE_POLYFLAGS_JUMP		= 0x08,		// Ability to jump.
-		SAMPLE_POLYFLAGS_DISABLED	= 0x10,		// Disabled polygon
-		SAMPLE_POLYFLAGS_ALL		= 0xffff	// All abilities.
-	};
 
 protected:
 	bool m_keepInterResults;
@@ -94,6 +97,16 @@ protected:
 	float m_detailSampleMaxError;
 	int m_partitionType;
 
+	int m_maxTiles;
+	int m_maxPolysPerTile;
+	float m_tileSize;
+
+	float m_cacheBuildTimeMs;
+	int m_cacheCompressedSize;
+	int m_cacheRawSize;
+	int m_cacheLayerCount;
+	int m_cacheBuildMemUsage;
+
 private:
 	CUtlString m_Name;
 	
@@ -106,8 +119,13 @@ private:
 	rcConfig m_cfg;	
 	rcPolyMeshDetail* m_dmesh;
 
+	struct dtTileCacheAlloc* m_talloc;
+	struct dtTileCacheCompressor* m_tcomp;
+	struct dtTileCacheMeshProcess *m_tmproc;
+
 	// Data used for path finding
 	class dtNavMesh* m_navMesh;
+	class dtTileCache* m_tileCache;
 	class dtNavMeshQuery* m_navQuery;
 };
 

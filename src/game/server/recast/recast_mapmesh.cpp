@@ -10,10 +10,10 @@
 #include "recast/recast_mapmesh.h"
 #include "builddisp.h"
 #include "gamebspfile.h"
-#include "datacache/imdlcache.h"
-#include "optimize.h"
-
+//#include "datacache/imdlcache.h"
 #include <filesystem.h>
+
+#include "ChunkyTriMesh.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CMapMesh::CMapMesh()
+CMapMesh::CMapMesh() : m_chunkyMesh(0)
 {
 
 }
@@ -42,6 +42,12 @@ void CMapMesh::Clear()
 	m_Vertices.Purge();
 	m_Triangles.Purge();
 	m_Normals.Purge();
+
+	if( m_chunkyMesh )
+	{
+		delete m_chunkyMesh;
+		m_chunkyMesh = 0;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -496,6 +502,21 @@ bool CMapMesh::Load()
 			n[2] *= d;
 		}
 	}
+
+	// Chunky mesh
+	m_chunkyMesh = new rcChunkyTriMesh;
+	if (!m_chunkyMesh)
+	{
+		Warning("buildTiledNavigation: Out of memory 'm_chunkyMesh'.\n");
+		//ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Out of memory 'm_chunkyMesh'.");
+		return false;
+	}
+	if (!rcCreateChunkyTriMesh(GetVerts(), GetTris(), GetNumTris(), 256, m_chunkyMesh))
+	{
+		Warning("buildTiledNavigation: Failed to build chunky mesh.\n");
+		//ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Failed to build chunky mesh.");
+		return false;
+	}	
 
 	return true;
 }

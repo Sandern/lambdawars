@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+struct rcChunkyTriMesh;
+
 class CMapMesh
 {
 public:
@@ -25,6 +27,7 @@ public:
 	const int *GetTris();
 	int GetNumTris();
 	const float *GetNorms();
+	const rcChunkyTriMesh *GetChunkyMesh();
 
 private:
 	virtual bool GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
@@ -35,6 +38,8 @@ private:
 	CUtlVector< float > m_Vertices;
 	CUtlVector< int > m_Triangles; // Indices into m_Vertices
 	CUtlVector< float > m_Normals;
+
+	rcChunkyTriMesh* m_chunkyMesh;
 };
 
 inline const float *CMapMesh::GetVerts()
@@ -58,6 +63,11 @@ inline int CMapMesh::GetNumTris()
 inline const float *CMapMesh::GetNorms()
 {
 	return m_Normals.Base();
+}
+
+inline const rcChunkyTriMesh *CMapMesh::GetChunkyMesh()
+{
+	return m_chunkyMesh;
 }
 
 #endif // RECAST_MAPMESH_H

@@ -14,6 +14,7 @@
 #include "tier1/utldict.h"
 
 class CRecastMesh;
+class CMapMesh;
 
 class CRecastMgr
 {
@@ -47,6 +48,10 @@ protected:
 #endif // CLIENT_DLL
 
 private:
+#ifndef CLIENT_DLL
+	CMapMesh *m_pMapMesh;
+#endif // CLIENT_DLL
+
 	CUtlDict< CRecastMesh *, int > m_Meshes;
 };
 

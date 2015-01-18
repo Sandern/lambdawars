@@ -16,6 +16,8 @@
 
 #include "detour/DetourNavMesh.h"
 #include "detour/DetourNavMeshQuery.h"
+#include "detourtilecache/DetourTileCache.h"
+#include "detourtilecache/DetourTileCacheBuilder.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -34,16 +36,17 @@ struct NavMgrHeader
 	int numMeshes;
 };
 
-struct NavMeshSetHeader
+struct TileCacheSetHeader
 {
 	int numTiles;
-	dtNavMeshParams params;
+	dtNavMeshParams meshParams;
+	dtTileCacheParams cacheParams;
 	int lenName;
 };
 
-struct NavMeshTileHeader
+struct TileCacheTileHeader
 {
-	dtTileRef tileRef;
+	dtCompressedTileRef tileRef;
 	int dataSize;
 };
 
@@ -52,7 +55,8 @@ struct NavMeshTileHeader
 //-----------------------------------------------------------------------------
 bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 {
-	NavMeshSetHeader header;
+	// Read header.
+	TileCacheSetHeader header;
 	fileBuffer.Get( &header, sizeof( header ) );
 	if( !fileBuffer.IsValid() )
 	{
@@ -72,26 +76,34 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 
 	SetName( szName );
 
-	if( !m_navMesh )
+	m_navMesh = dtAllocNavMesh();
+	if (!m_navMesh)
 	{
-		m_navMesh = dtAllocNavMesh();
-		if (!m_navMesh)
-		{
-			return false;
-		}
+		return false;
 	}
-
-	dtStatus status = m_navMesh->init(&header.params);
+	dtStatus status = m_navMesh->init(&header.meshParams);
 	if (dtStatusFailed(status))
 	{
+		return false;
+	}
+
+	m_tileCache = dtAllocTileCache();
+	if (!m_tileCache)
+	{
+		return false;
+	}
+	status = m_tileCache->init(&header.cacheParams, m_talloc, m_tcomp, m_tmproc);
+	if (dtStatusFailed(status))
+	{
+		Warning("Failed to init tile cache\n");
 		return false;
 	}
 		
 	// Read tiles.
 	for (int i = 0; i < header.numTiles; ++i)
 	{
-		NavMeshTileHeader tileHeader;
-		fileBuffer.Get( &tileHeader, sizeof( tileHeader ) );
+		TileCacheTileHeader tileHeader;
+		fileBuffer.Get( &tileHeader, sizeof(tileHeader) );
 		if( !fileBuffer.IsValid() )
 			return false;
 
@@ -105,8 +117,12 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 		fileBuffer.Get( data, tileHeader.dataSize );
 		if( !fileBuffer.IsValid() )
 			return false;
+		
+		dtCompressedTileRef tile = 0;
+		m_tileCache->addTile(data, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile);
 
-		m_navMesh->addTile(data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0);
+		if (tile)
+			m_tileCache->buildNavMeshTile(tile, m_navMesh);
 	}
 
 	// Init nav query
@@ -117,7 +133,7 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 		return false;
 	}
 
-	Msg( "Loaded mesh %s\n", szName );
+	Msg( "Loaded mesh %s\n", m_Name.Get() );
 	return true;
 }
 
@@ -184,34 +200,30 @@ bool CRecastMesh::Save( CUtlBuffer &fileBuffer )
 {
 	Msg( "Saving mesh %s (%d)\n", m_Name.Get(), m_Name.Length() );
 
-	const dtNavMesh *mesh = m_navMesh;
-	if( !mesh )
-		return false;
-
-	// Store mesh information
-	NavMeshSetHeader header;
-	header.lenName = m_Name.Length();
+	// Store header.
+	TileCacheSetHeader header;
 	header.numTiles = 0;
-	for (int i = 0; i < mesh->getMaxTiles(); ++i)
+	header.lenName = m_Name.Length();
+	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
 	{
-		const dtMeshTile* tile = mesh->getTile(i);
+		const dtCompressedTile* tile = m_tileCache->getTile(i);
 		if (!tile || !tile->header || !tile->dataSize) 
 			continue;
 		header.numTiles++;
 	}
-	V_memcpy(&header.params, mesh->getParams(), sizeof(dtNavMeshParams));
+	memcpy(&header.cacheParams, m_tileCache->getParams(), sizeof(dtTileCacheParams));
+	memcpy(&header.meshParams, m_navMesh->getParams(), sizeof(dtNavMeshParams));
 	fileBuffer.Put( &header, sizeof( header ) );
 	fileBuffer.Put( m_Name.Get(), m_Name.Length() );
 
 	// Store tiles.
-	for( int i = 0; i < mesh->getMaxTiles(); ++i )
+	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
 	{
-		const dtMeshTile* tile = mesh->getTile(i);
-		if (!tile || !tile->header || !tile->dataSize) 
-			continue;
+		const dtCompressedTile* tile = m_tileCache->getTile(i);
+		if (!tile || !tile->header || !tile->dataSize) continue;
 
-		NavMeshTileHeader tileHeader;
-		tileHeader.tileRef = mesh->getTileRef(tile);
+		TileCacheTileHeader tileHeader;
+		tileHeader.tileRef = m_tileCache->getTileRef(tile);
 		tileHeader.dataSize = tile->dataSize;
 		fileBuffer.Put( &tileHeader, sizeof( tileHeader ) );
 

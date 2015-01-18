@@ -17,17 +17,20 @@
 #include "recast/recast_detourdebugdraw.h"
 #endif // CLIENT_DLL
 
+#include "recast/recast_tilecache_helpers.h"
+
 #include "detour/DetourNavMesh.h"
 #include "detour/DetourNavMeshBuilder.h"
 #include "detour/DetourNavMeshQuery.h"
 #include "detour/DetourCommon.h"
+#include "detourtilecache/DetourTileCache.h"
 
 #ifndef CLIENT_DLL
 #include "unit_navigator.h"
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
+//#include "tier0/memdbgon.h"
 
 ConVar recast_edit( "recast_edit", "1", FCVAR_GAMEDLL | FCVAR_CHEAT, "Set to one to interactively edit the Recast Navigation Mesh. Set to zero to leave edit mode." );
 
@@ -42,10 +45,20 @@ CRecastMesh::CRecastMesh() :
 	m_cset(0),
 	m_pmesh(0),
 	m_dmesh(0),
-	m_navMesh(0)
+	m_navMesh(0),
+	m_tileCache(0),
+	m_cacheBuildTimeMs(0),
+	m_cacheCompressedSize(0),
+	m_cacheRawSize(0),
+	m_cacheLayerCount(0),
+	m_cacheBuildMemUsage(0)
 {
 	m_Name.Set("default");
 	m_navQuery = dtAllocNavMeshQuery();
+
+	m_talloc = new LinearAllocator(32000);
+	m_tcomp = new FastLZCompressor;
+	m_tmproc = new MeshProcess();
 }
 
 //-----------------------------------------------------------------------------
@@ -81,124 +94,11 @@ void CRecastMesh::ResetCommonSettings()
 	m_detailSampleDist = 600.0f;
 	m_detailSampleMaxError = 100.0f;
 	m_partitionType = SAMPLE_PARTITION_WATERSHED;
+
+	m_maxTiles = 0;
+	m_maxPolysPerTile = 0;
+	m_tileSize = 48;
 }
-
-static void AddVertex( float* verts, float x, float y, float z )
-{
-	verts[0] = x;
-	verts[1] = z;
-	verts[2] = y;
-}
-static void AddTriangle( int* tris, int p1, int p2, int p3 )
-{
-	tris[0] = p1;
-	tris[1] = p2;
-	tris[2] = p3;
-}
-
-static void PrintDebugSpans( const char *pStepName, rcHeightfield& solid )
-{
-	const int w = solid.width;
-	const int h = solid.height;
-
-	int nWalkableAreas = 0;
-	for (int y = 0; y < h; ++y)
-	{
-		for (int x = 0; x < w; ++x)
-		{
-			for (rcSpan* s = solid.spans[x + y*w]; s; s = s->next)
-			{
-				if( s->area == RC_WALKABLE_AREA )
-					nWalkableAreas += 1;
-			}
-		}
-	}
-	Msg( "%s: %d walkable areas\n", pStepName, nWalkableAreas );
-}
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Build cube
-//-----------------------------------------------------------------------------
-void CRecastMesh::LoadTestData()
-{
-	// Create a mesh for testing
-	const int nverts = 8;
-	float* verts = new float[nverts*3];
-
-	// Create four points for triangles
-	const float meshHeight = 720.0f;
-	AddVertex( verts, -1024.0f, -1024.0f, 0.0f ); // 0
-	AddVertex( verts + 3, -1024.0f, 1024.0f, 0.0f ); // 1
-	AddVertex( verts + 6, 1024.0f, 1024.0f, 0.0f ); // 2
-	AddVertex( verts + 9, 1024.0f, -1024.0f, 0.0f ); // 3
-
-	AddVertex( verts + 12, -1024.0f, -1024.0f, meshHeight ); // 4
-	AddVertex( verts + 15, -1024.0f, 1024.0f, meshHeight ); // 5
-	AddVertex( verts + 18, 1024.0f, 1024.0f, meshHeight ); // 6
-	AddVertex( verts + 21, 1024.0f, -1024.0f, meshHeight ); // 7
-
-	const int ntris = 12;
-	int* tris = new int[ntris*3];
-
-	// Create two triangles using above points
-	// Bottom
-	AddTriangle( tris, 0, 1, 2 );
-	AddTriangle( tris + 3, 0, 2, 3 );
-
-	// Top
-	AddTriangle( tris + 6, 4, 6, 5 );
-	AddTriangle( tris + 9, 4, 7, 6 );
-
-	// Side 1
-	AddTriangle( tris + 12, 0, 5, 1 );
-	AddTriangle( tris + 15, 0, 4, 5 );
-
-	// Side 2
-	AddTriangle( tris + 18, 1, 5, 2 );
-	AddTriangle( tris + 21, 5, 6, 2 );
-
-	// Side 3
-	AddTriangle( tris + 24, 2, 6, 3 );
-	AddTriangle( tris + 27, 6, 7, 3 );
-
-	// Side 4
-	AddTriangle( tris + 30, 3, 7, 0 );
-	AddTriangle( tris + 33, 7, 4, 0 );
-
-	m_verts = verts;
-	m_nverts = nverts;
-	m_tris = tris;
-	m_ntris = ntris;
-
-	// Calculate normals.
-	m_normals = new float[ntris*3];
-	for (int i = 0; i < ntris*3; i += 3)
-	{
-		const float* v0 = &m_verts[m_tris[i]*3];
-		const float* v1 = &m_verts[m_tris[i+1]*3];
-		const float* v2 = &m_verts[m_tris[i+2]*3];
-		float e0[3], e1[3];
-		for (int j = 0; j < 3; ++j)
-		{
-			e0[j] = v1[j] - v0[j];
-			e1[j] = v2[j] - v0[j];
-		}
-		float* n = &m_normals[i];
-		n[0] = e0[1]*e1[2] - e0[2]*e1[1];
-		n[1] = e0[2]*e1[0] - e0[0]*e1[2];
-		n[2] = e0[0]*e1[1] - e0[1]*e1[0];
-		float d = sqrtf(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
-		if (d > 0)
-		{
-			d = 1.0f/d;
-			n[0] *= d;
-			n[1] *= d;
-			n[2] *= d;
-		}
-	}
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -246,6 +146,12 @@ bool CRecastMesh::Reset()
 	{
 		dtFreeNavMesh(m_navMesh);
 		m_navMesh = 0;
+	}
+
+	if( m_tileCache )
+	{
+		dtFreeTileCache(m_tileCache);
+		m_tileCache = 0;
 	}
 
 	return true;
