@@ -103,6 +103,14 @@ void CRecastMesh::ResetCommonSettings()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CRecastMesh::Update( float dt )
+{
+	m_tileCache->update( dt, m_navMesh );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CRecastMesh::Reset()
 {
 	// Cleanup Nav mesh data
@@ -224,6 +232,8 @@ void CRecastMesh::DebugRender()
 //-----------------------------------------------------------------------------
 UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd )
 {
+	VPROF_BUDGET( "CRecastMesh::FindPath", "RecastNav" );
+
 	UnitBaseWaypoint *pResultPath = NULL;
 
 	dtQueryFilter m_filter;
@@ -289,3 +299,11 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	return pResultPath;
 }
 #endif // CLIENT_DLL
+
+
+void CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
+{
+	float pos[3] = {vPos.x, vPos.z, vPos.y};
+	Msg("Adding temp obstacle to %f %f %f with radius % fand height %f\n", pos[0], pos[1], pos[2], radius, height);
+	m_tileCache->addObstacle( pos, radius, height, NULL );
+}

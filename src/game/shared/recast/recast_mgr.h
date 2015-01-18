@@ -22,6 +22,8 @@ public:
 	CRecastMgr();
 	~CRecastMgr();
 
+	virtual void Update( float dt );
+
 	// Load methods
 	virtual bool Load();
 	virtual void Reset();

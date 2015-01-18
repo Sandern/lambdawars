@@ -1405,6 +1405,8 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 	TheNavMesh->Update();
 
+	RecastMgr().Update( gpGlobals->frametime );
+
 	{
 		VPROF( "gamestatsuploader->UpdateConnection" );
 		gamestatsuploader->UpdateConnection();

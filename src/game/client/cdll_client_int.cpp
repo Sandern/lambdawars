@@ -1579,6 +1579,8 @@ void CHLClient::HudUpdate( bool bActive )
 		IGameSystem::UpdateAllSystems( frametime );
 	}
 
+	RecastMgr().Update( frametime );
+
 	// run vgui animations
 	vgui::GetAnimationController()->UpdateAnimations( Plat_FloatTime() );
 

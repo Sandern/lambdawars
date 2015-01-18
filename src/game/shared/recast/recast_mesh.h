@@ -58,6 +58,8 @@ public:
 	const char *GetName();
 	void SetName( const char *name );
 
+	virtual void Update( float dt );
+
 	// Load/build 
 	//virtual void LoadTestData();
 	virtual void ResetCommonSettings();
@@ -78,6 +80,9 @@ public:
 	// Path find functions
 	virtual UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd );
 #endif // CLIENT_DLL
+
+	// Obstacle management
+	void AddTempObstacle( const Vector &vPos, float radius, float height );
 
 protected:
 	bool m_keepInterResults;

@@ -12,6 +12,9 @@
 
 #ifndef CLIENT_DLL
 #include "recast/recast_mapmesh.h"
+#include "hl2wars_player.h"
+#else
+#include "c_hl2wars_player.h"
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -62,6 +65,20 @@ void CRecastMgr::Reset()
 		m_pMapMesh = NULL;
 	}
 #endif // CLIENT_DLL
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CRecastMgr::Update( float dt )
+{
+	VPROF_BUDGET( "CRecastMgr::Update", "RecastNav" );
+
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		CRecastMesh *pMesh = m_Meshes[ i ];
+		pMesh->Update( dt );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -187,4 +204,35 @@ CON_COMMAND_F( cl_recast_listmeshes, "", FCVAR_CHEAT )
 		Msg( "%d: %s\n", idx, meshes.Element(idx)->GetName() );
 		idx = meshes.Next( idx );
 	}
+}
+
+
+#ifndef CLIENT_DLL
+CON_COMMAND_F( recast_addobstacle, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( cl_recast_addobstacle, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+#ifndef CLIENT_DLL
+	CHL2WarsPlayer *pPlayer = dynamic_cast<CHL2WarsPlayer *>( UTIL_GetCommandClient() );
+#else
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+#endif // CLIENT_DLL
+	if( !pPlayer )
+	{
+		return;
+	}
+
+	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
+	for ( int i = meshes.First(); i != meshes.InvalidIndex(); i = meshes.Next(i ) )
+	{
+		CRecastMesh *pMesh = meshes[ i ];
+		float radius = args.ArgC() > 1 ? atof( args[1] ) : 64.0f;
+		float height = args.ArgC() > 2 ? atof( args[2] ) : 96.0f;
+		pMesh->AddTempObstacle( pPlayer->GetMouseData().m_vEndPos, radius, height );
+	}
+
+#ifndef CLIENT_DLL
+	engine->ClientCommand( pPlayer->edict(), "cl_recast_addobstacle %s %s\n", args[1], args[2] );
+#endif // CLIENT_DLL
 }
