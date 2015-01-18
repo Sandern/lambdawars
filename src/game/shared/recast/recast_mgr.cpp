@@ -108,18 +108,44 @@ void CRecastMgr::DebugRender()
 #ifndef CLIENT_DLL
 CON_COMMAND_F( recast_build, "", FCVAR_CHEAT )
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
 	s_RecastMgr.Build();
 	s_RecastMgr.Save();
+
+	CBasePlayer *pPlayer = UTIL_GetCommandClient();
+	if( pPlayer )
+	{
+		engine->ClientCommand( pPlayer->edict(), "cl_recast_reload\n" );
+	}
 }
 
 CON_COMMAND_F( recast_save, "", FCVAR_CHEAT )
 {
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
 	s_RecastMgr.Save();
 
-	// Something like that:
-	//engine->ClientCmd("recast_reload\n");
+	CBasePlayer *pPlayer = UTIL_GetCommandClient();
+	if( pPlayer )
+	{
+		engine->ClientCommand( pPlayer->edict(), "cl_recast_reload\n" );
+	}
 }
 #endif // CLIENT_DLL
+
+#ifndef CLIENT_DLL
+CON_COMMAND_F( recast_reload, "Reload the Recast Navigation Mesh from disk on server", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( cl_recast_reload, "Reload the Recast Navigation Mesh from disk on client", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+#ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+	s_RecastMgr.Load();
+}
 
 #ifndef CLIENT_DLL
 CON_COMMAND_F( recast_listmeshes, "", FCVAR_CHEAT )
@@ -127,6 +153,10 @@ CON_COMMAND_F( recast_listmeshes, "", FCVAR_CHEAT )
 CON_COMMAND_F( cl_recast_listmeshes, "", FCVAR_CHEAT )
 #endif // CLIENT_DLL
 {
+#ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
 	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
 	int idx = meshes.First();
 	while( meshes.IsValidIndex( idx ) )

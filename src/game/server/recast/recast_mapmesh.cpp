@@ -330,11 +330,7 @@ bool CMapMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &ver
 //-----------------------------------------------------------------------------
 bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int> &triangles )
 {
-#ifdef CLIENT_DLL
-	for( CBaseEntity *pEntity = ClientEntityList().FirstBaseEntity(); pEntity; pEntity = ClientEntityList().NextBaseEntity( pEntity ) )
-#else
 	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
-#endif // CLIENT_DLL
 	{
 		if( FClassnameIs( pEntity, "prop_dynamic" ) )
 		{
@@ -364,13 +360,7 @@ bool CMapMesh::Load()
 
 	// nav filename is derived from map filename
 	char filename[256];
-#ifdef CLIENT_DLL
-	V_snprintf( filename, sizeof( filename ), "%s", STRING( engine->GetLevelName() ) );
-	V_StripExtension( filename, filename, 256 );
-	V_snprintf( filename, sizeof( filename ), "%s.bsp", filename );
-#else
 	V_snprintf( filename, sizeof( filename ), "maps\\%s.bsp", STRING( gpGlobals->mapname ) );
-#endif // CLIENT_DLL
 
 	CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::READ_ONLY );
 	if ( !filesystem->ReadFile( filename, "MOD", fileBuffer ) )	// this ignores .nav files embedded in the .bsp ...
@@ -461,28 +451,13 @@ bool CMapMesh::Load()
 				m_Triangles.AddToTail( connectingVertIdx );
 			}
 		}
-		/*else
-		{
-			// Displacement
-		}*/
 	}
 
 	GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
 	GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
 	GenerateDynamicPropData( m_Vertices, m_Triangles );
 
-#if 0
-	// Copy result
-	m_nverts = verts.Count() / 3;
-	m_verts = new float[verts.Count()];
-	V_memcpy( m_verts, verts.Base(), verts.Count() * sizeof(float) );
-
-	m_ntris = triangles.Count() / 3;
-	m_tris = new int[triangles.Count()];
-	V_memcpy( m_tris, triangles.Base(), triangles.Count() * sizeof(int) );
-#endif // 0
-
-//#if defined(_DEBUG)
+#if defined(_DEBUG)
 	for( int i = 0; i < m_Triangles.Count(); i++ )
 	{
 		if( m_Triangles[i] < 0 || m_Triangles[i] >= GetNumVerts() )
@@ -490,7 +465,7 @@ bool CMapMesh::Load()
 			Warning("Triangle %d has invalid vertex index: %d\n", i, m_Triangles[i] );
 		}
 	}
-//#endif // _DEBUG
+#endif // _DEBUG
 
 	Msg( "Recast Load map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, GetNumVerts(), GetNumTris(), length, header->m_nVersion );
 

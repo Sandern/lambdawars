@@ -281,7 +281,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_sound.cpp" />
     <ClCompile Include="..\shared\python\srcpy_util.cpp" />
     <ClCompile Include="..\shared\recast\recast_file.cpp" />
-    <ClCompile Include="..\shared\recast\recast_mapmesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_server.cpp" />
@@ -816,6 +815,8 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="recast\recast_build.cpp" />
+    <ClCompile Include="recast\recast_mapmesh.cpp" />
     <ClCompile Include="recipientfilter.cpp" />
     <ClCompile Include="..\..\public\registry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -1071,7 +1072,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_class_shared.h" />
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
     <ClInclude Include="..\shared\recast\recast_file.h" />
-    <ClInclude Include="..\shared\recast\recast_mapmesh.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="..\shared\recast\recast_mgr.h" />
     <ClInclude Include="deferred\cdeferred_manager_server.h" />
@@ -1367,6 +1367,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="pushentity.h" />
     <ClInclude Include="..\shared\ragdoll_shared.h" />
     <ClInclude Include="RagdollBoogie.h" />
+    <ClInclude Include="recast\recast_mapmesh.h" />
     <ClInclude Include="recipientfilter.h" />
     <ClInclude Include="replaydirector.h" />
     <ClInclude Include="rope.h" />

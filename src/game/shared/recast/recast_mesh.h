@@ -15,6 +15,13 @@
 
 class UnitBaseWaypoint;
 
+enum SamplePartitionType
+{
+	SAMPLE_PARTITION_WATERSHED,
+	SAMPLE_PARTITION_MONOTONE,
+	SAMPLE_PARTITION_LAYERS,
+};
+
 class CRecastMesh
 {
 public:
@@ -28,11 +35,11 @@ public:
 	//virtual void LoadTestData();
 	virtual void ResetCommonSettings();
 
-	virtual bool Build();
 	virtual bool Load( CUtlBuffer &fileBuffer );
 	virtual bool Reset();
 
 #ifndef CLIENT_DLL
+	virtual bool Build();
 	virtual bool Save( CUtlBuffer &fileBuffer );
 #endif // CLIENT_DLL
 
