@@ -357,6 +357,44 @@ bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int
 	return true;
 }
 
+static int CalcBrushContents( void *fileContent, int nodeidx )
+{
+	int contents = 0;
+
+	BSPHeader_t *header = (BSPHeader_t *)fileContent;
+	dleaf_t *leafs = (dleaf_t *)((char *)fileContent + header->lumps[LUMP_LEAFS].fileofs);
+	unsigned short *leafbrushes = (unsigned short *)((char *)fileContent + header->lumps[LUMP_LEAFBRUSHES].fileofs);
+	dnode_t *nodes = (dnode_t *)((char *)fileContent + header->lumps[LUMP_NODES].fileofs);
+	dbrush_t *brushes = (dbrush_t *)((char *)fileContent + header->lumps[LUMP_BRUSHES].fileofs);
+
+	// Keep going until terminated by leafs.
+	// Each node has exactly two children, which can be either another node or a leaf. 
+	// A child node has two further children, and so on until all branches of the tree are terminated with leaves, which have no children.
+	// https://developer.valvesoftware.com/wiki/Source_BSP_File_Format
+	while( true )
+	{
+		if( nodeidx < 0 )
+		{
+			// negative numbers are -(leafs+1), not nodes
+			int leafidx = -(nodeidx+1);
+			dleaf_t &leaf = leafs[leafidx];
+			
+			for( int i = 0; i < leaf.numleafbrushes; i++ )
+			{
+				contents |= brushes[leafbrushes[leaf.firstleafbrush+i]].contents;
+			}
+
+			return contents;
+		}
+
+		dnode_t &node = nodes[nodeidx];
+		contents |= CalcBrushContents( fileContent, node.children[0] );
+		nodeidx = node.children[1];
+	}
+
+	return contents;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -365,12 +403,11 @@ bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CU
 	BSPHeader_t *header = (BSPHeader_t *)fileContent;
 
 	// Load Brush Models
-	CUtlVector< cmodel_t > cmodels;
+	CUtlVector< vcollide_t > parsedphysmodels;
 
-	cmodel_t *brushmodels = (cmodel_t *)((char *)fileContent + header->lumps[LUMP_MODELS].fileofs);
-	int nbrushmodels = (header->lumps[LUMP_MODELS].filelen) / sizeof(cmodel_t);
-	cmodels.EnsureCount( nbrushmodels );
-	cmodels.CopyArray( brushmodels, nbrushmodels );
+	dmodel_t *brushmodels = (dmodel_t *)((char *)fileContent + header->lumps[LUMP_MODELS].fileofs);
+	int nbrushmodels = (header->lumps[LUMP_MODELS].filelen) / sizeof(dmodel_t);
+	parsedphysmodels.EnsureCount( nbrushmodels );
 
 	// Load PhysModel data
 	byte *physmodels = (byte *)((char *)fileContent + header->lumps[LUMP_PHYSCOLLIDE].fileofs);
@@ -386,8 +423,7 @@ bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CU
 
 		if( physModel.dataSize > 0 )
 		{
-			cmodel_t *pModel = &cmodels[ physModel.modelIndex ];
-			physcollision->VCollideLoad( &pModel->vcollisionData, physModel.solidCount, (const char *)physmodels, physModel.dataSize + physModel.keydataSize );
+			physcollision->VCollideLoad( &parsedphysmodels[ physModel.modelIndex ], physModel.solidCount, (const char *)physmodels, physModel.dataSize + physModel.keydataSize );
 			physmodels += physModel.dataSize;
 			physmodels += physModel.keydataSize;
 		}
@@ -397,37 +433,25 @@ bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CU
 
 	} while ( physModel.dataSize > 0 );
 
-	for( int i = 0; i < cmodels.Count(); i++ )
+	for( int i = 0; i < nbrushmodels; i++ )
 	{
-		matrix3x4_t transform; // model to world transformation
-		AngleMatrix( vec3_angle, vec3_origin, transform);
+		dmodel_t *pModel = &brushmodels[ i ];
 
-		for( int j = 0; j < cmodels[i].vcollisionData.solidCount; j++ )
-		{
-			AddCollisionModelToMesh( transform, cmodels[i].vcollisionData.solids[j], verts, triangles );
-		}
-	}
-
-#if 0
-	dbrush_t *brushes = (dbrush_t *)((char *)fileContent + header->lumps[LUMP_BRUSHES].fileofs);
-	int nbrushes = (header->lumps[LUMP_BRUSHES].filelen) / sizeof(dbrush_t);
-
-	int nCount = 0;
-	for( int i = 0; i < nbrushes; i++ )
-	{
-		dbrush_t &brush = brushes[i];
-		if( (brush.contents & CONTENTS_MONSTERCLIP) == 0 )
+		int contents = CalcBrushContents( fileContent, pModel->headnode );
+		if( (contents & CONTENTS_MONSTERCLIP) == 0 )
 		{
 			continue;
 		}
 
-		// Parse sides into verts/tris...
+		matrix3x4_t transform; // model to world transformation
+		AngleMatrix( vec3_angle, vec3_origin, transform);
 
-		nCount++;
+		for( int j = 0; j < parsedphysmodels[i].solidCount; j++ )
+		{
+			AddCollisionModelToMesh( transform, parsedphysmodels[i].solids[j], verts, triangles );
+		}
 	}
 
-	Msg( "Found %d clip brushes out of a total of %d brushes\n", nCount, nbrushes );
-#endif // 0
 	return true;
 }
 
