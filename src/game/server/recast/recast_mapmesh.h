@@ -33,6 +33,7 @@ private:
 	virtual bool GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 	virtual bool GenerateStaticPropData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 	virtual bool GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int> &triangles );
+	virtual bool GenerateClipData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 
 private:
 	CUtlVector< float > m_Vertices;

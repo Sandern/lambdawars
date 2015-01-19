@@ -341,7 +341,7 @@ bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int
 		if( FClassnameIs( pEntity, "prop_dynamic" ) )
 		{
 			if( pEntity->GetSolid() == SOLID_VPHYSICS )
-				{
+			{
 				matrix3x4_t transform; // model to world transformation
 				AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform);
 
@@ -354,6 +354,80 @@ bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int
 		}
 	}
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
+{
+	BSPHeader_t *header = (BSPHeader_t *)fileContent;
+
+	// Load Brush Models
+	CUtlVector< cmodel_t > cmodels;
+
+	cmodel_t *brushmodels = (cmodel_t *)((char *)fileContent + header->lumps[LUMP_MODELS].fileofs);
+	int nbrushmodels = (header->lumps[LUMP_MODELS].filelen) / sizeof(cmodel_t);
+	cmodels.EnsureCount( nbrushmodels );
+	cmodels.CopyArray( brushmodels, nbrushmodels );
+
+	// Load PhysModel data
+	byte *physmodels = (byte *)((char *)fileContent + header->lumps[LUMP_PHYSCOLLIDE].fileofs);
+	byte *basephysmodels = physmodels;
+	int nphysmodelsize = header->lumps[LUMP_PHYSCOLLIDE].filelen;
+
+	dphysmodel_t physModel;
+	// Variable length, etc. Last is null.
+	do
+	{
+		V_memcpy( &physModel, physmodels, sizeof(physModel) );
+		physmodels += sizeof(physModel);
+
+		if( physModel.dataSize > 0 )
+		{
+			cmodel_t *pModel = &cmodels[ physModel.modelIndex ];
+			physcollision->VCollideLoad( &pModel->vcollisionData, physModel.solidCount, (const char *)physmodels, physModel.dataSize + physModel.keydataSize );
+			physmodels += physModel.dataSize;
+			physmodels += physModel.keydataSize;
+		}
+		
+		if( (int)(physmodels - basephysmodels) > nphysmodelsize )
+			break;
+
+	} while ( physModel.dataSize > 0 );
+
+	for( int i = 0; i < cmodels.Count(); i++ )
+	{
+		matrix3x4_t transform; // model to world transformation
+		AngleMatrix( vec3_angle, vec3_origin, transform);
+
+		for( int j = 0; j < cmodels[i].vcollisionData.solidCount; j++ )
+		{
+			AddCollisionModelToMesh( transform, cmodels[i].vcollisionData.solids[j], verts, triangles );
+		}
+	}
+
+#if 0
+	dbrush_t *brushes = (dbrush_t *)((char *)fileContent + header->lumps[LUMP_BRUSHES].fileofs);
+	int nbrushes = (header->lumps[LUMP_BRUSHES].filelen) / sizeof(dbrush_t);
+
+	int nCount = 0;
+	for( int i = 0; i < nbrushes; i++ )
+	{
+		dbrush_t &brush = brushes[i];
+		if( (brush.contents & CONTENTS_MONSTERCLIP) == 0 )
+		{
+			continue;
+		}
+
+		// Parse sides into verts/tris...
+
+		nCount++;
+	}
+
+	Msg( "Found %d clip brushes out of a total of %d brushes\n", nCount, nbrushes );
+#endif // 0
 	return true;
 }
 
@@ -462,6 +536,7 @@ bool CMapMesh::Load()
 	GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
 	GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
 	GenerateDynamicPropData( m_Vertices, m_Triangles );
+	GenerateClipData( fileContent, m_Vertices, m_Triangles );
 
 #if defined(_DEBUG)
 	for( int i = 0; i < m_Triangles.Count(); i++ )
