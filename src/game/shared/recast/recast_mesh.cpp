@@ -304,6 +304,22 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 void CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
 {
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
-	Msg("Adding temp obstacle to %f %f %f with radius % fand height %f\n", pos[0], pos[1], pos[2], radius, height);
+	Msg("Adding temp obstacle to %f %f %f with radius %f and height %f\n", pos[0], pos[1], pos[2], radius, height);
 	m_tileCache->addObstacle( pos, radius, height, NULL );
+}
+
+void CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height )
+{
+	float pos[3] = {vPos.x, vPos.z, vPos.y};
+
+	float *verts = (float *)stackalloc( numConvexHull * 3 * sizeof( float ) );
+	for( int i = 0; i < numConvexHull; i++ )
+	{
+		verts[(i*3)+0] = convexHull[i].x;
+		verts[(i*3)+1] = convexHull[i].z;
+		verts[(i*3)+2] = convexHull[i].y;
+	}
+
+	Msg("Adding temp obstacle to %f %f %f with height %f and %d verts\n", pos[0], pos[1], pos[2], height, numConvexHull);
+	m_tileCache->addObstacle( pos, verts, numConvexHull, height, NULL );
 }

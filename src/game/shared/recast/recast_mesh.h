@@ -83,6 +83,7 @@ public:
 
 	// Obstacle management
 	void AddTempObstacle( const Vector &vPos, float radius, float height );
+	void AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height );
 
 protected:
 	bool m_keepInterResults;

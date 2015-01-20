@@ -236,3 +236,49 @@ CON_COMMAND_F( cl_recast_addobstacle, "", FCVAR_CHEAT )
 	engine->ClientCommand( pPlayer->edict(), "cl_recast_addobstacle %s %s\n", args[1], args[2] );
 #endif // CLIENT_DLL
 }
+
+#ifndef CLIENT_DLL
+CON_COMMAND_F( recast_addobstacle_poly, "", FCVAR_CHEAT )
+#else
+CON_COMMAND_F( cl_recast_addobstacle_poly, "", FCVAR_CHEAT )
+#endif // CLIENT_DLL
+{
+#ifndef CLIENT_DLL
+	CHL2WarsPlayer *pPlayer = dynamic_cast<CHL2WarsPlayer *>( UTIL_GetCommandClient() );
+#else
+	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+#endif // CLIENT_DLL
+	if( !pPlayer )
+	{
+		return;
+	}
+
+	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
+	for ( int i = meshes.First(); i != meshes.InvalidIndex(); i = meshes.Next(i ) )
+	{
+		CRecastMesh *pMesh = meshes[ i ];
+		float radius = args.ArgC() > 1 ? atof( args[1] ) : 64.0f;
+		float height = args.ArgC() > 2 ? atof( args[2] ) : 96.0f;
+
+		const Vector &vPos = pPlayer->GetMouseData().m_vEndPos;
+
+		// Random polygon obstacle, maybe non-convex
+		int nverts = (int)floorf(rand() / 32768.f * 6.f) + 3;
+		CUtlVector< Vector > verts( 0, nverts );
+		verts.SetCount( nverts );
+		float angleSteps = 6.2831853f/nverts;
+		for (int i = 0; i < nverts; i++)
+		{
+			float angle = angleSteps * i;
+			verts[i].x = vPos[0] + sinf(angle) * radius;
+			verts[i].y = vPos[1] + cosf(angle) * radius;
+			verts[i].z = vPos[2];
+		}
+
+		pMesh->AddTempObstacle( vPos, verts.Base(), verts.Count(), height );
+	}
+
+#ifndef CLIENT_DLL
+	engine->ClientCommand( pPlayer->edict(), "cl_recast_addobstacle_poly %s %s\n", args[1], args[2] );
+#endif // CLIENT_DLL
+}
