@@ -20,6 +20,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static bool EntityIndexLessFunc( const EHANDLE &lhs, const EHANDLE &rhs )	
+{ 
+	return lhs.GetEntryIndex() < rhs.GetEntryIndex(); 
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Accessor
 //-----------------------------------------------------------------------------
@@ -37,6 +42,8 @@ CRecastMgr::CRecastMgr()
 #ifndef CLIENT_DLL
 	m_pMapMesh = NULL;
 #endif // CLIENT_DLL
+
+	m_Obstacles.SetLessFunc( EntityIndexLessFunc );
 }
 
 //-----------------------------------------------------------------------------
@@ -129,6 +136,57 @@ bool CRecastMgr::Build()
 	return true;
 }
 #endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Purpose: Adds an obstacle with radius and height for entity
+//-----------------------------------------------------------------------------
+void CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height )
+{
+	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
+
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		CRecastMesh *pMesh = m_Meshes[ i ];
+
+		obstacle.obs.AddToTail();
+		obstacle.obs.Tail().meshIndex = i;
+		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), radius, height );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Removes any obstacle associated with the entity
+//-----------------------------------------------------------------------------
+void CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
+{
+	int idx = m_Obstacles.Find( pEntity );
+	if( m_Obstacles.IsValidIndex( idx ) )
+	{
+		for( int i = 0; i < m_Obstacles[idx].obs.Count(); i++ )
+		{
+			if( m_Meshes.IsValidIndex( m_Obstacles[idx].obs[i].meshIndex ) )
+			{
+				CRecastMesh *pMesh = m_Meshes[ m_Obstacles[idx].obs[i].meshIndex ];
+				pMesh->RemoveObstacle( m_Obstacles[idx].obs[i].ref );
+			}
+		}
+
+		m_Obstacles.RemoveAt( idx );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
+{
+	int idx = m_Obstacles.Find( pEntity );
+	if( !m_Obstacles.IsValidIndex( idx ) )
+	{
+		idx = m_Obstacles.Insert( pEntity );
+	}
+	return m_Obstacles[idx];
+}
 
 #ifdef CLIENT_DLL
 ConVar recast_debug_mesh("recast_debug_mesh", "soldier");

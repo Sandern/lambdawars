@@ -75,6 +75,7 @@ modules = [
     # Misc
     ('_steam', 'Steam'),
     ('_navmesh', 'NavMesh'),
+    ('_recast', 'Recast'),
     ('_ndebugoverlay', 'NDebugOverlay'),
     ('vprof', 'VProf'),
     ('_srctests', '_SrcTests'),

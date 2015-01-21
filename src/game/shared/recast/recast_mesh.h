@@ -12,6 +12,7 @@
 #endif
 
 #include <recast/Recast.h>
+#include "detourtilecache/DetourTileCache.h"
 
 class UnitBaseWaypoint;
 class CMapMesh;
@@ -82,8 +83,9 @@ public:
 #endif // CLIENT_DLL
 
 	// Obstacle management
-	void AddTempObstacle( const Vector &vPos, float radius, float height );
-	void AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height );
+	dtObstacleRef AddTempObstacle( const Vector &vPos, float radius, float height );
+	dtObstacleRef AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height );
+	bool RemoveObstacle( const dtObstacleRef ref );
 
 protected:
 	bool m_keepInterResults;

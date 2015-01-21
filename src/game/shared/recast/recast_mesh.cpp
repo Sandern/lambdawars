@@ -23,7 +23,6 @@
 #include "detour/DetourNavMeshBuilder.h"
 #include "detour/DetourNavMeshQuery.h"
 #include "detour/DetourCommon.h"
-#include "detourtilecache/DetourTileCache.h"
 
 #ifndef CLIENT_DLL
 #include "unit_navigator.h"
@@ -301,14 +300,16 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 #endif // CLIENT_DLL
 
 
-void CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
+dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
 {
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
 	Msg("Adding temp obstacle to %f %f %f with radius %f and height %f\n", pos[0], pos[1], pos[2], radius, height);
-	m_tileCache->addObstacle( pos, radius, height, NULL );
+	dtObstacleRef result;
+	m_tileCache->addObstacle( pos, radius, height, &result );
+	return result;
 }
 
-void CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height )
+dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height )
 {
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
 
@@ -321,5 +322,13 @@ void CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull,
 	}
 
 	Msg("Adding temp obstacle to %f %f %f with height %f and %d verts\n", pos[0], pos[1], pos[2], height, numConvexHull);
-	m_tileCache->addObstacle( pos, verts, numConvexHull, height, NULL );
+	dtObstacleRef result;
+	m_tileCache->addObstacle( pos, verts, numConvexHull, height, &result );
+	return result;
+}
+
+bool CRecastMesh::RemoveObstacle( const dtObstacleRef ref )
+{
+	m_tileCache->removeObstacle( ref );
+	return true;
 }

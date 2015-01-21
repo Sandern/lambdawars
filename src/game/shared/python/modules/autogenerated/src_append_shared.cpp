@@ -31,6 +31,7 @@ extern "C" __declspec(dllexport) PYINIT_DECL(unit_helper)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_editorsystem)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_steam)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_navmesh)();
+extern "C" __declspec(dllexport) PYINIT_DECL(_recast)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_ndebugoverlay)();
 extern "C" __declspec(dllexport) PYINIT_DECL(vprof)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_srctests)();
@@ -56,6 +57,7 @@ extern "C" PYINIT_DECL(unit_helper)();
 extern "C" PYINIT_DECL(_editorsystem)();
 extern "C" PYINIT_DECL(_steam)();
 extern "C" PYINIT_DECL(_navmesh)();
+extern "C" PYINIT_DECL(_recast)();
 extern "C" PYINIT_DECL(_ndebugoverlay)();
 extern "C" PYINIT_DECL(vprof)();
 extern "C" PYINIT_DECL(_srctests)();
@@ -85,6 +87,7 @@ void AppendSharedModules()
 	APPEND_MODULE(_editorsystem)
 	APPEND_MODULE(_steam)
 	APPEND_MODULE(_navmesh)
+	APPEND_MODULE(_recast)
 	APPEND_MODULE(_ndebugoverlay)
 	APPEND_MODULE(vprof)
 	APPEND_MODULE(_srctests)

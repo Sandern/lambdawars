@@ -12,9 +12,28 @@
 #endif
 
 #include "tier1/utldict.h"
+#include "tier1/utlmap.h"
+#include "detourtilecache/DetourTileCache.h"
 
 class CRecastMesh;
 class CMapMesh;
+
+typedef struct NavObstacle_t
+{
+	int meshIndex;
+	dtObstacleRef ref;
+} NavObstacleRef_t;
+
+typedef struct NavObstacleArray_t
+{
+	NavObstacleArray_t() {}
+	NavObstacleArray_t( const NavObstacleArray_t &ref )
+	{
+		obs =  ref.obs;
+	}
+
+	CUtlVector< NavObstacle_t > obs;
+} NavObstacleArray_t;
 
 class CRecastMgr
 {
@@ -39,6 +58,10 @@ public:
 	virtual bool Save();
 #endif // CLIENT_DLL
 
+	// Obstacle management
+	virtual void AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height );
+	virtual void RemoveEntObstacles( CBaseEntity *pEntity );
+
 	// Debug
 #ifdef CLIENT_DLL
 	void DebugRender();
@@ -49,12 +72,16 @@ protected:
 	const char *GetFilename( void ) const;
 #endif // CLIENT_DLL
 
+	NavObstacleArray_t &FindOrCreateObstacle( CBaseEntity *pEntity );
+
 private:
 #ifndef CLIENT_DLL
 	CMapMesh *m_pMapMesh;
 #endif // CLIENT_DLL
 
 	CUtlDict< CRecastMesh *, int > m_Meshes;
+
+	CUtlMap< EHANDLE, NavObstacleArray_t > m_Obstacles;
 };
 
 CRecastMgr &RecastMgr();
