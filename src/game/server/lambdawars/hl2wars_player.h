@@ -175,7 +175,6 @@ public:
 	// Owner number
 	virtual void			OnChangeOwnerNumber( int old_owner_number );
 
-	// 
 	virtual void			VPhysicsShadowUpdate( IPhysicsObject *pPhysics );
 
 	// AckTickCount
@@ -187,6 +186,8 @@ public:
 	// picker debug utility functions
 	virtual CBaseEntity*	FindEntityClassForward( char *classname );
 	virtual CBaseEntity*	FindEntityForward( bool fHull );
+
+	virtual void UpdateLastKnownArea( void ) {}
 
 private:
     void					OnLeftMouseButtonPressedInternal( const MouseTraceData_t &data );

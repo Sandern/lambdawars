@@ -1732,6 +1732,15 @@ void register_C_HL2WarsPlayer_class(){
                 , UpdateCameraMode_function_type( &::C_HL2WarsPlayer::UpdateCameraMode ) );
         
         }
+        { //::C_HL2WarsPlayer::UpdateLastKnownArea
+        
+            typedef void ( ::C_HL2WarsPlayer::*UpdateLastKnownArea_function_type )(  ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "UpdateLastKnownArea"
+                , UpdateLastKnownArea_function_type( &::C_HL2WarsPlayer::UpdateLastKnownArea ) );
+        
+        }
         { //::C_HL2WarsPlayer::UpdateMouseData
         
             typedef void ( ::C_HL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector const & ) ;
