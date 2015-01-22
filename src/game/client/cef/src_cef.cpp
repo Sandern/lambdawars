@@ -212,6 +212,7 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 	{
 		command_line->AppendSwitch( CefString( "disable-gpu" ) );
 		command_line->AppendSwitch( CefString( "disable-gpu-compositing" ) );
+		command_line->AppendSwitch( CefString( "disable-d3d11" ) );
 	}
 
 	if( g_debug_cef.GetBool() )
