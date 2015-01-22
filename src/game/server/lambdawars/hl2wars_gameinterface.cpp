@@ -177,7 +177,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	//g_bOfflineGame = pKV->GetString( "map/offline", NULL ) != NULL;
 	g_bOfflineGame = !Q_stricmp( pKV->GetString( "system/network", "LIVE" ), "offline" );
 
-	Msg( "GameInterface reservation payload:\n" );
+	DevMsg( "GameInterface reservation payload:\n" );
 	KeyValuesDumpAsDevMsg( pKV );
 
 	// Vitaliy: Disable cheats as part of reservation in case they were enabled (unless we are on Steam Beta)
