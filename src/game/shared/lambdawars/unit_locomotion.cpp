@@ -1690,15 +1690,13 @@ void UnitBaseLocomotion::DoUnstuck()
 		mv->origin = trace.endpos;
 	}
 
-#if 0
-	if( unit_locomotion_debug.GetBool() )
-	{
-		DevMsg( "#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, 
-			trace.m_pEnt ? trace.m_pEnt->GetClassname() : "null" );
-	}
+#ifdef CLIENT_DLL
+	Warning("CLIENT.");
 #else
-	Warning( "#%d Applying unstuck hack at position %f %f %f (ent: %s)\n", m_pOuter->entindex(), mv->origin.x, mv->origin.y, mv->origin.z, m_pOuter->GetClassname() );
-#endif // 0
+	Warning("SERVER.");
+#endif // CLIENT_DLL
+	Warning( "#%d Applying unstuck hack at position %f %f %f (ent: %s, has ground entity: %d)\n", m_pOuter->entindex(), 
+		mv->origin.x, mv->origin.y, mv->origin.z, m_pOuter->GetClassname(), GetGroundEntity() ? 1 : 0 );
 }
 
 //-----------------------------------------------------------------------------
