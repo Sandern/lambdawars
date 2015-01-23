@@ -1338,6 +1338,17 @@ BOOST_PYTHON_MODULE(_physics){
     
     }
 
+    { //::PyGetCollideAABB
+    
+        typedef ::boost::python::tuple ( *GetCollideAABB_function_type )( ::C_BaseEntity * );
+        
+        bp::def( 
+            "GetCollideAABB"
+            , GetCollideAABB_function_type( &::PyGetCollideAABB )
+            , ( bp::arg("pEnt") ) );
+    
+    }
+
     { //::PyPhysDestroyObject
     
         typedef void ( *PhysDestroyObject_function_type )( ::PyPhysicsObject *,::C_BaseEntity * );
@@ -2760,6 +2771,17 @@ BOOST_PYTHON_MODULE(_physics){
         bp::def( 
             "ForcePhysicsSimulate"
             , ForcePhysicsSimulate_function_type( &::PyForcePhysicsSimulate ) );
+    
+    }
+
+    { //::PyGetCollideAABB
+    
+        typedef ::boost::python::tuple ( *GetCollideAABB_function_type )( ::CBaseEntity * );
+        
+        bp::def( 
+            "GetCollideAABB"
+            , GetCollideAABB_function_type( &::PyGetCollideAABB )
+            , ( bp::arg("pEnt") ) );
     
     }
 

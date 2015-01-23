@@ -786,6 +786,23 @@ void PyPhysDestroyObject( PyPhysicsObject *pPyPhysObj, CBaseEntity *pEntity )
 	pPyPhysObj->Destroy();
 }
 
+boost::python::tuple PyGetCollideAABB( CBaseEntity *pEnt )
+{
+	if( pEnt )
+	{
+		IPhysicsObject *pPhysObject = pEnt->VPhysicsGetObject();
+		if( pPhysObject )
+		{
+			const CPhysCollide *pCollide = pPhysObject->GetCollide();
+			Vector mins, maxs;
+			physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
+			return bp::make_tuple( mins, maxs );
+		}
+	}
+
+	return bp::make_tuple( bp::object(), bp::object() );
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Physic collision interface
 //-----------------------------------------------------------------------------
