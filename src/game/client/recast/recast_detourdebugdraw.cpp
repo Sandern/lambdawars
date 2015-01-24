@@ -26,8 +26,12 @@
 #include "detour/DetourCommon.h"
 #include "detour/DetourNode.h"
 
+#include "view.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+extern ConVar recast_debug_culldist;
 
 static float distancePtLine2d(const float* pt, const float* p, const float* q)
 {
@@ -48,8 +52,6 @@ static void drawPolyBoundaries(duDebugDraw* dd, const dtMeshTile* tile,
 							   bool inner)
 {
 	static const float thr = 0.01f*0.01f;
-
-	dd->begin(DU_DRAW_LINES, 0, linew);
 
 	for (int i = 0; i < tile->header->polyCount; ++i)
 	{
@@ -94,6 +96,7 @@ static void drawPolyBoundaries(duDebugDraw* dd, const dtMeshTile* tile,
 			
 			// Draw detail mesh edges which align with the actual poly edge.
 			// This is really slow.
+			dd->begin(DU_DRAW_LINES, pd->triCount * 3, linew);
 			for (int k = 0; k < pd->triCount; ++k)
 			{
 				const unsigned char* t = &tile->detailTris[(pd->triBase+k)*4];
@@ -116,21 +119,29 @@ static void drawPolyBoundaries(duDebugDraw* dd, const dtMeshTile* tile,
 					}
 				}
 			}
+			dd->end();
 		}
 	}
-	dd->end();
+	
 }
 
 static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMeshQuery* query,
 						 const dtMeshTile* tile, unsigned char flags)
 {
+	const Vector &vCullOrigin = MainViewOrigin();
+	float fCullDist = recast_debug_culldist.GetFloat();
+	
+	Vector tilePos( mesh.getParams()->orig[0] + tile->header->x * mesh.getParams()->tileWidth, mesh.getParams()->orig[2] + tile->header->y * mesh.getParams()->tileHeight, 0 );
+
+	if( tilePos.AsVector2D().DistTo( vCullOrigin.AsVector2D() ) > fCullDist )
+		return;
+
 	dtPolyRef base = mesh.getPolyRefBase(tile);
 
 	int tileNum = mesh.decodePolyIdTile(base);
 	
 	dd->depthMask(false);
 
-	dd->begin(DU_DRAW_TRIS);
 	for (int i = 0; i < tile->header->polyCount; ++i)
 	{
 		const dtPoly* p = &tile->polys[i];
@@ -157,6 +168,7 @@ static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMesh
 			}
 		}
 		
+		dd->begin(DU_DRAW_TRIS, pd->triCount);
 		for (int j = 0; j < pd->triCount; ++j)
 		{
 			const unsigned char* t = &tile->detailTris[(pd->triBase+j)*4];
@@ -168,8 +180,8 @@ static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMesh
 					dd->vertex(&tile->detailVerts[(pd->vertBase+t[k]-p->vertCount)*3], col);
 			}
 		}
+		dd->end();
 	}
-	dd->end();
 	
 	// Draw inter poly boundaries
 	drawPolyBoundaries(dd, tile, duRGBA(0,48,64,32), 1.5f, true);
@@ -233,7 +245,7 @@ static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMesh
 	}
 	
 	const unsigned int vcol = duRGBA(0,0,0,196);
-	dd->begin(DU_DRAW_POINTS, 0, 3.0f);
+	dd->begin(DU_DRAW_POINTS, tile->header->vertCount, 3.0f);
 	for (int i = 0; i < tile->header->vertCount; ++i)
 	{
 		const float* v = &tile->verts[i*3];

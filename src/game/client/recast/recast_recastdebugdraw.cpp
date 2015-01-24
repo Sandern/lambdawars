@@ -31,7 +31,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar recast_debug_culldist("recast_debug_culldist", "2048.0");
+ConVar recast_debug_culldist("recast_debug_culldist", "2048.0");
 static ConVar recast_polymesh_alpha("recast_polymesh_alpha", "128");
 
 void duDebugDrawTriMesh(duDebugDraw* dd, const float* verts, int /*nverts*/,
