@@ -17,9 +17,9 @@
 class UnitBaseWaypoint;
 class CMapMesh;
 
-//struct LinearAllocator;
-//struct FastLZCompressor;
-//struct MeshProcess;
+class dtNavMesh;
+class dtTileCache;
+class dtNavMeshQuery;
 
 enum SamplePartitionType
 {
@@ -87,6 +87,10 @@ public:
 	dtObstacleRef AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height );
 	bool RemoveObstacle( const dtObstacleRef ref );
 
+	// Accessors
+	dtNavMesh *GetNavMesh() { return m_navMesh; }
+	dtNavMeshQuery *GetNavMeshQuery() { return m_navQuery; }
+
 protected:
 	bool m_keepInterResults;
 
@@ -132,9 +136,9 @@ private:
 	struct dtTileCacheMeshProcess *m_tmproc;
 
 	// Data used for path finding
-	class dtNavMesh* m_navMesh;
-	class dtTileCache* m_tileCache;
-	class dtNavMeshQuery* m_navQuery;
+	dtNavMesh* m_navMesh;
+	dtTileCache* m_tileCache;
+	dtNavMeshQuery* m_navQuery;
 };
 
 inline const char *CRecastMesh::GetName()

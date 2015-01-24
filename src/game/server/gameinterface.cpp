@@ -678,6 +678,8 @@ static bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
+
+	RecastMgr().Init();
 #endif // HL2WARS_DLL
 
 	// init the gamestatsupload connection

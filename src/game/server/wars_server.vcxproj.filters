@@ -3912,6 +3912,9 @@
     <ClInclude Include="..\shared\recast\fastlz\fastlz.h">
       <Filter>Source Files\Recast\fastlz</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_imgr.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bonesetup.lib">

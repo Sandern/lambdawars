@@ -2825,7 +2825,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	if( pNavMesh )
 	{
 		const Vector &vStart = GetAbsOrigin(); 
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos );
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos);
 		if( pFoundPath )
 			return pFoundPath;
 	}

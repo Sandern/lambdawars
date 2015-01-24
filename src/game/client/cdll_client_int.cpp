@@ -1391,6 +1391,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
 
+	RecastMgr().Init();
+
 #ifdef ENABLE_PYTHON
 	WarsNet_Init();
 #endif // ENABLE_PYTHON

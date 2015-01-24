@@ -15,7 +15,7 @@ class CWarsExtension : public CTier3AppSystem< IWarsExtension >
 {
 	typedef CTier3AppSystem< IWarsExtension > BaseClass;
 public:
-	CWarsExtension() : m_bPaused(false) {}
+	CWarsExtension() : m_bPaused(false), m_pRecastMgr(NULL) {}
 	// Methods of IAppSystem
 	virtual bool Connect( CreateInterfaceFn factory );
 	virtual void Disconnect();
@@ -45,6 +45,10 @@ public:
 	virtual void SetPaused( bool bPaused ) { m_bPaused = bPaused; }
 	virtual bool IsPaused() { return m_bPaused; }
 
+	// Way of accessing the server recast mesh on the client (for debugging/visualization)
+	virtual void SetRecastMgr( IRecastMgr *pRecastMgr ) { m_pRecastMgr = pRecastMgr; }
+	virtual IRecastMgr *GetRecastMgr() { return m_pRecastMgr; }
+
 private:
 	virtual void ReceiveSteamP2PMessages( ISteamNetworking *pSteamNetworking, int channel, CUtlVector<WarsMessageData_t> &messageQueue );
 
@@ -59,6 +63,9 @@ private:
 
 	// Paused?
 	bool m_bPaused;
+
+	// Recast Server mgr for debugging
+	IRecastMgr *m_pRecastMgr;
 };
 
 #endif // _INCLUDED_WARS_EXTENSION_H

@@ -17,6 +17,10 @@ BOOST_PYTHON_MODULE(_recast){
 
     bp::class_< CRecastMgr, boost::noncopyable >( "CRecastMgr", bp::no_init )    
         .def( 
+            "AddEntBoxObstacle"
+            , (void ( ::CRecastMgr::* )( ::C_BaseEntity *,::Vector const &,::Vector const &,float ) )( &::CRecastMgr::AddEntBoxObstacle )
+            , ( bp::arg("pEntity"), bp::arg("mins"), bp::arg("maxs"), bp::arg("height") ) )    
+        .def( 
             "AddEntRadiusObstacle"
             , (void ( ::CRecastMgr::* )( ::C_BaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
@@ -51,6 +55,10 @@ BOOST_PYTHON_MODULE(_recast){
     bp::docstring_options doc_options( true, true, false );
 
     bp::class_< CRecastMgr, boost::noncopyable >( "CRecastMgr", bp::no_init )    
+        .def( 
+            "AddEntBoxObstacle"
+            , (void ( ::CRecastMgr::* )( ::CBaseEntity *,::Vector const &,::Vector const &,float ) )( &::CRecastMgr::AddEntBoxObstacle )
+            , ( bp::arg("pEntity"), bp::arg("mins"), bp::arg("maxs"), bp::arg("height") ) )    
         .def( 
             "AddEntRadiusObstacle"
             , (void ( ::CRecastMgr::* )( ::CBaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )

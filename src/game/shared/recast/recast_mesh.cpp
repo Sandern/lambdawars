@@ -15,6 +15,8 @@
 #include "recast/recast_recastdebugdraw.h"
 #include "recast/recast_debugdrawmesh.h"
 #include "recast/recast_detourdebugdraw.h"
+#include "wars/iwars_extension.h"
+#include "recast_imgr.h"
 #endif // CLIENT_DLL
 
 #include "recast/recast_tilecache_helpers.h"
@@ -165,11 +167,14 @@ bool CRecastMesh::Reset()
 }
 
 #ifdef CLIENT_DLL
+#if 0
 ConVar recast_draw_trimeshslope("recast_draw_trimeshslope", "0");
 ConVar recast_draw_contours("recast_draw_contours", "0");
 ConVar recast_draw_polymesh("recast_draw_polymesh", "0");
 ConVar recast_draw_polymeshdetail("recast_draw_polymeshdetail", "0");
+#endif // 0
 ConVar recast_draw_navmesh("recast_draw_navmesh", "0");
+ConVar recast_draw_server("recast_draw_server", "1");
 
 //-----------------------------------------------------------------------------
 // Purpose: Draws the mesh
@@ -181,6 +186,7 @@ void CRecastMesh::DebugRender()
 
 	DebugDrawMesh dd;
 
+#if 0
 #if defined(_DEBUG) || defined(CALC_GEOM_NORMALS)
 	if( recast_draw_trimeshslope.GetBool() && m_normals )
 	{
@@ -206,21 +212,39 @@ void CRecastMesh::DebugRender()
 	{
 		duDebugDrawPolyMeshDetail(&dd, *m_dmesh);
 	}
+#endif // 0
 
 	if( recast_draw_navmesh.GetBool() && m_navMesh != NULL )
 	{
-		char m_navMeshDrawFlags = DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST;
-		duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+		dtNavMesh *navMesh = NULL;
+		dtNavMeshQuery *navQuery = NULL;
+		if( recast_draw_server.GetBool() )
+		{
+			IRecastMgr *pRecastMgr = warsextension->GetRecastMgr();
+			navMesh = pRecastMgr->GetNavMesh( m_Name.Get() );
+			navQuery = pRecastMgr->GetNavMeshQuery( m_Name.Get() );
+		}
+		else
+		{
+			navMesh = m_navMesh;
+			navQuery = m_navQuery;
+		}
+
+		if( navMesh != NULL && navQuery != NULL )
+		{
+			char m_navMeshDrawFlags = DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST;
+			duDebugDrawNavMeshWithClosedList(&dd, *navMesh, *navQuery, m_navMeshDrawFlags);
 
 #if 0 // TODO: add different draw modes
-		if (m_drawMode != DRAWMODE_NAVMESH_INVIS)
-			duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
-		if (m_drawMode == DRAWMODE_NAVMESH_BVTREE)
-			duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
-		if (m_drawMode == DRAWMODE_NAVMESH_NODES)
-			duDebugDrawNavMeshNodes(&dd, *m_navQuery);
-		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+			if (m_drawMode != DRAWMODE_NAVMESH_INVIS)
+				duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+			if (m_drawMode == DRAWMODE_NAVMESH_BVTREE)
+				duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
+			if (m_drawMode == DRAWMODE_NAVMESH_NODES)
+				duDebugDrawNavMeshNodes(&dd, *m_navQuery);
+			duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
 #endif // 0
+		}
 	}
 }
 #endif // CLIENT_DLL
@@ -256,10 +280,11 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	epos[1] = vEnd[2];
 	epos[2] = vEnd[1];
 
+	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
-	polyPickExt[0] = 2;
-	polyPickExt[1] = 4;
-	polyPickExt[2] = 2;
+	polyPickExt[0] = 20.0f;
+	polyPickExt[1] = 40.0f;
+	polyPickExt[2] = 20.0f;
 
 	int m_straightPathOptions = 0;
 	float m_straightPath[MAX_POLYS*3];

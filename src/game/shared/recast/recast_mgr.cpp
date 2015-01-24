@@ -9,6 +9,7 @@
 #include "cbase.h"
 #include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
+#include "wars/iwars_extension.h"
 
 #ifndef CLIENT_DLL
 #include "recast/recast_mapmesh.h"
@@ -19,11 +20,6 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-static bool EntityIndexLessFunc( const EHANDLE &lhs, const EHANDLE &rhs )	
-{ 
-	return lhs.GetEntryIndex() < rhs.GetEntryIndex(); 
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Accessor
@@ -37,13 +33,11 @@ CRecastMgr &RecastMgr()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRecastMgr::CRecastMgr()
+CRecastMgr::CRecastMgr() : m_Obstacles( 0, 0, DefLessFunc( int ) )
 {
 #ifndef CLIENT_DLL
 	m_pMapMesh = NULL;
 #endif // CLIENT_DLL
-
-	m_Obstacles.SetLessFunc( EntityIndexLessFunc );
 }
 
 //-----------------------------------------------------------------------------
@@ -51,6 +45,17 @@ CRecastMgr::CRecastMgr()
 //-----------------------------------------------------------------------------
 CRecastMgr::~CRecastMgr()
 {
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CRecastMgr::Init()
+{
+#ifndef CLIENT_DLL
+	// Accessor for client debugging
+	warsextension->SetRecastMgr( this );
+#endif // CLIENT_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -108,6 +113,32 @@ int CRecastMgr::FindMeshIndex( const char *name )
 	return m_Meshes.Find( name );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+dtNavMesh* CRecastMgr::GetNavMesh( const char *meshName )
+{
+	int idx = FindMeshIndex( meshName );
+	if( m_Meshes.IsValidIndex( idx ) )
+	{
+		return m_Meshes[idx]->GetNavMesh();
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+dtNavMeshQuery* CRecastMgr::GetNavMeshQuery( const char *meshName )
+{
+	int idx = FindMeshIndex( meshName );
+	if( m_Meshes.IsValidIndex( idx ) )
+	{
+		return m_Meshes[idx]->GetNavMeshQuery();
+	}
+	return NULL;
+}
+
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: Builds all navigation meshes
@@ -142,6 +173,9 @@ bool CRecastMgr::Build()
 //-----------------------------------------------------------------------------
 void CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height )
 {
+	if( !pEntity )
+		return;
+
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
 
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
@@ -155,11 +189,47 @@ void CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Adds an obstacle based on bounds and height for entity
+//-----------------------------------------------------------------------------
+void CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height )
+{
+	if( !pEntity )
+		return;
+
+	matrix3x4_t transform; // model to world transformation
+	AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform );
+
+	Vector convexHull[4];
+	VectorTransform( mins, transform, convexHull[0] );
+	VectorTransform( Vector(mins.x, maxs.y, mins.z), transform, convexHull[1] );
+	VectorTransform( Vector(maxs.x, maxs.y, mins.z), transform, convexHull[2] );
+	VectorTransform( Vector(maxs.x, mins.y, mins.z), transform, convexHull[3] );
+
+	Msg("Add obstacle %f %f %f\n", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z);
+	for( int i = 0; i < 4; i++ )
+		Msg("\thull %d: %f %f %f\n", i, convexHull[i].x, convexHull[i].y, convexHull[i].z );
+
+	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
+
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		CRecastMesh *pMesh = m_Meshes[ i ];
+
+		obstacle.obs.AddToTail();
+		obstacle.obs.Tail().meshIndex = i;
+		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), convexHull, 4, height );
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Removes any obstacle associated with the entity
 //-----------------------------------------------------------------------------
 void CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 {
-	int idx = m_Obstacles.Find( pEntity );
+	if( !pEntity )
+		return;
+
+	int idx = m_Obstacles.Find( pEntity->entindex() );
 	if( m_Obstacles.IsValidIndex( idx ) )
 	{
 		for( int i = 0; i < m_Obstacles[idx].obs.Count(); i++ )
@@ -180,10 +250,10 @@ void CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
 {
-	int idx = m_Obstacles.Find( pEntity );
+	int idx = m_Obstacles.Find( pEntity->entindex() );
 	if( !m_Obstacles.IsValidIndex( idx ) )
 	{
-		idx = m_Obstacles.Insert( pEntity );
+		idx = m_Obstacles.Insert( pEntity->entindex() );
 	}
 	return m_Obstacles[idx];
 }

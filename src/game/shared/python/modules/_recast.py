@@ -21,6 +21,7 @@ class Recast(SemiSharedModuleGenerator):
         cls.mem_funs().virtuality = 'not virtual'
         
         cls.mem_fun('AddEntRadiusObstacle').include()
+        cls.mem_fun('AddEntBoxObstacle').include()
         cls.mem_fun('RemoveEntObstacles').include()
         
         mb.free_function('RecastMgr').include()

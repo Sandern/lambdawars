@@ -14,6 +14,7 @@
 #include "tier1/utldict.h"
 #include "tier1/utlmap.h"
 #include "detourtilecache/DetourTileCache.h"
+#include "recast_imgr.h"
 
 class CRecastMesh;
 class CMapMesh;
@@ -35,11 +36,13 @@ typedef struct NavObstacleArray_t
 	CUtlVector< NavObstacle_t > obs;
 } NavObstacleArray_t;
 
-class CRecastMgr
+class CRecastMgr : public IRecastMgr
 {
 public:
 	CRecastMgr();
 	~CRecastMgr();
+
+	virtual void Init();
 
 	virtual void Update( float dt );
 
@@ -52,6 +55,10 @@ public:
 	int FindMeshIndex( const char *name );
 	CUtlDict< CRecastMesh *, int > &GetMeshes();
 
+	// Used for debugging purposes on client
+	virtual dtNavMesh* GetNavMesh( const char *meshName );
+	virtual dtNavMeshQuery* GetNavMeshQuery( const char *meshName );
+
 #ifndef CLIENT_DLL
 	// Generation methods
 	virtual bool Build();
@@ -60,6 +67,7 @@ public:
 
 	// Obstacle management
 	virtual void AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height );
+	virtual void AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height );
 	virtual void RemoveEntObstacles( CBaseEntity *pEntity );
 
 	// Debug
@@ -81,7 +89,7 @@ private:
 
 	CUtlDict< CRecastMesh *, int > m_Meshes;
 
-	CUtlMap< EHANDLE, NavObstacleArray_t > m_Obstacles;
+	CUtlMap< int, NavObstacleArray_t > m_Obstacles;
 };
 
 CRecastMgr &RecastMgr();
