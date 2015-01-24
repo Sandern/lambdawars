@@ -324,6 +324,7 @@ boost::python::object PyCreateEmptyPhysicsObject();
 boost::python::object PyCreatePhysicsObject( IPhysicsObject *pPhysObj );
 boost::python::object PyCreatePhysicsObject( CBaseEntity *pEnt );
 void PyPhysDestroyObject( PyPhysicsObject *pPyPhysObj, CBaseEntity *pEntity = NULL );
+boost::python::tuple PyGetCollideAABB( CBaseEntity *pEnt );
 
 //-----------------------------------------------------------------------------
 // Purpose: Physic collision interface

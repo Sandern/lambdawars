@@ -80,6 +80,8 @@ class Physics(SemiSharedModuleGenerator):
             mb.free_function('PyPhysModelCreateSphere').rename('PhysModelCreateSphere')
         mb.free_function('PyPhysDestroyObject').include()
         mb.free_function('PyPhysDestroyObject').rename('PhysDestroyObject')
+        mb.free_function('PyGetCollideAABB').include()
+        mb.free_function('PyGetCollideAABB').rename('GetCollideAABB')
         
         if self.isserver:
             mb.free_function('PyPhysCallbackImpulse').include()

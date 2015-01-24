@@ -185,6 +185,8 @@ public:
 	// Owner number
 	virtual void					OnChangeOwnerNumber( int old_owner_number );
 
+	virtual void UpdateLastKnownArea( void ) {}
+
 private:
     void					OnLeftMouseButtonPressedInternal( const MouseTraceData_t &data );
 	void					OnLeftMouseButtonDoublePressedInternal( const MouseTraceData_t &data );

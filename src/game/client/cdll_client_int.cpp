@@ -1385,7 +1385,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 
 #ifndef _XBOX
 	// create the Navigation Mesh interface
-	TheNavMesh = new CNavMesh;
+	TheNavMesh = NavMeshFactory();
 #endif
 
 #ifdef HL2WARS_DLL

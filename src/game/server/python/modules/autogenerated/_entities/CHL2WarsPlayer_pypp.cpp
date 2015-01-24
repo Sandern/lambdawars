@@ -2001,6 +2001,15 @@ void register_CHL2WarsPlayer_class(){
                 , UpdateControl_function_type( &::CHL2WarsPlayer::UpdateControl ) );
         
         }
+        { //::CHL2WarsPlayer::UpdateLastKnownArea
+        
+            typedef void ( ::CHL2WarsPlayer::*UpdateLastKnownArea_function_type )(  ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "UpdateLastKnownArea"
+                , UpdateLastKnownArea_function_type( &::CHL2WarsPlayer::UpdateLastKnownArea ) );
+        
+        }
         { //::CHL2WarsPlayer::UpdateMouseData
         
             typedef void ( ::CHL2WarsPlayer::*UpdateMouseData_function_type )( ::Vector const & ) ;
