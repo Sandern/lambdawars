@@ -158,7 +158,7 @@ bool CRecastMgr::Build()
 
 	// Create meshes
 	CRecastMesh *pMesh = new CRecastMesh();
-	pMesh->SetName( "soldier" );
+	pMesh->Init( "soldier" );
 	if( pMesh->Build( pMapMesh ) )
 	{
 		m_Meshes.Insert( pMesh->GetName(), pMesh );
@@ -200,20 +200,23 @@ void CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 	AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform );
 
 	Vector convexHull[4];
-	VectorTransform( mins, transform, convexHull[0] );
-	VectorTransform( Vector(mins.x, maxs.y, mins.z), transform, convexHull[1] );
-	VectorTransform( Vector(maxs.x, maxs.y, mins.z), transform, convexHull[2] );
-	VectorTransform( Vector(maxs.x, mins.y, mins.z), transform, convexHull[3] );
 
-	Msg("Add obstacle %f %f %f\n", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z);
-	for( int i = 0; i < 4; i++ )
-		Msg("\thull %d: %f %f %f\n", i, convexHull[i].x, convexHull[i].y, convexHull[i].z );
+	//Msg("Add obstacle %f %f %f\n", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z);
+
+	
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
 
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
+
+		float erodeDist = pMesh->GetAgentRadius();
+
+		VectorTransform( mins + Vector(-erodeDist, -erodeDist, 0), transform, convexHull[0] );
+		VectorTransform( Vector(mins.x, maxs.y, mins.z) + Vector(-erodeDist, erodeDist, 0), transform, convexHull[1] );
+		VectorTransform( Vector(maxs.x, maxs.y, mins.z) + Vector(erodeDist, erodeDist, 0), transform, convexHull[2] );
+		VectorTransform( Vector(maxs.x, mins.y, mins.z) + Vector(erodeDist, -erodeDist, 0), transform, convexHull[3] );
 
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;

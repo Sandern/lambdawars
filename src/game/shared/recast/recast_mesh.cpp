@@ -79,8 +79,10 @@ static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CRecastMesh::ResetCommonSettings()
+void CRecastMesh::Init( const char *name )
 {
+	m_Name.Set( name );
+
 	m_cellSize = recast_cellsize.GetFloat();
 	m_cellHeight = recast_cellheight.GetFloat();
 	m_agentHeight = 72.0f; // => Soldier/human

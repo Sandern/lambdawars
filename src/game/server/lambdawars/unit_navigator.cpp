@@ -231,9 +231,10 @@ void UnitBaseNavigator::Reset()
 	m_fLastBestDensity = 0.0f;
 	m_fDiscomfortWeight = unit_cost_discomfortweight_start.GetFloat();
 
+#if 0 // TODO: REMOVE
 	m_iBlockResolveDirection = 1;
 	m_fNextChooseDirection = 0;
-
+#endif // 0
 	m_hAtGoalDependencyEnt = NULL;
 }
 
@@ -917,7 +918,7 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 		}
 		else
 		{
-#if 0
+#if 0 // TODO: REMOVE
 			// Add density from nav mesh (don't drop off cliffs when we don't want too)
 			// Note that we don't do this for special waypoints (climbing/dropping/etc)
 			if( ShouldConsiderNavMesh() )
@@ -1066,6 +1067,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// 3. The "free" non blocked directions
 	float cost = ( unit_cost_distweight.GetFloat() * fDist ) + 
 			 ( m_fDiscomfortWeight * fDensity );
+#if 0 // TODO: REMOVE
 	if( m_vBlockingDirection != vec3_origin )
 	{
 		if( m_fNextChooseDirection < gpGlobals->curtime )
@@ -1078,6 +1080,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 
 		cost += (vFinalVelocity.Normalized() - (m_vBlockingDirection * m_iBlockResolveDirection)).Length2D() * unit_cost_blockdirweight.GetFloat();
 	}
+#endif // 0
 	return cost;
 }
 
@@ -1697,7 +1700,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 		}
 		else
 		{
-			tolerance = GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance;
+			tolerance = GetPath()->m_waypointTolerance;
 		}
 
 		if( waypointDist <= Min(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
@@ -1710,6 +1713,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 	}
 	else
 	{
+#if 0
 		float fToleranceX = pCurWaypoint->flToleranceX + GetPath()->m_waypointTolerance;
 		float fToleranceY = pCurWaypoint->flToleranceY + GetPath()->m_waypointTolerance;
 
@@ -1741,6 +1745,12 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 
 			AdvancePath();
 		}
+#else
+		if( GetAbsOrigin().DistTo( pCurWaypoint->GetPos() ) < GetPath()->m_waypointTolerance )
+		{
+			AdvancePath();
+		}
+#endif // 0
 
 	}
 	if( SpecialGoalStatus != CHS_NOGOAL )
@@ -2517,6 +2527,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( UnitBasePath *pPath, const 
 	return NULL;
 }
 
+#if 0 // TODO: REMOVE
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -2724,6 +2735,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPat
 	return BuildWayPointsFromRoute( pPath, fromArea, pWayPoint, dir );  
 
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2733,7 +2745,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	if( !unit_route_navmesh_paths.GetBool() )
 		return NULL;
 
-#if 0
+#if 0 // TODO: REMOVE
 	CNavArea *startArea, *goalArea, *closestArea;
 
 	// Use GetAbsOrigin here. Nav area selection falls back to nearest nav.

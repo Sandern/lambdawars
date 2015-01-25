@@ -74,7 +74,7 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 	fileBuffer.Get( szName, header.lenName );
 	szName[header.lenName] = 0;
 
-	SetName( szName );
+	Init( szName );
 
 	m_navMesh = dtAllocNavMesh();
 	if (!m_navMesh)

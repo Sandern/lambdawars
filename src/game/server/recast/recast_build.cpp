@@ -22,7 +22,7 @@
 #include "ChunkyTriMesh.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-//#include "tier0/memdbgon.h"
+#include "tier0/memdbgon.h"
 
 // This value specifies how many layers (or "floors") each navmesh tile is expected to have.
 static const int EXPECTED_LAYERS_PER_TILE = 4;
@@ -285,7 +285,6 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 	double fStartTime = Plat_FloatTime();
 
 	Reset(); // Clean any existing data
-	ResetCommonSettings(); // Reset parameters
 
 	BuildContext ctx;
 

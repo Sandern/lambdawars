@@ -162,12 +162,14 @@ public:
 	//
 	float			flPathDistGoal;
 
+#if 0 // TODO: REMOVE
 	//---------------------------------
 	//
 	// Nav Area info
 	//
 	CNavArea *pFrom;
 	CNavArea *pTo;
+#endif // 0
 
 private:
 	UnitBaseWaypoint *pNext;
@@ -490,7 +492,7 @@ protected:
 	virtual bool		FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
 									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
 	virtual UnitBaseWaypoint *	BuildLocalPath( UnitBasePath *pPath, const Vector &pos );
-	virtual UnitBaseWaypoint *	BuildWayPointsFromRoute( UnitBasePath *pPath, CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1 );
+	//virtual UnitBaseWaypoint *	BuildWayPointsFromRoute( UnitBasePath *pPath, CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1 );
 	virtual UnitBaseWaypoint *	BuildNavAreaPath( UnitBasePath *pPath, const Vector &pos );
 	virtual UnitBaseWaypoint *	BuildRoute( UnitBasePath *pPath );
 
@@ -585,8 +587,8 @@ protected:
 	CUtlVector<seed_entry_t> m_Seeds;
 
 	Vector m_vBlockingDirection;
-	int m_iBlockResolveDirection;
-	float m_fNextChooseDirection;
+	//int m_iBlockResolveDirection;
+	//float m_fNextChooseDirection;
 
 	int m_iTestRouteMask;
 

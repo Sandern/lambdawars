@@ -57,13 +57,12 @@ public:
 	~CRecastMesh();
 
 	const char *GetName();
-	void SetName( const char *name );
+	void Init( const char *name );
 
 	virtual void Update( float dt );
 
 	// Load/build 
 	//virtual void LoadTestData();
-	virtual void ResetCommonSettings();
 
 	virtual bool Load( CUtlBuffer &fileBuffer );
 	virtual bool Reset();
@@ -90,6 +89,8 @@ public:
 	// Accessors
 	dtNavMesh *GetNavMesh() { return m_navMesh; }
 	dtNavMeshQuery *GetNavMeshQuery() { return m_navQuery; }
+
+	float GetAgentRadius() { return m_agentRadius; }
 
 protected:
 	bool m_keepInterResults;
@@ -144,11 +145,6 @@ private:
 inline const char *CRecastMesh::GetName()
 {
 	return m_Name.Get();
-}
-
-inline void CRecastMesh::SetName( const char *name )
-{
-	m_Name.Set( name );
 }
 
 #endif // RECAST_MESH_H
