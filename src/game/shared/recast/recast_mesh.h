@@ -91,6 +91,7 @@ public:
 	dtNavMeshQuery *GetNavMeshQuery() { return m_navQuery; }
 
 	float GetAgentRadius() { return m_agentRadius; }
+	float GetAgentHeight() { return m_agentHeight; }
 
 protected:
 	bool m_keepInterResults;

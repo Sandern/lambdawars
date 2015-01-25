@@ -9,6 +9,9 @@
 #include "unit_locomotion.h"
 #include "hl2wars_util_shared.h"
 
+#include "recast/recast_mgr.h"
+#include "recast/recast_mesh.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -156,4 +159,13 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildLocalPath( const Vector &vGoalPos )
 		NavDbgMsg("#%d BuildLocalPath: builded direct route\n", GetOuter()->entindex());
 		return new UnitBaseWaypoint(vGoalPos);
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+CRecastMesh *UnitBaseAirNavigator::GetNavMesh()
+{
+	int idx = RecastMgr().FindMeshIndex( "air" );
+	return RecastMgr().GetMesh( idx );
 }

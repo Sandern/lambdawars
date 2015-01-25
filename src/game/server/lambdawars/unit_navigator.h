@@ -26,6 +26,7 @@ extern ConVar unit_navigator_debug_inrange;
 // Forward declarations
 class UnitBaseMoveCommand;
 class CNavArea;
+class CRecastMesh;
 
 // Goal types
 enum UnitGoalTypes
@@ -489,6 +490,7 @@ protected:
 	virtual	void		InsertSeed( const Vector &vPos );
 
 	// Route buiding
+	virtual CRecastMesh *GetNavMesh();
 	virtual bool		FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
 									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
 	virtual UnitBaseWaypoint *	BuildLocalPath( UnitBasePath *pPath, const Vector &pos );

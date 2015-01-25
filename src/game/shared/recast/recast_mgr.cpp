@@ -21,6 +21,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+	ConVar recast_debug_mesh( "recast_debug_mesh", "human" );
+#else
+	ConVar recast_build_single( "recast_build_single", "" );
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: Accessor
 //-----------------------------------------------------------------------------
@@ -114,6 +120,46 @@ int CRecastMgr::FindMeshIndex( const char *name )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Determines best nav mesh radius/height
+//-----------------------------------------------------------------------------
+int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
+{
+	int bestIdx = -1;
+	float fBestRadiusDiff = 0;
+	float fBestHeightDiff = 0;
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		CRecastMesh *pMesh = m_Meshes[ i ];
+		// Only consider fitting meshes
+		if( pMesh->GetAgentRadius() < radius || pMesh->GetAgentHeight() < height )
+		{
+			continue;
+		}
+
+		// From these meshes, pick the best fitting one
+		float fRadiusDiff = fabs( pMesh->GetAgentRadius() - radius );
+		float fHeightDiff = fabs( pMesh->GetAgentHeight() - height );
+		if( bestIdx == -1 || (fRadiusDiff <= fBestRadiusDiff && fHeightDiff <= fBestHeightDiff ) )
+		{
+			bestIdx = i;
+			fBestRadiusDiff = fRadiusDiff;
+			fBestHeightDiff = fHeightDiff;
+		}
+	}
+	return bestIdx;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Determines best nav mesh for entity
+//-----------------------------------------------------------------------------
+int CRecastMgr::FindBestMeshForEntity( CBaseEntity *pEntity )
+{
+	if( !pEntity )
+		return -1;
+	return FindBestMeshForRadiusHeight( pEntity->CollisionProp()->BoundingRadius2D(), pEntity->CollisionProp()->OBBSize().z );
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 dtNavMesh* CRecastMgr::GetNavMesh( const char *meshName )
@@ -141,6 +187,21 @@ dtNavMeshQuery* CRecastMgr::GetNavMeshQuery( const char *meshName )
 
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CRecastMgr::BuildMesh( CMapMesh *pMapMesh, const char *name )
+{
+	CRecastMesh *pMesh = new CRecastMesh();
+	pMesh->Init( name );
+	if( pMesh->Build( pMapMesh ) )
+	{
+		m_Meshes.Insert( pMesh->GetName(), pMesh );
+		return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Builds all navigation meshes
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Build()
@@ -157,11 +218,16 @@ bool CRecastMgr::Build()
 	}
 
 	// Create meshes
-	CRecastMesh *pMesh = new CRecastMesh();
-	pMesh->Init( "soldier" );
-	if( pMesh->Build( pMapMesh ) )
+	if( V_strlen( recast_build_single.GetString() ) > 0 )
 	{
-		m_Meshes.Insert( pMesh->GetName(), pMesh );
+		BuildMesh( pMapMesh, recast_build_single.GetString() );
+	}
+	else
+	{
+		BuildMesh( pMapMesh, "human" );
+		BuildMesh( pMapMesh, "small" );
+		BuildMesh( pMapMesh, "large" );
+		BuildMesh( pMapMesh, "air" );
 	}
 
 	return true;
@@ -262,7 +328,6 @@ NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
 }
 
 #ifdef CLIENT_DLL
-ConVar recast_debug_mesh("recast_debug_mesh", "soldier");
 //-----------------------------------------------------------------------------
 // Purpose: Saves the generated navigation meshes
 //-----------------------------------------------------------------------------

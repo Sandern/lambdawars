@@ -38,6 +38,8 @@ public:
 	bool GetUseSimplifiedRouteBuilding();
 	void SetUseSimplifiedRouteBuilding( bool enable );
 
+	virtual CRecastMesh *GetNavMesh();
+
 private:
 	float m_fCurrentHeight;
 	float m_fDesiredHeight;

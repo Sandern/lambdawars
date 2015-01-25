@@ -2740,6 +2740,15 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildWayPointsFromRoute( UnitBasePath *pPat
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+CRecastMesh *UnitBaseNavigator::GetNavMesh()
+{
+	int idx = RecastMgr().FindBestMeshForEntity( m_pOuter );
+	return RecastMgr().GetMesh( idx );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, const Vector &vGoalPos )
 {
 	if( !unit_route_navmesh_paths.GetBool() )
@@ -2832,8 +2841,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
 	return new UnitBaseWaypoint( vGoalPos );
 #else
-	int idx = RecastMgr().FindMeshIndex( "soldier" );
-	CRecastMesh *pNavMesh = RecastMgr().GetMesh( idx );
+	CRecastMesh *pNavMesh = GetNavMesh();
 	if( pNavMesh )
 	{
 		const Vector &vStart = GetAbsOrigin(); 

@@ -73,7 +73,7 @@ CRecastMesh::~CRecastMesh()
 // Test settings temporary
 static ConVar recast_cellsize("recast_cellsize", "10.0", FCVAR_REPLICATED);
 static ConVar recast_cellheight("recast_cellheight", "10.0", FCVAR_REPLICATED);
-static ConVar recast_maxclimb("recast_maxclimb", "18.0", FCVAR_REPLICATED);
+//static ConVar recast_maxclimb("recast_maxclimb", "18.0", FCVAR_REPLICATED);
 static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
@@ -83,11 +83,9 @@ void CRecastMesh::Init( const char *name )
 {
 	m_Name.Set( name );
 
+	// Shared settings by all
 	m_cellSize = recast_cellsize.GetFloat();
 	m_cellHeight = recast_cellheight.GetFloat();
-	m_agentHeight = 72.0f; // => Soldier/human
-	m_agentRadius = 18.5f; // => Soldier/human
-	m_agentMaxClimb = recast_maxclimb.GetFloat(); //18.0f; // => default unit step height
 	m_agentMaxSlope = recast_maxslope.GetFloat(); // Default slope for units
 	m_regionMinSize = 8;
 	m_regionMergeSize = 20;
@@ -101,6 +99,45 @@ void CRecastMesh::Init( const char *name )
 	m_maxTiles = 0;
 	m_maxPolysPerTile = 0;
 	m_tileSize = 48;
+
+	// Per type
+	if( V_strncmp( name, "human", V_strlen( name ) ) == 0 )
+	{
+		// HULL_HUMAN, e.g. Soldier/human
+		m_agentHeight = 72.0f;
+		m_agentRadius = 18.5f;
+		m_agentMaxClimb = 18.0f;
+
+	}
+	else if( V_strncmp( name, "small", V_strlen( name ) )== 0 )
+	{
+		// HULL_TINY, e.g. headcrab
+		m_agentHeight = 24.0f;
+		m_agentRadius = 18.0f;
+		m_agentMaxClimb = 18.0f;
+	}
+	else if( V_strncmp( name, "large", V_strlen( name ) )== 0 )
+	{
+		// HULL_LARGE, e.g. Antlion Guard
+		m_agentHeight = 100.0f;
+		m_agentRadius = 58.0f; 
+		m_agentMaxClimb = 18.0f;
+	}
+	else if( V_strncmp( name, "air", V_strlen( name ) )== 0 )
+	{
+		// HULL_LARGE_CENTERED, e.g. Strider. Should also be good for gunship/helicop.
+		m_agentHeight = 1024.0f; // Not really that height ever, but don't want to have areas indoor
+		m_agentRadius = 42.0f; 
+		m_agentMaxClimb = 1024.0f;
+	}
+	else
+	{
+		Warning( "CRecastMesh::Init: Unknown mesh %s\n", name );
+
+		m_agentHeight = 72.0f; // => Soldier/human
+		m_agentRadius = 18.5f; // => Soldier/human
+		m_agentMaxClimb = 18.0f;
+	}
 }
 
 //-----------------------------------------------------------------------------

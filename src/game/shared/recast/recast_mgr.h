@@ -55,6 +55,9 @@ public:
 	int FindMeshIndex( const char *name );
 	CUtlDict< CRecastMesh *, int > &GetMeshes();
 
+	int FindBestMeshForRadiusHeight( float radius, float height );
+	int FindBestMeshForEntity( CBaseEntity *pEntity );
+
 	// Used for debugging purposes on client
 	virtual dtNavMesh* GetNavMesh( const char *meshName );
 	virtual dtNavMeshQuery* GetNavMeshQuery( const char *meshName );
@@ -78,6 +81,7 @@ public:
 protected:
 #ifndef CLIENT_DLL
 	const char *GetFilename( void ) const;
+	virtual bool BuildMesh( CMapMesh *m_pMapMesh, const char *name );
 #endif // CLIENT_DLL
 
 	NavObstacleArray_t &FindOrCreateObstacle( CBaseEntity *pEntity );
