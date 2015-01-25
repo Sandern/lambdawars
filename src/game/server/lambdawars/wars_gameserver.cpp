@@ -308,15 +308,21 @@ void CWarsGameServer::UpdateServer()
 //-----------------------------------------------------------------------------
 void CWarsGameServer::RunFrame()
 {
-	if( !steamgameserverapicontext->SteamGameServer() )
-	{
-		ProcessMessages();
-		//Warning("No steam game server interface\n");
-		return;
-	}
 	if( !warsextension )
 	{
 		Error("No steam warsextension interface\n");
+		return;
+	}
+
+	if( !steamgameserverapicontext->SteamGameServer() )
+	{
+		if( !m_bUpdatingServer )
+		{
+			m_bUpdatingServer = true;
+			ProcessMessages();
+			m_bUpdatingServer = false;
+		}
+		//Warning("No steam game server interface\n");
 		return;
 	}
 
