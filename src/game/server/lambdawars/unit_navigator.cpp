@@ -1691,7 +1691,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 		}
 		else
 		{
-			tolerance = GetPath()->m_waypointTolerance, GetPath()->m_fGoalTolerance;
+			tolerance = GetPath()->m_waypointTolerance;
 		}
 
 		if( waypointDist <= Min(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
