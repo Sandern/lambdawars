@@ -120,6 +120,7 @@
 #include "fowmgr.h"
 #include "wars_mount_system.h"
 #include "editor/editorsystem.h"
+#include "wars_grid.h"
 #include "wars_flora.h"
 
 //#include "INetChannel.h"
@@ -1302,6 +1303,8 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	IGameSystem::LevelInitPostEntityAllSystems();
 
 #ifdef HL2WARS_DLL
+	CWarsGrid::LevelInit();
+
 	CWarsFlora::SpawnMapFlora();
 #endif // HL2WARS_DLL
 
@@ -1578,6 +1581,10 @@ void CServerGameDLL::LevelShutdown( void )
 	CBaseEntity::SetAllowPrecache( false );
 
 	TheNavMesh->Reset();
+
+#ifdef HL2WARS_DLL
+	CWarsGrid::LevelShutdown();
+#endif // HL2WARS_DLL
 
 	g_nCurrentChapterIndex = -1;
 	CStudioHdr::CActivityToSequenceMapping::ResetMappings();
