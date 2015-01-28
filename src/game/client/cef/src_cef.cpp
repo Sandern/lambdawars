@@ -205,7 +205,6 @@ void ClientApp::OnContextInitialized()
 void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line )
 {
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
-
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
 
 	if( !m_bEnableGPU )
@@ -294,7 +293,7 @@ bool CCefSystem::Init()
 #endif // USE_MULTITHREADED_MESSAGELOOP
 	settings.log_severity = developer.GetBool() ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DEFAULT;
 	settings.command_line_args_disabled = true; // Specify args through OnBeforeCommandLineProcessing
-	settings.remote_debugging_port = 8088;
+	//settings.remote_debugging_port = 8088;
 	settings.windowless_rendering_enabled = true;
 #if !CEF_ENABLE_SANDBOX
 	settings.no_sandbox = true;
@@ -333,6 +332,8 @@ void CCefSystem::Shutdown()
 
 	DevMsg( "Shutting down CEF (%d active browsers)\n", m_CefBrowsers.Count() );
 
+	CefClearSchemeHandlerFactories();
+
 	// Make sure all browsers are closed
 	for( int i = m_CefBrowsers.Count() - 1; i >= 0; i-- )
 		m_CefBrowsers[i]->Destroy();
@@ -340,12 +341,16 @@ void CCefSystem::Shutdown()
 	CefDoMessageLoopWork();
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
+#ifdef WIN32
+	// Restore window process to prevent unwanted callbacks
+	SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( s_pChainedWndProc ) );
+#endif // WIN32
+
 	// Shut down CEF.
 	CefShutdown();
 
 #ifdef WIN32
 	// Restore window process to prevent unwanted callbacks
-	SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( s_pChainedWndProc ) );
 
 #ifndef USE_MULTITHREADED_MESSAGELOOP
 	// Workaround crash on exit: minimize window...
@@ -354,6 +359,8 @@ void CCefSystem::Shutdown()
 	ShowWindow( GetMainWindow(), SW_MINIMIZE );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 #endif // WIN32
+
+	g_pClientApp = NULL;
 
 	m_bIsRunning = false;
 }
