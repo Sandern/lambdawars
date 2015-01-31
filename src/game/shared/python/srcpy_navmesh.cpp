@@ -14,12 +14,14 @@
 #include "hl2wars_nav_pathfind.h"
 #include "collisionutils.h"
 
+#include "wars_grid.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 ConVar g_pynavmesh_debug("g_pynavmesh_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 ConVar g_pynavmesh_debug_hidespot("g_pynavmesh_debug_hidespot", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
-ConVar g_pynavmesh_hidespot_searchmethod("g_pynavmesh_hidespot_searchmethod", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
+//ConVar g_pynavmesh_hidespot_searchmethod("g_pynavmesh_hidespot_searchmethod", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -545,6 +547,7 @@ CON_COMMAND_F( nav_verifyareas, "", FCVAR_CHEAT)
 
 #define HIDESPOT_DEBUG_DURATION 0.25f
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -834,4 +837,196 @@ bool DestroyHidingSpotByID( unsigned int navareaid, unsigned int hidespotid )
 	}
 
 	return deleted;
+}
+#endif // 0
+
+#ifdef CLIENT_DLL
+	ConVar disable_hidingspots( "cl_disable_coverspots", "0", FCVAR_CHEAT );
+#else
+	ConVar disable_hidingspots( "sv_disable_coverspots", "0", FCVAR_CHEAT );
+#endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+typedef struct CoverSpotResult_t
+{
+	CoverSpotResult_t( wars_coverspot_t *spot, float dist ) : pSpot(spot), fDist(dist) {}
+
+	wars_coverspot_t *pSpot;
+	float fDist;
+} CoverSpotResult_t;
+
+static int CoverCompare(const CoverSpotResult_t *pLeft, const CoverSpotResult_t *pRight )
+{
+	if( pLeft->fDist < pRight->fDist )
+		return -1; 
+	else if( pLeft->fDist > pRight->fDist )
+		return 1;
+	return 0;
+}
+
+
+class CoverSpotCollector
+{
+public:
+	CoverSpotCollector( CUtlVector< CoverSpotResult_t > &coverSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit, const Vector *pSortPos ) : 
+			m_CoverSpots( coverSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL), m_pSortPos( pSortPos )
+	{
+		m_fRadius = fRadius;
+
+		if( vPos.IsValid() )
+			m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, 1250.0f + fRadius, false, true);
+		else
+			Warning( "HidingSpotCollector: Invalid input position %f %f %f\n", vPos.x, vPos.y, vPos.z );
+
+		if( g_pynavmesh_debug_hidespot.GetBool() )
+		{
+			char buf[512];
+			if( m_pOrderArea )
+			{
+				V_snprintf( buf, 512, "HidingSpotCollector: HAS nav mesh! %d spots. Test Radius: %f", m_pOrderArea->GetHidingSpots()->Count(), m_fRadius );
+				NDebugOverlay::Text( m_pOrderArea->GetCenter(), buf, false, HIDESPOT_DEBUG_DURATION );
+			}
+			else
+			{
+				V_snprintf( buf, 512, "HidingSpotCollector: no nav mesh! Test Radius: %f", m_fRadius );
+				NDebugOverlay::Text( vPos, buf, false, HIDESPOT_DEBUG_DURATION );
+			}
+		}
+	}
+
+	bool operator() ( wars_coverspot_t *coverSpot )
+	{
+		// Figure out normal and skip if the slope is crap
+		CNavArea *area = TheNavMesh->GetNearestNavArea(coverSpot->position, false, 1250.0f + m_fRadius, false, true);
+		if( !area ) 
+		{
+			return true;
+		}
+
+		Vector normal;
+		area->ComputeNormal( &normal );
+		float fSlope = DotProduct( normal, Vector(0, 0, 1) );
+		if( fSlope < 0.83f )
+		{
+			if( g_pynavmesh_debug_hidespot.GetBool() )
+				NDebugOverlay::Text( area->GetCenter(), "HidingSpotCollector: skipping area due slope", false, HIDESPOT_DEBUG_DURATION );
+			return true;
+		}
+
+		// Area must be reachable
+		float fPathDist;
+		if( !m_pUnit )
+		{
+			ShortestPathCost costFunc;
+			fPathDist = NavAreaTravelDistance<ShortestPathCost>( m_pOrderArea, area, costFunc, 1250.0f + m_fRadius );
+		}
+		else
+		{
+			UnitShortestPathCost costFunc( m_pUnit, false );
+			fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, area, costFunc, 1250.0f + m_fRadius );
+		}
+
+		if( fPathDist < 0 )
+		{
+			return true;
+		}
+
+		// Collect spots in range
+		const Vector &vPos = coverSpot->position;
+		float fDist = ( vPos - m_vPos ).Length2D();
+
+		if( fDist < m_fRadius )
+		{
+			// When m_pSortPos is defined, an alternative distance is calculated for sorting
+			if( m_pSortPos )
+				m_CoverSpots.AddToTail( CoverSpotResult_t( coverSpot, ( vPos - *m_pSortPos ).Length2D() ) );
+			else
+				m_CoverSpots.AddToTail( CoverSpotResult_t( coverSpot, fDist ) );
+
+			if( g_pynavmesh_debug_hidespot.GetBool() )
+				NDebugOverlay::Box( vPos, -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, true, HIDESPOT_DEBUG_DURATION );
+		}
+		else
+		{
+			if( g_pynavmesh_debug_hidespot.GetBool() )
+			{
+				NDebugOverlay::Box( vPos, -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, true, HIDESPOT_DEBUG_DURATION );
+			}
+		}
+
+		return true;
+	}
+
+private:
+	CUnitBase *m_pUnit;
+	CNavArea *m_pOrderArea;
+	float m_fRadius;
+	const Vector &m_vPos;
+	const Vector *m_pSortPos;
+	CUtlVector< CoverSpotResult_t > &m_CoverSpots;
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *pUnit, bool bSort, const Vector *pSortPos )
+{
+	boost::python::list l;
+
+	if( disable_hidingspots.GetBool() )
+		return l;
+
+	// Get hiding spots in radius
+	CUtlVector< CoverSpotResult_t > coverSpots;
+	CoverSpotCollector collector( coverSpots, pos, radius, pUnit, pSortPos );
+	WarsGrid().ForAllCoverInRadius( collector, pos, radius );
+
+	if( bSort )
+	{
+		// Sort based on distance
+		coverSpots.Sort( CoverCompare );
+	}
+
+	// Python return result
+	for( int i = 0; i < coverSpots.Count(); i++ )
+		l.append( boost::python::make_tuple( coverSpots[i].pSpot->id, coverSpots[i].pSpot->position ) );
+
+	return l;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CreateHidingSpot( const Vector &pos, bool notsaved, bool checkground )
+{
+	return WarsGrid().CreateCoverSpot( pos, notsaved ? wars_coverspot_t::NOTSAVED : 0 );
+}
+
+bool DestroyHidingSpot( const Vector &pos, float tolerance, int num, unsigned int excludeFlags )
+{
+	// Get hiding spots in radius
+	CUtlVector< CoverSpotResult_t > coverSpots;
+	CoverSpotCollector collector( coverSpots, pos, tolerance, NULL, NULL );
+	WarsGrid().ForAllCoverInRadius( collector, pos, tolerance );
+
+	// Sort based on distance
+	coverSpots.Sort( CoverCompare );
+
+	for( int i = 0; i < coverSpots.Count(); i++ )
+	{
+		if( i >= num )
+			break;
+		if( coverSpots[i].pSpot->flags & excludeFlags )
+			continue;
+		DestroyHidingSpotByID( coverSpots[i].pSpot->position, coverSpots[i].pSpot->id );
+	}
+
+	return false;
+}
+
+bool DestroyHidingSpotByID( const Vector &pos, unsigned int hidespotid )
+{
+	return WarsGrid().DestroyCoverSpot( pos, hidespotid );
 }

@@ -49,8 +49,8 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 // Hiding/cover spot functions
 boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *unit = NULL, bool sort = true, const Vector *sortpos = NULL );
 
-int CreateHidingSpot( const Vector &pos, int &navareaid, bool notsaved = false, bool checkground = true );
-bool DestroyHidingSpot( const Vector &pos, float tolerance );
-bool DestroyHidingSpotByID( unsigned int navareaid, unsigned int hidespotid );
+int CreateHidingSpot( const Vector &pos, bool notsaved = false, bool checkground = true );
+bool DestroyHidingSpot( const Vector &pos, float tolerance, int num = 1, unsigned int excludeFlags = 0 );
+bool DestroyHidingSpotByID( const Vector &pos, unsigned int hidespotid );
 
 #endif // SRCPY_NAVMESH_H

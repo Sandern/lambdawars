@@ -2097,7 +2097,7 @@ void CHLClient::LevelInitPostEntity( )
 	}
 
 #ifdef HL2WARS_DLL
-	CWarsGrid::LevelInit();
+	WarsGrid().LevelInit();
 
 	CWarsFlora::SpawnMapFlora();
 #endif // HL2WARS_DLL
@@ -2214,7 +2214,7 @@ void CHLClient::LevelShutdown( void )
 	TheNavMesh->Reset();
 
 #ifdef HL2WARS_DLL
-	CWarsGrid::LevelShutdown();
+	WarsGrid().LevelShutdown();
 
 	// Should never be paused at this point
 	warsextension->SetPaused( false );

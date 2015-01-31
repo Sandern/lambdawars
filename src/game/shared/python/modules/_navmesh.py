@@ -41,7 +41,6 @@ class NavMesh(SemiSharedModuleGenerator):
         
         mb.free_function('GetHidingSpotsInRadius').include()
         mb.free_function('CreateHidingSpot').include()
-        mb.free_function('CreateHidingSpot').add_transformation( FT.output('navareaid') )
         mb.free_function('DestroyHidingSpot').include()
         mb.free_function('DestroyHidingSpotByID').include()
         

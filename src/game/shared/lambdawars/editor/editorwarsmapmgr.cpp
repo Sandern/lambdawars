@@ -11,6 +11,7 @@
 #include <filesystem.h>
 #include "wars_flora.h"
 #include "checksum_md5.h"
+#include "wars_grid.h"
 
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
@@ -190,6 +191,10 @@ void CEditorWarsMapMgr::CollectNewAndUpdatedEntities( CUtlMap< const char*, CBas
 //-----------------------------------------------------------------------------
 bool CEditorWarsMapMgr::WriteChangesToWarsFile()
 {
+	// Grid
+	WarsGrid().SaveGridData( m_pKVWars );
+
+	// Flora
 	KeyValues *pFloraKey = m_pKVWars->FindKey( "flora", true );
 
 	CUtlVector< KeyValues* > listToRemove;

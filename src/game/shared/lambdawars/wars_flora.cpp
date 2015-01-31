@@ -789,13 +789,13 @@ void CWarsFlora::DestroyFloraGrid()
 void CWarsFlora::InsertInFloraGrid()
 {
 	m_iKey = WARSGRID_KEY( GetAbsOrigin() );
-	if( m_iKey < 0 || m_iKey > CWarsGrid::GetGrid().Count() )
+	if( m_iKey < 0 || m_iKey > WarsGrid().GetGrid().Count() )
 	{
 		Warning("InsertInFloraGrid: Could not insert flora entity with key %d\n", m_iKey );
 		m_iKey = -1;
 		return;
 	}
-	CWarsGrid::GetGrid()[m_iKey].flora.AddToTail( this );
+	WarsGrid().GetGrid()[m_iKey].flora.AddToTail( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -806,7 +806,7 @@ void CWarsFlora::RemoveFromFloraGrid()
 	if( m_iKey == -1 )
 		return;
 
-	CWarsGrid::GetGrid()[m_iKey].flora.FindAndRemove( this );
+	WarsGrid().GetGrid()[m_iKey].flora.FindAndRemove( this );
 	m_iKey = -1;
 }
 
@@ -884,7 +884,7 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 			if ( y < 0 || y >= WARSGRID_GRIDSIZE )
 				continue;
 
-			const FloraVector &floraVector = CWarsGrid::GetGrid()[x + (y * WARSGRID_GRIDSIZE)].flora;
+			const FloraVector &floraVector = WarsGrid().GetGrid()[x + (y * WARSGRID_GRIDSIZE)].flora;
 			for( int i = 0; i < floraVector.Count(); i++ )
 			{
 				CWarsFlora *pFlora = floraVector[i];
@@ -1285,10 +1285,10 @@ CON_COMMAND_F( wars_flora_grid_mouse, "", FCVAR_CHEAT )
 
 	int iKey = WARSGRID_KEY( data.m_vWorldOnlyEndPos );
 
-	Msg( "%d Flora at mouse position\n", CWarsGrid::GetGrid()[iKey].flora.Count() );
-	for( int i = 0; i < CWarsGrid::GetGrid()[iKey].flora.Count(); i++ )
+	Msg( "%d Flora at mouse position\n", WarsGrid().GetGrid()[iKey].flora.Count() );
+	for( int i = 0; i < WarsGrid().GetGrid()[iKey].flora.Count(); i++ )
 	{
-		Msg("%d: uuid: %s (%d)\n", i, CWarsGrid::GetGrid()[iKey].flora[i]->GetFloraUUID(), CWarsGrid::GetGrid()[iKey].flora[i]->HasFloraUUID() );
+		Msg("%d: uuid: %s (%d)\n", i, WarsGrid().GetGrid()[iKey].flora[i]->GetFloraUUID(), WarsGrid().GetGrid()[iKey].flora[i]->HasFloraUUID() );
 	}
 }
 

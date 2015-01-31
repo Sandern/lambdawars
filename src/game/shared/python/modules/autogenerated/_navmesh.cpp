@@ -2,10 +2,6 @@
 
 #include "cbase.h"
 #ifdef CLIENT_DLL
-#include "__convenience.pypp.hpp"
-
-#include "__call_policies.pypp.hpp"
-
 #include "cbase.h"
 
 #include "srcpy_navmesh.h"
@@ -18,22 +14,16 @@
 
 namespace bp = boost::python;
 
-static boost::python::tuple CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72( ::Vector const & pos, bool notsaved=false, bool checkground=true ){
-    int navareaid2;
-    int result = ::CreateHidingSpot(pos, navareaid2, notsaved, checkground);
-    return bp::make_tuple( result, navareaid2 );
-}
-
 BOOST_PYTHON_MODULE(_navmesh){
     bp::docstring_options doc_options( true, true, false );
 
     { //::CreateHidingSpot
     
-        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool,bool );
+        typedef int ( *CreateHidingSpot_function_type )( ::Vector const &,bool,bool );
         
         bp::def( 
             "CreateHidingSpot"
-            , CreateHidingSpot_function_type( &CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72 )
+            , CreateHidingSpot_function_type( &::CreateHidingSpot )
             , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false), bp::arg("checkground")=(bool)(true) ) );
     
     }
@@ -72,23 +62,23 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::DestroyHidingSpot
     
-        typedef bool ( *DestroyHidingSpot_function_type )( ::Vector const &,float );
+        typedef bool ( *DestroyHidingSpot_function_type )( ::Vector const &,float,int,unsigned int );
         
         bp::def( 
             "DestroyHidingSpot"
             , DestroyHidingSpot_function_type( &::DestroyHidingSpot )
-            , ( bp::arg("pos"), bp::arg("tolerance") ) );
+            , ( bp::arg("pos"), bp::arg("tolerance"), bp::arg("num")=(int)(1), bp::arg("excludeFlags")=(unsigned int)(0) ) );
     
     }
 
     { //::DestroyHidingSpotByID
     
-        typedef bool ( *DestroyHidingSpotByID_function_type )( unsigned int,unsigned int );
+        typedef bool ( *DestroyHidingSpotByID_function_type )( ::Vector const &,unsigned int );
         
         bp::def( 
             "DestroyHidingSpotByID"
             , DestroyHidingSpotByID_function_type( &::DestroyHidingSpotByID )
-            , ( bp::arg("navareaid"), bp::arg("hidespotid") ) );
+            , ( bp::arg("pos"), bp::arg("hidespotid") ) );
     
     }
 
@@ -277,10 +267,6 @@ BOOST_PYTHON_MODULE(_navmesh){
     }
 }
 #else
-#include "__convenience.pypp.hpp"
-
-#include "__call_policies.pypp.hpp"
-
 #include "cbase.h"
 
 #include "srcpy_navmesh.h"
@@ -293,22 +279,16 @@ BOOST_PYTHON_MODULE(_navmesh){
 
 namespace bp = boost::python;
 
-static boost::python::tuple CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72( ::Vector const & pos, bool notsaved=false, bool checkground=true ){
-    int navareaid2;
-    int result = ::CreateHidingSpot(pos, navareaid2, notsaved, checkground);
-    return bp::make_tuple( result, navareaid2 );
-}
-
 BOOST_PYTHON_MODULE(_navmesh){
     bp::docstring_options doc_options( true, true, false );
 
     { //::CreateHidingSpot
     
-        typedef boost::python::tuple ( *CreateHidingSpot_function_type )( ::Vector const &,bool,bool );
+        typedef int ( *CreateHidingSpot_function_type )( ::Vector const &,bool,bool );
         
         bp::def( 
             "CreateHidingSpot"
-            , CreateHidingSpot_function_type( &CreateHidingSpot_4a636d1d69898eb85c2ab54cea15ca72 )
+            , CreateHidingSpot_function_type( &::CreateHidingSpot )
             , ( bp::arg("pos"), bp::arg("notsaved")=(bool)(false), bp::arg("checkground")=(bool)(true) ) );
     
     }
@@ -347,23 +327,23 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::DestroyHidingSpot
     
-        typedef bool ( *DestroyHidingSpot_function_type )( ::Vector const &,float );
+        typedef bool ( *DestroyHidingSpot_function_type )( ::Vector const &,float,int,unsigned int );
         
         bp::def( 
             "DestroyHidingSpot"
             , DestroyHidingSpot_function_type( &::DestroyHidingSpot )
-            , ( bp::arg("pos"), bp::arg("tolerance") ) );
+            , ( bp::arg("pos"), bp::arg("tolerance"), bp::arg("num")=(int)(1), bp::arg("excludeFlags")=(unsigned int)(0) ) );
     
     }
 
     { //::DestroyHidingSpotByID
     
-        typedef bool ( *DestroyHidingSpotByID_function_type )( unsigned int,unsigned int );
+        typedef bool ( *DestroyHidingSpotByID_function_type )( ::Vector const &,unsigned int );
         
         bp::def( 
             "DestroyHidingSpotByID"
             , DestroyHidingSpotByID_function_type( &::DestroyHidingSpotByID )
-            , ( bp::arg("navareaid"), bp::arg("hidespotid") ) );
+            , ( bp::arg("pos"), bp::arg("hidespotid") ) );
     
     }
 

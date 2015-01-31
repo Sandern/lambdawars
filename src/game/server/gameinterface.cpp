@@ -1303,7 +1303,7 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	IGameSystem::LevelInitPostEntityAllSystems();
 
 #ifdef HL2WARS_DLL
-	CWarsGrid::LevelInit();
+	WarsGrid().LevelInit();
 
 	CWarsFlora::SpawnMapFlora();
 #endif // HL2WARS_DLL
@@ -1583,7 +1583,7 @@ void CServerGameDLL::LevelShutdown( void )
 	TheNavMesh->Reset();
 
 #ifdef HL2WARS_DLL
-	CWarsGrid::LevelShutdown();
+	WarsGrid().LevelShutdown();
 #endif // HL2WARS_DLL
 
 	g_nCurrentChapterIndex = -1;
