@@ -1360,10 +1360,7 @@ static void SetMinMaxSize (CBaseEntity *pEnt, const Vector& mins, const Vector& 
 #ifdef ENABLE_PYTHON
 			if( pEnt->GetPyInstance().ptr() != Py_None )
 			{
-				char buf[256];
-				V_snprintf(buf, sizeof( buf ), "%s: backwards mins/maxs", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>");
-				PyErr_SetString(PyExc_ValueError, buf );
-				throw boost::python::error_already_set(); 
+				Warning( "%s: backwards mins/maxs\n", ( pEnt ) ? pEnt->GetDebugName() : "<NULL>" );
 			}
 			else
 #endif // ENABLE_PYTHON
@@ -1406,12 +1403,20 @@ void UTIL_SetModel( CBaseEntity *pEntity, const char *pModelName )
 #ifdef ENABLE_PYTHON
 		if( pEntity->GetPyInstance().ptr() != Py_None )
 		{
-			char buf[256];
-			V_snprintf(buf, sizeof( buf ), "%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
-				STRING( pEntity->GetEntityName() ),
-				pEntity->GetClassname(), pModelName );
-			PyErr_SetString(PyExc_ValueError, buf );
-			throw boost::python::error_already_set(); 
+			if( V_strncmp( "models/error.mdl", pModelName, sizeof( "models/error.mdl" ) ) == 0 )
+			{
+				Error("%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
+					STRING( pEntity->GetEntityName() ),
+					pEntity->GetClassname(), pModelName);
+			}
+			else
+			{
+				Warning( "%i/%s - %s:  UTIL_SetModel:  not precached: %s\n", pEntity->entindex(),
+					STRING( pEntity->GetEntityName() ),
+					pEntity->GetClassname(), pModelName );
+				UTIL_SetModel( pEntity, "models/error.mdl" );
+				return;
+			}
 		}
 		else
 #endif // ENABLE_PYTHON
