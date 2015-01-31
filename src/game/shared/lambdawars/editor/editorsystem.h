@@ -32,6 +32,9 @@ public:
 	virtual bool Init();
 	virtual void Shutdown();
 
+#ifndef CLIENT_DLL
+	virtual void LevelInitPreEntity();
+#endif // CLIENT_DLL
 	virtual void LevelShutdownPreEntity();
 
 	bool IsActive();
@@ -198,6 +201,9 @@ private:
 	int m_iDragStartPos[2];
 	bool m_bDragSelectArmed;
 	Vector m_vecLastDragWorldPos;
+
+#else
+	float m_fNextAutoSave;
 #endif // CLIENT_DLL
 };
 

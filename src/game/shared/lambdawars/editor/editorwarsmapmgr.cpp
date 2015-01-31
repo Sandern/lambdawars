@@ -79,7 +79,7 @@ void CEditorWarsMapMgr::ClearLoadedMap()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorWarsMapMgr::SaveCurrentMap()
+void CEditorWarsMapMgr::SaveCurrentMap( bool bIsAutoSave )
 {
 #ifndef CLIENT_DLL
 	if( !WriteChangesToWarsFile() )
@@ -88,8 +88,20 @@ void CEditorWarsMapMgr::SaveCurrentMap()
 	}
 	
 	// Write changes to file
-	Msg( "Saved %s...\n", m_szCurrentMap );
-	m_pKVWars->SaveToFile( filesystem, m_szCurrentMap, NULL );
+	if( bIsAutoSave )
+	{
+		char buf[MAX_PATH];
+		V_snprintf( buf, sizeof( buf ), "%s.autosave", m_szCurrentMap );
+
+		CUtlBuffer *fileBuf = new CUtlBuffer();
+		m_pKVWars->RecursiveSaveToFile( *fileBuf, 0 );
+		filesystem->AsyncWriteFile( buf, fileBuf, fileBuf->TellMaxPut(), true, false );
+	}
+	else
+	{
+		Msg( "Saved %s...\n", m_szCurrentMap );
+		m_pKVWars->SaveToFile( filesystem, m_szCurrentMap, NULL );
+	}
 #endif // CLIENT_DLL
 }
 

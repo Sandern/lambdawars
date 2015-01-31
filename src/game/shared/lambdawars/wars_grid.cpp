@@ -146,7 +146,15 @@ void CWarsGrid::LoadCover( KeyValues *pKVWars )
 //-----------------------------------------------------------------------------
 bool CWarsGrid::SaveCover( KeyValues *pKVWars )
 {
-	KeyValues *pCoverKey = pKVWars->FindKey( "cover", true );
+	// Remove old key
+	KeyValues *pCoverKey = pKVWars->FindKey( "cover" );
+	if( pCoverKey != NULL )
+	{
+		pKVWars->RemoveSubKey( pCoverKey );
+	}
+	
+	// Create new key with updated cover
+	pCoverKey = pKVWars->FindKey( "cover", true );
 
 	pCoverKey->SetBool( "loadnavmeshcover", !m_bOldNavMeshConverted );
 
