@@ -1302,12 +1302,6 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 
 	IGameSystem::LevelInitPostEntityAllSystems();
 
-#ifdef HL2WARS_DLL
-	WarsGrid().LevelInit();
-
-	CWarsFlora::SpawnMapFlora();
-#endif // HL2WARS_DLL
-
 	// No more precaching after PostEntityAllSystems!!!
 	CBaseEntity::SetAllowPrecache( false );
 
@@ -1321,6 +1315,12 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	// load the Navigation Mesh for this map
 	TheNavMesh->Load();
 #endif
+
+#ifdef HL2WARS_DLL
+	WarsGrid().LevelInit();
+
+	CWarsFlora::SpawnMapFlora();
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------

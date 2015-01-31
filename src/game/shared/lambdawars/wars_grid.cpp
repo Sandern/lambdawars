@@ -104,14 +104,14 @@ void CWarsGrid::LoadCover( KeyValues *pKVWars )
 {
 	m_nNextCoverID = 0;
 
-	bool bLoadNavMeshCover = true;
+	m_bOldNavMeshConverted = false;
 	if( pKVWars )
 	{
 		KeyValues *pCover = pKVWars->FindKey( "cover" );
 		if( pCover )
 		{
 			// This is set when the old nav mesh based spots are converted to the wars file
-			bLoadNavMeshCover = pCover->GetBool( "loadnavmeshcover", true );
+			m_bOldNavMeshConverted = !pCover->GetBool( "loadnavmeshcover", true );
 
 			for ( KeyValues *pKey = pCover->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 			{
@@ -127,7 +127,7 @@ void CWarsGrid::LoadCover( KeyValues *pKVWars )
 		}
 	}
 
-	if( bLoadNavMeshCover )
+	if( !m_bOldNavMeshConverted )
 	{
 		FOR_EACH_VEC( TheNavAreas, it )
 		{
@@ -147,6 +147,8 @@ void CWarsGrid::LoadCover( KeyValues *pKVWars )
 bool CWarsGrid::SaveCover( KeyValues *pKVWars )
 {
 	KeyValues *pCoverKey = pKVWars->FindKey( "cover", true );
+
+	pCoverKey->SetBool( "loadnavmeshcover", !m_bOldNavMeshConverted );
 
 	FOR_EACH_VEC( s_WarsGrid, gridit )
 	{

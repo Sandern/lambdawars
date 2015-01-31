@@ -117,6 +117,7 @@ private:
 
 private:
 	int m_nNextCoverID;
+	bool m_bOldNavMeshConverted;
 };
 
 CWarsGrid &WarsGrid();
