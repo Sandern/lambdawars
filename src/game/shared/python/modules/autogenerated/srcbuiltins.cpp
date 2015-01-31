@@ -691,23 +691,73 @@ BOOST_PYTHON_MODULE(srcbuiltins){
         g_PyKeyValuesType = (PyTypeObject *)KeyValues_exposer.ptr();
     }
 
-    bp::class_< SrcPyStdErr >( "SrcPyStdErr" )    
-        .def( 
-            "flush"
-            , (void ( ::SrcPyStdErr::* )(  ) )( &::SrcPyStdErr::flush ) )    
-        .def( 
-            "write"
-            , (void ( ::SrcPyStdErr::* )( char const * ) )( &::SrcPyStdErr::write )
-            , ( bp::arg("msg") ) );
+    { //::SrcPyStdErr
+        typedef bp::class_< SrcPyStdErr > SrcPyStdErr_exposer_t;
+        SrcPyStdErr_exposer_t SrcPyStdErr_exposer = SrcPyStdErr_exposer_t( "SrcPyStdErr" );
+        bp::scope SrcPyStdErr_scope( SrcPyStdErr_exposer );
+        { //::SrcPyStdErr::flush
+        
+            typedef void ( ::SrcPyStdErr::*flush_function_type )(  ) ;
+            
+            SrcPyStdErr_exposer.def( 
+                "flush"
+                , flush_function_type( &::SrcPyStdErr::flush ) );
+        
+        }
+        { //::SrcPyStdErr::write
+        
+            typedef void ( ::SrcPyStdErr::*write_function_type )( char const * ) ;
+            
+            SrcPyStdErr_exposer.def( 
+                "write"
+                , write_function_type( &::SrcPyStdErr::write )
+                , ( bp::arg("msg") ) );
+        
+        }
+        { //property "encoding"[fget=::SrcPyStdErr::encoding]
+        
+            typedef char const * ( ::SrcPyStdErr::*fget )(  ) ;
+            
+            SrcPyStdErr_exposer.add_property( 
+                "encoding"
+                , fget( &::SrcPyStdErr::encoding ) );
+        
+        }
+    }
 
-    bp::class_< SrcPyStdOut >( "SrcPyStdOut" )    
-        .def( 
-            "flush"
-            , (void ( ::SrcPyStdOut::* )(  ) )( &::SrcPyStdOut::flush ) )    
-        .def( 
-            "write"
-            , (void ( ::SrcPyStdOut::* )( char const * ) )( &::SrcPyStdOut::write )
-            , ( bp::arg("msg") ) );
+    { //::SrcPyStdOut
+        typedef bp::class_< SrcPyStdOut > SrcPyStdOut_exposer_t;
+        SrcPyStdOut_exposer_t SrcPyStdOut_exposer = SrcPyStdOut_exposer_t( "SrcPyStdOut" );
+        bp::scope SrcPyStdOut_scope( SrcPyStdOut_exposer );
+        { //::SrcPyStdOut::flush
+        
+            typedef void ( ::SrcPyStdOut::*flush_function_type )(  ) ;
+            
+            SrcPyStdOut_exposer.def( 
+                "flush"
+                , flush_function_type( &::SrcPyStdOut::flush ) );
+        
+        }
+        { //::SrcPyStdOut::write
+        
+            typedef void ( ::SrcPyStdOut::*write_function_type )( char const * ) ;
+            
+            SrcPyStdOut_exposer.def( 
+                "write"
+                , write_function_type( &::SrcPyStdOut::write )
+                , ( bp::arg("msg") ) );
+        
+        }
+        { //property "encoding"[fget=::SrcPyStdOut::encoding]
+        
+            typedef char const * ( ::SrcPyStdOut::*fget )(  ) ;
+            
+            SrcPyStdOut_exposer.add_property( 
+                "encoding"
+                , fget( &::SrcPyStdOut::encoding ) );
+        
+        }
+    }
 
     bp::class_< color24 >( "color24" )    
         .def_readwrite( "b", &color24::b )    
