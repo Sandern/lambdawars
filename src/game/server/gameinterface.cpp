@@ -120,6 +120,7 @@
 #include "fowmgr.h"
 #include "wars_mount_system.h"
 #include "editor/editorsystem.h"
+#include "wars_grid.h"
 #include "wars_flora.h"
 
 //#include "INetChannel.h"
@@ -1306,8 +1307,6 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	IGameSystem::LevelInitPostEntityAllSystems();
 
 #ifdef HL2WARS_DLL
-	CWarsFlora::SpawnMapFlora();
-
 	RecastMgr().Load();
 #endif // HL2WARS_DLL
 
@@ -1324,6 +1323,12 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	// load the Navigation Mesh for this map
 	TheNavMesh->Load();
 #endif
+
+#ifdef HL2WARS_DLL
+	WarsGrid().LevelInit();
+
+	CWarsFlora::SpawnMapFlora();
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------
@@ -1589,6 +1594,8 @@ void CServerGameDLL::LevelShutdown( void )
 
 #ifdef HL2WARS_DLL
 	RecastMgr().Reset();
+	
+	WarsGrid().LevelShutdown();
 #endif // HL2WARS_DLL
 
 	g_nCurrentChapterIndex = -1;
@@ -2964,7 +2971,7 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 	// The client must directly be informed about the python classes to avoid recv/send table mismatches
 	// NOTE: Usermessages don't work here. However it is possible to send client commands
 	// NOTE2: Dedicated servers send the message in the client active. They seem to check against CBaseEntity recv table.
-	if( (!engine->IsDedicatedServer() && ENTINDEX(pEdict) == 1) )
+	if( !engine->IsDedicatedServer() && ENTINDEX(pEdict) == 1 )
 	{
 		FullClientUpdatePyNetworkClsByEdict(pEdict);
 	}

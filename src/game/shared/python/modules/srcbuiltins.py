@@ -83,8 +83,14 @@ class SrcBuiltins(SharedModuleGenerator):
         mb.free_function('SrcPyDevMsg').rename('DevMsg')
 
         # Include classes for redirecting output (replace stdout and stderr)
-        mb.class_('SrcPyStdOut').include()
-        mb.class_('SrcPyStdErr').include()
+        cls = mb.class_('SrcPyStdOut')
+        cls.include()
+        cls.mem_fun('encoding').exclude()
+        cls.add_property('encoding', cls.mem_fun('encoding'))
+        cls = mb.class_('SrcPyStdErr')
+        cls.include()
+        cls.mem_fun('encoding').exclude()
+        cls.add_property('encoding', cls.mem_fun('encoding'))
         
         # Debug logging
         mb.free_function('PyCOM_TimestampedLog').include()

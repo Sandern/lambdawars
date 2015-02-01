@@ -11,6 +11,7 @@
 #include <filesystem.h>
 #include "wars_flora.h"
 #include "checksum_md5.h"
+#include "wars_grid.h"
 
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
@@ -78,7 +79,7 @@ void CEditorWarsMapMgr::ClearLoadedMap()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CEditorWarsMapMgr::SaveCurrentMap()
+void CEditorWarsMapMgr::SaveCurrentMap( bool bIsAutoSave )
 {
 #ifndef CLIENT_DLL
 	if( !WriteChangesToWarsFile() )
@@ -87,8 +88,20 @@ void CEditorWarsMapMgr::SaveCurrentMap()
 	}
 	
 	// Write changes to file
-	Msg( "Saved %s...\n", m_szCurrentMap );
-	m_pKVWars->SaveToFile( filesystem, m_szCurrentMap, NULL );
+	if( bIsAutoSave )
+	{
+		char buf[MAX_PATH];
+		V_snprintf( buf, sizeof( buf ), "%s.autosave", m_szCurrentMap );
+
+		CUtlBuffer *fileBuf = new CUtlBuffer();
+		m_pKVWars->RecursiveSaveToFile( *fileBuf, 0 );
+		filesystem->AsyncWriteFile( buf, fileBuf, fileBuf->TellMaxPut(), true, false );
+	}
+	else
+	{
+		Msg( "Saved %s...\n", m_szCurrentMap );
+		m_pKVWars->SaveToFile( filesystem, m_szCurrentMap, NULL );
+	}
 #endif // CLIENT_DLL
 }
 
@@ -190,6 +203,10 @@ void CEditorWarsMapMgr::CollectNewAndUpdatedEntities( CUtlMap< const char*, CBas
 //-----------------------------------------------------------------------------
 bool CEditorWarsMapMgr::WriteChangesToWarsFile()
 {
+	// Grid
+	WarsGrid().SaveGridData( m_pKVWars );
+
+	// Flora
 	KeyValues *pFloraKey = m_pKVWars->FindKey( "flora", true );
 
 	CUtlVector< KeyValues* > listToRemove;

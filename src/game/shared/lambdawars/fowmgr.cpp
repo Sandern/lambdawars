@@ -119,9 +119,6 @@ void FOWAddEntity( FOWListInfo **pHead, int ownernumber, CBaseEntity *pEnt )
 
 	// Not found, create new one
 	pFOWList = new FOWListInfo();
-	if( !pFOWList )
-		return;
-
 	pFOWList->m_iOwnerNumber = ownernumber;
 	pFOWList->m_EntityList.AddToTail(pEnt);
 	pFOWList->m_pNext = *pHead;

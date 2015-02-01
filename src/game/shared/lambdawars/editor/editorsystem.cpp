@@ -18,6 +18,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifndef CLIENT_DLL
+static ConVar wars_editor_autosave_freq( "wars_editor_autosave_freq", "30.0", FCVAR_ARCHIVE );
+#endif // CLIENT_DLL
+
 // Deferred helper
 static void CalcBoundaries( Vector *list, const int &num, Vector &min, Vector &max )
 {
@@ -74,6 +78,16 @@ void CEditorSystem::Shutdown()
 	gEntList.RemoveListenerEntity( this );
 #endif // CLIENT_DLL
 }
+
+#ifndef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CEditorSystem::LevelInitPreEntity()
+{
+	m_fNextAutoSave = gpGlobals->curtime + Max( 5.0f, wars_editor_autosave_freq.GetFloat() );
+}
+#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -521,6 +535,13 @@ void CEditorSystem::FrameUpdatePostEntityThink()
 
 		// Clean up keyvalues after processing
 		pCommand->deleteThis();
+	}
+
+	if( m_fNextAutoSave < gpGlobals->curtime && wars_editor_autosave_freq.GetInt() != 0 )
+	{
+		m_WarsMapManager.SaveCurrentMap( true );
+
+		m_fNextAutoSave = gpGlobals->curtime + Max( 5.0f, wars_editor_autosave_freq.GetFloat() );
 	}
 }
 #endif // CLIENT_DLL

@@ -157,6 +157,7 @@
 #ifdef HL2WARS_DLL
 #include "fowmgr.h"
 #include "wars_mount_system.h"
+#include "wars_grid.h"
 #include "wars_flora.h"
 #include "editor/editorsystem.h"
 #include "wars/iwars_extension.h"
@@ -2102,9 +2103,11 @@ void CHLClient::LevelInitPostEntity( )
 	}
 
 #ifdef HL2WARS_DLL
-	CWarsFlora::SpawnMapFlora();
-
 	RecastMgr().Load();
+
+	WarsGrid().LevelInit();
+
+	CWarsFlora::SpawnMapFlora();
 #endif // HL2WARS_DLL
 }
 
@@ -2220,6 +2223,8 @@ void CHLClient::LevelShutdown( void )
 
 #ifdef HL2WARS_DLL
 	RecastMgr().Reset();
+	
+	WarsGrid().LevelShutdown();
 
 	// Should never be paused at this point
 	warsextension->SetPaused( false );

@@ -1978,6 +1978,9 @@
     <ClCompile Include="..\shared\lambdawars\wars_network_shared.cpp">
       <Filter>Source Files\wars\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\lambdawars\wars_grid.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
     <ClCompile Include="..\shared\recast\recast_mesh.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
@@ -3871,6 +3874,9 @@
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\wars_network.h">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\lambdawars\wars_grid.h">
       <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_mesh.h">

@@ -7,8 +7,11 @@
 #include "cbase.h"
 #include "editorsystem.h"
 #include "wars_flora.h"
+#include "wars_grid.h"
 #include "collisionutils.h"
 #include "wars/iwars_extension.h"
+
+#include "srcpy_navmesh.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -44,6 +47,19 @@ bool CEditorSystem::ProcessCommand( KeyValues *pCommand )
 	else if( V_strcmp( pOperation, "edit" ) == 0 )
 	{
 		return ProcessEditCommand( pCommand );
+	}
+	else if( V_strcmp( pOperation, "createcover" ) == 0 )
+	{
+		return ProcessCreateCoverCommand( pCommand );
+	}
+	else if( V_strcmp( pOperation, "destroycover" ) == 0 )
+	{
+		return ProcessDestroyCoverCommand( pCommand );
+	}
+	else if( V_strcmp( pOperation, "coverconvertoldnavmesh" ) == 0 )
+	{
+		WarsGrid().ConvertOldNavMeshCover();
+		return true;
 	}
 
 	Warning( "CEditorSystem::ProcessCommand: unprocessed operation type \"%s\"\n", pOperation );
@@ -218,6 +234,33 @@ bool CEditorSystem::ProcessEditCommand( KeyValues *pCommand )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CEditorSystem::ProcessCreateCoverCommand( KeyValues *pCommand )
+{
+	Vector vecPos;
+	UTIL_StringToVector( vecPos.Base(), pCommand->GetString( "position" ) );
+
+	WarsGrid().CreateCoverSpot( vecPos, pCommand->GetInt( "flags", 0 ) );
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CEditorSystem::ProcessDestroyCoverCommand( KeyValues *pCommand )
+{
+	Vector vecPos;
+	UTIL_StringToVector( vecPos.Base(), pCommand->GetString( "position" ) );
+
+	DestroyHidingSpot( vecPos, pCommand->GetFloat( "tolerance" ), pCommand->GetInt( "num" ), pCommand->GetInt( "excludeFlags" ) );
+	//WarsGrid().DestroyCoverSpot( vecPos, pCommand->GetInt( "tolerance" ), pCommand->GetInt( "excludeFlags" ) );
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CEditorSystem::QueueCommand( KeyValues *pCommand )
 {
 	warsextension->QueueClientCommand( pCommand->MakeCopy() );
@@ -272,3 +315,48 @@ KeyValues *CEditorSystem::CreateEditCommand( KeyValues *pAttributes )
 	pOperation->AddSubKey(pAttributes);
 	return pOperation;
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+KeyValues *CEditorSystem::CreateCoverCreateCommand( const Vector &vPos, unsigned int flags )
+{
+	KeyValues *pOperation = new KeyValues( "data" );
+	pOperation->SetString("operation", "createcover");
+	pOperation->SetString( "position", VarArgs( "%f %f %f", vPos.x, vPos.y, vPos.z ) );
+	pOperation->SetInt( "flags", flags );
+	return pOperation;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+KeyValues *CEditorSystem::CreateCoverDestroyCommand( const Vector &vPos, float tolerance, int num, unsigned int excludeFlags )
+{
+	KeyValues *pOperation = new KeyValues( "data" );
+	pOperation->SetString("operation", "destroycover");
+	pOperation->SetString( "position", VarArgs( "%f %f %f", vPos.x, vPos.y, vPos.z ) );
+	pOperation->SetFloat( "tolerance", tolerance );
+	pOperation->SetInt( "num", num );
+	pOperation->SetInt( "excludeFlags", excludeFlags );
+	return pOperation;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+KeyValues *CEditorSystem::CreateCoverConvertOldNavMeshCommand()
+{
+	KeyValues *pOperation = new KeyValues( "data" );
+	pOperation->SetString("operation", "coverconvertoldnavmesh");
+	return pOperation;
+}
+
+#ifndef CLIENT_DLL
+CON_COMMAND_F( cover_convert_oldnavmesh, "", 0 )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+	EditorSystem()->QueueCommand( EditorSystem()->CreateCoverConvertOldNavMeshCommand() );
+}
+#endif // CLIENT_DLL

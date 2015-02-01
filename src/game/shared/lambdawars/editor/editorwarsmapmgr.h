@@ -20,7 +20,7 @@ public:
 	virtual bool IsMapLoaded();
 	virtual bool LoadCurrentMap();
 	virtual void ClearLoadedMap();
-	virtual void SaveCurrentMap();
+	virtual void SaveCurrentMap( bool bIsAutoSave = false );
 
 	void LoadVmf( const char *pszVmf );
 

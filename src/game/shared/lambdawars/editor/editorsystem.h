@@ -32,6 +32,9 @@ public:
 	virtual bool Init();
 	virtual void Shutdown();
 
+#ifndef CLIENT_DLL
+	virtual void LevelInitPreEntity();
+#endif // CLIENT_DLL
 	virtual void LevelShutdownPreEntity();
 
 	bool IsActive();
@@ -96,10 +99,17 @@ public:
 	bool ProcessSelectCommand( KeyValues *pCommand );
 	bool ProcessEditCommand( KeyValues *pCommand );
 
+	bool ProcessCreateCoverCommand( KeyValues *pCommand );
+	bool ProcessDestroyCoverCommand( KeyValues *pCommand );
+
 	void QueueCommand( KeyValues *pCommand );
 	KeyValues *CreateFloraCreateCommand( CWarsFlora *pFlora, const Vector *vOffset = NULL );
 	KeyValues *CreateClearSelectionCommand();
 	KeyValues *CreateEditCommand( KeyValues *pAttributes );
+
+	KeyValues *CreateCoverCreateCommand( const Vector &vPos, unsigned int flags = 0 );
+	KeyValues *CreateCoverDestroyCommand( const Vector &vPos, float tolerance, int num = 1, unsigned int excludeFlags = 0 );
+	KeyValues *CreateCoverConvertOldNavMeshCommand();
 
 private:
 	// Selection
@@ -191,6 +201,9 @@ private:
 	int m_iDragStartPos[2];
 	bool m_bDragSelectArmed;
 	Vector m_vecLastDragWorldPos;
+
+#else
+	float m_fNextAutoSave;
 #endif // CLIENT_DLL
 };
 

@@ -163,6 +163,7 @@ class SrcPyStdOut
 public:
 	void write( const char *msg ) { Msg( "%s", msg ); }
 	void flush() {}
+	const char *encoding() { return "ansi"; }
 };
 
 class SrcPyStdErr 
@@ -170,6 +171,7 @@ class SrcPyStdErr
 public:
 	void write( const char *msg ) { Warning( "%s", msg ); }
 	void flush() {}
+	const char *encoding() { return "ansi"; }
 };
 
 // Wrappers for Msg, Warning and DevMsg (Python does not use VarArgs)

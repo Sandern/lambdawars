@@ -14,6 +14,7 @@
 #include "srcpy_entities.h"
 #include "srcpy_networkvar.h"
 #include "gamestringpool.h"
+#include "tier1\fmtstr.h"
 
 #ifdef CLIENT_DLL
 #include "networkstringtable_clientdll.h"
@@ -423,9 +424,12 @@ bool CSrcPython::InitInterpreter( void )
 	sys = Import("sys");
 
 	// Redirect stdout/stderr to source print functions
+	// Also set these to the "original" values, which are none.
 	srcbuiltins = Import("srcbuiltins");
 	sys.attr("stdout") = srcbuiltins.attr("SrcPyStdOut")();
 	sys.attr("stderr") = srcbuiltins.attr("SrcPyStdErr")();
+	sys.attr("__stdout__") = sys.attr("stdout");
+	sys.attr("__stderr__") = sys.attr("stderr");
 
 	weakref = Import("weakref");
 	
@@ -649,13 +653,12 @@ bool CSrcPython::CheckVSPTInterpreter()
 {
 #ifdef CLIENT_DLL
 	return true; // TODO
-#endif // CLIENT_DLL
+#endif // CLIENT_DL
 
 	const bool bRunInterpreter = CommandLine() && CommandLine()->FindParm("-interpreter") != 0;
 	if( !bRunInterpreter )
 		return true;
 
-#ifdef WIN32
 	bool bSuccess = false;
 
 #ifndef CLIENT_DLL
@@ -664,10 +667,10 @@ bool CSrcPython::CheckVSPTInterpreter()
 
 	// Note: appends to the same log on the same day
 	char logfilename[MAX_PATH];
-	Q_snprintf( logfilename, sizeof( logfilename ), "con_logfile vspt_%02i-%02i-%04i.txt\n",
+	V_snprintf( logfilename, sizeof( logfilename ), "vspt_%02i-%02i-%04i.txt",
 		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year );
 
-	engine->ServerCommand( logfilename );
+	engine->ServerCommand( CFmtStr("con_logfile %s\n", logfilename) );
 	engine->ServerExecute();
 #endif // CLIENT_DLL
 
@@ -731,26 +734,35 @@ bool CSrcPython::CheckVSPTInterpreter()
 
 			bp::exec( command.c_str() );
 			bSuccess = true;
+			Msg("Successfully runned interpreter command\n");
 		}
 		else if( firstchars == "-m " )
 		{
-			command = command.substr( 3 );
-			Msg("Running interpreter module: %s\n", command.c_str() );
+			if( V_strncmp( command.c_str(), "-m pip list", command.length() ) == 0 )
+			{
+				Msg("Ignoring pip list call\n");
+				bSuccess = true;
+			}
+			else
+			{
+				command = command.substr( 3 );
+				Msg("Running interpreter module: %s\n", command.c_str() );
 
-			bp::str newCmd( command.c_str() );
-			newCmd = newCmd.replace( "\\\"", "\\\\\"" );
+				bp::str newCmd( command.c_str() );
+				newCmd = newCmd.replace( "\\\"", "\\\\\"" );
 
-			builtins.attr("print")( newCmd );
+				builtins.attr("print")( newCmd );
 
-			bp::list argv( shlex.attr("split")( newCmd ) );
-			bp::setattr( sys, bp::object("argv"), argv );
+				bp::list argv( shlex.attr("split")( newCmd ) );
+				bp::setattr( sys, bp::object("argv"), argv );
 
-			bp::object runpy = bp::import( "runpy" );
-			boost::python::dict kwargs;
-			kwargs["run_name"] = bp::object("__main__");
-			kwargs["alter_sys"] = (bool)(true);
-			runpy.attr("run_module")( *bp::make_tuple(argv[0]), **kwargs );
-			bSuccess = true;
+				bp::object runpy = bp::import( "runpy" );
+				boost::python::dict kwargs;
+				kwargs["run_name"] = bp::object("__main__");
+				kwargs["alter_sys"] = (bool)(true);
+				runpy.attr("run_module")( *bp::make_tuple(argv[0]), **kwargs );
+				bSuccess = true;
+			}
 		}
 		else
 		{
@@ -760,6 +772,7 @@ bool CSrcPython::CheckVSPTInterpreter()
 			Msg("Running interpreter file: %s\n", pFilePath );
 			Run("import encodings.idna");
 			bSuccess = this->ExecuteFile( pFilePath );
+			Msg("Successfully runned interpreter file\n");
 		}
 	}
 	catch( bp::error_already_set & ) 
@@ -769,7 +782,11 @@ bool CSrcPython::CheckVSPTInterpreter()
 
 	if( !bSuccess )
 	{
-		Warning("PySource: Failed to execute interpreter file (%s). Please check log.\n", command.c_str() );
+#ifdef CLIENT_DLL
+		Warning( "PySource: Failed to execute interpreter file (%s). Please check log\n", command.c_str() );
+#else
+		Error( "PySource: Failed to execute interpreter file (%s). Please check log: %s", command.c_str(), logfilename );
+#endif // CLIENT_DLL
 	}
 	// Make sure logs are saved
 #ifndef CLIENT_DLL
@@ -778,7 +795,6 @@ bool CSrcPython::CheckVSPTInterpreter()
 	filesystem->AsyncFinishAllWrites();
 	::TerminateProcess( ::GetCurrentProcess(), 0 );
 	return true;
-#endif // WIN32
 }
 
 //-----------------------------------------------------------------------------
@@ -1760,7 +1776,7 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 			char ext[5];
 			V_ExtractFileExtension( filename, ext, 5 );
 
-			if( V_strncmp( ext, "py", 5 ) == 0 )
+			if( V_strncmp( ext, "py", 2 ) == 0 )
 			{
 				char noextfilename[MAX_PATH]; 
 				V_StripExtension( filename, noextfilename, MAX_PATH );

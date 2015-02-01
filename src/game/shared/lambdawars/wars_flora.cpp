@@ -6,6 +6,7 @@
 
 #include "cbase.h"
 #include "wars_flora.h"
+#include "wars_grid.h"
 #include "mapentities_shared.h"
 #include "gamestringpool.h"
 #include "worldsize.h"
@@ -100,17 +101,6 @@ END_SEND_TABLE()
 
 static CTEIgniteFlora g_TEIgniteFloraEvent( "IgniteFloraEvent" );
 #endif // CLIENT_DLL
-
-//-----------------------------------------------------------------------------
-// Purpose: Flora Grid
-//-----------------------------------------------------------------------------
-#define FLORA_TILESIZE 256
-#define FLORA_GRIDSIZE (COORD_EXTENT/FLORA_TILESIZE)
-#define FLORA_KEYSINGLE( x ) (int)((MAX_COORD_INTEGER+x) / FLORA_TILESIZE)
-#define FLORA_KEY( position ) (int)((MAX_COORD_INTEGER+position.x) / FLORA_TILESIZE) + ((int)((MAX_COORD_INTEGER+position.y) / FLORA_TILESIZE) * FLORA_GRIDSIZE)
-
-typedef CUtlVector< CWarsFlora * > FloraVector;
-CUtlVector< FloraVector > s_FloraGrid;
 
 KeyValues *CWarsFlora::m_pKVFloraData = NULL;
 
@@ -783,8 +773,6 @@ void CWarsFlora::SpawnMapFlora()
 //-----------------------------------------------------------------------------
 void CWarsFlora::InitFloraGrid()
 {
-	s_FloraGrid.SetCount( FLORA_TILESIZE * FLORA_TILESIZE );
-
 	InitFloraDataKeyValues();
 }
 
@@ -793,7 +781,6 @@ void CWarsFlora::InitFloraGrid()
 //-----------------------------------------------------------------------------
 void CWarsFlora::DestroyFloraGrid()
 {
-	s_FloraGrid.RemoveAll();
 }
 
 //-----------------------------------------------------------------------------
@@ -801,14 +788,14 @@ void CWarsFlora::DestroyFloraGrid()
 //-----------------------------------------------------------------------------
 void CWarsFlora::InsertInFloraGrid()
 {
-	m_iKey = FLORA_KEY( GetAbsOrigin() );
-	if( m_iKey < 0 || m_iKey > s_FloraGrid.Count() )
+	m_iKey = WARSGRID_KEY( GetAbsOrigin() );
+	if( m_iKey < 0 || m_iKey > WarsGrid().GetGrid().Count() )
 	{
 		Warning("InsertInFloraGrid: Could not insert flora entity with key %d\n", m_iKey );
 		m_iKey = -1;
 		return;
 	}
-	s_FloraGrid[m_iKey].AddToTail( this );
+	WarsGrid().GetGrid()[m_iKey].flora.AddToTail( this );
 }
 
 //-----------------------------------------------------------------------------
@@ -819,7 +806,7 @@ void CWarsFlora::RemoveFromFloraGrid()
 	if( m_iKey == -1 )
 		return;
 
-	s_FloraGrid[m_iKey].FindAndRemove( this );
+	WarsGrid().GetGrid()[m_iKey].flora.FindAndRemove( this );
 	m_iKey = -1;
 }
 
@@ -883,21 +870,21 @@ bool ForAllFloraInRadius( Functor &func, const Vector &vPosition, float fRadius 
 	CUtlVector<CWarsFlora *> foundFlora;
 	float fRadiusSqr = fRadius * fRadius;
 
-	int originX = FLORA_KEYSINGLE( vPosition.x );
-	int originY = FLORA_KEYSINGLE( vPosition.y );
-	int shiftLimit = ceil( fRadius / FLORA_TILESIZE );
+	int originX = WARSGRID_KEYSINGLE( vPosition.x );
+	int originY = WARSGRID_KEYSINGLE( vPosition.y );
+	int shiftLimit = ceil( fRadius / WARSGRID_TILESIZE );
 
 	for( int x = originX - shiftLimit; x <= originX + shiftLimit; ++x )
 	{
-		if ( x < 0 || x >= FLORA_GRIDSIZE )
+		if ( x < 0 || x >= WARSGRID_GRIDSIZE )
 			continue;
 
 		for( int y = originY - shiftLimit; y <= originY + shiftLimit; ++y )
 		{
-			if ( y < 0 || y >= FLORA_GRIDSIZE )
+			if ( y < 0 || y >= WARSGRID_GRIDSIZE )
 				continue;
 
-			const FloraVector &floraVector = s_FloraGrid[x + (y * FLORA_GRIDSIZE)];
+			const FloraVector &floraVector = WarsGrid().GetGrid()[x + (y * WARSGRID_GRIDSIZE)].flora;
 			for( int i = 0; i < floraVector.Count(); i++ )
 			{
 				CWarsFlora *pFlora = floraVector[i];
@@ -1296,12 +1283,12 @@ CON_COMMAND_F( wars_flora_grid_mouse, "", FCVAR_CHEAT )
 
 	const MouseTraceData_t &data = pPlayer->GetMouseData();
 
-	int iKey = FLORA_KEY( data.m_vWorldOnlyEndPos );
+	int iKey = WARSGRID_KEY( data.m_vWorldOnlyEndPos );
 
-	Msg( "%d Flora at mouse position\n", s_FloraGrid[iKey].Count() );
-	for( int i = 0; i < s_FloraGrid[iKey].Count(); i++ )
+	Msg( "%d Flora at mouse position\n", WarsGrid().GetGrid()[iKey].flora.Count() );
+	for( int i = 0; i < WarsGrid().GetGrid()[iKey].flora.Count(); i++ )
 	{
-		Msg("%d: uuid: %s (%d)\n", i, s_FloraGrid[iKey][i]->GetFloraUUID(), s_FloraGrid[iKey][i]->HasFloraUUID() );
+		Msg("%d: uuid: %s (%d)\n", i, WarsGrid().GetGrid()[iKey].flora[i]->GetFloraUUID(), WarsGrid().GetGrid()[iKey].flora[i]->HasFloraUUID() );
 	}
 }
 

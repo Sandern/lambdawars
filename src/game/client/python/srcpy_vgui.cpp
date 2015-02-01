@@ -543,7 +543,7 @@ void CWrapSurface::DrawFilledRectArray( boost::python::list rects )
 		pRects[i] = boost::python::extract<IntRect>(rects[i]);
 	}
 	surface()->DrawFilledRectArray(pRects, n);
-	delete pRects;
+	delete [] pRects;
 }
 
 boost::python::tuple CWrapSurface::GetTextSize( HFont font, boost::python::object unistr )
@@ -582,7 +582,7 @@ boost::python::tuple CWrapSurface::GetTextSize( HFont font, boost::python::objec
 	int wide, tall;
 	surface()->GetTextSize(font, w, wide, tall); 
 
-	delete w;
+	delete [] w;
 	return boost::python::make_tuple(wide, tall);
 }
 
@@ -607,7 +607,7 @@ void CWrapSurface::DrawTexturedPolyLine( boost::python::list vertices )
 	}
 	vgui::surface()->DrawTexturedPolyLine(pVertices, n);
 
-	delete pVertices;
+	delete [] pVertices;
 }
 
 //-----------------------------------------------------------------------------
@@ -631,7 +631,7 @@ void CWrapSurface::DrawTexturedPolygon( boost::python::list vertices )
 	}
 	vgui::surface()->DrawTexturedPolygon(n, pVertices);
 
-	delete pVertices;
+	delete [] pVertices;
 }
 
 //-----------------------------------------------------------------------------
@@ -671,7 +671,7 @@ void CWrapSurface::DrawUnicodeString( boost::python::object unistr, FontDrawType
 	w[l] = '\0';
 	surface()->DrawUnicodeString(w, drawType);
 
-	delete w;
+	delete [] w;
 }
 
 //-----------------------------------------------------------------------------

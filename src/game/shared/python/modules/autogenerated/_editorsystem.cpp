@@ -58,6 +58,38 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
+        { //::CEditorSystem::CreateCoverConvertOldNavMeshCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateCoverConvertOldNavMeshCommand_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateCoverConvertOldNavMeshCommand"
+                , CreateCoverConvertOldNavMeshCommand_function_type( &::CEditorSystem::CreateCoverConvertOldNavMeshCommand )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateCoverCreateCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateCoverCreateCommand_function_type )( ::Vector const &,unsigned int ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateCoverCreateCommand"
+                , CreateCoverCreateCommand_function_type( &::CEditorSystem::CreateCoverCreateCommand )
+                , ( bp::arg("vPos"), bp::arg("flags")=(unsigned int)(0) )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateCoverDestroyCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateCoverDestroyCommand_function_type )( ::Vector const &,float,int,unsigned int ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateCoverDestroyCommand"
+                , CreateCoverDestroyCommand_function_type( &::CEditorSystem::CreateCoverDestroyCommand )
+                , ( bp::arg("vPos"), bp::arg("tolerance"), bp::arg("num")=(int)(1), bp::arg("excludeFlags")=(unsigned int)(0) )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
         { //::CEditorSystem::CreateEditCommand
         
             typedef ::KeyValues * ( ::CEditorSystem::*CreateEditCommand_function_type )( ::KeyValues * ) ;
@@ -268,6 +300,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pCommand") ) );
         
         }
+        { //::CEditorSystem::ProcessCreateCoverCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessCreateCoverCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessCreateCoverCommand"
+                , ProcessCreateCoverCommand_function_type( &::CEditorSystem::ProcessCreateCoverCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
         { //::CEditorSystem::ProcessDeleteFloraCommand
         
             typedef bool ( ::CEditorSystem::*ProcessDeleteFloraCommand_function_type )( ::KeyValues * ) ;
@@ -275,6 +317,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "ProcessDeleteFloraCommand"
                 , ProcessDeleteFloraCommand_function_type( &::CEditorSystem::ProcessDeleteFloraCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessDestroyCoverCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessDestroyCoverCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessDestroyCoverCommand"
+                , ProcessDestroyCoverCommand_function_type( &::CEditorSystem::ProcessDestroyCoverCommand )
                 , ( bp::arg("pCommand") ) );
         
         }
@@ -422,6 +474,38 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "CreateClearSelectionCommand"
                 , CreateClearSelectionCommand_function_type( &::CEditorSystem::CreateClearSelectionCommand )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateCoverConvertOldNavMeshCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateCoverConvertOldNavMeshCommand_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateCoverConvertOldNavMeshCommand"
+                , CreateCoverConvertOldNavMeshCommand_function_type( &::CEditorSystem::CreateCoverConvertOldNavMeshCommand )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateCoverCreateCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateCoverCreateCommand_function_type )( ::Vector const &,unsigned int ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateCoverCreateCommand"
+                , CreateCoverCreateCommand_function_type( &::CEditorSystem::CreateCoverCreateCommand )
+                , ( bp::arg("vPos"), bp::arg("flags")=(unsigned int)(0) )
+                , bp::return_value_policy< bp::return_by_value >() );
+        
+        }
+        { //::CEditorSystem::CreateCoverDestroyCommand
+        
+            typedef ::KeyValues * ( ::CEditorSystem::*CreateCoverDestroyCommand_function_type )( ::Vector const &,float,int,unsigned int ) ;
+            
+            CEditorSystem_exposer.def( 
+                "CreateCoverDestroyCommand"
+                , CreateCoverDestroyCommand_function_type( &::CEditorSystem::CreateCoverDestroyCommand )
+                , ( bp::arg("vPos"), bp::arg("tolerance"), bp::arg("num")=(int)(1), bp::arg("excludeFlags")=(unsigned int)(0) )
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
@@ -634,6 +718,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pCommand") ) );
         
         }
+        { //::CEditorSystem::ProcessCreateCoverCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessCreateCoverCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessCreateCoverCommand"
+                , ProcessCreateCoverCommand_function_type( &::CEditorSystem::ProcessCreateCoverCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
         { //::CEditorSystem::ProcessDeleteFloraCommand
         
             typedef bool ( ::CEditorSystem::*ProcessDeleteFloraCommand_function_type )( ::KeyValues * ) ;
@@ -641,6 +735,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "ProcessDeleteFloraCommand"
                 , ProcessDeleteFloraCommand_function_type( &::CEditorSystem::ProcessDeleteFloraCommand )
+                , ( bp::arg("pCommand") ) );
+        
+        }
+        { //::CEditorSystem::ProcessDestroyCoverCommand
+        
+            typedef bool ( ::CEditorSystem::*ProcessDestroyCoverCommand_function_type )( ::KeyValues * ) ;
+            
+            CEditorSystem_exposer.def( 
+                "ProcessDestroyCoverCommand"
+                , ProcessDestroyCoverCommand_function_type( &::CEditorSystem::ProcessDestroyCoverCommand )
                 , ( bp::arg("pCommand") ) );
         
         }

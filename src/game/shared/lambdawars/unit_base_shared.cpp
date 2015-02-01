@@ -275,9 +275,6 @@ void CUnitBase::AddToUnitList()
 
 	// Not found, create new one
 	pUnitList = new UnitListInfo;
-	if( !pUnitList )
-		return;
-
 	pUnitList->m_OwnerNumber = GetOwnerNumber();
 	pUnitList->m_pHead = this;
 	m_pUnitList = pUnitList;
