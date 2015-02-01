@@ -972,10 +972,13 @@ public:
 		}
 #endif // 0
 
-		float fPathDist = m_pMesh->FindPathDistance( m_vPos, coverSpot->position );
-		if( fPathDist < 0 )
+		if( m_pMesh )
 		{
-			return true;
+			float fPathDist = m_pMesh->FindPathDistance( m_vPos, coverSpot->position );
+			if( fPathDist < 0 )
+			{
+				return true;
+			}
 		}
 
 		// Collect spots in range
