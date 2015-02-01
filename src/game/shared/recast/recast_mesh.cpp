@@ -299,6 +299,8 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 
 	UnitBaseWaypoint *pResultPath = NULL;
 
+	dtStatus status;
+
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
@@ -335,7 +337,11 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
 	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
 
-	m_navQuery->findPath(startRef, endRef, spos, epos, &m_filter, m_polys, &m_npolys, MAX_POLYS);
+	status = m_navQuery->findPath(startRef, endRef, spos, epos, &m_filter, m_polys, &m_npolys, MAX_POLYS);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
 	m_nstraightPath = 0;
 	if (m_npolys)
 	{
@@ -345,9 +351,13 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 		if (m_polys[m_npolys-1] != endRef)
 			m_navQuery->closestPointOnPoly(m_polys[m_npolys-1], epos, epos2, 0);
 				
-		m_navQuery->findStraightPath(spos, epos2, m_polys, m_npolys,
+		status = m_navQuery->findStraightPath(spos, epos2, m_polys, m_npolys,
 										m_straightPath, m_straightPathFlags,
 										m_straightPathPolys, &m_nstraightPath, MAX_POLYS, m_straightPathOptions);
+		if( !dtStatusSucceed( status ) )
+		{
+			return NULL;
+		}
 
 		pResultPath = new UnitBaseWaypoint( vEnd );
 		for (int i = m_nstraightPath - 1; i >= 0; i--)
@@ -364,6 +374,44 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 }
 #endif // CLIENT_DLL
 
+bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
+{
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+	dtPolyRef startRef;
+	dtPolyRef endRef;
+
+	float spos[3];
+	spos[0] = vStart[0];
+	spos[1] = vStart[2];
+	spos[2] = vStart[1];
+
+	float epos[3];
+	epos[0] = vEnd[0];
+	epos[1] = vEnd[2];
+	epos[2] = vEnd[1];
+
+	float polyPickExt[3];
+	polyPickExt[0] = 256.0f;
+	polyPickExt[1] = 600.0f;
+	polyPickExt[2] = 256.0f;
+
+	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
+	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+
+	dtRaycastHit rayHit;
+	rayHit.maxPath = 0;
+	rayHit.pathCost = rayHit.t = 0;
+	dtStatus status = m_navQuery->raycast( startRef, spos, epos, &m_filter, 0, &rayHit );
+	if( !dtStatusSucceed( status ) )
+	{
+		return false;
+	}
+
+	return rayHit.t == FLT_MAX;
+}
 
 dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
 {

@@ -80,6 +80,7 @@ public:
 	// Path find functions
 	virtual UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd );
 #endif // CLIENT_DLL
+	bool TestRoute( const Vector &vStart, const Vector &vEnd );
 
 	// Obstacle management
 	dtObstacleRef AddTempObstacle( const Vector &vPos, float radius, float height );

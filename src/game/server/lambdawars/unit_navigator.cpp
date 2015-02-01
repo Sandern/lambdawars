@@ -61,7 +61,7 @@
 #include "tier0/memdbgon.h"
 
 // Settings
-ConVar unit_reactivepath("unit_reactivepath", "0", 0, "Optimize the current path each update."); // TODO: Update for recast mesh
+ConVar unit_reactivepath("unit_reactivepath", "1", 0, "Optimize the current path each update."); // TODO: Update for recast mesh
 ConVar unit_reactivepath_maxlookahead("unit_reactivepath_maxlookahead", "2048.0", 0, "Max distance a path is optimized each update.");
 ConVar unit_reactivepath_maxwaypointsahead("unit_reactivepath_maxwaypointsahead", "5", 0, "Max number of waypoints being looked ahead.");
 ConVar unit_nonavigator("unit_nonavigator", "0", 0, "Do not perform navigation");
@@ -222,7 +222,7 @@ void UnitBaseNavigator::Reset()
 	m_vLastWishVelocity.Init(0, 0, 0);
 
 	m_fLastPathRecomputation = 0.0f;
-	m_fNextReactivePathUpdate = 0.0f;
+	//m_fNextReactivePathUpdate = 0.0f;
 	m_iLastTargetArea = 0;
 	ResetBlockedStatus();
 
@@ -1361,8 +1361,8 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		GoalStatus = MoveUpdateWaypoint( MoveCommand );
 		if( GoalStatus != CHS_ATGOAL )
 		{
-			if( unit_reactivepath.GetBool() && m_fNextReactivePathUpdate < gpGlobals->curtime ) {
-				m_fNextReactivePathUpdate = gpGlobals->curtime + 0.25f;
+			if( unit_reactivepath.GetBool() /*&& m_fNextReactivePathUpdate < gpGlobals->curtime*/ ) {
+				//m_fNextReactivePathUpdate = gpGlobals->curtime + 0.25f;
 				bPathBlocked = UpdateReactivePath();
 			}
 
@@ -1838,101 +1838,34 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 
 	bool bBlocked = false;
 
-#if 0
-	UnitBaseWaypoint *pCur, *pCurTest, *pBestWaypoint;
-	float dist;
-	Vector dir, testPos, endPos;
-	trace_t tr;
-	bool bBlocked = false;
-
-	UTIL_TraceHull( GetAbsOrigin(), GetAbsOrigin()-Vector(0,0,MAX_TRACE_LENGTH), 
-		WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-		GetOuter(), GetOuter()->CalculateIgnoreOwnerCollisionGroup(), &tr);
-	testPos = tr.endpos;
-
-	const Vector &origin = GetOuter()->EyePosition();
-
-	float fMaxLookAhead = unit_reactivepath_maxlookahead.GetFloat();
-	int nMaxLookAhead = unit_reactivepath_maxwaypointsahead.GetInt();
-	pBestWaypoint = NULL;
-	pCur = NULL;
-
-	if( GetPath()->CurWaypointIsGoal() )
+	CRecastMesh *pNavMesh = GetNavMesh();
+	if( pNavMesh )
 	{
-		// Just test the head waypoint
-		endPos = ComputeWaypointTarget( testPos, GetPath()->m_pWaypointHead );
+		const Vector &vOrigin = GetAbsOrigin();
+		UnitBaseWaypoint *pCur = GetPath()->m_pWaypointHead;
 
-		if( !TestRouteEnd( GetPath()->m_pWaypointHead ) && !TestRoute( testPos, endPos ) ) {
-			bBlocked = true;
-		}
-	}
-	else
-	{
-		// Build list of max waypoints we will look ahead
-		pCurTest = GetPath()->m_pWaypointHead;
-		for( int i = 0; i < nMaxLookAhead; i++ )
+		if( GetPath()->CurWaypointIsGoal() )
 		{
-			if( !pCurTest )
-				break;
-
-			dist = (origin - pCurTest->GetPos()).Length();
-			if( dist > fMaxLookAhead )
-				break;
-
-			// Don't further check in case we encounter a "special travel" node like an edge
-			if( pCurTest->SpecialGoalStatus == CHS_NOSIMPLIFY || pCurTest->SpecialGoalStatus == CHS_CLIMBDEST || pCurTest->SpecialGoalStatus == CHS_CLIMB )
-				break;
-
-			pCur = pCurTest; // Valid waypoint for checking up to
-			pCurTest = pCurTest->GetNext();
-		}
-
-		if( !pCur )
-		{
-			// Just test the head waypoint
-			endPos = ComputeWaypointTarget( testPos, GetPath()->m_pWaypointHead );
-
-			if( !TestRouteEnd( GetPath()->m_pWaypointHead ) && !TestRoute( testPos, endPos ) ) {
-				bBlocked = true;
-			}
+			bBlocked = !pNavMesh->TestRoute( vOrigin, pCur->GetPos() );
 		}
 		else
 		{
-			// Now test if we can directly move from our origin to that waypoint
-			bBlocked = true;
-			while( pCur )
+			// Try skipping directly to the next waypoint
+			// If not possible, just test if the current waypoint is still ok
+			UnitBaseWaypoint *pNext = pCur->GetNext();
+			if( pNext )
 			{
-				endPos = ComputeWaypointTarget( testPos, pCur );
-
-				if( !TestRouteEnd( pCur ) && !TestRoute(testPos, endPos) ) 
+				if( pNavMesh->TestRoute( vOrigin, pNext->GetPos() ) )
 				{
-					pCur = pCur->GetPrev();
-					continue;
-				}
-
-				// Furthest waypoint we can move, so we are done. No need to test more.
-				pBestWaypoint = pCur;
-				break;
-			}	
-		
-
-			if( pBestWaypoint )
-			{
-				while( GetPath()->m_pWaypointHead != pBestWaypoint)
 					AdvancePath();
-				bBlocked = false;
+				}
+				else
+				{
+					bBlocked = !pNavMesh->TestRoute( vOrigin, pCur->GetPos() );
+				}
 			}
 		}
 	}
-
-	// Don't do the blocked test when the next node is a climb destination
-	// This would like result in "being blocked" and recomputing a path will be wrong
-	// at this point
-	if( bBlocked && GetPath()->m_pWaypointHead->SpecialGoalStatus == CHS_CLIMBDEST )
-	{
-		bBlocked = false;
-	}
-#endif // 0
 
 	return bBlocked;
 }

@@ -87,13 +87,11 @@ public:
 	{
 		memset( this, 0, sizeof(*this) );
 		vecLocation	= vec3_invalid;
-		flPathDistGoal = -1;
 		navDir = NUM_DIRECTIONS;
 	}
 	UnitBaseWaypoint( const Vector &vecPosition, float flYaw=0.0f )
 	{
 		memset( this, 0, sizeof(*this) );
-		flPathDistGoal = -1;
 		vecLocation = vecPosition;
 		flYaw = flYaw;
 		navDir = NUM_DIRECTIONS;
@@ -101,7 +99,6 @@ public:
 	UnitBaseWaypoint( const UnitBaseWaypoint &from )
 	{
 		memcpy( this, &from, sizeof(*this) );
-		flPathDistGoal = -1;
 		pNext = pPrev = NULL;
 		navDir = NUM_DIRECTIONS;
 	}
@@ -109,7 +106,6 @@ public:
 	UnitBaseWaypoint &operator=( const UnitBaseWaypoint &from )
 	{
 		memcpy( this, &from, sizeof(*this) );
-		flPathDistGoal = -1;
 		pNext = pPrev = NULL;
 		return *this;
 	}
@@ -156,12 +152,6 @@ public:
 	NavDirType		navDir;
 
 	CheckGoalStatus_t SpecialGoalStatus; // Leave 0 to be ignored
-
-	//---------------------------------
-	//
-	// Precalculated distances
-	//
-	float			flPathDistGoal;
 
 #if 0 // TODO: REMOVE
 	//---------------------------------
@@ -547,7 +537,7 @@ private:
 	bool m_bLowVelocityDetectionActive;
 
 	float m_fLastPathRecomputation;
-	float m_fNextReactivePathUpdate;
+	//float m_fNextReactivePathUpdate;
 	float m_fNextAllowPathRecomputeTime;
 	bool m_bNoNavAreasNearby;
 	float m_fIgnoreNavMeshTime;
