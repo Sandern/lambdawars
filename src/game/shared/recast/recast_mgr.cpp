@@ -131,7 +131,7 @@ int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
 		// Only consider fitting meshes
-		if( pMesh->GetAgentRadius() < radius || pMesh->GetAgentHeight() < height )
+		if( radius > pMesh->GetAgentRadius() || height > pMesh->GetAgentHeight() )
 		{
 			continue;
 		}
@@ -139,7 +139,7 @@ int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
 		// From these meshes, pick the best fitting one
 		float fRadiusDiff = fabs( pMesh->GetAgentRadius() - radius );
 		float fHeightDiff = fabs( pMesh->GetAgentHeight() - height );
-		if( bestIdx == -1 || (fRadiusDiff <= fBestRadiusDiff && fHeightDiff <= fBestHeightDiff ) )
+		if( bestIdx == -1 || (fRadiusDiff + fHeightDiff <= fBestRadiusDiff + fBestHeightDiff) )
 		{
 			bestIdx = i;
 			fBestRadiusDiff = fRadiusDiff;

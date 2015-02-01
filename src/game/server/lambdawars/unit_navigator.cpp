@@ -101,6 +101,7 @@ ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 ConVar unit_route_local_paths("unit_route_local_paths", "1");
+ConVar unit_route_fallback_direct("unit_route_fallback_direct", "1");
 ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 
 ConVar unit_blocked_lowvel_check("unit_blocked_lowvel_check", "1");
@@ -2865,7 +2866,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 			return pFoundPath;
 	}
 
-	return new UnitBaseWaypoint( vGoalPos );
+	return NULL;
 #endif // 0
 }
 
@@ -2917,9 +2918,18 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 			return waypoints;
 	}
 
-	// Fallback to a direct path
-	pPath->m_bIsDirectPath = true;
-	return new UnitBaseWaypoint( pPath->m_vGoalPos );
+	if( unit_route_fallback_direct.GetBool() )
+	{
+		// Fallback to a direct path
+		Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
+		pPath->m_bIsDirectPath = true;
+		return new UnitBaseWaypoint( pPath->m_vGoalPos );
+	}
+
+	// Failure, no path
+	pPath->Clear();
+	Warning( "#%d BuildNavAreaPath: no path found to goal\n", GetOuter()->entindex() );
+	return NULL;
 }
 
 #ifdef ENABLE_PYTHON
@@ -3009,6 +3019,12 @@ void UnitBaseNavigator::CalculateDeflection( const Vector &start, const Vector &
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::DrawDebugRouteOverlay()
 {
+	CRecastMesh *pNavMesh = GetNavMesh();
+	if( pNavMesh )
+	{
+		NDebugOverlay::Text( m_pOuter->GetAbsOrigin(), pNavMesh->GetName(), false, 0.0 );
+	}
+
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE )
 	{
 		UnitBaseWaypoint *pWaypoint = GetPath()->m_pWaypointHead;
