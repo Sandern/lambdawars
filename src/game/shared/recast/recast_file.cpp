@@ -38,6 +38,8 @@ struct NavMgrHeader
 
 struct TileCacheSetHeader
 {
+	int cellSize;
+	int cellHeight;
 	int numTiles;
 	dtNavMeshParams meshParams;
 	dtTileCacheParams cacheParams;
@@ -63,6 +65,9 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 		Msg( "Failed to read mesh header.\n" );
 		return false;
 	}
+
+	m_cellSize = header.cellSize;
+	m_cellHeight = header.cellHeight;
 
 	if( header.lenName > 2048 )
 	{
@@ -202,6 +207,8 @@ bool CRecastMesh::Save( CUtlBuffer &fileBuffer )
 
 	// Store header.
 	TileCacheSetHeader header;
+	header.cellSize = m_cellSize;
+	header.cellHeight = m_cellHeight;
 	header.numTiles = 0;
 	header.lenName = m_Name.Length();
 	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
