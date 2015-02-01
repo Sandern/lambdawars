@@ -109,7 +109,7 @@ public:
 #endif // CLIENT_DLL
 
 			// If hitting a trigger, it must have the IMouse interface
-			if( pEntity->GetSolidFlags() & FSOLID_TRIGGER|FSOLID_NOT_SOLID )
+			if( pEntity->GetSolidFlags() & (FSOLID_TRIGGER|FSOLID_NOT_SOLID) )
 			{
 				if( !pEntity->GetIMouse() )
 					return true;

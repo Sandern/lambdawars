@@ -1776,7 +1776,7 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 			char ext[5];
 			V_ExtractFileExtension( filename, ext, 5 );
 
-			if( V_strncmp( ext, "py", 5 ) == 0 )
+			if( V_strncmp( ext, "py", 2 ) == 0 )
 			{
 				char noextfilename[MAX_PATH]; 
 				V_StripExtension( filename, noextfilename, MAX_PATH );

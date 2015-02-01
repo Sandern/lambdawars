@@ -59,7 +59,7 @@ static boost::python::object ConvertLangID2LocaleInfo( LCID locale )
 		PyUnicode_FromWideChar(pLanguageCode, nchars) 
 	) );
 
-	delete pLanguageCode;
+	delete [] pLanguageCode;
 #else
 	localeName = boost::python::object("");
 #endif // WIN32

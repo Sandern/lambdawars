@@ -2959,7 +2959,7 @@ bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, co
 	// The client must directly be informed about the python classes to avoid recv/send table mismatches
 	// NOTE: Usermessages don't work here. However it is possible to send client commands
 	// NOTE2: Dedicated servers send the message in the client active. They seem to check against CBaseEntity recv table.
-	if( (!engine->IsDedicatedServer() && ENTINDEX(pEdict) == 1) )
+	if( !engine->IsDedicatedServer() && ENTINDEX(pEdict) == 1 )
 	{
 		FullClientUpdatePyNetworkClsByEdict(pEdict);
 	}
