@@ -438,10 +438,18 @@ bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CU
 		dmodel_t *pModel = &brushmodels[ i ];
 
 		int contents = CalcBrushContents( fileContent, pModel->headnode );
-		if( (contents & CONTENTS_MONSTERCLIP) == 0 )
+
+		// Include brushes with the following:
+		if( (contents & (MASK_NPCWORLDSTATIC)) == 0 )
 		{
 			continue;
 		}
+
+		// Exclude water
+		/*if( (contents & (CONTENTS_WATER)) != 0 )
+		{
+			continue;
+		}*/
 
 		matrix3x4_t transform; // model to world transformation
 		AngleMatrix( vec3_angle, vec3_origin, transform);
@@ -478,6 +486,7 @@ bool CMapMesh::Load()
 
 	BSPHeader_t *header = (BSPHeader_t *)fileContent;
 
+#if 0
 	// Load vertices
 	dvertex_t *vertices = (dvertex_t *)((char *)fileContent + header->lumps[LUMP_VERTEXES].fileofs);
 	int nvertsLump = (header->lumps[LUMP_VERTEXES].filelen) / sizeof(dvertex_t);
@@ -489,14 +498,14 @@ bool CMapMesh::Load()
 	}
 
 	// Load edges and Surfedge array
-	dedge_t *edges = (dedge_t *)((char *)fileContent + header->lumps[LUMP_EDGES].fileofs);
+	//dedge_t *edges = (dedge_t *)((char *)fileContent + header->lumps[LUMP_EDGES].fileofs);
 	//int nEdges = (header->lumps[LUMP_EDGES].filelen) / sizeof(dedge_t);
-	int *surfedge = (int *)((char *)fileContent + header->lumps[LUMP_SURFEDGES].fileofs);
+	//int *surfedge = (int *)((char *)fileContent + header->lumps[LUMP_SURFEDGES].fileofs);
 	//int nSurfEdges = (header->lumps[LUMP_SURFEDGES].filelen) / sizeof(int);
 
 	// Load texinfo
-	texinfo_s *texinfo = (texinfo_s *)((char *)fileContent + header->lumps[LUMP_TEXINFO].fileofs);
-	int nTexInfo = (header->lumps[LUMP_TEXINFO].filelen) / sizeof(texinfo_s);
+	//texinfo_s *texinfo = (texinfo_s *)((char *)fileContent + header->lumps[LUMP_TEXINFO].fileofs);
+	//int nTexInfo = (header->lumps[LUMP_TEXINFO].filelen) / sizeof(texinfo_s);
 
 	// Load triangles, parse from faces
 	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
@@ -554,8 +563,10 @@ bool CMapMesh::Load()
 				}
 				m_Triangles.AddToTail( connectingVertIdx );
 			}
+
 		}
 	}
+#endif // 0
 
 	GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
 	GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
