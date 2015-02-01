@@ -31,7 +31,9 @@
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
-//#include "tier0/memdbgon.h"
+#include "tier0/memdbgon.h"
+
+#define MAX_POLYS 256
 
 ConVar recast_edit( "recast_edit", "1", FCVAR_GAMEDLL | FCVAR_CHEAT, "Set to one to interactively edit the Recast Navigation Mesh. Set to zero to leave edit mode." );
 
@@ -289,6 +291,118 @@ void CRecastMesh::DebugRender()
 }
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
+{
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+	float pos[3];
+	pos[0] = vPoint[0];
+	pos[1] = vPoint[2];
+	pos[2] = vPoint[1];
+
+	// The search distance along each axis. [(x, y, z)]
+	float polyPickExt[3];
+	polyPickExt[0] = 256.0f;
+	polyPickExt[1] = fBeneathLimit;
+	polyPickExt[2] = 256.0f;
+
+	dtPolyRef ref;
+	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &ref, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return -1;
+	}
+	return ref;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit )
+{
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+	float pos[3];
+	pos[0] = vPoint[0];
+	pos[1] = vPoint[2];
+	pos[2] = vPoint[1];
+
+	// The search distance along each axis. [(x, y, z)]
+	float polyPickExt[3];
+	polyPickExt[0] = 256.0f;
+	polyPickExt[1] = fBeneathLimit;
+	polyPickExt[2] = 256.0f;
+
+	dtPolyRef closestRef;
+	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &closestRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return vec3_origin;
+	}
+
+	bool posOverPoly;
+	float closest[3];
+	status = m_navQuery->closestPointOnPoly(closestRef, pos, closest, &posOverPoly);
+	if( !dtStatusSucceed( status ) || !posOverPoly )
+	{
+		return vec3_origin;
+	}
+
+	return Vector( closest[0], closest[2], closest[1] );
+}
+
+// Returns a random number [0..1)
+static float frand()
+{
+//	return ((float)(rand() & 0xffff)/(float)0xffff);
+	return (float)rand()/(float)RAND_MAX;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius )
+{
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+	float pos[3];
+	pos[0] = vCenter[0];
+	pos[1] = vCenter[2];
+	pos[2] = vCenter[1];
+
+	// The search distance along each axis. [(x, y, z)]
+	float polyPickExt[3];
+	polyPickExt[0] = 256.0f;
+	polyPickExt[1] = 1024.0f;
+	polyPickExt[2] = 256.0f;
+
+	dtPolyRef closestRef;
+	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &closestRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return vec3_origin;
+	}
+
+	dtPolyRef eRef;
+	float epos[3];
+	status = m_navQuery->findRandomPointAroundCircle( closestRef, pos, fRadius, &m_filter, frand, &eRef, epos );
+	if( !dtStatusSucceed( status ) )
+	{
+		return vec3_origin;
+	}
+
+	return Vector( epos[0], epos[2], epos[1] );
+}
+
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -305,7 +419,6 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
 
-#define MAX_POLYS 256
 	dtPolyRef m_polys[MAX_POLYS];
 	int m_npolys;
 
@@ -373,6 +486,86 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	return pResultPath;
 }
 #endif // CLIENT_DLL
+
+// TODO: Merge common with FindPath
+float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd )
+{
+	VPROF_BUDGET( "CRecastMesh::FindPathDistance", "RecastNav" );
+
+	dtStatus status;
+
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+	dtPolyRef m_polys[MAX_POLYS];
+	int m_npolys;
+
+	dtPolyRef startRef;
+	dtPolyRef endRef;
+
+	float spos[3];
+	spos[0] = vStart[0];
+	spos[1] = vStart[2];
+	spos[2] = vStart[1];
+
+	float epos[3];
+	epos[0] = vEnd[0];
+	epos[1] = vEnd[2];
+	epos[2] = vEnd[1];
+
+	// The search distance along each axis. [(x, y, z)]
+	float polyPickExt[3];
+	polyPickExt[0] = 256.0f;
+	polyPickExt[1] = 600.0f;
+	polyPickExt[2] = 256.0f;
+
+	int m_straightPathOptions = 0;
+	float m_straightPath[MAX_POLYS*3];
+	unsigned char m_straightPathFlags[MAX_POLYS];
+	dtPolyRef m_straightPathPolys[MAX_POLYS];
+	int m_nstraightPath;
+
+	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
+	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+
+	status = m_navQuery->findPath(startRef, endRef, spos, epos, &m_filter, m_polys, &m_npolys, MAX_POLYS);
+	if( !dtStatusSucceed( status ) )
+	{
+		return -1;
+	}
+	m_nstraightPath = 0;
+	if (m_npolys)
+	{
+		// In case of partial path, make sure the end point is clamped to the last polygon.
+		float epos2[3];
+		dtVcopy(epos2, epos);
+		if (m_polys[m_npolys-1] != endRef)
+		{
+			return -1;
+		}
+				
+		status = m_navQuery->findStraightPath(spos, epos2, m_polys, m_npolys,
+										m_straightPath, m_straightPathFlags,
+										m_straightPathPolys, &m_nstraightPath, MAX_POLYS, m_straightPathOptions);
+		if( !dtStatusSucceed( status ) )
+		{
+			return NULL;
+		}
+
+		float fPathDistance = 0;
+		Vector vPrev = vEnd;
+		for (int i = m_nstraightPath - 1; i >= 0; i--)
+		{
+			Vector pos( m_straightPath[i*3], m_straightPath[i*3+2], m_straightPath[i*3+1] );
+			fPathDistance += pos.DistTo(vPrev);
+			vPrev = pos;
+		}
+		return fPathDistance;
+	}
+
+	return -1;
+}
 
 bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 {

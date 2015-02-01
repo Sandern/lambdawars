@@ -17,7 +17,7 @@ class NavMesh(SemiSharedModuleGenerator):
         mb.decls().exclude() 
         
         mb.free_function('NavMeshAvailable').include()
-        mb.free_function('NavMeshTestHasArea').include()
+        #mb.free_function('NavMeshTestHasArea').include()
         mb.free_function('NavMeshGetPathDistance').include()
         mb.free_function('NavMeshGetPositionNearestNavArea').include()
         mb.free_function('CreateNavArea').include()
@@ -27,17 +27,16 @@ class NavMesh(SemiSharedModuleGenerator):
         mb.free_function('RandomNavAreaPositionWithin').include()
         mb.free_function('DestroyAllNavAreas').include()
         
-        mb.free_function('GetActiveNavMesh').include()
-        mb.free_function('GetEditingCursor').include()
+        #mb.free_function('GetActiveNavMesh').include()
+        #mb.free_function('GetEditingCursor').include()
         
         mb.free_function('GetNavAreaAt').include()
-        mb.free_function('GetNavAreasAtBB').include()
-        mb.free_function('SplitAreasAtBB').include()
-        mb.free_function('SetAreasBlocked').include()
-        mb.free_function('IsAreaBlocked').include()
+        #mb.free_function('GetNavAreasAtBB').include()
+        #mb.free_function('SplitAreasAtBB').include()
+        #mb.free_function('SetAreasBlocked').include()
+        #mb.free_function('IsAreaBlocked').include()
         mb.free_function('IsBBCoveredByNavAreas').include()
-        
-        mb.free_function('TryMergeSurrounding').include()
+        #mb.free_function('TryMergeSurrounding').include()
         
         mb.free_function('GetHidingSpotsInRadius').include()
         mb.free_function('CreateHidingSpot').include()

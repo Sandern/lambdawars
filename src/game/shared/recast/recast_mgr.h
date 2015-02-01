@@ -51,7 +51,9 @@ public:
 	virtual void Reset();
 	
 	// Accessors for Units
+	bool HasMeshes();
 	CRecastMesh *GetMesh( int index );
+	CRecastMesh *GetMesh( const char *name );
 	int FindMeshIndex( const char *name );
 	CUtlDict< CRecastMesh *, int > &GetMeshes();
 
@@ -101,6 +103,19 @@ CRecastMgr &RecastMgr();
 inline CUtlDict< CRecastMesh *, int > &CRecastMgr::GetMeshes()
 {
 	return m_Meshes;
+}
+
+inline bool CRecastMgr::HasMeshes()
+{
+	return m_Meshes.Count() != 0;
+}
+
+inline CRecastMesh *CRecastMgr::GetMesh( const char *name )
+{
+	int idx = FindMeshIndex( name );
+	if( idx != -1 )
+		return GetMesh( idx );
+	return NULL;
 }
 
 #endif // RECAST_MGR_H

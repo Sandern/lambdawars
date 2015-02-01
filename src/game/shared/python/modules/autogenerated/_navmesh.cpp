@@ -93,26 +93,6 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::GetActiveNavMesh
-    
-        typedef int ( *GetActiveNavMesh_function_type )(  );
-        
-        bp::def( 
-            "GetActiveNavMesh"
-            , GetActiveNavMesh_function_type( &::GetActiveNavMesh ) );
-    
-    }
-
-    { //::GetEditingCursor
-    
-        typedef ::Vector ( *GetEditingCursor_function_type )(  );
-        
-        bp::def( 
-            "GetEditingCursor"
-            , GetEditingCursor_function_type( &::GetEditingCursor ) );
-    
-    }
-
     { //::GetHidingSpotsInRadius
     
         typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::C_UnitBase *,bool,::Vector const * );
@@ -132,28 +112,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "GetNavAreaAt"
             , GetNavAreaAt_function_type( &::GetNavAreaAt )
             , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f ) );
-    
-    }
-
-    { //::GetNavAreasAtBB
-    
-        typedef ::boost::python::list ( *GetNavAreasAtBB_function_type )( ::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "GetNavAreasAtBB"
-            , GetNavAreasAtBB_function_type( &::GetNavAreasAtBB )
-            , ( bp::arg("mins"), bp::arg("maxs") ) );
-    
-    }
-
-    { //::IsAreaBlocked
-    
-        typedef bool ( *IsAreaBlocked_function_type )( int );
-        
-        bp::def( 
-            "IsAreaBlocked"
-            , IsAreaBlocked_function_type( &::IsAreaBlocked )
-            , ( bp::arg("areaid") ) );
     
     }
 
@@ -191,23 +149,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,bool );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::C_UnitBase * );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("checkblocked")=(bool)(true) ) );
-    
-    }
-
-    { //::NavMeshTestHasArea
-    
-        typedef bool ( *NavMeshTestHasArea_function_type )( ::Vector &,float );
-        
-        bp::def( 
-            "NavMeshTestHasArea"
-            , NavMeshTestHasArea_function_type( &::NavMeshTestHasArea )
-            , ( bp::arg("pos"), bp::arg("beneathLimt")=1.2e+2f ) );
+            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("unit")=bp::object() ) );
     
     }
 
@@ -230,39 +177,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "RandomNavAreaPositionWithin"
             , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
             , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
-    
-    }
-
-    { //::SetAreasBlocked
-    
-        typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool,::C_BaseEntity * );
-        
-        bp::def( 
-            "SetAreasBlocked"
-            , SetAreasBlocked_function_type( &::SetAreasBlocked )
-            , ( bp::arg("areas"), bp::arg("blocked"), bp::arg("pOwner")=bp::object() ) );
-    
-    }
-
-    { //::SplitAreasAtBB
-    
-        typedef void ( *SplitAreasAtBB_function_type )( ::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "SplitAreasAtBB"
-            , SplitAreasAtBB_function_type( &::SplitAreasAtBB )
-            , ( bp::arg("mins"), bp::arg("maxs") ) );
-    
-    }
-
-    { //::TryMergeSurrounding
-    
-        typedef bool ( *TryMergeSurrounding_function_type )( int,float );
-        
-        bp::def( 
-            "TryMergeSurrounding"
-            , TryMergeSurrounding_function_type( &::TryMergeSurrounding )
-            , ( bp::arg("id"), bp::arg("tolerance")=1.1920928955078125e-7f ) );
     
     }
 }
@@ -358,26 +272,6 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::GetActiveNavMesh
-    
-        typedef int ( *GetActiveNavMesh_function_type )(  );
-        
-        bp::def( 
-            "GetActiveNavMesh"
-            , GetActiveNavMesh_function_type( &::GetActiveNavMesh ) );
-    
-    }
-
-    { //::GetEditingCursor
-    
-        typedef ::Vector ( *GetEditingCursor_function_type )(  );
-        
-        bp::def( 
-            "GetEditingCursor"
-            , GetEditingCursor_function_type( &::GetEditingCursor ) );
-    
-    }
-
     { //::GetHidingSpotsInRadius
     
         typedef ::boost::python::list ( *GetHidingSpotsInRadius_function_type )( ::Vector const &,float,::CUnitBase *,bool,::Vector const * );
@@ -397,28 +291,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "GetNavAreaAt"
             , GetNavAreaAt_function_type( &::GetNavAreaAt )
             , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f ) );
-    
-    }
-
-    { //::GetNavAreasAtBB
-    
-        typedef ::boost::python::list ( *GetNavAreasAtBB_function_type )( ::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "GetNavAreasAtBB"
-            , GetNavAreasAtBB_function_type( &::GetNavAreasAtBB )
-            , ( bp::arg("mins"), bp::arg("maxs") ) );
-    
-    }
-
-    { //::IsAreaBlocked
-    
-        typedef bool ( *IsAreaBlocked_function_type )( int );
-        
-        bp::def( 
-            "IsAreaBlocked"
-            , IsAreaBlocked_function_type( &::IsAreaBlocked )
-            , ( bp::arg("areaid") ) );
     
     }
 
@@ -456,23 +328,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,bool );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::CUnitBase * );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("checkblocked")=(bool)(true) ) );
-    
-    }
-
-    { //::NavMeshTestHasArea
-    
-        typedef bool ( *NavMeshTestHasArea_function_type )( ::Vector &,float );
-        
-        bp::def( 
-            "NavMeshTestHasArea"
-            , NavMeshTestHasArea_function_type( &::NavMeshTestHasArea )
-            , ( bp::arg("pos"), bp::arg("beneathLimt")=1.2e+2f ) );
+            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("unit")=bp::object() ) );
     
     }
 
@@ -495,39 +356,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "RandomNavAreaPositionWithin"
             , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
             , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
-    
-    }
-
-    { //::SetAreasBlocked
-    
-        typedef void ( *SetAreasBlocked_function_type )( ::boost::python::list,bool,::CBaseEntity * );
-        
-        bp::def( 
-            "SetAreasBlocked"
-            , SetAreasBlocked_function_type( &::SetAreasBlocked )
-            , ( bp::arg("areas"), bp::arg("blocked"), bp::arg("pOwner")=bp::object() ) );
-    
-    }
-
-    { //::SplitAreasAtBB
-    
-        typedef void ( *SplitAreasAtBB_function_type )( ::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "SplitAreasAtBB"
-            , SplitAreasAtBB_function_type( &::SplitAreasAtBB )
-            , ( bp::arg("mins"), bp::arg("maxs") ) );
-    
-    }
-
-    { //::TryMergeSurrounding
-    
-        typedef bool ( *TryMergeSurrounding_function_type )( int,float );
-        
-        bp::def( 
-            "TryMergeSurrounding"
-            , TryMergeSurrounding_function_type( &::TryMergeSurrounding )
-            , ( bp::arg("id"), bp::arg("tolerance")=1.1920928955078125e-7f ) );
     
     }
 }

@@ -7,12 +7,15 @@
 
 #include "cbase.h"
 #include "srcpy_navmesh.h"
-#include "nav_mesh.h"
-#include "nav_pathfind.h"
-#include "nav_area.h"
+//#include "nav_mesh.h"
+//#include "nav_pathfind.h"
+//#include "nav_area.h"
 #include "wars_mapboundary.h"
-#include "hl2wars_nav_pathfind.h"
+//#include "hl2wars_nav_pathfind.h"
 #include "collisionutils.h"
+#include "recast/recast_mgr.h"
+#include "recast/recast_mesh.h"
+#include "unit_base_shared.h"
 
 #include "wars_grid.h"
 
@@ -23,14 +26,17 @@ ConVar g_pynavmesh_debug("g_pynavmesh_debug", "0", FCVAR_CHEAT|FCVAR_REPLICATED)
 ConVar g_pynavmesh_debug_hidespot("g_pynavmesh_debug_hidespot", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 //ConVar g_pynavmesh_hidespot_searchmethod("g_pynavmesh_hidespot_searchmethod", "0", FCVAR_CHEAT|FCVAR_REPLICATED);
 
+#define DEFAULT_MESH "human"
+
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: Keep?
 //-----------------------------------------------------------------------------
 bool NavMeshAvailable()
 {
-	return TheNavMesh->IsLoaded();
+	return RecastMgr().HasMeshes(); // TheNavMesh->IsLoaded();
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -38,6 +44,7 @@ bool NavMeshTestHasArea( Vector &pos, float beneathLimt )
 {
 	return TheNavMesh->GetNavArea( pos, beneathLimt ) != NULL;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -47,6 +54,13 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 	if( g_pynavmesh_debug.GetInt() > 1 )
 		DevMsg("NavMeshGetPathDistance: anyz: %d, maxdist: %f, bNoTolerance: %d, unit: %d\n", anyz, maxdist, bNoTolerance, pUnit);
 
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	if( !pMesh )
+		return 0;
+
+	return pMesh->FindPathDistance( vStart, vGoal );
+
+#if 0
 	CNavArea *startArea, *goalArea;
 	if( bNoTolerance )
 	{
@@ -78,22 +92,19 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 		UnitShortestPathCost costFunc( pUnit, false );
 		return NavAreaTravelDistance<UnitShortestPathCost>(startArea, goalArea, costFunc, maxdist);
 	}
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, bool bCheckBlocked )
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, CUnitBase *pUnit )
 {
-	CNavArea *pArea;
-	//pArea = TheNavMesh->GetNearestNavArea(pos, false, 64.0f);
-	pArea = TheNavMesh->GetNavArea(pos, beneathlimit, bCheckBlocked);
-	if( pArea ) {
-		Vector vAreaPos(pos);
-		vAreaPos.z = pArea->GetZ(pos);
-		return vAreaPos;
-	}
-	return vec3_origin;
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	if( !pMesh )
+		return vec3_origin;
+
+	return pMesh->ClosestPointOnMesh( pos, beneathlimit );
 }
 
 //-----------------------------------------------------------------------------
@@ -101,8 +112,9 @@ Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, 
 //-----------------------------------------------------------------------------
 int CreateNavArea( const Vector &corner, const Vector &otherCorner )
 {
+	return -1;
 #ifndef CLIENT_DLL
-	return TheNavMesh->CreateNavArea( corner, otherCorner );
+	//return TheNavMesh->CreateNavArea( corner, otherCorner );
 #else
 	return -1;
 #endif // CLIENT_DLL
@@ -113,8 +125,9 @@ int CreateNavArea( const Vector &corner, const Vector &otherCorner )
 //-----------------------------------------------------------------------------
 int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, const Vector &seCorner, const Vector &swCorner )
 {
+	return -1;
 #ifndef CLIENT_DLL
-	return TheNavMesh->CreateNavArea( nwCorner, neCorner, seCorner, swCorner );
+	//return TheNavMesh->CreateNavArea( nwCorner, neCorner, seCorner, swCorner );
 #else
 	return -1;
 #endif // CLIENT_DLL
@@ -125,12 +138,14 @@ int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, cons
 //-----------------------------------------------------------------------------
 void DestroyNavArea( unsigned int id )
 {
+#if 0 // TODO
 	CNavArea *area = TheNavMesh->GetNavAreaByID( id );
 	if( area )
 	{
 		TheNavAreas.FindAndRemove( area );
 		TheNavMesh->DestroyArea( area );
 	}
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -138,7 +153,7 @@ void DestroyNavArea( unsigned int id )
 //-----------------------------------------------------------------------------
 void DestroyAllNavAreas()
 {
-	TheNavMesh->Reset();
+	RecastMgr().Reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -179,6 +194,16 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, floa
 	if( maxtries < 0 )
 		maxtries = 1;
 
+	Vector center = (maxs - mins) / 2.0f;
+	float radius = maxs.AsVector2D().DistTo(mins.AsVector2D()) / 2.0f;
+	CUnitBase *pUnit = NULL;
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	if( !pMesh )
+		return vec3_origin;
+
+	return pMesh->RandomPointWithRadius( center, radius ) + Vector( 0, 0, 32.0f );
+
+#if 0
 	Vector random;
 	CNavArea *pArea = NULL;
 	Extent extent;
@@ -217,8 +242,10 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, floa
 		DevMsg("RandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
 
 	return vRandomPoint;
+#endif // 0
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -238,19 +265,21 @@ Vector GetEditingCursor()
 {
 	return TheNavMesh->GetEditCursorPosition();
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 int GetNavAreaAt( const Vector &pos, float beneathlimit )
 {
-	CNavArea *pArea = TheNavMesh->GetNavArea( pos, beneathlimit );
-	if( !pArea )
+	CUnitBase *pUnit = NULL;
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	if( !pMesh )
 		return -1;
-
-	return pArea->GetID();
+	return pMesh->GetPolyRef( pos, beneathlimit );
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -412,6 +441,7 @@ bool IsAreaBlocked( int areaid )
 	PyErr_SetString(PyExc_Exception, "Could not find area for given id" );
 	throw boost::python::error_already_set();
 }
+#endif // 0
 
 #ifndef CLIENT_DLL
 static ConVar g_debug_coveredbynavareas("g_debug_coveredbynavareas", "0", FCVAR_CHEAT);
@@ -422,6 +452,7 @@ static ConVar g_debug_coveredbynavareas("g_debug_coveredbynavareas", "0", FCVAR_
 //-----------------------------------------------------------------------------
 bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolerance, bool bRequireIsFlat, float fFlatTol )
 {
+#if 0
 	float fArea, fGoalArea;
 	CNavArea *area;
 	Extent extent;
@@ -484,8 +515,12 @@ bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolera
 		DevMsg("IsBBCoveredByNavAreas: goal area %f, total area: %f, tol: %f\n", fGoalArea, fArea, tolerance);
 #endif // CLIENT_DLL
 	return false;
+#else
+	return true; // TODO!
+#endif // 0
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -500,7 +535,9 @@ bool TryMergeSurrounding( int id, float tolerance )
 
 	return TheNavMesh->TryMergeSingleArea( pArea, tolerance );
 }
+#endif // 0
 
+#if 0
 #ifndef CLIENT_DLL
 CON_COMMAND_F( nav_verifyareas, "", FCVAR_CHEAT)
 {
@@ -544,6 +581,7 @@ CON_COMMAND_F( nav_verifyareas, "", FCVAR_CHEAT)
 	Msg("Total of %d areas\n", TheNavAreas.Count());
 }
 #endif // CLIENT_DLL
+#endif // 0
 
 #define HIDESPOT_DEBUG_DURATION 0.25f
 
@@ -875,6 +913,9 @@ public:
 	{
 		m_fRadius = fRadius;
 
+		m_pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+
+#if 0
 		if( vPos.IsValid() )
 			m_pOrderArea = TheNavMesh->GetNearestNavArea(vPos, false, 1250.0f + fRadius, false, true);
 		else
@@ -894,10 +935,12 @@ public:
 				NDebugOverlay::Text( vPos, buf, false, HIDESPOT_DEBUG_DURATION );
 			}
 		}
+#endif // 0
 	}
 
 	bool operator() ( wars_coverspot_t *coverSpot )
 	{
+#if 0
 		// Figure out normal and skip if the slope is crap
 		CNavArea *area = TheNavMesh->GetNearestNavArea(coverSpot->position, false, 1250.0f + m_fRadius, false, true);
 		if( !area ) 
@@ -927,7 +970,9 @@ public:
 			UnitShortestPathCost costFunc( m_pUnit, false );
 			fPathDist = NavAreaTravelDistance<UnitShortestPathCost>( m_pOrderArea, area, costFunc, 1250.0f + m_fRadius );
 		}
+#endif // 0
 
+		float fPathDist = m_pMesh->FindPathDistance( m_vPos, coverSpot->position );
 		if( fPathDist < 0 )
 		{
 			return true;
@@ -961,6 +1006,7 @@ public:
 
 private:
 	CUnitBase *m_pUnit;
+	CRecastMesh *m_pMesh;
 	CNavArea *m_pOrderArea;
 	float m_fRadius;
 	const Vector &m_vPos;

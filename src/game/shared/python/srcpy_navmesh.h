@@ -20,9 +20,9 @@
 
 // Generic Nav mesh functions
 bool NavMeshAvailable();
-bool NavMeshTestHasArea( Vector &pos, float beneathLimt = 120.0f );
+//bool NavMeshTestHasArea( Vector &pos, float beneathLimt = 120.0f );
 float NavMeshGetPathDistance( Vector &start, Vector &goal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false, CUnitBase *unit = NULL );
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, bool checkblocked=true );
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, CUnitBase *unit = NULL );
 
 Vector RandomNavAreaPosition( float minimumarea = 0, int maxtries = -1 );
 Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, float minimumarea = 0, int maxtries = -1 );
@@ -33,15 +33,15 @@ int CreateNavAreaByCorners( const Vector &nwcorner, const Vector &necorner, cons
 void DestroyNavArea( unsigned int id );
 void DestroyAllNavAreas();
 
-int GetActiveNavMesh();
-Vector GetEditingCursor();
+//int GetActiveNavMesh();
+//Vector GetEditingCursor();
 
 int GetNavAreaAt( const Vector &pos, float beneathlimit = 120.0f );
-boost::python::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs );
-void SplitAreasAtBB( const Vector &mins, const Vector &maxs );
-void SetAreasBlocked( boost::python::list areas, bool blocked, CBaseEntity *pOwner = NULL );
-bool IsAreaBlocked( int areaid );
-bool TryMergeSurrounding( int id, float tolerance = FLT_EPSILON );
+//boost::python::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs );
+//void SplitAreasAtBB( const Vector &mins, const Vector &maxs );
+//void SetAreasBlocked( boost::python::list areas, bool blocked, CBaseEntity *pOwner = NULL );
+//bool IsAreaBlocked( int areaid );
+//bool TryMergeSurrounding( int id, float tolerance = FLT_EPSILON );
 
 // Nav mesh testing
 bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolerance = 0.1f, bool requireisflat = true, float flattol = 0.7f );

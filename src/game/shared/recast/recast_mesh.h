@@ -76,11 +76,17 @@ public:
 	virtual void DebugRender();
 #endif // CLIENT_DLL
 
+	// Mesh Querying
+	int GetPolyRef( const Vector &vPoint, float fBeneathLimit = 120.0f );
+	Vector ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit = 120.0f );
+	Vector RandomPointWithRadius( const Vector &vCenter, float fRadius );
+
 #ifndef CLIENT_DLL
 	// Path find functions
 	virtual UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd );
 #endif // CLIENT_DLL
 	bool TestRoute( const Vector &vStart, const Vector &vEnd );
+	float FindPathDistance( const Vector &vStart, const Vector &vEnd );
 
 	// Obstacle management
 	dtObstacleRef AddTempObstacle( const Vector &vPos, float radius, float height );
