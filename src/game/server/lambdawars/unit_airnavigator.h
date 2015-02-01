@@ -30,7 +30,7 @@ public:
 
 	virtual bool		ShouldConsiderNavMesh( void );
 
-	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
+	//virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
 	bool GetTestRouteWorldOnly();
 	void SetTestRouteWorldOnly( bool enable );

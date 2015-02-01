@@ -181,7 +181,6 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.include()
         cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs().exclude()
-        cls.mem_funs('TestRoute').include()
         cls.mem_fun('Reset').include()
         cls.mem_fun('StopMoving').include()
         cls.mem_fun('Update').include()
@@ -192,7 +191,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.mem_fun('SetGoalTarget').include()
         cls.mem_fun('SetGoalInRange').include()
         cls.mem_fun('SetGoalTargetInRange').include()
-        cls.mem_fun('SetVectorGoal').include()
+        #cls.mem_fun('SetVectorGoal').include()
         cls.mem_fun('FindPathAsResult').include()
         cls.mem_fun('UpdateGoalInRange').include()
         cls.mem_fun('UpdateGoalTarget').include()
@@ -266,7 +265,6 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.calldefs().virtuality = 'not virtual' 
         cls.mem_funs().exclude()
         cls.mem_fun('Update').include()
-        cls.mem_fun('TestRoute').include()
         cls.add_property( 'testrouteworldonly'
                          , cls.mem_fun('GetTestRouteWorldOnly')
                          , cls.mem_fun('SetTestRouteWorldOnly') )

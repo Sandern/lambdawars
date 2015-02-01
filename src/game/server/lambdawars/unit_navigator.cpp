@@ -46,9 +46,9 @@
 #include "hl2wars_util_shared.h"
 #include "fowmgr.h"
 
-#include "nav_mesh.h"
-#include "nav_pathfind.h"
-#include "hl2wars_nav_pathfind.h"
+//#include "nav_mesh.h"
+//#include "nav_pathfind.h"
+//#include "hl2wars_nav_pathfind.h"
 
 #include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
@@ -854,12 +854,16 @@ bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 {
 	if( unit_cost_nonavareacheck.GetBool() )
 		return false;
+#if 0 // TODO: update for recast where this is used.
 	// m_bNoNavAreasNearby is set when in BS_STUCK and we can't find anything nearby 
 	// Also don't consider nav meshes when really nearby our goal or when this is a direct path
 	if( GetPath()->m_bIsDirectPath || m_bNoNavAreasNearby || m_fGoalDistance < 32.0f ) 
 		return false;
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
 	return TheNavMesh->IsLoaded() && ( !pCurWaypoint || pCurWaypoint->SpecialGoalStatus == CHS_NOGOAL );
+#else
+	return false;
+#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -1259,6 +1263,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 
 		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 8.0f )
 		{
+#if 0 // TODO:
 			CNavArea *pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin, true, 256.0f, false, false );
 			CNavArea *pGoalArea = TheNavMesh->GetNavAreaByID( m_iLastTargetArea );
 			if( !pGoalArea )
@@ -1286,6 +1291,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				GetPath()->m_vGoalPos = vTargetOrigin;
 				GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 			}
+#endif // 0
 		}
 		else
 		{
@@ -1746,7 +1752,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 			AdvancePath();
 		}
 #else
-		if( GetAbsOrigin().DistTo( pCurWaypoint->GetPos() ) < GetPath()->m_waypointTolerance )
+		if( GetAbsOrigin().AsVector2D().DistTo( pCurWaypoint->GetPos().AsVector2D() ) < GetPath()->m_waypointTolerance )
 		{
 			AdvancePath();
 		}
@@ -1819,17 +1825,19 @@ void UnitBaseNavigator::AdvancePath()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Updates our current path by looking ahead.
-//		    Tests if we can skip a waypoint by directly testing a route to
-//			the next waypoint, resulting in a smoother path.
-//			Also determines if the path is blocked.
-// Based on: http://www.valvesoftware.com/publications/2009/ai_systems_of_l4d_mike_booth.pdf
+// Purpose: Tests if we can go ahead to the waypoint after the current waypoint
+//			When groups of units move to the same waypoint, they will push each
+//			other out of the way, causing ackward navigation.
+//			Instead the unit should only use the current waypoint as guideline.
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 {
 	if( !GetPath()->m_pWaypointHead )
 		return false;
 
+	bool bBlocked = false;
+
+#if 0
 	UnitBaseWaypoint *pCur, *pCurTest, *pBestWaypoint;
 	float dist;
 	Vector dir, testPos, endPos;
@@ -1923,6 +1931,7 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 	{
 		bBlocked = false;
 	}
+#endif // 0
 
 	return bBlocked;
 }
@@ -1947,6 +1956,7 @@ float UnitBaseNavigator::ComputeWaypointDistanceAndDir( Vector &vPathDir )
 	return fWaypointDist;
 }
 
+#if 0 // TODO: Remove, shouldn't be needed anymore.
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1959,7 +1969,9 @@ bool UnitBaseNavigator::IsCompleteInArea( CNavArea *pArea, const Vector &vPos )
 	return (vPos.x+vWorldMins.x) >= vMins.x && (vPos.x+vWorldMaxs.x) <= vMaxs.x &&
 		(vPos.y+vWorldMins.y) >= vMins.y && (vPos.y+vWorldMaxs.y) <= vMaxs.y;
 }
+#endif // 0
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: Test end waypoint
 //-----------------------------------------------------------------------------
@@ -2056,6 +2068,7 @@ bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPo
 
 	return true;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -2237,6 +2250,7 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 	return bResult;
 }
 
+#if 0 // TODO: Not used atm, disabled since need to update for recast
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -2249,6 +2263,7 @@ bool UnitBaseNavigator::SetVectorGoal( const Vector &dir, float targetDist, floa
 	
 	return false;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Update In range path information
@@ -2845,7 +2860,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	if( pNavMesh )
 	{
 		const Vector &vStart = GetAbsOrigin(); 
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos);
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos );
 		if( pFoundPath )
 			return pFoundPath;
 	}
@@ -2956,6 +2971,7 @@ void UnitBaseNavigator::CalculateDestinationInRange( Vector *pResult, const Vect
 
 #endif 
 
+#if 0 // TODO: Not used atm, so disabled. Needs to be updated for Recast.
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
@@ -2975,6 +2991,7 @@ bool UnitBaseNavigator::FindVectorGoal( Vector *pResult, const Vector &dir, floa
 	*pResult = testLoc;
 	return true;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose:

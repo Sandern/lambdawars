@@ -5816,16 +5816,6 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("pTarget"), bp::arg("maxrange"), bp::arg("minrange")=0.0f, bp::arg("goaltolerance")=0.0f, bp::arg("goalflags")=(int)(0), bp::arg("avoidenemies")=(bool)(true) ) );
         
         }
-        { //::UnitBaseNavigator::SetVectorGoal
-        
-            typedef bool ( ::UnitBaseNavigator::*SetVectorGoal_function_type )( ::Vector const &,float,float,bool ) ;
-            
-            UnitBaseNavigator_exposer.def( 
-                "SetVectorGoal"
-                , SetVectorGoal_function_type( &::UnitBaseNavigator::SetVectorGoal )
-                , ( bp::arg("dir"), bp::arg("targetDist"), bp::arg("minDist")=0, bp::arg("fShouldDeflect")=(bool)(false) ) );
-        
-        }
         { //::UnitBaseNavigator::StopMoving
         
             typedef void ( ::UnitBaseNavigator::*StopMoving_function_type )(  ) ;
@@ -5833,16 +5823,6 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitBaseNavigator_exposer.def( 
                 "StopMoving"
                 , StopMoving_function_type( &::UnitBaseNavigator::StopMoving ) );
-        
-        }
-        { //::UnitBaseNavigator::TestRoute
-        
-            typedef bool ( ::UnitBaseNavigator::*TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
-            
-            UnitBaseNavigator_exposer.def( 
-                "TestRoute"
-                , TestRoute_function_type( &::UnitBaseNavigator::TestRoute )
-                , ( bp::arg("vStartPos"), bp::arg("vEndPos") ) );
         
         }
         { //::UnitBaseNavigator::Update
@@ -5956,16 +5936,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseAirNavigator_exposer_t UnitBaseAirNavigator_exposer = UnitBaseAirNavigator_exposer_t( "UnitBaseAirNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseAirNavigator_scope( UnitBaseAirNavigator_exposer );
         bp::implicitly_convertible< bp::api::object, UnitBaseAirNavigator >();
-        { //::UnitBaseAirNavigator::TestRoute
-        
-            typedef bool ( ::UnitBaseAirNavigator::*TestRoute_function_type )( ::Vector const &,::Vector const & ) ;
-            
-            UnitBaseAirNavigator_exposer.def( 
-                "TestRoute"
-                , TestRoute_function_type( &::UnitBaseAirNavigator::TestRoute )
-                , ( bp::arg("vStartPos"), bp::arg("vEndPos") ) );
-        
-        }
         { //::UnitBaseAirNavigator::Update
         
             typedef void ( ::UnitBaseAirNavigator::*Update_function_type )( ::UnitAirMoveCommand & ) ;

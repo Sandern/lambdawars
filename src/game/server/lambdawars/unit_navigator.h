@@ -416,9 +416,9 @@ public:
 	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
 	virtual float		ComputeWaypointDistanceAndDir( Vector &vPathDir );
 
-	virtual bool		IsCompleteInArea( CNavArea *pArea, const Vector &vPos );
-	virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
-	virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
+	//virtual bool		IsCompleteInArea( CNavArea *pArea, const Vector &vPos );
+	//virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
+	//virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
 	int					GetTestRouteMask();
 	void				SetTestRouteMask( int mask );
@@ -436,8 +436,8 @@ public:
 	virtual bool		SetGoalInRange( Vector &destination, float maxrange, float minrange=0.0f, float goaltolerance=0.0f, int goalflags=0, bool avoidenemies=true );
 	virtual bool		SetGoalTargetInRange( CBaseEntity *pTarget, float maxrange, float minrange=0.0f, float goaltolerance=0.0f, int goalflags=0, bool avoidenemies=true );
 
-	bool				SetVectorGoal( const Vector &dir, float targetDist, float minDist = 0, bool fShouldDeflect = false );
-	virtual bool		SetVectorGoalFromTarget( Vector &destination, float minDist, float goaltolerance=64.0f) { return SetGoal(destination, goaltolerance); }
+	//bool				SetVectorGoal( const Vector &dir, float targetDist, float minDist = 0, bool fShouldDeflect = false );
+	//virtual bool		SetVectorGoalFromTarget( Vector &destination, float minDist, float goaltolerance=64.0f) { return SetGoal(destination, goaltolerance); }
 
 	virtual void		UpdateGoalInRange( float maxrange, float minrange=0.0f, UnitBasePath *path = NULL );
 	virtual void		UpdateGoalTarget( CBaseEntity *target, UnitBasePath *path = NULL );
@@ -476,7 +476,7 @@ public:
 
 	// Misc
 	//void				CalculateDestinationInRange( Vector *pResult, const Vector &vGoalPos, float minrange, float maxrange);
-	bool				FindVectorGoal( Vector *pResult, const Vector &dir, float targetDist, float minDist=0 );
+	//bool				FindVectorGoal( Vector *pResult, const Vector &dir, float targetDist, float minDist=0 );
 	static void			CalculateDeflection( const Vector &start, const Vector &dir, const Vector &normal, Vector *pResult );
 
 	void				LimitPosition( const Vector &pos, float radius );

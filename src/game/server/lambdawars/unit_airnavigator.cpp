@@ -94,6 +94,7 @@ CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand 
 	return BaseClass::MoveUpdateWaypoint( MoveCommand );
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -124,6 +125,7 @@ bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEn
 		return false;
 	return true;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 

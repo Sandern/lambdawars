@@ -126,9 +126,10 @@ void CRecastMesh::Init( const char *name )
 	else if( V_strncmp( name, "air", V_strlen( name ) )== 0 )
 	{
 		// HULL_LARGE_CENTERED, e.g. Strider. Should also be good for gunship/helicop.
-		m_agentHeight = 1024.0f; // Not really that height ever, but don't want to have areas indoor
+		m_agentHeight = 450.0f; // Not really that height ever, but don't want to have areas indoor
 		m_agentRadius = 42.0f; 
-		m_agentMaxClimb = 1024.0f;
+		m_agentMaxClimb = 450.0f;
+		m_agentMaxSlope = 90.0f;
 	}
 	else
 	{
@@ -321,9 +322,9 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
-	polyPickExt[0] = 20.0f;
-	polyPickExt[1] = 40.0f;
-	polyPickExt[2] = 20.0f;
+	polyPickExt[0] = 256.0f;
+	polyPickExt[1] = 600.0f;
+	polyPickExt[2] = 256.0f;
 
 	int m_straightPathOptions = 0;
 	float m_straightPath[MAX_POLYS*3];
