@@ -1156,6 +1156,10 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	ResetWindspeed();
 	UpdateChapterRestrictions( pMapName );
 
+#ifdef HL2WARS_DLL
+	RecastMgr().Load();
+#endif // HL2WARS_DLL
+
 	// IGameSystem::LevelInitPreEntityAllSystems() is called when the world is precached
 	// That happens either in LoadGameState() or in MapEntity_ParseAllEntities()
 	if ( loadGame )
@@ -1305,10 +1309,6 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	}
 
 	IGameSystem::LevelInitPostEntityAllSystems();
-
-#ifdef HL2WARS_DLL
-	RecastMgr().Load();
-#endif // HL2WARS_DLL
 
 	// No more precaching after PostEntityAllSystems!!!
 	CBaseEntity::SetAllowPrecache( false );

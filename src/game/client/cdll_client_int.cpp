@@ -2078,12 +2078,14 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	}
 #endif
 
-#ifndef SWARMKEEPER_DLL
+#ifdef HL2WARS_DLL
+	RecastMgr().Load();
+#endif // HL2WARS_DLL
+
 #ifndef _XBOX
 	// load the Navigation Mesh for this map
 	TheNavMesh->Load();
 #endif
-#endif // SWARMKEEPER_DLL
 }
 
 
@@ -2103,8 +2105,6 @@ void CHLClient::LevelInitPostEntity( )
 	}
 
 #ifdef HL2WARS_DLL
-	RecastMgr().Load();
-
 	WarsGrid().LevelInit();
 
 	CWarsFlora::SpawnMapFlora();
