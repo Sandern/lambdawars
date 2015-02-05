@@ -41,7 +41,7 @@ void CProxyIsNPC::OnBind( void *pC_BaseEntity )
 		return;
 
 	C_BaseEntity *pEntity = BindArgToEntity( pC_BaseEntity );
-	if ( pEntity && pEntity->IsNPC() )
+	if ( pEntity && (pEntity->IsNPC() || pEntity->IsUnit()) )
 	{
 		SetFloatResult( m_Factor.GetFloat() );
 	}

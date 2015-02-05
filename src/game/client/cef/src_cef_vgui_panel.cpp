@@ -322,11 +322,15 @@ void SrcCefVGUIPanel::Paint()
 				int iMip = 0;
 				int z = 0;
 
-				g_pShaderAPI->ModifyTexture( textureHandle );
+				// Material system might be modifying textures too in a different thread, so lock the texture
+				MaterialLock_t lock = NULL;
 
 				if( renderer->GetTextureBuffer() && m_bTextureDirty )
 				{
+					lock = materials->Lock();
+
 					// Full Copy
+					g_pShaderAPI->ModifyTexture( textureHandle );
 					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
 					// Partial copy, would work if we had a partial buffer:
 					//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
@@ -351,10 +355,20 @@ void SrcCefVGUIPanel::Paint()
 
 				if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
 				{
+					if( lock == NULL ) {
+						lock = materials->Lock();
+					}
+					g_pShaderAPI->ModifyTexture( textureHandle );
 					g_pShaderAPI->TexSubImage2D( iMip, iFace, renderer->GetPopupOffsetX(), renderer->GetPopupOffsetY(), z, renderer->GetPopupWidth(), renderer->GetPopupHeight(),
 						m_iTexImageFormat, 0, false, renderer->GetPopupBuffer() );
 
 					m_bPopupTextureDirty = false;
+				}
+
+				// Always release the lock
+				if( lock )
+				{
+					materials->Unlock( lock );
 				}
 			}
 		}
