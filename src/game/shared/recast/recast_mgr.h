@@ -63,9 +63,11 @@ public:
 	// Used for debugging purposes on client
 	virtual dtNavMesh* GetNavMesh( const char *meshName );
 	virtual dtNavMeshQuery* GetNavMeshQuery( const char *meshName );
-
+	virtual IMapMesh* GetMapMesh();
+	
 #ifndef CLIENT_DLL
 	// Generation methods
+	virtual bool LoadMapMesh();
 	virtual bool Build();
 	virtual bool Save();
 #endif // CLIENT_DLL

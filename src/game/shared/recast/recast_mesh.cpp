@@ -12,6 +12,7 @@
 #ifndef CLIENT_DLL
 #include "recast/recast_mapmesh.h"
 #else
+#include "recast/recast_imapmesh.h"
 #include "recast/recast_recastdebugdraw.h"
 #include "recast/recast_debugdrawmesh.h"
 #include "recast/recast_detourdebugdraw.h"
@@ -226,8 +227,8 @@ bool CRecastMesh::Reset()
 }
 
 #ifdef CLIENT_DLL
-#if 0
 ConVar recast_draw_trimeshslope("recast_draw_trimeshslope", "0");
+#if 0
 ConVar recast_draw_contours("recast_draw_contours", "0");
 ConVar recast_draw_polymesh("recast_draw_polymesh", "0");
 ConVar recast_draw_polymeshdetail("recast_draw_polymeshdetail", "0");
@@ -245,18 +246,24 @@ void CRecastMesh::DebugRender()
 
 	DebugDrawMesh dd;
 
-#if 0
-#if defined(_DEBUG) || defined(CALC_GEOM_NORMALS)
-	if( recast_draw_trimeshslope.GetBool() && m_normals )
+	if( recast_draw_trimeshslope.GetBool() )
 	{
 		const float texScale = 1.0f / (m_cellSize * 10.0f);
 
-		duDebugDrawTriMeshSlope(&dd, m_verts, m_nverts,
-								m_tris, m_normals, m_ntris,
-								m_agentMaxSlope, texScale);
+		IRecastMgr *pRecastMgr = warsextension->GetRecastMgr();
+		if( pRecastMgr )
+		{
+			IMapMesh *pMapMesh = pRecastMgr->GetMapMesh();
+			if( pMapMesh )
+			{
+				duDebugDrawTriMeshSlope(&dd, pMapMesh->GetVerts(), pMapMesh->GetNumVerts(),
+										pMapMesh->GetTris(), pMapMesh->GetNorms(), pMapMesh->GetNumTris(),
+										m_agentMaxSlope, texScale);
+			}
+		}
 	}
-#endif // CALC_GEOM_NORMALS
 
+#if 0
 	if( recast_draw_contours.GetBool() && m_cset != NULL )
 	{
 		duDebugDrawContours(&dd, *m_cset);

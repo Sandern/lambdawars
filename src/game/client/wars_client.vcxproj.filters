@@ -5047,6 +5047,12 @@
     <ClInclude Include="..\shared\recast\recast_tilecache_helpers.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_imapmesh.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_imgr.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bitmap.lib">

@@ -185,6 +185,18 @@ dtNavMeshQuery* CRecastMgr::GetNavMeshQuery( const char *meshName )
 	return NULL;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+IMapMesh* CRecastMgr::GetMapMesh()
+{
+#ifdef CLIENT_DLL
+	return NULL;
+#else
+	return m_pMapMesh;
+#endif // CLIENT_DLL
+}
+
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -202,6 +214,20 @@ bool CRecastMgr::BuildMesh( CMapMesh *pMapMesh, const char *name )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Loads the map mesh (geometry)
+//-----------------------------------------------------------------------------
+bool CRecastMgr::LoadMapMesh()
+{
+	m_pMapMesh = new CMapMesh();
+	if( !m_pMapMesh->Load() )
+	{
+		Warning("CRecastMesh::Load: failed to load map data!\n");
+		return false;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Builds all navigation meshes
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Build()
@@ -210,8 +236,7 @@ bool CRecastMgr::Build()
 	Reset();
 
 	// Load map mesh
-	CMapMesh *pMapMesh = new CMapMesh();
-	if( !pMapMesh->Load() )
+	if( !LoadMapMesh() )
 	{
 		Warning("CRecastMesh::Load: failed to load map data!\n");
 		return false;
@@ -220,14 +245,14 @@ bool CRecastMgr::Build()
 	// Create meshes
 	if( V_strlen( recast_build_single.GetString() ) > 0 )
 	{
-		BuildMesh( pMapMesh, recast_build_single.GetString() );
+		BuildMesh( m_pMapMesh, recast_build_single.GetString() );
 	}
 	else
 	{
-		BuildMesh( pMapMesh, "human" );
-		BuildMesh( pMapMesh, "small" );
-		BuildMesh( pMapMesh, "large" );
-		BuildMesh( pMapMesh, "air" );
+		BuildMesh( m_pMapMesh, "human" );
+		BuildMesh( m_pMapMesh, "small" );
+		BuildMesh( m_pMapMesh, "large" );
+		BuildMesh( m_pMapMesh, "air" );
 	}
 
 	return true;
@@ -342,6 +367,13 @@ void CRecastMgr::DebugRender()
 #endif // CLIENT_DLL
 
 #ifndef CLIENT_DLL
+CON_COMMAND_F( recast_loadmapmesh, "", FCVAR_CHEAT )
+{
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+	s_RecastMgr.LoadMapMesh();
+}
+
 CON_COMMAND_F( recast_build, "", FCVAR_CHEAT )
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )

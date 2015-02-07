@@ -14,6 +14,7 @@
 
 class dtNavMesh;
 class dtNavMeshQuery;
+class IMapMesh;
 
 abstract_class IRecastMgr
 {
@@ -21,6 +22,7 @@ public:
 	// Used for debugging purposes on client
 	virtual dtNavMesh* GetNavMesh( const char *meshName ) = 0;
 	virtual dtNavMeshQuery* GetNavMeshQuery( const char *meshName ) = 0;
+	virtual IMapMesh* GetMapMesh() = 0;
 };
 
 #endif // IRECASTMGR_H
