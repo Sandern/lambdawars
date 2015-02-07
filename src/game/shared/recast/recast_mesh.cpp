@@ -38,6 +38,11 @@
 
 ConVar recast_edit( "recast_edit", "1", FCVAR_GAMEDLL | FCVAR_CHEAT, "Set to one to interactively edit the Recast Navigation Mesh. Set to zero to leave edit mode." );
 
+// Defaults
+static ConVar recast_cellsize("recast_cellsize", "10.0", FCVAR_REPLICATED);
+static ConVar recast_cellheight("recast_cellheight", "10.0", FCVAR_REPLICATED);
+static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -62,6 +67,21 @@ CRecastMesh::CRecastMesh() :
 	m_tmproc(0)
 {
 	m_Name.Set("default");
+
+	m_cellSize = recast_cellsize.GetFloat();
+	m_cellHeight = recast_cellheight.GetFloat();
+	m_regionMinSize = 8;
+	m_regionMergeSize = 20;
+	m_edgeMaxLen = 12000.0f;
+	m_edgeMaxError = 1.3f;
+	m_vertsPerPoly = 6.0f;
+	m_detailSampleDist = 600.0f;
+	m_detailSampleMaxError = 100.0f;
+	m_partitionType = SAMPLE_PARTITION_WATERSHED;
+
+	m_maxTiles = 0;
+	m_maxPolysPerTile = 0;
+	m_tileSize = 48;
 }
 
 //-----------------------------------------------------------------------------
@@ -69,13 +89,32 @@ CRecastMesh::CRecastMesh() :
 //-----------------------------------------------------------------------------
 CRecastMesh::~CRecastMesh()
 {
+	Reset();
 
+	if( m_navQuery )
+	{
+		dtFreeNavMeshQuery( m_navQuery );
+		m_navQuery = 0;
+	}
+
+	if( m_talloc )
+	{
+		delete m_talloc;
+		m_talloc = 0;
+	}
+
+	if( m_tcomp )
+	{
+		delete m_tcomp;
+		m_tcomp = 0;
+	}
+
+	if( m_tmproc )
+	{
+		delete m_tmproc;
+		m_tmproc = 0;
+	}
 }
-
-// Test settings temporary
-static ConVar recast_cellsize("recast_cellsize", "10.0", FCVAR_REPLICATED);
-static ConVar recast_cellheight("recast_cellheight", "10.0", FCVAR_REPLICATED);
-static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -142,21 +181,6 @@ void CRecastMesh::Init( const char *name )
 	m_tmproc = new MeshProcess( name );
 
 	// Shared settings by all
-	m_cellSize = recast_cellsize.GetFloat();
-	m_cellHeight = recast_cellheight.GetFloat();
-	m_regionMinSize = 8;
-	m_regionMergeSize = 20;
-	m_edgeMaxLen = 12000.0f;
-	m_edgeMaxError = 1.3f;
-	m_vertsPerPoly = 6.0f;
-	m_detailSampleDist = 600.0f;
-	m_detailSampleMaxError = 100.0f;
-	m_partitionType = SAMPLE_PARTITION_WATERSHED;
-
-	m_maxTiles = 0;
-	m_maxPolysPerTile = 0;
-	m_tileSize = 48;
-
 	ComputeMeshSettings( name, m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope );
 }
 

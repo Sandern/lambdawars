@@ -103,6 +103,14 @@ public:
 	float GetAgentRadius() { return m_agentRadius; }
 	float GetAgentHeight() { return m_agentHeight; }
 
+	// Getters/setters for various build settings:
+	float GetCellSize() { return m_cellSize; }
+	void SetCellSize( float cellSize ) { m_cellSize = cellSize; }
+	float GetCellHeight() { return m_cellHeight; }
+	void SetCellHeight( float cellHeight ) { m_cellHeight = cellHeight; }
+	float GetTileSize() { return m_tileSize; }
+	void SetTileSize( float tileSize ) { m_tileSize = tileSize; }
+
 protected:
 	bool m_keepInterResults;
 

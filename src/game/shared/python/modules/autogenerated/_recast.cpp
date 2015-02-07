@@ -6,6 +6,8 @@
 
 #include "recast/recast_mgr.h"
 
+#include "recast/recast_mesh.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -14,6 +16,63 @@ namespace bp = boost::python;
 
 BOOST_PYTHON_MODULE(_recast){
     bp::docstring_options doc_options( true, true, false );
+
+    { //::CRecastMesh
+        typedef bp::class_< CRecastMesh > CRecastMesh_exposer_t;
+        CRecastMesh_exposer_t CRecastMesh_exposer = CRecastMesh_exposer_t( "CRecastMesh", bp::no_init );
+        bp::scope CRecastMesh_scope( CRecastMesh_exposer );
+        { //property "agentradius"[fget=::CRecastMesh::GetAgentRadius]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "agentradius"
+                , fget( &::CRecastMesh::GetAgentRadius ) );
+        
+        }
+        { //property "agentheight"[fget=::CRecastMesh::GetAgentHeight]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "agentheight"
+                , fget( &::CRecastMesh::GetAgentHeight ) );
+        
+        }
+        { //property "cellsize"[fget=::CRecastMesh::GetCellSize, fset=::CRecastMesh::SetCellSize]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            typedef void ( ::CRecastMesh::*fset )( float ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "cellsize"
+                , fget( &::CRecastMesh::GetCellSize )
+                , fset( &::CRecastMesh::SetCellSize ) );
+        
+        }
+        { //property "cellheight"[fget=::CRecastMesh::GetCellHeight, fset=::CRecastMesh::SetCellHeight]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            typedef void ( ::CRecastMesh::*fset )( float ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "cellheight"
+                , fget( &::CRecastMesh::GetCellHeight )
+                , fset( &::CRecastMesh::SetCellHeight ) );
+        
+        }
+        { //property "tilesize"[fget=::CRecastMesh::GetTileSize, fset=::CRecastMesh::SetTileSize]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            typedef void ( ::CRecastMesh::*fset )( float ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "tilesize"
+                , fget( &::CRecastMesh::GetTileSize )
+                , fset( &::CRecastMesh::SetTileSize ) );
+        
+        }
+    }
 
     bp::class_< CRecastMgr, boost::noncopyable >( "CRecastMgr", bp::no_init )    
         .def( 
@@ -24,6 +83,16 @@ BOOST_PYTHON_MODULE(_recast){
             "AddEntRadiusObstacle"
             , (void ( ::CRecastMgr::* )( ::C_BaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
+        .def( 
+            "GetMesh"
+            , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
+            , ( bp::arg("index") )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "GetMesh"
+            , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
+            , ( bp::arg("name") )
+            , bp::return_internal_reference< >() )    
         .def( 
             "RemoveEntObstacles"
             , (void ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
@@ -45,6 +114,8 @@ BOOST_PYTHON_MODULE(_recast){
 
 #include "recast/recast_mgr.h"
 
+#include "recast/recast_mesh.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -53,6 +124,63 @@ namespace bp = boost::python;
 
 BOOST_PYTHON_MODULE(_recast){
     bp::docstring_options doc_options( true, true, false );
+
+    { //::CRecastMesh
+        typedef bp::class_< CRecastMesh > CRecastMesh_exposer_t;
+        CRecastMesh_exposer_t CRecastMesh_exposer = CRecastMesh_exposer_t( "CRecastMesh", bp::no_init );
+        bp::scope CRecastMesh_scope( CRecastMesh_exposer );
+        { //property "agentradius"[fget=::CRecastMesh::GetAgentRadius]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "agentradius"
+                , fget( &::CRecastMesh::GetAgentRadius ) );
+        
+        }
+        { //property "agentheight"[fget=::CRecastMesh::GetAgentHeight]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "agentheight"
+                , fget( &::CRecastMesh::GetAgentHeight ) );
+        
+        }
+        { //property "cellsize"[fget=::CRecastMesh::GetCellSize, fset=::CRecastMesh::SetCellSize]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            typedef void ( ::CRecastMesh::*fset )( float ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "cellsize"
+                , fget( &::CRecastMesh::GetCellSize )
+                , fset( &::CRecastMesh::SetCellSize ) );
+        
+        }
+        { //property "cellheight"[fget=::CRecastMesh::GetCellHeight, fset=::CRecastMesh::SetCellHeight]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            typedef void ( ::CRecastMesh::*fset )( float ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "cellheight"
+                , fget( &::CRecastMesh::GetCellHeight )
+                , fset( &::CRecastMesh::SetCellHeight ) );
+        
+        }
+        { //property "tilesize"[fget=::CRecastMesh::GetTileSize, fset=::CRecastMesh::SetTileSize]
+        
+            typedef float ( ::CRecastMesh::*fget )(  ) ;
+            typedef void ( ::CRecastMesh::*fset )( float ) ;
+            
+            CRecastMesh_exposer.add_property( 
+                "tilesize"
+                , fget( &::CRecastMesh::GetTileSize )
+                , fset( &::CRecastMesh::SetTileSize ) );
+        
+        }
+    }
 
     bp::class_< CRecastMgr, boost::noncopyable >( "CRecastMgr", bp::no_init )    
         .def( 
@@ -63,6 +191,16 @@ BOOST_PYTHON_MODULE(_recast){
             "AddEntRadiusObstacle"
             , (void ( ::CRecastMgr::* )( ::CBaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
+        .def( 
+            "GetMesh"
+            , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
+            , ( bp::arg("index") )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "GetMesh"
+            , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
+            , ( bp::arg("name") )
+            , bp::return_internal_reference< >() )    
         .def( 
             "RemoveEntObstacles"
             , (void ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )

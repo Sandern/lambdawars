@@ -45,6 +45,7 @@ struct TileCacheSetHeader
 {
 	int cellSize;
 	int cellHeight;
+	int tileSize;
 	int numTiles;
 	dtNavMeshParams meshParams;
 	dtTileCacheParams cacheParams;
@@ -94,6 +95,7 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 
 	m_cellSize = header.cellSize;
 	m_cellHeight = header.cellHeight;
+	m_tileSize = header.tileSize;
 
 	if( header.lenName > 2048 )
 	{
@@ -260,6 +262,7 @@ bool CRecastMesh::Save( CUtlBuffer &fileBuffer )
 	TileCacheSetHeader header;
 	header.cellSize = m_cellSize;
 	header.cellHeight = m_cellHeight;
+	header.tileSize = m_tileSize;
 	header.numTiles = 0;
 	header.lenName = m_Name.Length();
 	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
