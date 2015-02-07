@@ -443,8 +443,8 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 
 		int contents = CalcBrushContents( fileContent, pModel->headnode );
 
-		// Include brushes with the following:
-		if( (contents & (MASK_NPCWORLDSTATIC)) == 0 )
+		// Only parse the first brush (world) and clips
+		if( i != 0 && (contents & (CONTENTS_MONSTERCLIP)) == 0 )
 		{
 			continue;
 		}
@@ -456,8 +456,9 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 		}*/
 
 		matrix3x4_t transform; // model to world transformation
-		AngleMatrix( vec3_angle, vec3_origin, transform);
+		AngleMatrix( vec3_angle, pModel->origin, transform);
 
+		//Msg( "Brush %d: solid count %d, contents: %d\n", i, parsedphysmodels[i].solidCount, contents );
 		for( int j = 0; j < parsedphysmodels[i].solidCount; j++ )
 		{
 			AddCollisionModelToMesh( transform, parsedphysmodels[i].solids[j], verts, triangles );
