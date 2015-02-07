@@ -464,6 +464,12 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 //-----------------------------------------------------------------------------
 bool CRecastMgr::LoadMapMesh()
 {
+	if( m_pMapMesh )
+	{
+		delete m_pMapMesh;
+		m_pMapMesh = NULL;
+	}
+
 	m_pMapMesh = new CMapMesh();
 	if( !m_pMapMesh->Load() )
 	{
@@ -478,11 +484,15 @@ bool CRecastMgr::LoadMapMesh()
 //-----------------------------------------------------------------------------
 bool CRecastMgr::BuildMesh( CMapMesh *pMapMesh, const char *name )
 {
-	CRecastMesh *pMesh = new CRecastMesh();
-	pMesh->Init( name );
+	CRecastMesh *pMesh = GetMesh( name );
+	if( !pMesh )
+	{
+		pMesh = new CRecastMesh();
+		pMesh->Init( name );
+		m_Meshes.Insert( pMesh->GetName(), pMesh );
+	}
 	if( pMesh->Build( pMapMesh ) )
 	{
-		m_Meshes.Insert( pMesh->GetName(), pMesh );
 		return true;
 	}
 	return false;
@@ -516,9 +526,6 @@ bool CRecastMgr::Build()
 {
 	double fStartTime = Plat_FloatTime();
 
-	// Clear any existing mesh
-	Reset();
-
 	// Load map mesh
 	if( !LoadMapMesh() )
 	{
@@ -533,9 +540,13 @@ bool CRecastMgr::Build()
 		CUtlVector<CRecastMesh *> meshesToBuild;
 		for( int i = 0; i < ARRAYSIZE( s_MeshNames ); i++ )
 		{
-			CRecastMesh *pMesh = new CRecastMesh();
-			pMesh->Init( s_MeshNames[i] );
-			m_Meshes.Insert( pMesh->GetName(), pMesh );
+			CRecastMesh *pMesh = GetMesh( s_MeshNames[i] );
+			if( !pMesh )
+			{
+				pMesh = new CRecastMesh();
+				pMesh->Init( s_MeshNames[i] );
+				m_Meshes.Insert( pMesh->GetName(), pMesh );
+			}
 			meshesToBuild.AddToTail( pMesh );
 		}
 
@@ -561,4 +572,52 @@ bool CRecastMgr::Build()
 
 	DevMsg( "CRecastMgr: Finished generating %d meshes in %f seconds\n", m_Meshes.Count(), Plat_FloatTime() - fStartTime );
 	return true;
+}
+
+CON_COMMAND( recast_mesh_setcellsize, "" )
+{
+#ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+
+	CRecastMesh *pMesh = RecastMgr().GetMesh( args[1] );
+	if( !pMesh )
+	{
+		Warning("recast_mesh_setcellsize: could not find mesh \"%s\"\n", args[1] );
+		return;
+	}
+	pMesh->SetCellSize( atof( args[2] ) );
+}
+
+CON_COMMAND( recast_mesh_setcellheight, "" )
+{
+#ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+
+	CRecastMesh *pMesh = RecastMgr().GetMesh( args[1] );
+	if( !pMesh )
+	{
+		Warning("recast_mesh_setcellheight: could not find mesh \"%s\"\n", args[1] );
+		return;
+	}
+	pMesh->SetCellHeight( atof( args[2] ) );
+}
+
+CON_COMMAND( recast_mesh_settilesize, "" )
+{
+#ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+
+	CRecastMesh *pMesh = RecastMgr().GetMesh( args[1] );
+	if( !pMesh )
+	{
+		Warning("recast_mesh_settilesize: could not find mesh \"%s\"\n", args[1] );
+		return;
+	}
+	pMesh->SetTileSize( atof( args[2] ) );
 }

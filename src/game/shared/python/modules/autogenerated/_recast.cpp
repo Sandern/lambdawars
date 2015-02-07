@@ -87,12 +87,12 @@ BOOST_PYTHON_MODULE(_recast){
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("index") )
-            , bp::return_internal_reference< >() )    
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("name") )
-            , bp::return_internal_reference< >() )    
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "RemoveEntObstacles"
             , (void ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
@@ -195,12 +195,12 @@ BOOST_PYTHON_MODULE(_recast){
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("index") )
-            , bp::return_internal_reference< >() )    
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("name") )
-            , bp::return_internal_reference< >() )    
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "RemoveEntObstacles"
             , (void ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )

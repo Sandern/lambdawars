@@ -378,6 +378,11 @@ CON_COMMAND_F( cl_recast_addobstacle, "", FCVAR_CHEAT )
 #endif // CLIENT_DLL
 {
 #ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+
+#ifndef CLIENT_DLL
 	CHL2WarsPlayer *pPlayer = dynamic_cast<CHL2WarsPlayer *>( UTIL_GetCommandClient() );
 #else
 	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
@@ -407,6 +412,11 @@ CON_COMMAND_F( recast_addobstacle_poly, "", FCVAR_CHEAT )
 CON_COMMAND_F( cl_recast_addobstacle_poly, "", FCVAR_CHEAT )
 #endif // CLIENT_DLL
 {
+#ifndef CLIENT_DLL
+	if ( !UTIL_IsCommandIssuedByServerAdmin() )
+		return;
+#endif // CLIENT_DLL
+
 #ifndef CLIENT_DLL
 	CHL2WarsPlayer *pPlayer = dynamic_cast<CHL2WarsPlayer *>( UTIL_GetCommandClient() );
 #else

@@ -109,6 +109,9 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 
 	Init( szName );
 
+	DevMsg("Loading mesh %s with cell size %f, cell height %f, tile size %f\n", 
+		m_Name.Get(), m_cellSize, m_cellHeight, m_tileSize );
+
 	m_navMesh = dtAllocNavMesh();
 	if (!m_navMesh)
 	{
@@ -167,7 +170,7 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 		return false;
 	}
 
-	Msg( "Loaded mesh %s\n", m_Name.Get() );
+	DevMsg( "Loaded mesh %s\n", m_Name.Get() );
 	return true;
 }
 
@@ -256,7 +259,8 @@ bool CRecastMgr::Load()
 #ifndef CLIENT_DLL
 bool CRecastMesh::Save( CUtlBuffer &fileBuffer )
 {
-	Msg( "Saving mesh %s (%d)\n", m_Name.Get(), m_Name.Length() );
+	Msg( "Saving mesh %s with cell size %f, cell height %f, tile size %f\n", 
+		m_Name.Get(), m_cellSize, m_cellHeight, m_tileSize );
 
 	// Store header.
 	TileCacheSetHeader header;
