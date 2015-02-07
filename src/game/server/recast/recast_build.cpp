@@ -348,12 +348,6 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 	tcparams.maxObstacles = 128;
 
 	dtFreeTileCache(m_tileCache);
-	
-	MeshProcess *pMeshProcess = dynamic_cast< MeshProcess * >( m_tmproc );
-	if( pMeshProcess )
-	{
-		pMeshProcess->init( pMapMesh );
-	}
 
 	m_tileCache = dtAllocTileCache();
 	if (!m_tileCache)

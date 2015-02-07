@@ -11,15 +11,15 @@
 #pragma once
 #endif
 
-struct rcChunkyTriMesh;
+#include "recast/recast_imapmesh.h"
 
-class CMapMesh
+class CMapMesh : public IMapMesh
 {
 public:
 	CMapMesh();
 	~CMapMesh();
 
-	bool Load( bool offMeshConnectionsOnly = false );
+	bool Load();
 	void Clear();
 
 	const float *GetVerts();
@@ -29,20 +29,11 @@ public:
 	const float *GetNorms();
 	const rcChunkyTriMesh *GetChunkyMesh();
 
-	CUtlVector< float > &GetOffMeshConnVerts() { return m_OffMeshConnVerts; }
-	CUtlVector< float > &GetOffMeshConnRad() { return m_OffMeshConnRad; }
-	CUtlVector< unsigned char > &GetOffMeshConnDir() { return m_OffMeshConnDir; }
-	CUtlVector< unsigned char > &GetOffMeshConnArea() { return m_OffMeshConnArea; }
-	CUtlVector< unsigned short > &GetOffMeshConnFlags() { return m_OffMeshConnFlags; }
-	CUtlVector< unsigned int > &GetOffMeshConnId() { return m_OffMeshConnId; }
-	int GetOffMeshConnCount() { return m_OffMeshConnId.Count(); }
-
 private:
 	virtual bool GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 	virtual bool GenerateStaticPropData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 	virtual bool GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int> &triangles );
 	virtual bool GenerateBrushData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
-	virtual bool GenerateOffMeshConnections();
 
 private:
 	CUtlVector< float > m_Vertices;
@@ -50,14 +41,6 @@ private:
 	CUtlVector< float > m_Normals;
 
 	rcChunkyTriMesh* m_chunkyMesh;
-
-	// Offmesh connections
-	CUtlVector< float > m_OffMeshConnVerts;
-	CUtlVector< float > m_OffMeshConnRad;
-	CUtlVector< unsigned char > m_OffMeshConnDir;
-	CUtlVector< unsigned char > m_OffMeshConnArea;
-	CUtlVector< unsigned short > m_OffMeshConnFlags;
-	CUtlVector< unsigned int > m_OffMeshConnId;
 };
 
 inline const float *CMapMesh::GetVerts()

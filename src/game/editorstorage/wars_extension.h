@@ -45,6 +45,9 @@ public:
 	virtual void SetPaused( bool bPaused ) { m_bPaused = bPaused; }
 	virtual bool IsPaused() { return m_bPaused; }
 
+	// Version of extension
+	virtual int GetExtensionVersion() { return WARSEXT_VERSION; }
+
 	// Way of accessing the server recast mesh on the client (for debugging/visualization)
 	virtual void SetRecastMgr( IRecastMgr *pRecastMgr ) { m_pRecastMgr = pRecastMgr; }
 	virtual IRecastMgr *GetRecastMgr() { return m_pRecastMgr; }

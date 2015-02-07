@@ -54,14 +54,13 @@ CRecastMesh::CRecastMesh() :
 	m_cacheCompressedSize(0),
 	m_cacheRawSize(0),
 	m_cacheLayerCount(0),
-	m_cacheBuildMemUsage(0)
+	m_cacheBuildMemUsage(0),
+	m_navQuery(0),
+	m_talloc(0),
+	m_tcomp(0),
+	m_tmproc(0)
 {
 	m_Name.Set("default");
-	m_navQuery = dtAllocNavMeshQuery();
-
-	m_talloc = new LinearAllocator(32000);
-	m_tcomp = new FastLZCompressor;
-	m_tmproc = new MeshProcess();
 }
 
 //-----------------------------------------------------------------------------
@@ -81,14 +80,70 @@ static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CRecastMesh::ComputeMeshSettings( const char *name, 
+	float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope )
+{
+	// Per type
+	fAgentMaxSlope = recast_maxslope.GetFloat(); // Default slope for units
+	if( V_strncmp( name, "human", V_strlen( name ) ) == 0 )
+	{
+		// HULL_HUMAN, e.g. Soldier/human
+		fAgentHeight = 72.0f;
+		fAgentRadius = 18.5f;
+		fAgentMaxClimb = 18.0f;
+
+	}
+	else if( V_strncmp( name, "small", V_strlen( name ) )== 0 )
+	{
+		// HULL_TINY, e.g. headcrab
+		fAgentHeight = 24.0f;
+		fAgentRadius = 18.0f;
+		fAgentMaxClimb = 18.0f;
+	}
+	else if( V_strncmp( name, "large", V_strlen( name ) )== 0 )
+	{
+		// HULL_LARGE, e.g. Antlion Guard
+		fAgentHeight = 100.0f;
+		fAgentRadius = 58.0f; 
+		fAgentMaxClimb = 18.0f;
+	}
+	else if( V_strncmp( name, "air", V_strlen( name ) )== 0 )
+	{
+		// HULL_LARGE_CENTERED, e.g. Strider. Should also be good for gunship/helicop.
+		fAgentHeight = 450.0f; // Not really that height ever, but don't want to have areas indoor
+		fAgentRadius = 42.0f; 
+		fAgentMaxClimb = 450.0f;
+		fAgentMaxSlope = 90.0f;
+	}
+	else
+	{
+		Warning( "CRecastMesh::ComputeMeshSettings: Unknown mesh %s\n", name );
+
+		fAgentHeight = 72.0f; // => Soldier/human
+		fAgentRadius = 18.5f; // => Soldier/human
+		fAgentMaxClimb = 18.0f;
+
+		return false;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CRecastMesh::Init( const char *name )
 {
 	m_Name.Set( name );
 
+	m_navQuery = dtAllocNavMeshQuery();
+
+	m_talloc = new LinearAllocator(32000);
+	m_tcomp = new FastLZCompressor;
+	m_tmproc = new MeshProcess( name );
+
 	// Shared settings by all
 	m_cellSize = recast_cellsize.GetFloat();
 	m_cellHeight = recast_cellheight.GetFloat();
-	m_agentMaxSlope = recast_maxslope.GetFloat(); // Default slope for units
 	m_regionMinSize = 8;
 	m_regionMergeSize = 20;
 	m_edgeMaxLen = 12000.0f;
@@ -102,45 +157,7 @@ void CRecastMesh::Init( const char *name )
 	m_maxPolysPerTile = 0;
 	m_tileSize = 48;
 
-	// Per type
-	if( V_strncmp( name, "human", V_strlen( name ) ) == 0 )
-	{
-		// HULL_HUMAN, e.g. Soldier/human
-		m_agentHeight = 72.0f;
-		m_agentRadius = 18.5f;
-		m_agentMaxClimb = 18.0f;
-
-	}
-	else if( V_strncmp( name, "small", V_strlen( name ) )== 0 )
-	{
-		// HULL_TINY, e.g. headcrab
-		m_agentHeight = 24.0f;
-		m_agentRadius = 18.0f;
-		m_agentMaxClimb = 18.0f;
-	}
-	else if( V_strncmp( name, "large", V_strlen( name ) )== 0 )
-	{
-		// HULL_LARGE, e.g. Antlion Guard
-		m_agentHeight = 100.0f;
-		m_agentRadius = 58.0f; 
-		m_agentMaxClimb = 18.0f;
-	}
-	else if( V_strncmp( name, "air", V_strlen( name ) )== 0 )
-	{
-		// HULL_LARGE_CENTERED, e.g. Strider. Should also be good for gunship/helicop.
-		m_agentHeight = 450.0f; // Not really that height ever, but don't want to have areas indoor
-		m_agentRadius = 42.0f; 
-		m_agentMaxClimb = 450.0f;
-		m_agentMaxSlope = 90.0f;
-	}
-	else
-	{
-		Warning( "CRecastMesh::Init: Unknown mesh %s\n", name );
-
-		m_agentHeight = 72.0f; // => Soldier/human
-		m_agentRadius = 18.5f; // => Soldier/human
-		m_agentMaxClimb = 18.0f;
-	}
+	ComputeMeshSettings( name, m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope );
 }
 
 //-----------------------------------------------------------------------------

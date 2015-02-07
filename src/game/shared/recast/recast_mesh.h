@@ -64,6 +64,9 @@ public:
 	// Load/build 
 	//virtual void LoadTestData();
 
+	static bool ComputeMeshSettings( const char *pMeshName, 
+		float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope );
+
 	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
 	virtual bool Reset();
 

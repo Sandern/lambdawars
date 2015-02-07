@@ -14,6 +14,8 @@ class KeyValues;
 class ISteamNetworking;
 class IRecastMgr;
 
+#define WARSEXT_VERSION 1
+
 // Source Engine switches to Steam P2P api for sending data
 // when behind a firewall, so we can't use the default channel.
 // Make sure we are above the used channels.
@@ -71,6 +73,9 @@ public:
 	// Hack to tell client we are paused (engine->IsPaused is broken...)
 	virtual void SetPaused( bool bPaused ) = 0;
 	virtual bool IsPaused() = 0;
+
+	// Version of extension
+	virtual int GetExtensionVersion() = 0;
 
 	// Way of accessing the server recast mesh on the client (for debugging/visualization)
 	virtual void SetRecastMgr( IRecastMgr *pRecastMgr ) = 0;

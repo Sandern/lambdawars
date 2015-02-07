@@ -1083,6 +1083,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_tests.h" />
     <ClInclude Include="..\shared\recast\fastlz\fastlz.h" />
     <ClInclude Include="..\shared\recast\recast_file.h" />
+    <ClInclude Include="..\shared\recast\recast_imapmesh.h" />
     <ClInclude Include="..\shared\recast\recast_imgr.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="..\shared\recast\recast_mgr.h" />

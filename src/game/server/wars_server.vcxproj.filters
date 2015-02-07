@@ -3927,6 +3927,9 @@
     <ClInclude Include="recast\recast_offmesh_connection.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_imapmesh.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bonesetup.lib">

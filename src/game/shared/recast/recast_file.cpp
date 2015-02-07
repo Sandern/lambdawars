@@ -38,6 +38,7 @@ struct NavMgrHeader
 	int magic;
 	int version;
 	int numMeshes;
+	unsigned int bspSize;
 };
 
 struct TileCacheSetHeader
@@ -55,6 +56,27 @@ struct TileCacheTileHeader
 	dtCompressedTileRef tileRef;
 	int dataSize;
 };
+
+static char *RecastGetBspFilename( const char *navFilename )
+{
+	static char bspFilename[256];
+
+#ifdef CLIENT_DLL
+	V_snprintf( bspFilename, sizeof( bspFilename ), FORMAT_BSPFILE, STRING( engine->GetLevelName() ) );
+#else
+	V_snprintf( bspFilename, sizeof( bspFilename ), FORMAT_BSPFILE, STRING( gpGlobals->mapname ) );
+#endif // CLIENT_DLL
+
+	int len = strlen( bspFilename );
+	if (len < 3)
+		return NULL;
+
+	bspFilename[ len-3 ] = 'b';
+	bspFilename[ len-2 ] = 's';
+	bspFilename[ len-1 ] = 'p';
+
+	return bspFilename;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -102,13 +124,6 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 		return false;
 	}
 
-#ifndef CLIENT_DLL
-	MeshProcess *pMeshProcess = dynamic_cast< MeshProcess * >( m_tmproc );
-	if( pMeshProcess )
-	{
-		pMeshProcess->init( pMapMesh );
-	}
-#endif // CLIENT_DLL
 	status = m_tileCache->init(&header.cacheParams, m_talloc, m_tcomp, m_tmproc);
 	if (dtStatusFailed(status))
 	{
@@ -183,18 +198,6 @@ bool CRecastMgr::Load()
 		}
 	}
 
-#ifndef CLIENT_DLL
-	// Load off mesh connections
-	CMapMesh *pMapMesh = new CMapMesh();
-	if( !pMapMesh->Load( true ) )
-	{
-		Warning("CRecastMgr::Load: failed to load map off mesh connections!\n");
-		return false;
-	}
-#else
-	CMapMesh *pMapMesh = NULL;
-#endif // CLIENT_DLL
-
 	// Read header of nav mesh file
 	NavMgrHeader header;
 	fileBuffer.Get( &header, sizeof( header ) );
@@ -211,11 +214,35 @@ bool CRecastMgr::Load()
 		return false;
 	}
 
+	// verify size
+	char *bspFilename = RecastGetBspFilename( filename );
+	if ( bspFilename == NULL )
+	{
+		Msg( "CRecastMgr::Load: Could not get bsp file name\n" );
+		return false;
+	}
+
+	unsigned int bspSize = filesystem->Size( bspFilename );
+	if ( bspSize != header.bspSize && !navIsInBsp )
+	{
+#ifndef CLIENT_DLL
+		if ( engine->IsDedicatedServer() )
+		{
+			// Warning doesn't print to the dedicated server console, so we'll use Msg instead
+			DevMsg( "The Navigation Mesh was built using a different version of this map.\n" );
+		}
+		else
+#endif // CLIENT_DLL
+		{
+			DevWarning( "The Navigation Mesh was built using a different version of this map.\n" );
+		}
+	}
+
 	// Read the meshes!
 	for( int i = 0; i < header.numMeshes; i++ )
 	{
 		CRecastMesh *pMesh = new CRecastMesh();
-		if( !pMesh->Load( fileBuffer, pMapMesh ) )
+		if( !pMesh->Load( fileBuffer ) )
 			return false;
 
 		m_Meshes.Insert( pMesh->GetName(), pMesh );
@@ -291,10 +318,20 @@ bool CRecastMgr::Save()
 
 	CUtlBuffer fileBuffer( 4096, 1024*1024 );
 
+	char *bspFilename = RecastGetBspFilename( filename );
+	if (bspFilename == NULL)
+	{
+		return false;
+	}
+
+	unsigned int bspSize  = filesystem->Size( bspFilename );
+	DevMsg( "Size of bsp file '%s' is %u bytes.\n", bspFilename, bspSize );
+
 	NavMgrHeader header;
 	header.magic = NAVMESHSET_MAGIC;
 	header.version = NAVMESHSET_VERSION;
 	header.numMeshes = m_Meshes.Count();
+	header.bspSize = bspSize;
 	fileBuffer.Put( &header, sizeof( header ) );
 
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
