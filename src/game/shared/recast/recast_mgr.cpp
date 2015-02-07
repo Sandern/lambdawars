@@ -22,9 +22,7 @@
 #include "tier0/memdbgon.h"
 
 #ifdef CLIENT_DLL
-	ConVar recast_debug_mesh( "recast_debug_mesh", "human" );
-#else
-	ConVar recast_build_single( "recast_build_single", "" );
+	ConVar recast_debug_mesh( "recast_debug_mesh", "human" );	
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
@@ -196,68 +194,6 @@ IMapMesh* CRecastMgr::GetMapMesh()
 	return m_pMapMesh;
 #endif // CLIENT_DLL
 }
-
-#ifndef CLIENT_DLL
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CRecastMgr::BuildMesh( CMapMesh *pMapMesh, const char *name )
-{
-	CRecastMesh *pMesh = new CRecastMesh();
-	pMesh->Init( name );
-	if( pMesh->Build( pMapMesh ) )
-	{
-		m_Meshes.Insert( pMesh->GetName(), pMesh );
-		return true;
-	}
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Loads the map mesh (geometry)
-//-----------------------------------------------------------------------------
-bool CRecastMgr::LoadMapMesh()
-{
-	m_pMapMesh = new CMapMesh();
-	if( !m_pMapMesh->Load() )
-	{
-		Warning("CRecastMesh::Load: failed to load map data!\n");
-		return false;
-	}
-	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Builds all navigation meshes
-//-----------------------------------------------------------------------------
-bool CRecastMgr::Build()
-{
-	// Clear any existing mesh
-	Reset();
-
-	// Load map mesh
-	if( !LoadMapMesh() )
-	{
-		Warning("CRecastMesh::Load: failed to load map data!\n");
-		return false;
-	}
-
-	// Create meshes
-	if( V_strlen( recast_build_single.GetString() ) > 0 )
-	{
-		BuildMesh( m_pMapMesh, recast_build_single.GetString() );
-	}
-	else
-	{
-		BuildMesh( m_pMapMesh, "human" );
-		BuildMesh( m_pMapMesh, "small" );
-		BuildMesh( m_pMapMesh, "large" );
-		BuildMesh( m_pMapMesh, "air" );
-	}
-
-	return true;
-}
-#endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
 // Purpose: Adds an obstacle with radius and height for entity

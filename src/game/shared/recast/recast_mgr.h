@@ -70,6 +70,9 @@ public:
 	virtual bool LoadMapMesh();
 	virtual bool Build();
 	virtual bool Save();
+
+	// threaded mesh building
+	static void ThreadedBuildMesh( CRecastMesh *&pMesh );
 #endif // CLIENT_DLL
 
 	// Obstacle management

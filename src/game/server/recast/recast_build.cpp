@@ -7,9 +7,11 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
+#include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
 #include "recast/recast_mapmesh.h"
 #include "recast/recast_tilecache_helpers.h"
+#include "vstdlib/jobthread.h"
 
 #include "detour/DetourNavMesh.h"
 #include "detour/DetourNavMeshBuilder.h"
@@ -23,6 +25,10 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+static ConVar recast_build_single( "recast_build_single", "" );
+static ConVar recast_build_threaded( "recast_build_threaded", "1" );
+static ConVar recast_build_numthreads( "recast_build_numthreads", "4" );
 
 // This value specifies how many layers (or "floors") each navmesh tile is expected to have.
 static const int EXPECTED_LAYERS_PER_TILE = 4;
@@ -450,5 +456,109 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 
 	DevMsg( "CRecastMesh: Generated navigation mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
 
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Loads the map mesh (geometry)
+//-----------------------------------------------------------------------------
+bool CRecastMgr::LoadMapMesh()
+{
+	m_pMapMesh = new CMapMesh();
+	if( !m_pMapMesh->Load() )
+	{
+		Warning("CRecastMesh::Load: failed to load map data!\n");
+		return false;
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CRecastMgr::BuildMesh( CMapMesh *pMapMesh, const char *name )
+{
+	CRecastMesh *pMesh = new CRecastMesh();
+	pMesh->Init( name );
+	if( pMesh->Build( pMapMesh ) )
+	{
+		m_Meshes.Insert( pMesh->GetName(), pMesh );
+		return true;
+	}
+	return false;
+}
+
+static void PreThreadedBuildMesh()
+{
+}
+
+static void PostThreadedBuildMesh()
+{
+}
+
+void CRecastMgr::ThreadedBuildMesh( CRecastMesh *&pMesh )
+{
+	pMesh->Build( (CMapMesh *)RecastMgr().GetMapMesh() );
+}
+
+static char* s_MeshNames[] = 
+{
+	"human",
+	"small",
+	"large",
+	"air"
+};
+
+//-----------------------------------------------------------------------------
+// Purpose: Builds all navigation meshes
+//-----------------------------------------------------------------------------
+bool CRecastMgr::Build()
+{
+	double fStartTime = Plat_FloatTime();
+
+	// Clear any existing mesh
+	Reset();
+
+	// Load map mesh
+	if( !LoadMapMesh() )
+	{
+		Warning("CRecastMesh::Load: failed to load map data!\n");
+		return false;
+	}
+
+	// Create meshes
+	if( recast_build_threaded.GetBool() )
+	{
+		// Insert all meshes first
+		CUtlVector<CRecastMesh *> meshesToBuild;
+		for( int i = 0; i < ARRAYSIZE( s_MeshNames ); i++ )
+		{
+			CRecastMesh *pMesh = new CRecastMesh();
+			pMesh->Init( s_MeshNames[i] );
+			m_Meshes.Insert( pMesh->GetName(), pMesh );
+			meshesToBuild.AddToTail( pMesh );
+		}
+
+		// Build threaded
+		CParallelProcessor<CRecastMesh *, CFuncJobItemProcessor<CRecastMesh *>, 2 > processor;
+		processor.m_ItemProcessor.Init( &ThreadedBuildMesh, &PreThreadedBuildMesh, &PostThreadedBuildMesh );
+		processor.Run( meshesToBuild.Base(), meshesToBuild.Count(), 1, INT_MAX, g_pThreadPool );
+	}
+	else
+	{
+		if( V_strlen( recast_build_single.GetString() ) > 0 )
+		{
+			BuildMesh( m_pMapMesh, recast_build_single.GetString() );
+		}
+		else
+		{
+			for( int i = 0; i < ARRAYSIZE( s_MeshNames ); i++ )
+			{
+				BuildMesh( m_pMapMesh, s_MeshNames[i] );
+			}
+		}
+	}
+
+	DevMsg( "CRecastMgr: Finished generating %d meshes in %f seconds\n", m_Meshes.Count(), Plat_FloatTime() - fStartTime );
 	return true;
 }
