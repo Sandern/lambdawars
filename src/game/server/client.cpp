@@ -21,7 +21,7 @@
 #include "tier1/strtools.h"
 #include "te_effect_dispatch.h"
 #include "globals.h"
-#include "nav_mesh.h"
+//#include "nav_mesh.h"
 #include "team.h"
 #include "EventLog.h"
 #include "datacache/imdlcache.h"

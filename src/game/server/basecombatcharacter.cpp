@@ -37,7 +37,9 @@
 #include "RagdollBoogie.h"
 #include "rumble_shared.h"
 #include "saverestoretypes.h"
+#ifdef USE_NAV_MESH
 #include "nav_mesh.h"
+#endif // USE_NAV_MESH
 
 #ifdef HL2_DLL
 #include "weapon_physcannon.h"
@@ -3326,6 +3328,7 @@ bool CBaseCombatCharacter::GetFogParams( fogparams_t *fog ) const
 	return GetWorldFogParams( const_cast< CBaseCombatCharacter * >( this ), *fog );
 }
 
+#ifdef USE_NAV_MESH
 //-----------------------------------------------------------------------------
 // Purpose: Invoke this to update our last known nav area 
 // (since there is no think method chained to CBaseCombatCharacter)
@@ -3419,4 +3422,4 @@ void CBaseCombatCharacter::OnNavAreaRemoved( CNavArea *removedArea )
 		ClearLastKnownArea();
 	}
 }
-
+#endif // USE_NAV_MESH

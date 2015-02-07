@@ -8,7 +8,8 @@
 #include "hl2wars_util_shared.h"
 #include "wars_mapboundary.h"
 
-#include "nav_mesh.h"
+#include "recast/recast_mgr.h"
+#include "recast/recast_mesh.h"
 #ifdef ENABLE_PYTHON
 	#include "srcpy_navmesh.h"
 #endif // ENABLE_PYTHON
@@ -73,7 +74,7 @@ QAngle UTIL_CalculateDirection( const Vector &point1, const Vector &point2 )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void UTIL_FindPositionInRadius( positioninradius_t &info )
+void UTIL_FindPositionInRadius( positioninradius_t &info, CBaseEntity *navMeshEnt )
 {
 	Vector vecDir, vecTest;
 	trace_t tr;
@@ -85,10 +86,10 @@ void UTIL_FindPositionInRadius( positioninradius_t &info )
 
 		Vector vEndPos;
 
-		if( TheNavMesh->IsLoaded() )
+		if( RecastMgr().HasMeshes() )
 		{
 #ifdef ENABLE_PYTHON
-			vEndPos = NavMeshGetPositionNearestNavArea(vecTest, info.m_fBeneathLimit);
+			vEndPos = NavMeshGetPositionNearestNavArea(vecTest, info.m_fBeneathLimit, navMeshEnt);
 #else
 			vEndPos = vec3_origin;
 #endif // ENABLE_PYTHON
@@ -137,7 +138,7 @@ void UTIL_FindPositionInRadius( positioninradius_t &info )
 	info.m_bSuccess = false;
 }
 
-void UTIL_FindPosition( positioninfo_t &info )
+void UTIL_FindPosition( positioninfo_t &info, CBaseEntity *navMeshEnt )
 {
 	trace_t tr;
 	if( info.m_fRadius == 0 )
@@ -145,7 +146,7 @@ void UTIL_FindPosition( positioninfo_t &info )
 		// Find a start pos
 		Vector vEndPos;
 
-		if( TheNavMesh->IsLoaded() )
+		if( RecastMgr().HasMeshes() )
 		{
 #ifdef ENABLE_PYTHON
 			vEndPos = NavMeshGetPositionNearestNavArea(info.m_vPosition, info.m_fBeneathLimit);
@@ -194,7 +195,7 @@ void UTIL_FindPosition( positioninfo_t &info )
 		info.m_InRadiusInfo.m_fRadius = info.m_fRadius;
 		info.m_InRadiusInfo.ComputeRadiusStepSize();
 
-        UTIL_FindPositionInRadius(info.m_InRadiusInfo);
+        UTIL_FindPositionInRadius(info.m_InRadiusInfo, navMeshEnt);
         if( info.m_InRadiusInfo.m_bSuccess )
 		{
             info.m_vPosition = info.m_InRadiusInfo.m_vPosition;

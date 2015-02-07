@@ -62,7 +62,9 @@
 #include "replaydirector.h"
 #endif
 #include "SoundEmitterSystem/isoundemittersystembase.h"
+#ifdef USE_NAV_MESH
 #include "nav_mesh.h"
+#endif // USE_NAV_MESH
 #include "AI_ResponseSystem.h"
 #include "saverestore_stringtable.h"
 #include "util.h"
@@ -674,8 +676,10 @@ static bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 
 	InvalidateQueryCache();
 
+#ifdef USE_NAV_MESH
 	// create the Navigation Mesh interface
 	TheNavMesh = NavMeshFactory();
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
@@ -981,13 +985,14 @@ void CServerGameDLL::DLLShutdown( void )
 
 
 
-
+#ifdef USE_NAV_MESH
 	// destroy the Navigation Mesh interface
 	if (TheNavMesh)
 	{
 		delete TheNavMesh;
 		TheNavMesh = NULL;
 	}
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::DestroyFloraGrid();
@@ -1319,10 +1324,12 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 		think_limit.SetValue( 0 );
 	}
 
+#ifdef USE_NAV_MESH
 #ifndef _XBOX
 	// load the Navigation Mesh for this map
 	TheNavMesh->Load();
 #endif
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	WarsGrid().LevelInit();
@@ -1409,8 +1416,9 @@ void CServerGameDLL::GameFrame( bool simulating )
 	IGameSystem::FrameUpdatePreEntityThinkAllSystems();
 	GameStartFrame();
 
-
+#ifdef USE_NAV_MESH
 	TheNavMesh->Update();
+#endif // USE_NAV_MESH
 
 	RecastMgr().Update( gpGlobals->frametime );
 
@@ -1590,7 +1598,9 @@ void CServerGameDLL::LevelShutdown( void )
 	// In case we quit out during initial load
 	CBaseEntity::SetAllowPrecache( false );
 
+#ifdef USE_NAV_MESH
 	TheNavMesh->Reset();
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	RecastMgr().Reset();

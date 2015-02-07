@@ -1152,15 +1152,6 @@ void register_CBaseCombatCharacter_class(){
                 , ClearActiveWeapon_function_type( &::CBaseCombatCharacter::ClearActiveWeapon ) );
         
         }
-        { //::CBaseCombatCharacter::ClearLastKnownArea
-        
-            typedef void ( ::CBaseCombatCharacter::*ClearLastKnownArea_function_type )(  ) ;
-            
-            CBaseCombatCharacter_exposer.def( 
-                "ClearLastKnownArea"
-                , ClearLastKnownArea_function_type( &::CBaseCombatCharacter::ClearLastKnownArea ) );
-        
-        }
         { //::CBaseCombatCharacter::CorpseFade
         
             typedef void ( ::CBaseCombatCharacter::*CorpseFade_function_type )(  ) ;
@@ -2220,15 +2211,6 @@ void register_CBaseCombatCharacter_class(){
                 "TakeHealth"
                 , TakeHealth_function_type( &::CBaseCombatCharacter::TakeHealth )
                 , ( bp::arg("flHealth"), bp::arg("bitsDamageType") ) );
-        
-        }
-        { //::CBaseCombatCharacter::UpdateLastKnownArea
-        
-            typedef void ( ::CBaseCombatCharacter::*UpdateLastKnownArea_function_type )(  ) ;
-            
-            CBaseCombatCharacter_exposer.def( 
-                "UpdateLastKnownArea"
-                , UpdateLastKnownArea_function_type( &::CBaseCombatCharacter::UpdateLastKnownArea ) );
         
         }
         { //::CBaseCombatCharacter::UpdateOnRemove

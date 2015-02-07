@@ -50,6 +50,7 @@ void CEventLog::FormatPlayer( CBaseEntity *ent, char *str, int len ) const
 		}
 	}
 
+#ifdef USE_NAV_MESH
 	if ( ent && ent->MyCombatCharacterPointer() )
 	{
 		CNavArea *area = ent->MyCombatCharacterPointer()->GetLastKnownArea();
@@ -58,6 +59,7 @@ void CEventLog::FormatPlayer( CBaseEntity *ent, char *str, int len ) const
 			areaID = area->GetID();
 		}
 	}
+#endif // USE_NAV_MESH
 
 	V_snprintf( str, len, "\"%s<%i><%s><%s><Area %d>\"", playerName, userID, networkIDString, teamName, areaID );
 }

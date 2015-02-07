@@ -170,7 +170,9 @@
 #include "recast/recast_mgr.h"
 #endif // HL2WARS_DLL
 
+#ifdef USE_NAV_MESH
 #include "nav_mesh.h"
+#endif // USE_NAV_MESH
 
 #ifdef ENABLE_CEF
 	#include "cef/src_cef.h"
@@ -1384,10 +1386,12 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 	// This is a fullscreen element, so only lives on slot 0!!!
 	m_pHudCloseCaption = GET_FULLSCREEN_HUDELEMENT( CHudCloseCaption );
 
+#ifdef USE_NAV_MESH
 #ifndef _XBOX
 	// create the Navigation Mesh interface
 	TheNavMesh = NavMeshFactory();
 #endif
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::InitFloraGrid();
@@ -1486,6 +1490,7 @@ void CHLClient::Shutdown( void )
 	ClientSteamContext().Shutdown();
 #endif
 
+#ifdef USE_NAV_MESH
 #ifndef _XBOX
 	// destroy the Navigation Mesh interface
 	if (TheNavMesh)
@@ -1494,6 +1499,7 @@ void CHLClient::Shutdown( void )
 		TheNavMesh = NULL;
 	}
 #endif
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	CWarsFlora::DestroyFloraGrid();
@@ -2082,10 +2088,12 @@ void CHLClient::LevelInitPreEntity( char const* pMapName )
 	RecastMgr().Load();
 #endif // HL2WARS_DLL
 
+#ifdef USE_NAV_MESH
 #ifndef _XBOX
 	// load the Navigation Mesh for this map
 	TheNavMesh->Load();
 #endif
+#endif // USE_NAV_MESH
 }
 
 
@@ -2219,7 +2227,9 @@ void CHLClient::LevelShutdown( void )
 	CReplayRagdollCache::Instance().Shutdown();
 #endif
 
+#ifdef USE_NAV_MESH
 	TheNavMesh->Reset();
+#endif // USE_NAV_MESH
 
 #ifdef HL2WARS_DLL
 	RecastMgr().Reset();

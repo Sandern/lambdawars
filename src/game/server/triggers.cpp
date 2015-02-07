@@ -632,7 +632,9 @@ BEGIN_DATADESC( CTriggerHurt )
 	// Function Pointers
 	DEFINE_FUNCTION( RadiationThink ),
 	DEFINE_FUNCTION( HurtThink ),
+#ifdef USE_NAV_MESH
 	DEFINE_FUNCTION( NavThink ),
+#endif // USE_NAV_MESH
 
 	// Fields
 	DEFINE_FIELD( m_flOriginalDamage, FIELD_FLOAT ),
@@ -677,13 +679,15 @@ void CTriggerHurt::Spawn( void )
 		SetNextThink( gpGlobals->curtime + random->RandomFloat(0.0, 0.5) );
 	}
 
+#ifdef USE_NAV_MESH
 	if ( TheNavMesh )
 	{
 		SetContextThink( &CTriggerHurt::NavThink, gpGlobals->curtime, "NavContext" );
 	}
+#endif // USE_NAV_MESH
 }
 
-
+#ifdef USE_NAV_MESH
 //-----------------------------------------------------------------------------
 // Purpose: Marks nav areas as damaging.
 //-----------------------------------------------------------------------------
@@ -720,6 +724,7 @@ void CTriggerHurt::NavThink( void )
 		area->MarkAsDamaging( deltaT + 1.0f );
 	}
 }
+#endif // USE_NAV_MESH
 
 
 //-----------------------------------------------------------------------------

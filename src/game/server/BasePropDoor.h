@@ -77,12 +77,14 @@ public:
 	virtual void GetNPCOpenData(CAI_BaseNPC *pNPC, opendata_t &opendata) = 0;
 	virtual float GetOpenInterval(void) = 0;
 
+#ifdef USE_NAV_MESH
 	enum DoorExtent_t
 	{
 		DOOR_EXTENT_OPEN = 1,
 		DOOR_EXTENT_CLOSED = 2,
 	};
 	virtual void ComputeDoorExtent( Extent *extent, unsigned int extentType ) = 0;	// extent contains the volume encompassing by the door in the specified states
+#endif // USE_NAV_MESH
 	// }
 
 

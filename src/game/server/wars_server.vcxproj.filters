@@ -13,9 +13,6 @@
     <Filter Include="Source Files\temporary entities">
       <UniqueIdentifier>{8f39b145-c006-4a82-a191-87c78315a363}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Nav Mesh">
-      <UniqueIdentifier>{96672f83-e211-49df-99e4-d2190b8f50d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\From HL2">
       <UniqueIdentifier>{c4d42023-7d85-418b-89f5-3c4cb98b17f1}</UniqueIdentifier>
     </Filter>
@@ -1782,42 +1779,6 @@
     </ClCompile>
     <ClCompile Include="..\shared\lambdawars\unit_baseanimstate.cpp">
       <Filter>Source Files\wars\Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_area.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_colors.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_edit.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_entities.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_file.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_generate.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_ladder.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_merge.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_mesh.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_mesh_factory.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_node.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_simplify.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
     </ClCompile>
     <ClCompile Include="lambdawars\unit_airnavigator.cpp">
       <Filter>Source Files\wars</Filter>
@@ -3740,30 +3701,6 @@
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\unit_baseanimstate.h">
       <Filter>Source Files\wars\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_area.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_colors.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_entities.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_ladder.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_mesh.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_node.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_pathfind.h">
-      <Filter>Source Files\Nav Mesh</Filter>
     </ClInclude>
     <ClInclude Include="lambdawars\unit_airnavigator.h">
       <Filter>Source Files\wars</Filter>

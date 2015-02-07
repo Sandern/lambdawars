@@ -2670,7 +2670,9 @@ CPhysicsProp::CPhysicsProp( void ) :
 
 CPhysicsProp::~CPhysicsProp()
 {
+#ifdef USE_NAV_MESH
 	TheNavMesh->UnregisterAvoidanceObstacle( this );
+#endif // USE_NAV_MESH
 
 	if (HasSpawnFlags(SF_PHYSPROP_IS_GIB))
 	{
@@ -2804,10 +2806,12 @@ void CPhysicsProp::Spawn( )
 		}
 	}
 
+#ifdef USE_NAV_MESH
 	if ( IsPotentiallyAbleToObstructNavAreas() )
 	{
 		TheNavMesh->RegisterAvoidanceObstacle( this );
 	}
+#endif // USE_NAV_MESH
 
 	if( !HasSpawnFlags( SF_PHYSPROP_DEBRIS ) )
 		DensityMap()->SetType( DENSITY_GAUSSIAN );
@@ -3249,6 +3253,7 @@ void CPhysicsProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 
 }
 
+#ifdef USE_NAV_MESH
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -3308,6 +3313,7 @@ bool CPhysicsProp::CanObstructNavAreas( void ) const
 
 	return true;
 }
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -3339,6 +3345,7 @@ void CPhysicsProp::NavThink( void )
 		area->MarkObstacleToAvoid( obstructionHeight );
 	}
 }
+#endif // USE_NAV_MESH
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -5198,7 +5205,9 @@ public:
 
 	void	InputSetSpeed(inputdata_t &inputdata);
 
+#ifdef USE_NAV_MESH
 	virtual void ComputeDoorExtent( Extent *extent, unsigned int extentType );	// extent contains the volume encompassing open + closed states
+#endif // USE_NAV_MESH
 
 	DECLARE_DATADESC();
 	DECLARE_SERVERCLASS();
@@ -5530,6 +5539,7 @@ void CPropDoorRotating::OnRestore( void )
 	CalculateDoorVolume( GetLocalAngles(), m_angRotationOpenBack, &m_vecBackBoundsMin, &m_vecBackBoundsMax );
 }
 
+#ifdef USE_NAV_MESH
 // extent contains the volume encompassing open + closed states
 void CPropDoorRotating::ComputeDoorExtent( Extent *extent, unsigned int extentType )
 {
@@ -5556,6 +5566,7 @@ void CPropDoorRotating::ComputeDoorExtent( Extent *extent, unsigned int extentTy
 	extent->lo += GetAbsOrigin();
 	extent->hi += GetAbsOrigin();
 }
+#endif // USE_NAV_MESH
 
 //-----------------------------------------------------------------------------
 // Purpose: 

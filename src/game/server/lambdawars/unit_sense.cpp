@@ -7,7 +7,6 @@
 #include "cbase.h"
 #include "unit_sense.h"
 #include "wars_func_unit.h"
-#include "nav_mesh.h"
 #include "vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

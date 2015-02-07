@@ -138,7 +138,7 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPathDistance
     
-        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,bool,float,bool,::C_UnitBase * );
+        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,bool,float,bool,::C_BaseEntity * );
         
         bp::def( 
             "NavMeshGetPathDistance"
@@ -149,7 +149,7 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::C_UnitBase * );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::C_BaseEntity * );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
@@ -317,7 +317,7 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPathDistance
     
-        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,bool,float,bool,::CUnitBase * );
+        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,bool,float,bool,::CBaseEntity * );
         
         bp::def( 
             "NavMeshGetPathDistance"
@@ -328,7 +328,7 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::CUnitBase * );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::CBaseEntity * );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"

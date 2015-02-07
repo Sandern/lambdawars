@@ -10,8 +10,8 @@
 #include "movevars_shared.h"
 #include "coordsize.h"
 #include "hl2wars_util_shared.h"
-#include "nav_mesh.h"
-#include "nav_area.h"
+#include "recast/recast_mgr.h"
+#include "recast/recast_mesh.h"
 #include "vphysics/object_hash.h"
 
 #ifdef ENABLE_PYTHON
@@ -1665,12 +1665,14 @@ void UnitBaseLocomotion::DoUnstuck()
 {
 	// Prefer finding a position in radius
 	bool bFoundPosition = false;
-	if( TheNavMesh && TheNavMesh->IsLoaded() )
+	if( RecastMgr().HasMeshes() )
 	{
-		CNavArea *pArea = TheNavMesh->GetNearestNavArea( mv->origin, true, 10000.0f, false, false );
-		if( pArea )
+		CRecastMesh *pMesh = RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) );
+		if( pMesh )
 		{
-			positioninfo_t info( pArea->GetCenter(), m_vecMins, m_vecMaxs, 0, 1024.0f, 0, 0, NULL,
+			Vector vClosestPoint = pMesh->ClosestPointOnMesh( mv->origin, 10000.0f );
+
+			positioninfo_t info( vClosestPoint, m_vecMins, m_vecMaxs, 0, 1024.0f, 0, 0, NULL,
 								 8.0f, 256.0f, MASK_NPCSOLID, true );
 			UTIL_FindPosition( info );
 			if( info.m_bSuccess )

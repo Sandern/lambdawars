@@ -7,9 +7,6 @@
 
 #include "cbase.h"
 #include "srcpy_navmesh.h"
-//#include "nav_mesh.h"
-//#include "nav_pathfind.h"
-//#include "nav_area.h"
 #include "wars_mapboundary.h"
 //#include "hl2wars_nav_pathfind.h"
 #include "collisionutils.h"
@@ -49,7 +46,7 @@ bool NavMeshTestHasArea( Vector &pos, float beneathLimt )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance, CUnitBase *pUnit )
+float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance, CBaseEntity *pUnit )
 {
 	if( g_pynavmesh_debug.GetInt() > 1 )
 		DevMsg("NavMeshGetPathDistance: anyz: %d, maxdist: %f, bNoTolerance: %d, unit: %d\n", anyz, maxdist, bNoTolerance, pUnit);
@@ -98,7 +95,7 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, CUnitBase *pUnit )
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, CBaseEntity *pUnit )
 {
 	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )

@@ -6,8 +6,8 @@
 
 #include "cbase.h"
 #include "wars_grid.h"
+#include "filesystem.h"
 
-#include "nav_mesh.h"
 #include "editor/editorwarsmapmgr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -104,15 +104,11 @@ void CWarsGrid::LoadCover( KeyValues *pKVWars )
 {
 	m_nNextCoverID = 0;
 
-	m_bOldNavMeshConverted = false;
 	if( pKVWars )
 	{
 		KeyValues *pCover = pKVWars->FindKey( "cover" );
 		if( pCover )
 		{
-			// This is set when the old nav mesh based spots are converted to the wars file
-			m_bOldNavMeshConverted = !pCover->GetBool( "loadnavmeshcover", true );
-
 			for ( KeyValues *pKey = pCover->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 			{
 				if ( V_strcmp( pKey->GetName(), "spot" ) )
@@ -123,19 +119,6 @@ void CWarsGrid::LoadCover( KeyValues *pKVWars )
 				int flags = pKey->GetInt( "flags", 0 );
 
 				CreateCoverSpot( vecPos, flags );
-			}
-		}
-	}
-
-	if( !m_bOldNavMeshConverted )
-	{
-		FOR_EACH_VEC( TheNavAreas, it )
-		{
-			const HidingSpotVector *hidingSpots = TheNavAreas[it]->GetHidingSpots();
-			for( int i = 0; i < hidingSpots->Count(); i++ ) 
-			{
-				const Vector &vPos = (*hidingSpots)[i]->GetPosition();
-				CreateCoverSpot( vPos, wars_coverspot_t::NOTSAVED|wars_coverspot_t::FROMNAVMESH );
 			}
 		}
 	}
@@ -155,8 +138,6 @@ bool CWarsGrid::SaveCover( KeyValues *pKVWars )
 	
 	// Create new key with updated cover
 	pCoverKey = pKVWars->FindKey( "cover", true );
-
-	pCoverKey->SetBool( "loadnavmeshcover", !m_bOldNavMeshConverted );
 
 	FOR_EACH_VEC( s_WarsGrid, gridit )
 	{

@@ -198,7 +198,9 @@ public:
 	bool HurtEntity( CBaseEntity *pOther, float damage );
 	int HurtAllTouchers( float dt );
 
+#ifdef USE_NAV_MESH
 	void NavThink( void );
+#endif // USE_NAV_MESH
 
 	DECLARE_DATADESC();
 

@@ -51,7 +51,7 @@ struct positioninradius_t
 	}
 };
 
-void UTIL_FindPositionInRadius( positioninradius_t &info );
+void UTIL_FindPositionInRadius( positioninradius_t &info, CBaseEntity *navMeshEnt = NULL );
 
 struct positioninfo_t
 {
@@ -88,7 +88,7 @@ struct positioninfo_t
 	positioninradius_t m_InRadiusInfo;
 };
 
-void UTIL_FindPosition( positioninfo_t &info );
+void UTIL_FindPosition( positioninfo_t &info, CBaseEntity *navMeshEnt = NULL );
 
 #ifdef CLIENT_DLL
 class C_HL2WarsPlayer;

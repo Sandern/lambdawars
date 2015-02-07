@@ -785,9 +785,6 @@ void register_CPhysicsProp_class(){
             "CanBePickedUpByPhyscannon"
             , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::CanBePickedUpByPhyscannon ) )    
         .def( 
-            "CanObstructNavAreas"
-            , (bool ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::CanObstructNavAreas ) )    
-        .def( 
             "ClearFlagsThink"
             , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::ClearFlagsThink ) )    
         .def( 
@@ -814,13 +811,6 @@ void register_CPhysicsProp_class(){
             "GetMassCenter"
             , (void ( ::CPhysicsProp::* )( ::Vector * ) )( &::CPhysicsProp::GetMassCenter )
             , ( bp::arg("pMassCenter") ) )    
-        .def( 
-            "GetNavObstructionHeight"
-            , (float ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::GetNavObstructionHeight ) )    
-        .def( 
-            "GetObstructingEntity"
-            , (::CBaseEntity * ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::GetObstructingEntity )
-            , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetPropDataAngles"
             , (bool ( ::CPhysicsProp::* )( char const *,::QAngle & ) )( &::CPhysicsProp::GetPropDataAngles )
@@ -853,17 +843,8 @@ void register_CPhysicsProp_class(){
             "IsGib"
             , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::IsGib ) )    
         .def( 
-            "IsPotentiallyAbleToObstructNavAreas"
-            , (bool ( ::CPhysicsProp::* )(  ) const)( &::CPhysicsProp::IsPotentiallyAbleToObstructNavAreas ) )    
-        .def( 
-            "NavThink"
-            , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::NavThink ) )    
-        .def( 
             "ObjectCaps"
             , (int ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::ObjectCaps ) )    
-        .def( 
-            "OnNavMeshLoaded"
-            , (void ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::OnNavMeshLoaded ) )    
         .def( 
             "OnPhysGunDrop"
             , (void ( ::CPhysicsProp::* )( ::CBasePlayer *,::PhysGunDrop_t ) )( &::CPhysicsProp::OnPhysGunDrop )

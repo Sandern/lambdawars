@@ -653,15 +653,6 @@ void register_C_BaseCombatCharacter_class(){
                 , BloodColor_function_type( &::C_BaseCombatCharacter::BloodColor ) );
         
         }
-        { //::C_BaseCombatCharacter::ClearLastKnownArea
-        
-            typedef void ( ::C_BaseCombatCharacter::*ClearLastKnownArea_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "ClearLastKnownArea"
-                , ClearLastKnownArea_function_type( &::C_BaseCombatCharacter::ClearLastKnownArea ) );
-        
-        }
         { //::C_BaseCombatCharacter::DoMuzzleFlash
         
             typedef void ( ::C_BaseCombatCharacter::*DoMuzzleFlash_function_type )(  ) ;
@@ -876,15 +867,6 @@ void register_C_BaseCombatCharacter_class(){
                 "SwitchToNextBestWeapon"
                 , SwitchToNextBestWeapon_function_type( &::C_BaseCombatCharacter::SwitchToNextBestWeapon )
                 , ( bp::arg("pCurrent") ) );
-        
-        }
-        { //::C_BaseCombatCharacter::UpdateLastKnownArea
-        
-            typedef void ( ::C_BaseCombatCharacter::*UpdateLastKnownArea_function_type )(  ) ;
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "UpdateLastKnownArea"
-                , UpdateLastKnownArea_function_type( &::C_BaseCombatCharacter::UpdateLastKnownArea ) );
         
         }
         { //::C_BaseCombatCharacter::WeaponCount

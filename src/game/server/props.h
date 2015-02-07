@@ -15,7 +15,9 @@
 #include "physics_bone_follower.h"
 #include "player_pickup.h"
 #include "positionwatcher.h"
+#ifdef USE_NAV_MESH
 #include "nav_mesh.h"
+#endif // USE_NAV_MESH
 
 //=============================================================================================================
 // PROP TYPES
@@ -352,7 +354,10 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-class CPhysicsProp : public CBreakableProp, public INavAvoidanceObstacle
+class CPhysicsProp : public CBreakableProp
+#ifdef USE_NAV_MESH
+	, public INavAvoidanceObstacle
+#endif // USE_NAV_MESH
 {
 	DECLARE_CLASS( CPhysicsProp, CBreakableProp );
 	DECLARE_SERVERCLASS();
@@ -395,12 +400,14 @@ public:
 
 	void ClearFlagsThink( void );
 
+#ifdef USE_NAV_MESH
 	virtual bool IsPotentiallyAbleToObstructNavAreas( void ) const;	// could we at some future time obstruct nav?
 	virtual float GetNavObstructionHeight( void ) const;			// height at which to obstruct nav areas
 	virtual bool CanObstructNavAreas( void ) const;					// can we obstruct nav right this instant?
 	virtual CBaseEntity *GetObstructingEntity( void ) { return this; }
 	virtual void OnNavMeshLoaded( void );
 	void NavThink( void );
+#endif // USE_NAV_MESH
 
 	virtual int OnTakeDamage( const CTakeDamageInfo &info );
 	int DrawDebugTextOverlays(void);

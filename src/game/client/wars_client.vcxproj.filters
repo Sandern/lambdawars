@@ -43,9 +43,6 @@
     <Filter Include="Source Files\Python\Modules">
       <UniqueIdentifier>{d63a54b2-778e-43f3-9be6-c392e322ee03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Nav Mesh">
-      <UniqueIdentifier>{bce160ef-2dd4-4b96-8797-1b25efb10214}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\wars">
       <UniqueIdentifier>{01e2671c-0253-4f6b-82b0-1b56774a7577}</UniqueIdentifier>
     </Filter>
@@ -1643,30 +1640,6 @@
     <ClCompile Include="lambdawars\hl2wars_hud_weaponselection.cpp">
       <Filter>Source Files\wars\HUD Elements</Filter>
     </ClCompile>
-    <ClCompile Include="..\shared\nav_area.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_colors.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_file.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_ladder.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_merge.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_mesh.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_mesh_factory.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_node.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="hud_weapon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -2035,9 +2008,6 @@
     </ClCompile>
     <ClCompile Include="lambdawars\vgui_video_general.cpp">
       <Filter>Source Files\wars\vgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\shared\nav_edit.cpp">
-      <Filter>Source Files\Nav Mesh</Filter>
     </ClCompile>
     <ClCompile Include="lambdawars\vgui\wars_model_panel.cpp">
       <Filter>Source Files\wars\vgui</Filter>
@@ -4449,27 +4419,6 @@
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\unit_baseanimstate.h">
       <Filter>Source Files\wars\Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_area.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_colors.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_ladder.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_mesh.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_node.h">
-      <Filter>Source Files\Nav Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="..\shared\nav_pathfind.h">
-      <Filter>Source Files\Nav Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\lambdawars\density_weight_map.h">
       <Filter>Source Files\wars\Shared</Filter>

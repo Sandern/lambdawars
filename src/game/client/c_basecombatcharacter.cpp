@@ -14,7 +14,9 @@
 #include "c_basecombatcharacter.h"
 
 #include "gamestringpool.h"
+#ifdef USE_NAV_MESH
 #include "nav_mesh.h"
+#endif // USE_NAV_MESH
 #include "vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -87,6 +89,7 @@ Vector C_BaseCombatCharacter::Weapon_ShootPosition( )
 	return vecSrc;
 }
 
+#ifdef USE_NAV_MESH
 //-----------------------------------------------------------------------------
 // Purpose: Invoke this to update our last known nav area 
 // (since there is no think method chained to CBaseCombatCharacter)
@@ -166,7 +169,7 @@ void C_BaseCombatCharacter::OnNavAreaRemoved( CNavArea *removedArea )
 		ClearLastKnownArea();
 	}
 }
-
+#endif // USE_NAV_MESH
 
 IMPLEMENT_CLIENTCLASS(C_BaseCombatCharacter, DT_BaseCombatCharacter, CBaseCombatCharacter);
 

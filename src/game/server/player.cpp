@@ -58,7 +58,9 @@
 #if defined( REPLAY_ENABLED )
 #include "replaydirector.h"
 #endif
+#ifdef USE_NAV_MESH
 #include "nav_mesh.h"
+#endif // USE_NAV_MESH
 #include "env_zoom.h"
 #include "rumble_shared.h"
 #include "GameStats.h"
@@ -1730,8 +1732,10 @@ void CBasePlayer::Event_Killed( const CTakeDamageInfo &info )
 
 	m_flDeathTime = gpGlobals->curtime;
 
+#ifdef USE_NAV_MESH
 	// only count alive players
 	ClearLastKnownArea();
+#endif // USE_NAV_MESH
 
 	BaseClass::Event_Killed( info );
 }
@@ -3811,6 +3815,7 @@ void CBasePlayer::PreThink(void)
 		m_Local.m_flFallVelocity = -GetAbsVelocity().z;
 	}
 
+#ifdef USE_NAV_MESH
 #ifndef _XBOX
 	CNavArea *area = TheNavMesh->GetNavArea( GetAbsOrigin() );
 	if (area && area != m_lastNavArea)
@@ -3840,6 +3845,7 @@ void CBasePlayer::PreThink(void)
 		//gameeventmanager->FireEvent( event );
 	}
 #endif
+#endif // USE_NAV_MESH
 
 	// StudioFrameAdvance( );//!!!HACKHACK!!! Can't be hit by traceline when not animating?
 }
@@ -5052,13 +5058,17 @@ void CBasePlayer::Spawn( void )
 
 	m_movementCollisionNormal = Vector( 0, 0, 1 );
 
+#ifdef USE_NAV_MESH
 	// track where we are in the nav mesh
 	UpdateLastKnownArea();
+#endif // USE_NAV_MESH
 
 	BaseClass::Spawn();
 
+#ifdef USE_NAV_MESH
 	// track where we are in the nav mesh
 	UpdateLastKnownArea();
+#endif // USE_NAV_MESH
 
 	if ( !g_pGameRules->IsMultiplayer() && g_pScriptVM )
 	{
