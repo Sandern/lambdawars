@@ -10,6 +10,10 @@
 #include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
 #include "recast/recast_file.h"
+#include "recast_tilecache_helpers.h"
+#ifndef CLIENT_DLL
+#include "recast/recast_mapmesh.h"
+#endif // CLIENT_DLL
 
 #include "datacache/imdlcache.h"
 #include <filesystem.h>
@@ -55,7 +59,7 @@ struct TileCacheTileHeader
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
+bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 {
 	// Read header.
 	TileCacheSetHeader header;
@@ -97,6 +101,14 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer )
 	{
 		return false;
 	}
+
+#ifndef CLIENT_DLL
+	MeshProcess *pMeshProcess = dynamic_cast< MeshProcess * >( m_tmproc );
+	if( pMeshProcess )
+	{
+		pMeshProcess->init( pMapMesh );
+	}
+#endif // CLIENT_DLL
 	status = m_tileCache->init(&header.cacheParams, m_talloc, m_tcomp, m_tmproc);
 	if (dtStatusFailed(status))
 	{
@@ -171,6 +183,18 @@ bool CRecastMgr::Load()
 		}
 	}
 
+#ifndef CLIENT_DLL
+	// Load off mesh connections
+	CMapMesh *pMapMesh = new CMapMesh();
+	if( !pMapMesh->Load( true ) )
+	{
+		Warning("CRecastMgr::Load: failed to load map off mesh connections!\n");
+		return false;
+	}
+#else
+	CMapMesh *pMapMesh = NULL;
+#endif // CLIENT_DLL
+
 	// Read header of nav mesh file
 	NavMgrHeader header;
 	fileBuffer.Get( &header, sizeof( header ) );
@@ -191,7 +215,7 @@ bool CRecastMgr::Load()
 	for( int i = 0; i < header.numMeshes; i++ )
 	{
 		CRecastMesh *pMesh = new CRecastMesh();
-		if( !pMesh->Load( fileBuffer ) )
+		if( !pMesh->Load( fileBuffer, pMapMesh ) )
 			return false;
 
 		m_Meshes.Insert( pMesh->GetName(), pMesh );

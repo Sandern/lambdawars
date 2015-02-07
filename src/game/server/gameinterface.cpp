@@ -1156,10 +1156,6 @@ bool CServerGameDLL::LevelInit( const char *pMapName, char const *pMapEntities, 
 	ResetWindspeed();
 	UpdateChapterRestrictions( pMapName );
 
-#ifdef HL2WARS_DLL
-	RecastMgr().Load();
-#endif // HL2WARS_DLL
-
 	// IGameSystem::LevelInitPreEntityAllSystems() is called when the world is precached
 	// That happens either in LoadGameState() or in MapEntity_ParseAllEntities()
 	if ( loadGame )
@@ -1293,6 +1289,10 @@ void CServerGameDLL::ServerActivate( edict_t *pEdictList, int edictCount, int cl
 	{
 		Msg( "ERROR: Entity delete queue not empty on level start!\n" );
 	}
+
+#ifdef HL2WARS_DLL
+	RecastMgr().Load();
+#endif // HL2WARS_DLL
 
 	for ( CBaseEntity *pClass = gEntList.FirstEnt(); pClass != NULL; pClass = gEntList.NextEnt(pClass) )
 	{

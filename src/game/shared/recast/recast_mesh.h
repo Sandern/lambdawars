@@ -64,7 +64,7 @@ public:
 	// Load/build 
 	//virtual void LoadTestData();
 
-	virtual bool Load( CUtlBuffer &fileBuffer );
+	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
 	virtual bool Reset();
 
 #ifndef CLIENT_DLL

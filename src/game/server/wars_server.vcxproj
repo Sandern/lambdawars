@@ -825,6 +825,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="recast\ChunkyTriMesh.cpp" />
     <ClCompile Include="recast\recast_build.cpp" />
     <ClCompile Include="recast\recast_mapmesh.cpp" />
+    <ClCompile Include="recast\recast_offmesh_connection.cpp" />
     <ClCompile Include="recipientfilter.cpp" />
     <ClCompile Include="..\..\public\registry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -1381,6 +1382,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="RagdollBoogie.h" />
     <ClInclude Include="recast\ChunkyTriMesh.h" />
     <ClInclude Include="recast\recast_mapmesh.h" />
+    <ClInclude Include="recast\recast_offmesh_connection.h" />
     <ClInclude Include="recipientfilter.h" />
     <ClInclude Include="replaydirector.h" />
     <ClInclude Include="rope.h" />

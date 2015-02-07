@@ -10,9 +10,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static ConVar recast_draw_nodepth("recast_draw_nodepth", "0");
+
 DebugDrawMesh::DebugDrawMesh() : m_bBindTexture(false)
 {
-	m_mat.Init( "editor/recast_debug", TEXTURE_GROUP_OTHER );
+	m_mat.Init( recast_draw_nodepth.GetBool() ? "editor/recast_debug_nodepth" : "editor/recast_debug", TEXTURE_GROUP_OTHER );
 	Assert( m_mat.IsValid() );
 }
 

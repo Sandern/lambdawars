@@ -8,6 +8,8 @@
 //=============================================================================//
 #include "cbase.h"
 #include "recast/recast_mapmesh.h"
+#include "recast/recast_mesh.h"
+#include "recast_offmesh_connection.h"
 #include "builddisp.h"
 #include "gamebspfile.h"
 //#include "datacache/imdlcache.h"
@@ -357,6 +359,9 @@ bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static int CalcBrushContents( void *fileContent, int nodeidx )
 {
 	int contents = 0;
@@ -398,7 +403,7 @@ static int CalcBrushContents( void *fileContent, int nodeidx )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
+bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
 {
 	BSPHeader_t *header = (BSPHeader_t *)fileContent;
 
@@ -466,9 +471,68 @@ bool CMapMesh::GenerateClipData( void *fileContent, CUtlVector<float> &verts, CU
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CMapMesh::Load()
+bool CMapMesh::GenerateOffMeshConnections()
+{
+	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "recast_offmesh_connection" );
+	while( pEnt )
+	{
+		COffMeshConnection *pOffMeshConn = dynamic_cast< COffMeshConnection * >( pEnt );
+		if( pOffMeshConn )
+		{
+			CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, pOffMeshConn->m_target );
+			if( pTarget )
+			{
+				// Horrifying
+				int vertOffset = m_OffMeshConnVerts.Count();
+				m_OffMeshConnVerts.AddMultipleToTail( 6 );
+
+				const Vector &vStart = pOffMeshConn->GetAbsOrigin();
+				const Vector &vEnd = pTarget->GetAbsOrigin();
+
+				m_OffMeshConnVerts[vertOffset] = vStart.x;
+				m_OffMeshConnVerts[vertOffset+1] = vStart.z;
+				m_OffMeshConnVerts[vertOffset+2] = vStart.y;
+				m_OffMeshConnVerts[vertOffset+3] = vEnd.x;
+				m_OffMeshConnVerts[vertOffset+4] = vEnd.z;
+				m_OffMeshConnVerts[vertOffset+5] = vEnd.y;
+
+				m_OffMeshConnRad.AddToTail( 20.0f );
+
+				m_OffMeshConnId.AddToTail( 10000 + m_OffMeshConnId.Count() );
+
+				if( pOffMeshConn->GetSpawnFlags() & SF_OFFMESHCONN_JUMPEDGE )
+				{
+					m_OffMeshConnArea.AddToTail( SAMPLE_POLYAREA_JUMP );
+					m_OffMeshConnFlags.AddToTail( SAMPLE_POLYFLAGS_JUMP );
+					m_OffMeshConnDir.AddToTail( 0 ); // one direction
+				}
+				else
+				{
+					m_OffMeshConnArea.AddToTail( SAMPLE_POLYAREA_GROUND );
+					m_OffMeshConnFlags.AddToTail( SAMPLE_POLYFLAGS_WALK );
+					m_OffMeshConnDir.AddToTail( 1 ); // bi direction
+				}
+			}
+		}
+
+		// Find next off mesh connection
+		pEnt = gEntList.FindEntityByClassname( pEnt, "recast_offmesh_connection" );
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CMapMesh::Load( bool offMeshConnectionsOnly )
 {
 	Clear();
+
+	if( offMeshConnectionsOnly )
+	{
+		return GenerateOffMeshConnections();
+	}
 
 	// nav filename is derived from map filename
 	char filename[256];
@@ -571,7 +635,8 @@ bool CMapMesh::Load()
 	GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
 	GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
 	GenerateDynamicPropData( m_Vertices, m_Triangles );
-	GenerateClipData( fileContent, m_Vertices, m_Triangles );
+	GenerateBrushData( fileContent, m_Vertices, m_Triangles );
+	GenerateOffMeshConnections();
 
 #if defined(_DEBUG)
 	for( int i = 0; i < m_Triangles.Count(); i++ )

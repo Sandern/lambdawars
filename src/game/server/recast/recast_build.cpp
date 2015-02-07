@@ -349,6 +349,12 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 
 	dtFreeTileCache(m_tileCache);
 	
+	MeshProcess *pMeshProcess = dynamic_cast< MeshProcess * >( m_tmproc );
+	if( pMeshProcess )
+	{
+		pMeshProcess->init( pMapMesh );
+	}
+
 	m_tileCache = dtAllocTileCache();
 	if (!m_tileCache)
 	{
