@@ -268,6 +268,13 @@ void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &
 
 	if( g_debug_mouse_aim.GetBool() )
 	{
+		if( g_debug_mouse_aim.GetInt() > 2 )
+		{
+			char buf[256];
+			V_snprintf( buf, sizeof( buf ), "%f", mousedata.m_vNormal.z * (180 / M_PI) );
+			NDebugOverlay::Text( mousedata.m_vEndPos, buf, false, 0.05f );
+		}
+
 		NDebugOverlay::SweptBox( vStartPos,  vStartPos + (m_vMouseAim *  8192), 
 				MOUSE_TRACE_BOX_MINS, MOUSE_TRACE_BOX_MAXS, QAngle(), 255, 0, 0, 200, 0.05f );
 		if( mousedata.GetEnt() )
@@ -280,6 +287,11 @@ void CHL2WarsPlayer::CalculateMouseData( const Vector &vMouseAim, const Vector &
 			NDebugOverlay::BoxAngles( pEnt->GetAbsOrigin(), pEnt->WorldAlignMins(),
 				pEnt->WorldAlignMaxs(), pEnt->GetAbsAngles(), !pEnt->IsSolid() * 255, 255, 0, 255, 0.05f );
 #endif // CLIENT_DLL
+
+			if( g_debug_mouse_aim.GetInt() > 1 )
+			{
+				NDebugOverlay::EntityText( pEnt->entindex(), 0, pEnt->GetClassname(), 0.05f, 255, 255, 255, 255 );
+			}
 		}
 	}
 
