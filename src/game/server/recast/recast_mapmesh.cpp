@@ -19,6 +19,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+static ConVar recast_mapmesh_loadbrushes("recast_mapmesh_loadbrushes", "1");
+static ConVar recast_mapmesh_loadstaticprops("recast_mapmesh_loadstaticprops", "1");
+static ConVar recast_mapmesh_loaddynamicprops("recast_mapmesh_loaddynamicprops", "1");
+static ConVar recast_mapmesh_loaddisplacements("recast_mapmesh_loaddisplacements", "1");
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -189,32 +194,54 @@ vcollide_t *LoadModelPhysCollide( const char *pModelName )
 //-----------------------------------------------------------------------------
 // Purpose: Add vertices and triangles of a collision model to mesh
 //-----------------------------------------------------------------------------
-static void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, CUtlVector<float> &verts, CUtlVector<int> &triangles )
+static void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, 
+	CUtlVector<float> &verts, CUtlVector<int> &triangles, int filterContents = CONTENTS_EMPTY )
 {
-	int k;
-	Vector *outVerts;
-	int vertCount = physcollision->CreateDebugMesh( pCollisionModel, &outVerts );
-
-	int iStartingVertIndex = verts.Count() / 3;
-	for ( k = 0; k < vertCount; k++ )
+	ICollisionQuery *pCollisionQuery = physcollision->CreateQueryModel( (CPhysCollide *)pCollisionModel );
+	if( !pCollisionQuery )
 	{
-		Vector out;
-		VectorTransform( outVerts[k].Base(), transform, out.Base() );
-		verts.AddToTail( out[0] );
-		verts.AddToTail( out[2] );
-		verts.AddToTail( out[1] );
+		Warning("AddCollisionModelToMesh: could not create collision query model\n");
+		return;
 	}
 
-	k = 0;
-	while( k < vertCount )
+	for( int i = 0; i < pCollisionQuery->ConvexCount(); i++ )
 	{
-		triangles.AddToTail( iStartingVertIndex + k );
-		triangles.AddToTail( iStartingVertIndex + k + 1 );
-		triangles.AddToTail( iStartingVertIndex + k + 2 );
-		k += 3;
+		int nTris = pCollisionQuery->TriangleCount( i );
+		for( int j = 0; j < nTris; j++ )
+		{
+			Vector trisVerts[3];
+			pCollisionQuery->GetTriangleVerts( i, j, trisVerts );
+
+			if( filterContents != CONTENTS_EMPTY )
+			{
+				// UGLY! used for filtering out water of the world collidable.
+				// Preferable we should just have some way to get the material.
+				Vector offset(0, 0, 2.0f);
+				Vector vCenter = (trisVerts[0] + trisVerts[1] + trisVerts[2]) / 3; 
+				if( enginetrace->GetPointContents_WorldOnly(vCenter-offset, filterContents) & filterContents &&
+					(enginetrace->GetPointContents_WorldOnly(vCenter+offset, filterContents) & filterContents) == 0 )
+				{
+					continue;
+				}
+			}
+
+			int iStartingVertIndex = verts.Count() / 3;
+			for ( int k = 0; k < 3; k++ )
+			{
+				Vector out;
+				VectorTransform( trisVerts[k].Base(), transform, out.Base() );
+				verts.AddToTail( out[0] );
+				verts.AddToTail( out[2] );
+				verts.AddToTail( out[1] );
+			}
+
+			triangles.AddToTail( iStartingVertIndex );
+			triangles.AddToTail( iStartingVertIndex + 1 );
+			triangles.AddToTail( iStartingVertIndex + 2 );
+		}
 	}
 
-	physcollision->DestroyDebugMesh( vertCount, outVerts );
+	physcollision->DestroyQueryModel( pCollisionQuery );
 }
 
 //-----------------------------------------------------------------------------
@@ -449,19 +476,13 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 			continue;
 		}
 
-		// Exclude water
-		/*if( (contents & (CONTENTS_WATER)) != 0 )
-		{
-			continue;
-		}*/
-
 		matrix3x4_t transform; // model to world transformation
 		AngleMatrix( vec3_angle, pModel->origin, transform);
 
 		//Msg( "Brush %d: solid count %d, contents: %d\n", i, parsedphysmodels[i].solidCount, contents );
 		for( int j = 0; j < parsedphysmodels[i].solidCount; j++ )
 		{
-			AddCollisionModelToMesh( transform, parsedphysmodels[i].solids[j], verts, triangles );
+			AddCollisionModelToMesh( transform, parsedphysmodels[i].solids[j], verts, triangles, CONTENTS_WATER );
 		}
 	}
 
@@ -573,10 +594,14 @@ bool CMapMesh::Load()
 	}
 #endif // 0
 
-	GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
-	GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
-	GenerateDynamicPropData( m_Vertices, m_Triangles );
-	GenerateBrushData( fileContent, m_Vertices, m_Triangles );
+	if( recast_mapmesh_loaddisplacements.GetBool() )
+		GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
+	if( recast_mapmesh_loadstaticprops.GetBool() )
+		GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
+	if( recast_mapmesh_loaddynamicprops.GetBool() )
+		GenerateDynamicPropData( m_Vertices, m_Triangles );
+	if( recast_mapmesh_loadbrushes.GetBool() )
+		GenerateBrushData( fileContent, m_Vertices, m_Triangles );
 
 #if defined(_DEBUG)
 	for( int i = 0; i < m_Triangles.Count(); i++ )

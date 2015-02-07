@@ -75,7 +75,6 @@ CRecastMesh::~CRecastMesh()
 // Test settings temporary
 static ConVar recast_cellsize("recast_cellsize", "10.0", FCVAR_REPLICATED);
 static ConVar recast_cellheight("recast_cellheight", "10.0", FCVAR_REPLICATED);
-//static ConVar recast_maxclimb("recast_maxclimb", "18.0", FCVAR_REPLICATED);
 static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------

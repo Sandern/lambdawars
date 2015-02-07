@@ -33,7 +33,7 @@ ConVar g_pynavmesh_debug_hidespot("g_pynavmesh_debug_hidespot", "0", FCVAR_CHEAT
 //-----------------------------------------------------------------------------
 bool NavMeshAvailable()
 {
-	return RecastMgr().HasMeshes(); // TheNavMesh->IsLoaded();
+	return RecastMgr().HasMeshes();
 }
 
 #if 0
