@@ -514,7 +514,7 @@ void CRecastMgr::ThreadedBuildMesh( CRecastMesh *&pMesh )
 static char* s_MeshNames[] = 
 {
 	"human",
-	"small",
+	"medium",
 	"large",
 	"air"
 };

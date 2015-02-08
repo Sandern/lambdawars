@@ -89,7 +89,7 @@ void CRecastMgr::Reset()
 static char* s_DefaultMeshNames[] = 
 {
 	"human",
-	"small",
+	"medium",
 	"large",
 	"air"
 };

@@ -131,11 +131,11 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fCellHeight = round( fCellSize / 2.0f );
 
 	}
-	else if( V_strncmp( name, "small", V_strlen( name ) )== 0 )
+	else if( V_strncmp( name, "medium", V_strlen( name ) )== 0 )
 	{
-		// HULL_TINY, e.g. headcrab
-		fAgentHeight = 24.0f;
-		fAgentRadius = 18.0f;
+		// HULL_MEDIUM & HULL_TALL, e.g. antlion, hunter, dog
+		fAgentHeight = 80.0f;
+		fAgentRadius = 26.0f;
 		fAgentMaxClimb = 18.0f;
 		fCellSize = round( fAgentRadius / 3.0f );
 		fCellHeight = round( fCellSize / 2.0f );
