@@ -368,6 +368,9 @@ bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int
 	{
 		if( FClassnameIs( pEntity, "prop_dynamic" ) )
 		{
+			if( pEntity->IsSolidFlagSet(FSOLID_NOT_SOLID) )
+				continue;
+
 			if( pEntity->GetSolid() == SOLID_VPHYSICS )
 			{
 				matrix3x4_t transform; // model to world transformation
