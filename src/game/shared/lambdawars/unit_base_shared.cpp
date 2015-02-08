@@ -586,32 +586,20 @@ void CUnitBase::DoMuzzleFlash()
 //-----------------------------------------------------------------------------
 // Purpose: Weapons ignore other weapons when LOS tracing
 //-----------------------------------------------------------------------------
-class CWarsBulletsFilter : public CTraceFilterSimpleList
+bool CWarsBulletsFilter::ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
 {
-	DECLARE_CLASS( CWarsBulletsFilter, CTraceFilterSimpleList );
-public:
-	CWarsBulletsFilter( CUnitBase *pUnit, int collisionGroup ) : CTraceFilterSimpleList( collisionGroup ), m_pUnit(pUnit)
-	{
+	CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
+	if ( !pEntity )
+		return false;
 
+	IUnit *pUnit = pEntity->GetIUnit();
+	if( pUnit && pUnit->AreAttacksPassable(m_pUnit) && m_pUnit->GetCommander() == NULL )
+	{
+		return false;
 	}
 
-	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
-	{
-		CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
-		if ( !pEntity )
-			return false;
-
-		IUnit *pUnit = pEntity->GetIUnit();
-		if( pUnit && pUnit->AreAttacksPassable(m_pUnit) && m_pUnit->GetCommander() == NULL )
-		{
-			return false;
-		}
-
-		return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
-	}
-private:
-	CUnitBase *m_pUnit;
-};
+	return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

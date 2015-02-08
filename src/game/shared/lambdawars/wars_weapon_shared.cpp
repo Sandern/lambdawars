@@ -164,7 +164,7 @@ void CWarsWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int
 #endif
 #else
 #ifdef CLIENT_DLL
-	ASWUTracer( GetOwner(), tr.endpos, m_vTracerColor );
+	WarsUTracer( GetOwner(), tr.endpos, m_vTracerColor );
 #endif
 #endif // 0
 }

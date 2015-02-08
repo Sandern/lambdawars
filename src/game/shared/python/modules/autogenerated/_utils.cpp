@@ -26,6 +26,8 @@
 
 #include "hl2wars_util_shared.h"
 
+#include "unit_base_shared.h"
+
 #include "c_hl2wars_player.h"
 
 #include "srcpy.h"
@@ -812,6 +814,36 @@ struct CTraceFilterWorldOnly_wrapper : CTraceFilterWorldOnly, bp::wrapper< CTrac
 
 };
 
+struct CWarsBulletsFilter_wrapper : CWarsBulletsFilter, bp::wrapper< CWarsBulletsFilter > {
+
+    CWarsBulletsFilter_wrapper(::C_UnitBase * pUnit, int collisionGroup )
+    : CWarsBulletsFilter( pUnit, collisionGroup )
+      , bp::wrapper< CWarsBulletsFilter >(){
+        // constructor
+    
+    }
+
+    virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
+        PY_OVERRIDE_CHECK( CWarsBulletsFilter, ShouldHitEntity )
+        PY_OVERRIDE_LOG( _utils, CWarsBulletsFilter, ShouldHitEntity )
+        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        if( func_ShouldHitEntity.ptr() != Py_None )
+            try {
+                return func_ShouldHitEntity( PyEntityFromEntityHandle( pServerEntity ), contentsMask );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CWarsBulletsFilter::ShouldHitEntity( pServerEntity, contentsMask );
+            }
+        else
+            return this->CWarsBulletsFilter::ShouldHitEntity( pServerEntity, contentsMask );
+    }
+    
+    bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
+        return CWarsBulletsFilter::ShouldHitEntity( pServerEntity, contentsMask );
+    }
+
+};
+
 static boost::python::tuple GetTargetInScreenSpace_428767104c56b38864e43c8a491bdb7a( ::C_BaseEntity * pTargetEntity, ::Vector * vecOffset=0 ){
     int iX2;
     int iY2;
@@ -1155,6 +1187,13 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWorldOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
+            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
+
+    bp::class_< CWarsBulletsFilter_wrapper, bp::bases< CTraceFilterSimpleList >, boost::noncopyable >( "CWarsBulletsFilter", bp::init< C_UnitBase *, int >(( bp::arg("pUnit"), bp::arg("collisionGroup") )) )    
+        .def( 
+            "ShouldHitEntity"
+            , (bool ( ::CWarsBulletsFilter::* )( ::IHandleEntity *,int ) )(&::CWarsBulletsFilter::ShouldHitEntity)
+            , (bool ( CWarsBulletsFilter_wrapper::* )( ::IHandleEntity *,int ) )(&CWarsBulletsFilter_wrapper::default_ShouldHitEntity)
             , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
 
     { //::PyRay_t
@@ -2100,23 +2139,23 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_FindPosition
     
-        typedef void ( *UTIL_FindPosition_function_type )( ::positioninfo_t & );
+        typedef void ( *UTIL_FindPosition_function_type )( ::positioninfo_t &,::C_BaseEntity * );
         
         bp::def( 
             "UTIL_FindPosition"
             , UTIL_FindPosition_function_type( &::UTIL_FindPosition )
-            , ( bp::arg("info") ) );
+            , ( bp::arg("info"), bp::arg("navMeshEnt")=bp::object() ) );
     
     }
 
     { //::UTIL_FindPositionInRadius
     
-        typedef void ( *UTIL_FindPositionInRadius_function_type )( ::positioninradius_t & );
+        typedef void ( *UTIL_FindPositionInRadius_function_type )( ::positioninradius_t &,::C_BaseEntity * );
         
         bp::def( 
             "UTIL_FindPositionInRadius"
             , UTIL_FindPositionInRadius_function_type( &::UTIL_FindPositionInRadius )
-            , ( bp::arg("info") ) );
+            , ( bp::arg("info"), bp::arg("navMeshEnt")=bp::object() ) );
     
     }
 
@@ -2703,6 +2742,8 @@ BOOST_PYTHON_MODULE(_utils){
 #include "explode.h"
 
 #include "hl2wars_util_shared.h"
+
+#include "unit_base_shared.h"
 
 #include "srcpy.h"
 
@@ -3548,6 +3589,36 @@ struct CTraceFilterWorldOnly_wrapper : CTraceFilterWorldOnly, bp::wrapper< CTrac
 
 };
 
+struct CWarsBulletsFilter_wrapper : CWarsBulletsFilter, bp::wrapper< CWarsBulletsFilter > {
+
+    CWarsBulletsFilter_wrapper(::CUnitBase * pUnit, int collisionGroup )
+    : CWarsBulletsFilter( pUnit, collisionGroup )
+      , bp::wrapper< CWarsBulletsFilter >(){
+        // constructor
+    
+    }
+
+    virtual bool ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
+        PY_OVERRIDE_CHECK( CWarsBulletsFilter, ShouldHitEntity )
+        PY_OVERRIDE_LOG( _utils, CWarsBulletsFilter, ShouldHitEntity )
+        bp::override func_ShouldHitEntity = this->get_override( "ShouldHitEntity" );
+        if( func_ShouldHitEntity.ptr() != Py_None )
+            try {
+                return func_ShouldHitEntity( PyEntityFromEntityHandle( pServerEntity ), contentsMask );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CWarsBulletsFilter::ShouldHitEntity( pServerEntity, contentsMask );
+            }
+        else
+            return this->CWarsBulletsFilter::ShouldHitEntity( pServerEntity, contentsMask );
+    }
+    
+    bool default_ShouldHitEntity( ::IHandleEntity * pServerEntity, int contentsMask ) {
+        return CWarsBulletsFilter::ShouldHitEntity( pServerEntity, contentsMask );
+    }
+
+};
+
 BOOST_PYTHON_MODULE(_utils){
     bp::docstring_options doc_options( true, true, false );
 
@@ -3897,6 +3968,13 @@ BOOST_PYTHON_MODULE(_utils){
             "ShouldHitEntity"
             , (bool ( ::CTraceFilterWorldOnly::* )( ::IHandleEntity *,int ) )(&::CTraceFilterWorldOnly::ShouldHitEntity)
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
+            , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
+
+    bp::class_< CWarsBulletsFilter_wrapper, bp::bases< CTraceFilterSimpleList >, boost::noncopyable >( "CWarsBulletsFilter", bp::init< CUnitBase *, int >(( bp::arg("pUnit"), bp::arg("collisionGroup") )) )    
+        .def( 
+            "ShouldHitEntity"
+            , (bool ( ::CWarsBulletsFilter::* )( ::IHandleEntity *,int ) )(&::CWarsBulletsFilter::ShouldHitEntity)
+            , (bool ( CWarsBulletsFilter_wrapper::* )( ::IHandleEntity *,int ) )(&CWarsBulletsFilter_wrapper::default_ShouldHitEntity)
             , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
 
     { //::PyRay_t
@@ -5143,23 +5221,23 @@ BOOST_PYTHON_MODULE(_utils){
 
     { //::UTIL_FindPosition
     
-        typedef void ( *UTIL_FindPosition_function_type )( ::positioninfo_t & );
+        typedef void ( *UTIL_FindPosition_function_type )( ::positioninfo_t &,::CBaseEntity * );
         
         bp::def( 
             "UTIL_FindPosition"
             , UTIL_FindPosition_function_type( &::UTIL_FindPosition )
-            , ( bp::arg("info") ) );
+            , ( bp::arg("info"), bp::arg("navMeshEnt")=bp::object() ) );
     
     }
 
     { //::UTIL_FindPositionInRadius
     
-        typedef void ( *UTIL_FindPositionInRadius_function_type )( ::positioninradius_t & );
+        typedef void ( *UTIL_FindPositionInRadius_function_type )( ::positioninradius_t &,::CBaseEntity * );
         
         bp::def( 
             "UTIL_FindPositionInRadius"
             , UTIL_FindPositionInRadius_function_type( &::UTIL_FindPositionInRadius )
-            , ( bp::arg("info") ) );
+            , ( bp::arg("info"), bp::arg("navMeshEnt")=bp::object() ) );
     
     }
 

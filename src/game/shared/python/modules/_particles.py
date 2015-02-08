@@ -89,18 +89,30 @@ class Particles(SemiSharedModuleGenerator):
         cls.calldefs().exclude()
         cls.vars().exclude()
         
+        # CParticleCollection
+        cls = mb.class_('CParticleCollection')
+        cls.include()
+        cls.no_init = True
+        cls.mem_funs().virtuality = 'not virtual'
+        cls.vars().exclude()
+        cls.calldefs().exclude()
+        
+        cls.mem_fun('IsValid').include()
+        
         # CNewParticleEffect
         cls = mb.class_('CNewParticleEffect')
         cls.include()
+        cls.no_init = True
         cls.mem_funs().virtuality = 'not virtual'
         
+        cls.mem_fun('IsReleased').exclude()
         cls.mem_funs('AddParticle').exclude()
         cls.mem_funs('GetPMaterial').call_policies = call_policies.return_internal_reference() 
         cls.mem_funs('ReplaceWith').exclude()
         cls.vars('m_pNext').exclude()
         cls.vars('m_pPrev').exclude()
 
-        cls.mem_funs('GetOwner').call_policies = call_policies.return_value_policy( call_policies.return_by_value ) 
+        cls.mem_funs('GetOwner').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         if self.settings.branch == 'swarm':
             cls.mem_funs('Create').call_policies = call_policies.return_internal_reference()
@@ -108,7 +120,7 @@ class Particles(SemiSharedModuleGenerator):
             cls.mem_funs('CreateOrAggregatePrecached').call_policies = call_policies.return_internal_reference()
         else:
             cls.mem_funs('Create').exclude() # TODO/FIXME
-			
+
         #mb.class_('CNewParticleEffectHandle').include()
         #mb.class_('CNewParticleEffectHandle').mem_funs('GetParticleEffect').exclude()
         

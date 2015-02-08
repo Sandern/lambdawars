@@ -53,10 +53,6 @@ struct CNewParticleEffect_wrapper : CNewParticleEffect, bp::wrapper< CNewParticl
     
     }
 
-    int IsReleased(  ){
-        return CNewParticleEffect::IsReleased(  );
-    }
-
 };
 
 struct SimpleParticle_wrapper : SimpleParticle, bp::wrapper< SimpleParticle > {
@@ -104,7 +100,12 @@ BOOST_PYTHON_MODULE(_particles){
         .export_values()
         ;
 
-    bp::class_< CNewParticleEffect_wrapper, boost::noncopyable >( "CNewParticleEffect", bp::no_init )    
+    bp::class_< CParticleCollection, boost::noncopyable >( "CParticleCollection", bp::no_init )    
+        .def( 
+            "IsValid"
+            , (bool ( ::CParticleCollection::* )(  ) const)( &::CParticleCollection::IsValid ) );
+
+    bp::class_< CNewParticleEffect_wrapper, bp::bases< CParticleCollection >, boost::noncopyable >( "CNewParticleEffect", bp::no_init )    
         .def( bp::init< C_BaseEntity *, char const * >(( bp::arg("pOwner"), bp::arg("pEffectName") )) )    
         .def( bp::init< C_BaseEntity *, CParticleSystemDefinition * >(( bp::arg("pOwner"), bp::arg("pEffect") )) )    
         .def( bp::init< C_BaseEntity *, int >(( bp::arg("pOwner"), bp::arg("nPrecacheIndex") )) )    
@@ -194,9 +195,6 @@ BOOST_PYTHON_MODULE(_particles){
         .def( 
             "GetToolParticleEffectId"
             , (int ( ::CNewParticleEffect::* )(  ) const)( &::CNewParticleEffect::GetToolParticleEffectId ) )    
-        .def( 
-            "IsReleased"
-            , (int ( CNewParticleEffect_wrapper::* )(  ) )(&CNewParticleEffect_wrapper::IsReleased) )    
         .def( 
             "MarkShouldPerformCullCheck"
             , (void ( ::CNewParticleEffect::* )( bool ) )( &::CNewParticleEffect::MarkShouldPerformCullCheck )

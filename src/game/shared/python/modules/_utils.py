@@ -28,6 +28,7 @@ class Utils(SemiSharedModuleGenerator):
         '$view.h',
         
         'hl2wars_util_shared.h',
+        'unit_base_shared.h',
         '$c_hl2wars_player.h',
     ]
 
@@ -242,6 +243,7 @@ class Utils(SemiSharedModuleGenerator):
             'CTraceFilterSkipFriendly',
             'CTraceFilterSkipEnemies',
             'CTraceFilterWars',
+            'CWarsBulletsFilter',
         ]
         for clsname in tracefilters:
             self.SetupTraceFilter(mb, clsname)

@@ -69,9 +69,9 @@ enum ASW_Bullet_Attribute_Bits
 	BULLET_ATT_MAX				=	0x00000020,
 };
 
-void ASWDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects = 0 )
+void WarsDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects = 0 )
 {
-	VPROF_BUDGET( "ASWDoParticleTracer", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
+	VPROF_BUDGET( "WarsDoParticleTracerGeneric", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
 
 	// we want to aggregate particles because we are spawning a lot in rapid succession for tracers - this spawns MUCH less systems to spawn them
 	// NOTE: you cannot use beams/ropes in any particle system that is aggregated - they don't work properly :(
@@ -110,8 +110,8 @@ void ASWDoParticleTracer( const char *pTracerEffectName, const Vector &vecStart,
 	}
 }
 
-static int asw_num_u_tracers = 0;
-void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects )
+//static int wars_num_u_tracers = 0;
+void WarsUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector &vecColor, int iAttributeEffects )
 {
 	MDLCACHE_CRITICAL_SECTION();
 	Vector vecStart;
@@ -144,9 +144,9 @@ void ASWUTracer(CBaseCombatCharacter *pUnit, const Vector &vecEnd, const Vector 
 		DoDeferredMuzzleFlash( vecStart );
 #endif // DEFERRED_ENABLED
 
-	asw_num_u_tracers++;
-	//ASWDoParticleTracer( pWpn, vecStart, vecEnd, pWpn->GetMuzzleFlashRed(), iAttributeEffects );
-	ASWDoParticleTracer( "tracer_rifle", vecStart, vecEnd, vecColor, false );
+	//wars_num_u_tracers++;
+	//WarsDoParticleTracerGeneric( pWpn, vecStart, vecEnd, pWpn->GetMuzzleFlashRed(), iAttributeEffects );
+	WarsDoParticleTracer( "tracer_rifle", vecStart, vecEnd, vecColor, false );
 
 	// do a trace to the hit surface for impacts
 	trace_t tr;

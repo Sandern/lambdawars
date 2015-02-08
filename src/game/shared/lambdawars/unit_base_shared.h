@@ -117,6 +117,23 @@ struct UnitRelationship_t
 };
 
 
+//-----------------------------------------------------------------------------
+// Purpose: Weapons ignore other weapons when LOS tracing
+//-----------------------------------------------------------------------------
+class CWarsBulletsFilter : public CTraceFilterSimpleList
+{
+	DECLARE_CLASS( CWarsBulletsFilter, CTraceFilterSimpleList );
+public:
+	CWarsBulletsFilter( CUnitBase *pUnit, int collisionGroup ) : CTraceFilterSimpleList( collisionGroup ), m_pUnit(pUnit)
+	{
+	}
+
+	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask );
+private:
+	CUnitBase *m_pUnit;
+};
+
+
 //=============================================================================
 //
 //	class CUnitBase
