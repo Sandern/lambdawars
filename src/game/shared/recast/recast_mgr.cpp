@@ -86,6 +86,34 @@ void CRecastMgr::Reset()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+static char* s_DefaultMeshNames[] = 
+{
+	"human",
+	"small",
+	"large",
+	"air"
+};
+
+bool CRecastMgr::InitDefaultMeshes()
+{
+	// Ensures default meshes exists, even if they don't have a mesh loaded.
+	for( int i = 0; i < ARRAYSIZE( s_DefaultMeshNames ); i++ )
+	{
+		CRecastMesh *pMesh = GetMesh( s_DefaultMeshNames[i] );
+		if( !pMesh )
+		{
+			pMesh = new CRecastMesh();
+			pMesh->Init( s_DefaultMeshNames[i] );
+			m_Meshes.Insert( pMesh->GetName(), pMesh );
+		}
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CRecastMgr::Update( float dt )
 {
 	VPROF_BUDGET( "CRecastMgr::Update", "RecastNav" );
@@ -128,6 +156,7 @@ int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
+
 		// Only consider fitting meshes
 		if( radius > pMesh->GetAgentRadius() || height > pMesh->GetAgentHeight() )
 		{
@@ -229,8 +258,6 @@ void CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 	Vector convexHull[4];
 
 	//Msg("Add obstacle %f %f %f\n", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z);
-
-	
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
 

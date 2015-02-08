@@ -199,6 +199,7 @@ bool CRecastMgr::Load()
 		navIsInBsp = true;
 		if ( !filesystem->ReadFile( filename, "BSP", fileBuffer ) )	// ... and this looks for one if it's the only one around.
 		{
+			InitDefaultMeshes();
 			return false;
 		}
 	}

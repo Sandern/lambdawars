@@ -47,6 +47,7 @@ public:
 	virtual void Update( float dt );
 
 	// Load methods
+	virtual bool InitDefaultMeshes();
 	virtual bool Load();
 	virtual void Reset();
 	

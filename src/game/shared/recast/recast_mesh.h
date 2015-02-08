@@ -58,14 +58,14 @@ public:
 
 	const char *GetName();
 	void Init( const char *name );
+	bool IsLoaded();
 
 	virtual void Update( float dt );
 
 	// Load/build 
-	//virtual void LoadTestData();
-
 	static bool ComputeMeshSettings( const char *pMeshName, 
-		float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope );
+		float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope,
+		float &fCellSize, float &fCellHeight );
 
 	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
 	virtual bool Reset();
@@ -164,6 +164,11 @@ private:
 inline const char *CRecastMesh::GetName()
 {
 	return m_Name.Get();
+}
+
+inline bool CRecastMesh::IsLoaded()
+{
+	return m_tileCache != NULL;
 }
 
 #endif // RECAST_MESH_H

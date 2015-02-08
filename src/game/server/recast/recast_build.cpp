@@ -533,23 +533,15 @@ bool CRecastMgr::Build()
 		return false;
 	}
 
+	// Insert all meshes first
+	InitDefaultMeshes();
+	CUtlVector<CRecastMesh *> meshesToBuild;
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+		meshesToBuild.AddToTail( m_Meshes[i] );
+
 	// Create meshes
 	if( recast_build_threaded.GetBool() )
 	{
-		// Insert all meshes first
-		CUtlVector<CRecastMesh *> meshesToBuild;
-		for( int i = 0; i < ARRAYSIZE( s_MeshNames ); i++ )
-		{
-			CRecastMesh *pMesh = GetMesh( s_MeshNames[i] );
-			if( !pMesh )
-			{
-				pMesh = new CRecastMesh();
-				pMesh->Init( s_MeshNames[i] );
-				m_Meshes.Insert( pMesh->GetName(), pMesh );
-			}
-			meshesToBuild.AddToTail( pMesh );
-		}
-
 		// Build threaded
 		CParallelProcessor<CRecastMesh *, CFuncJobItemProcessor<CRecastMesh *>, 2 > processor;
 		processor.m_ItemProcessor.Init( &ThreadedBuildMesh, &PreThreadedBuildMesh, &PostThreadedBuildMesh );
@@ -563,9 +555,9 @@ bool CRecastMgr::Build()
 		}
 		else
 		{
-			for( int i = 0; i < ARRAYSIZE( s_MeshNames ); i++ )
+			for( int i = 0; i < meshesToBuild.Count(); i++ )
 			{
-				BuildMesh( m_pMapMesh, s_MeshNames[i] );
+				BuildMesh( m_pMapMesh, meshesToBuild[i]->GetName() );
 			}
 		}
 	}

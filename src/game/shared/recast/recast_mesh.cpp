@@ -39,8 +39,6 @@
 ConVar recast_edit( "recast_edit", "1", FCVAR_GAMEDLL | FCVAR_CHEAT, "Set to one to interactively edit the Recast Navigation Mesh. Set to zero to leave edit mode." );
 
 // Defaults
-static ConVar recast_cellsize("recast_cellsize", "10.0", FCVAR_REPLICATED);
-static ConVar recast_cellheight("recast_cellheight", "10.0", FCVAR_REPLICATED);
 static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
@@ -68,8 +66,6 @@ CRecastMesh::CRecastMesh() :
 {
 	m_Name.Set("default");
 
-	m_cellSize = recast_cellsize.GetFloat();
-	m_cellHeight = recast_cellheight.GetFloat();
 	m_regionMinSize = 8;
 	m_regionMergeSize = 20;
 	m_edgeMaxLen = 12000.0f;
@@ -120,7 +116,8 @@ CRecastMesh::~CRecastMesh()
 // Purpose: 
 //-----------------------------------------------------------------------------
 bool CRecastMesh::ComputeMeshSettings( const char *name, 
-	float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope )
+	float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope,
+	float &fCellSize, float &fCellHeight )
 {
 	// Per type
 	fAgentMaxSlope = recast_maxslope.GetFloat(); // Default slope for units
@@ -130,6 +127,8 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fAgentHeight = 72.0f;
 		fAgentRadius = 18.5f;
 		fAgentMaxClimb = 18.0f;
+		fCellSize = round( fAgentRadius / 3.0f );
+		fCellHeight = round( fCellSize / 2.0f );
 
 	}
 	else if( V_strncmp( name, "small", V_strlen( name ) )== 0 )
@@ -138,6 +137,8 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fAgentHeight = 24.0f;
 		fAgentRadius = 18.0f;
 		fAgentMaxClimb = 18.0f;
+		fCellSize = round( fAgentRadius / 3.0f );
+		fCellHeight = round( fCellSize / 2.0f );
 	}
 	else if( V_strncmp( name, "large", V_strlen( name ) )== 0 )
 	{
@@ -145,6 +146,8 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fAgentHeight = 100.0f;
 		fAgentRadius = 58.0f; 
 		fAgentMaxClimb = 18.0f;
+		fCellSize = 10.0f;
+		fCellHeight = round( fCellSize / 2.0f );
 	}
 	else if( V_strncmp( name, "air", V_strlen( name ) )== 0 )
 	{
@@ -153,6 +156,8 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fAgentRadius = 42.0f; 
 		fAgentMaxClimb = 450.0f;
 		fAgentMaxSlope = 90.0f;
+		fCellSize = 10.0f;
+		fCellHeight = round( fCellSize / 2.0f );
 	}
 	else
 	{
@@ -161,6 +166,8 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fAgentHeight = 72.0f; // => Soldier/human
 		fAgentRadius = 18.5f; // => Soldier/human
 		fAgentMaxClimb = 18.0f;
+		fCellSize = 10.0f;
+		fCellHeight = round( fCellSize / 2.0f );
 
 		return false;
 	}
@@ -181,7 +188,8 @@ void CRecastMesh::Init( const char *name )
 	m_tmproc = new MeshProcess( name );
 
 	// Shared settings by all
-	ComputeMeshSettings( name, m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope );
+	ComputeMeshSettings( name, m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope,
+		m_cellSize, m_cellHeight );
 }
 
 //-----------------------------------------------------------------------------
@@ -189,6 +197,8 @@ void CRecastMesh::Init( const char *name )
 //-----------------------------------------------------------------------------
 void CRecastMesh::Update( float dt )
 {
+	if( !IsLoaded() )
+		return;
 	m_tileCache->update( dt, m_navMesh );
 }
 
@@ -343,6 +353,9 @@ void CRecastMesh::DebugRender()
 //-----------------------------------------------------------------------------
 int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
 {
+	if( !IsLoaded() )
+		return -1;
+
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
@@ -372,6 +385,9 @@ int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
 //-----------------------------------------------------------------------------
 Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit )
 {
+	if( !IsLoaded() )
+		return vec3_origin;
+
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
@@ -417,6 +433,9 @@ static float frand()
 //-----------------------------------------------------------------------------
 Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius )
 {
+	if( !IsLoaded() )
+		return vec3_origin;
+
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
@@ -457,6 +476,9 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius 
 UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPath", "RecastNav" );
+
+	if( !IsLoaded() )
+		return NULL;
 
 	UnitBaseWaypoint *pResultPath = NULL;
 
@@ -539,6 +561,9 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPathDistance", "RecastNav" );
 
+	if( !IsLoaded() )
+		return -1;
+
 	dtStatus status;
 
 	dtQueryFilter m_filter;
@@ -616,6 +641,9 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd )
 
 bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 {
+	if( !IsLoaded() )
+		return false;
+
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
@@ -655,15 +683,24 @@ bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 
 dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
 {
+	if( !IsLoaded() )
+		return 0;
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
 	Msg("Adding temp obstacle to %f %f %f with radius %f and height %f\n", pos[0], pos[1], pos[2], radius, height);
 	dtObstacleRef result;
-	m_tileCache->addObstacle( pos, radius, height, &result );
+	dtStatus status = m_tileCache->addObstacle( pos, radius, height, &result );
+	if( !dtStatusSucceed( status ) )
+	{
+		return 0;
+	}
 	return result;
 }
 
 dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height )
 {
+	if( !IsLoaded() )
+		return 0;
+
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
 
 	float *verts = (float *)stackalloc( numConvexHull * 3 * sizeof( float ) );
@@ -676,12 +713,23 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *co
 
 	Msg("Adding temp obstacle to %f %f %f with height %f and %d verts\n", pos[0], pos[1], pos[2], height, numConvexHull);
 	dtObstacleRef result;
-	m_tileCache->addObstacle( pos, verts, numConvexHull, height, &result );
+	dtStatus status = m_tileCache->addObstacle( pos, verts, numConvexHull, height, &result );
+	if( !dtStatusSucceed( status ) )
+	{
+		return 0;
+	}
 	return result;
 }
 
 bool CRecastMesh::RemoveObstacle( const dtObstacleRef ref )
 {
-	m_tileCache->removeObstacle( ref );
+	if( !IsLoaded() )
+		return false;
+
+	dtStatus status = m_tileCache->removeObstacle( ref );
+	if( !dtStatusSucceed( status ) )
+	{
+		return false;
+	}
 	return true;
 }

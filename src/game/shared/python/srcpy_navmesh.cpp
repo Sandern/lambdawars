@@ -911,6 +911,8 @@ public:
 		m_fRadius = fRadius;
 
 		m_pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+		if( m_pMesh && !m_pMesh->IsLoaded() )
+			m_pMesh = NULL;
 
 #if 0
 		if( vPos.IsValid() )
