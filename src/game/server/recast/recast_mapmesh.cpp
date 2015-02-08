@@ -371,6 +371,15 @@ bool CMapMesh::GenerateDynamicPropData( CUtlVector<float> &verts, CUtlVector<int
 			if( pEntity->IsSolidFlagSet(FSOLID_NOT_SOLID) )
 				continue;
 
+			//DevMsg("Checking prop dynamic: %s, parent: %s\n", STRING( pEntity->GetEntityName() ), STRING( pEntity->m_iParent ) );
+
+			// Consider named or parented dynamic props to be really dynamic. They should either
+			// be an obstacle on the mesh, or have a nav_blocker entity around them.
+			if( pEntity->GetEntityName() != NULL_STRING || pEntity->m_iParent != NULL_STRING || pEntity->GetMoveParent() != NULL )
+				continue;
+
+			//DevMsg("\tAdding dynamic prop to map mesh\n");
+
 			if( pEntity->GetSolid() == SOLID_VPHYSICS )
 			{
 				matrix3x4_t transform; // model to world transformation
@@ -474,7 +483,7 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 		int contents = CalcBrushContents( fileContent, pModel->headnode );
 
 		// Only parse the first brush (world) and clips
-		if( i != 0 && (contents & (CONTENTS_MONSTERCLIP)) == 0 )
+		if( i != 0 /*&& (contents & (CONTENTS_MONSTERCLIP)) == 0*/ )
 		{
 			continue;
 		}
@@ -482,7 +491,7 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 		matrix3x4_t transform; // model to world transformation
 		AngleMatrix( vec3_angle, pModel->origin, transform);
 
-		//Msg( "Brush %d: solid count %d, contents: %d\n", i, parsedphysmodels[i].solidCount, contents );
+		DevMsg( "Brush %d: solid count %d, contents: %d\n", i, parsedphysmodels[i].solidCount, contents );
 		for( int j = 0; j < parsedphysmodels[i].solidCount; j++ )
 		{
 			AddCollisionModelToMesh( transform, parsedphysmodels[i].solids[j], verts, triangles, CONTENTS_WATER );

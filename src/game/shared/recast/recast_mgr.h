@@ -77,9 +77,9 @@ public:
 #endif // CLIENT_DLL
 
 	// Obstacle management
-	virtual void AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height );
-	virtual void AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height );
-	virtual void RemoveEntObstacles( CBaseEntity *pEntity );
+	virtual bool AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height );
+	virtual bool AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height );
+	virtual bool RemoveEntObstacles( CBaseEntity *pEntity );
 
 	// Debug
 #ifdef CLIENT_DLL

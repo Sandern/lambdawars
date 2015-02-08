@@ -77,11 +77,11 @@ BOOST_PYTHON_MODULE(_recast){
     bp::class_< CRecastMgr, boost::noncopyable >( "CRecastMgr", bp::no_init )    
         .def( 
             "AddEntBoxObstacle"
-            , (void ( ::CRecastMgr::* )( ::C_BaseEntity *,::Vector const &,::Vector const &,float ) )( &::CRecastMgr::AddEntBoxObstacle )
+            , (bool ( ::CRecastMgr::* )( ::C_BaseEntity *,::Vector const &,::Vector const &,float ) )( &::CRecastMgr::AddEntBoxObstacle )
             , ( bp::arg("pEntity"), bp::arg("mins"), bp::arg("maxs"), bp::arg("height") ) )    
         .def( 
             "AddEntRadiusObstacle"
-            , (void ( ::CRecastMgr::* )( ::C_BaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
+            , (bool ( ::CRecastMgr::* )( ::C_BaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
         .def( 
             "GetMesh"
@@ -95,7 +95,7 @@ BOOST_PYTHON_MODULE(_recast){
             , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "RemoveEntObstacles"
-            , (void ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
+            , (bool ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
             , ( bp::arg("pEntity") ) );
 
     { //::RecastMgr
@@ -185,11 +185,11 @@ BOOST_PYTHON_MODULE(_recast){
     bp::class_< CRecastMgr, boost::noncopyable >( "CRecastMgr", bp::no_init )    
         .def( 
             "AddEntBoxObstacle"
-            , (void ( ::CRecastMgr::* )( ::CBaseEntity *,::Vector const &,::Vector const &,float ) )( &::CRecastMgr::AddEntBoxObstacle )
+            , (bool ( ::CRecastMgr::* )( ::CBaseEntity *,::Vector const &,::Vector const &,float ) )( &::CRecastMgr::AddEntBoxObstacle )
             , ( bp::arg("pEntity"), bp::arg("mins"), bp::arg("maxs"), bp::arg("height") ) )    
         .def( 
             "AddEntRadiusObstacle"
-            , (void ( ::CRecastMgr::* )( ::CBaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
+            , (bool ( ::CRecastMgr::* )( ::CBaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
         .def( 
             "GetMesh"
@@ -203,7 +203,7 @@ BOOST_PYTHON_MODULE(_recast){
             , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "RemoveEntObstacles"
-            , (void ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
+            , (bool ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
             , ( bp::arg("pEntity") ) );
 
     { //::RecastMgr

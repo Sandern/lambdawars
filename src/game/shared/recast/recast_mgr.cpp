@@ -227,13 +227,14 @@ IMapMesh* CRecastMgr::GetMapMesh()
 //-----------------------------------------------------------------------------
 // Purpose: Adds an obstacle with radius and height for entity
 //-----------------------------------------------------------------------------
-void CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height )
+bool CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height )
 {
 	if( !pEntity )
-		return;
+		return false;
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
 
+	bool bSuccess = true;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
@@ -241,16 +242,19 @@ void CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
 		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), radius, height );
+		if( obstacle.obs.Tail().ref == 0 )
+			bSuccess = false;
 	}
+	return bSuccess;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Adds an obstacle based on bounds and height for entity
 //-----------------------------------------------------------------------------
-void CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height )
+bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height )
 {
 	if( !pEntity )
-		return;
+		return false;
 
 	matrix3x4_t transform; // model to world transformation
 	AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform );
@@ -261,6 +265,7 @@ void CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
 
+	bool bSuccess = true;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
@@ -275,17 +280,22 @@ void CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
 		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), convexHull, 4, height );
+
+		if( obstacle.obs.Tail().ref == 0 )
+			bSuccess = false;
 	}
+	return bSuccess;
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Removes any obstacle associated with the entity
 //-----------------------------------------------------------------------------
-void CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
+bool CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 {
 	if( !pEntity )
-		return;
+		return false;
 
+	bool bSuccess = true;
 	int idx = m_Obstacles.Find( pEntity->entindex() );
 	if( m_Obstacles.IsValidIndex( idx ) )
 	{
@@ -294,12 +304,14 @@ void CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 			if( m_Meshes.IsValidIndex( m_Obstacles[idx].obs[i].meshIndex ) )
 			{
 				CRecastMesh *pMesh = m_Meshes[ m_Obstacles[idx].obs[i].meshIndex ];
-				pMesh->RemoveObstacle( m_Obstacles[idx].obs[i].ref );
+				if( !pMesh->RemoveObstacle( m_Obstacles[idx].obs[i].ref ) )
+					bSuccess = false;
 			}
 		}
 
 		m_Obstacles.RemoveAt( idx );
 	}
+	return true;
 }
 
 //-----------------------------------------------------------------------------
