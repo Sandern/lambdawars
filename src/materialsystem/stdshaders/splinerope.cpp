@@ -3,9 +3,8 @@
 #include "BaseVSShader.h"
 #include "convar.h"
 
-#include "splinerope_ps20.inc"
-#include "splinerope_ps20b.inc"
-#include "splinerope_vs20.inc"
+#include "splinerope_ps30.inc"
+#include "splinerope_vs30.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -89,23 +88,13 @@ BEGIN_VS_SHADER( SplineRope, "Help for SplineRope" )
 			int numTexCoords = 4;
 			pShaderShadow->VertexShaderVertexFormat( flags, numTexCoords, s_TexCoordSize, 0 );
 
-			DECLARE_STATIC_VERTEX_SHADER( splinerope_vs20 );
-			SET_STATIC_VERTEX_SHADER( splinerope_vs20 );
+			DECLARE_STATIC_VERTEX_SHADER( splinerope_vs30 );
+			SET_STATIC_VERTEX_SHADER( splinerope_vs30 );
 
-			if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_STATIC_PIXEL_SHADER( splinerope_ps20b );
-				SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
-				SET_STATIC_PIXEL_SHADER_COMBO( SHADOWDEPTH, bShadowDepth );
-				SET_STATIC_PIXEL_SHADER( splinerope_ps20b );
-			}
-			else
-			{
-				DECLARE_STATIC_PIXEL_SHADER( splinerope_ps20 );
-				SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
-				SET_STATIC_PIXEL_SHADER_COMBO( SHADOWDEPTH, bShadowDepth );
-				SET_STATIC_PIXEL_SHADER( splinerope_ps20 );
-			}
+			DECLARE_STATIC_PIXEL_SHADER( splinerope_ps30 );
+			SET_STATIC_PIXEL_SHADER_COMBO( SHADER_SRGB_READ, bShaderSrgbRead );
+			SET_STATIC_PIXEL_SHADER_COMBO( SHADOWDEPTH, bShadowDepth );
+			SET_STATIC_PIXEL_SHADER( splinerope_ps30 );
 		}
 		DYNAMIC_STATE
 		{
@@ -141,21 +130,12 @@ BEGIN_VS_SHADER( SplineRope, "Help for SplineRope" )
 				pShaderAPI->SetPixelShaderConstant( 1, vEyePos, 1 );
 			}
 
-			DECLARE_DYNAMIC_VERTEX_SHADER( splinerope_vs20 );
-			SET_DYNAMIC_VERTEX_SHADER( splinerope_vs20 );
+			DECLARE_DYNAMIC_VERTEX_SHADER( splinerope_vs30 );
+			SET_DYNAMIC_VERTEX_SHADER( splinerope_vs30 );
 
-			if ( g_pHardwareConfig->SupportsPixelShaders_2_b() )
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( splinerope_ps20b );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, pShaderAPI->ShouldWriteDepthToDestAlpha() );
-				SET_DYNAMIC_PIXEL_SHADER( splinerope_ps20b );
-			}
-			else
-			{
-				DECLARE_DYNAMIC_PIXEL_SHADER( splinerope_ps20 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, pShaderAPI->ShouldWriteDepthToDestAlpha() );
-				SET_DYNAMIC_PIXEL_SHADER( splinerope_ps20 );
-			}
+			DECLARE_DYNAMIC_PIXEL_SHADER( splinerope_ps30 );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( WRITE_DEPTH_TO_DESTALPHA, pShaderAPI->ShouldWriteDepthToDestAlpha() );
+			SET_DYNAMIC_PIXEL_SHADER( splinerope_ps30 );
 		}
 		Draw( );
 	}

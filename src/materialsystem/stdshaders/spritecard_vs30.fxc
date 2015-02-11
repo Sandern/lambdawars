@@ -8,9 +8,7 @@
 // STATIC: "PACKED_INTERPOLATOR"			"0..1"
 // STATIC: "SPRITECARDVERTEXFOG"            "0..1"
 
-// STATIC: "HARDWAREFOGBLEND"				"0..0"	[XBOX]
-// STATIC: "HARDWAREFOGBLEND"				"0..1"	[PC] [vs20]
-// STATIC: "HARDWAREFOGBLEND"				"0..0"	[PC] [vs30]
+// STATIC: "HARDWAREFOGBLEND"				"0..0"
 
 // STATIC: "PERPARTICLEOUTLINE"             "0..1"
 // DYNAMIC: "ORIENTATION"					"0..3"
@@ -405,27 +403,26 @@ VS_OUTPUT main( CONST_PC VS_INPUT v
 	o.blendfactor0.z = v.vParms1.x;
 #endif
 
-	#if ( EXTRACTGREENALPHA )
+#if EXTRACTGREENALPHA
+	o.blendfactor1 = float4( 0.0f, 0.0f, 0.0f, 0.0f );
+													// Input range	  Output range
+													
+	if ( v.vParms.x > 0.75f )											// 0.75 .. 1.0	
 	{
-		o.blendfactor1 = float4( 0.0f, 0.0f, 0.0f, 0.0f );
-														// Input range	  Output range
-		if ( v.vParms.x < 0.25f )						// 0.0 .. 0.25
-		{
-			o.blendfactor0.a = v.vParms.x * 2 + 0.5f;					// 0.5 .. 1.0
-			o.blendfactor0.g = 1 - o.blendfactor0.a;					// 0.5 .. 0.0
-		}
-		else if ( v.vParms.x < 0.75f )					// 0.25 .. 0.75
-		{
-			o.blendfactor1.g = v.vParms.x * 2 - 0.5f;					// 0.0 .. 1.0
-			o.blendfactor0.a = 1 - o.blendfactor1.g;					// 1.0 .. 0.0
-		}
-		else											// 0.75 .. 1.0	
-		{
-			o.blendfactor1.a = v.vParms.x * 2 - 1.5f;					// 0.0 .. 0.5
-			o.blendfactor1.g = 1 - o.blendfactor1.a;					// 1.0 .. 0.5
-		}
+		o.blendfactor1.a = v.vParms.x * 2.0f - 1.5f;					// 0.0 .. 0.5
+		o.blendfactor1.g = 1.0f - o.blendfactor1.a;					// 1.0 .. 0.5
 	}
-	#endif
+	else if ( v.vParms.x > 0.25f )					// 0.25 .. 0.75
+	{
+		o.blendfactor1.g = v.vParms.x * 2.0f - 0.5f;					// 0.0 .. 1.0
+		o.blendfactor0.a = 1.0f - o.blendfactor1.g;					// 1.0 .. 0.0
+	}
+	else 															// 0.0 .. 0.25
+	{
+		o.blendfactor0.a = v.vParms.x * 2.0f + 0.5f;					// 0.5 .. 1.0
+		o.blendfactor0.g = 1.0f - o.blendfactor0.a;					// 0.5 .. 0.0
+	}
+#endif
 
 	// Map projected position to the refraction texture
 	float2 vScreenPos;
