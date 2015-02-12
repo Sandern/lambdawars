@@ -556,7 +556,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 			return NULL;
 		}
 
-		pResultPath = new UnitBaseWaypoint( vEnd );
+		pResultPath = new UnitBaseWaypoint( Vector(epos2[0], epos2[2], epos2[1]) );
 		for (int i = m_nstraightPath - 1; i >= 0; i--)
 		{
 			Vector pos( m_straightPath[i*3], m_straightPath[i*3+2], m_straightPath[i*3+1] );
