@@ -223,7 +223,7 @@ void UnitBaseNavigator::Reset()
 
 	m_fLastPathRecomputation = 0.0f;
 	//m_fNextReactivePathUpdate = 0.0f;
-	m_iLastTargetArea = 0;
+	m_iLastGoalRef = 0;
 	ResetBlockedStatus();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
@@ -1262,29 +1262,31 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		//const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition(); // Eye position may be too high for some targets
 		const Vector &vTargetOrigin = GetPath()->m_hTarget->WorldSpaceCenter();
 
-		if( (gpGlobals->curtime - m_fLastPathRecomputation) > 8.0f )
+		CRecastMesh *pMesh = GetNavMesh();
+		if( pMesh )
 		{
-#if 0 // TODO:
-			CNavArea *pTargetArea = TheNavMesh->GetNearestNavArea( vTargetOrigin, true, 256.0f, false, false );
-			CNavArea *pGoalArea = TheNavMesh->GetNavAreaByID( m_iLastTargetArea );
-			if( !pGoalArea )
-				pGoalArea = TheNavMesh->GetNearestNavArea( GetPath()->m_vGoalPos, true, 256.0f, false, false );
+			int targetRef = pMesh->GetPolyRef( vTargetOrigin, 256.0f );
+			int goalRef = m_iLastGoalRef;
+			if( pMesh->IsValidPolyRef( m_iLastGoalRef ) )
+				goalRef = pMesh->GetPolyRef( GetPath()->m_vGoalPos, 256.0f );
 
-			if( pTargetArea && pGoalArea && pTargetArea != pGoalArea )
+			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime && targetRef != -1 && goalRef != -1 && targetRef != goalRef )
 			{
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
-						GetOuter()->entindex(), pGoalArea->GetID(), pTargetArea->GetID() );
+						GetOuter()->entindex(), goalRef, targetRef );
 
 				// Update goal target position and recompute
-				GetPath()->m_vGoalPos =vTargetOrigin;
+				GetPath()->m_vGoalPos = vTargetOrigin;
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 					DoFindPathToPosInRange();
 				else
 					DoFindPathToPos();
 
 				// Store area id of the goal for the next time we check
-				m_iLastTargetArea = pGoalArea->GetID();
+				m_iLastGoalRef = goalRef;
+
+				m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(1.0f, 3.0f);
 			}
 			else
 			{
@@ -1292,7 +1294,6 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				GetPath()->m_vGoalPos = vTargetOrigin;
 				GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 			}
-#endif // 0
 		}
 		else
 		{

@@ -383,6 +383,21 @@ int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CRecastMesh::IsValidPolyRef( int polyRef )
+{
+	if( !IsLoaded() )
+		return false;
+
+	dtQueryFilter m_filter;
+	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_filter.setExcludeFlags(0);
+
+	return m_navQuery->isValidPolyRef( polyRef, &m_filter );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit )
 {
 	if( !IsLoaded() )

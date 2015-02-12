@@ -541,7 +541,7 @@ private:
 	float m_fNextAllowPathRecomputeTime;
 	bool m_bNoNavAreasNearby;
 	float m_fIgnoreNavMeshTime;
-	int m_iLastTargetArea; // Used for determing if the path needs to be recomputed to the target entity
+	int m_iLastGoalRef; // Used for determing if the path needs to be recomputed to the target entity
 
 	CHandle<CUnitBase> m_hAtGoalDependencyEnt;
 
