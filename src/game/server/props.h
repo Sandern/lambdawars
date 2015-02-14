@@ -35,15 +35,24 @@ public:
 	void Spawn( void );
 	void Precache( void );
 	void Activate( void );
+	virtual void UpdateOnRemove();
 	bool KeyValue( const char *szKeyName, const char *szValue );
 	void CalculateBlockLOS( void );
 	int  ParsePropData( void );
-	
+
+	// Updates the prop as obstacle on navigation mesh
+	void UpdateNavObstacle( bool bForce = false );
+
 	void DrawDebugGeometryOverlays( void );
 
 	// Don't treat as a live target
 	virtual bool IsAlive( void ) { return false; }
 	virtual bool OverridePropdata() { return true; }
+
+protected:
+	Vector m_vNavObstaclePos;
+	bool m_bCanBecomeObstacle;
+	float m_fNextCanUpdateObstacle;
 };
 
 
@@ -369,6 +378,7 @@ public:
 
 	void Spawn( void );
 	void Precache();
+	void Activate();
 	bool CreateVPhysics( void );
 	bool OverridePropdata( void );
 

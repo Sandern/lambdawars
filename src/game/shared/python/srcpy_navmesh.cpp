@@ -45,6 +45,7 @@ bool NavMeshTestHasArea( Vector &pos, float beneathLimt )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
+// TODO: Remove unused parameters
 //-----------------------------------------------------------------------------
 float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance, CBaseEntity *pUnit )
 {
@@ -185,6 +186,7 @@ Vector RandomNavAreaPosition( float minimumarea, int maxtries )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
+// TODO: Remove "tries" and add optional "unit" parameter for mesh selection
 //-----------------------------------------------------------------------------
 Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, float minimumarea, int maxtries )
 {
@@ -213,46 +215,6 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, floa
 		DevMsg("RandomNavAreaPosition: No position found within Mins: %f %f %f, Maxs: %f %f %f\n", 
 				mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z);
 	return vec3_origin;
-#if 0
-	Vector random;
-	CNavArea *pArea = NULL;
-	Extent extent;
-
-	for( int i = 0; i < maxtries; i++ )
-	{
-		random.Init( 
-			mins.x + ((float)rand() / RAND_MAX) * (maxs.x - mins.x),
-			mins.y + ((float)rand() / RAND_MAX) * (maxs.y - mins.y),
-			maxs.z
-		);
-		pArea = TheNavMesh->GetNearestNavArea( random, false, 10000.0f, false, false );
-		if( pArea )
-		{
-			pArea->GetExtent( &extent );
-			if( extent.Area() >= minimumarea )
-				break;
-		}
-
-		// Reset
-		pArea = NULL;
-	}
-
-
-	if( !pArea )
-	{
-		if( g_pynavmesh_debug.GetBool() )
-			DevMsg("RandomNavAreaPosition: No area found within Mins: %f %f %f, Maxs: %f %f %f, Random: %f %f %f\n", 
-					mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, random.x, random.y, random.z);
-		return vec3_origin;
-	}
-	Vector vRandomPoint = pArea->GetRandomPoint();
-	vRandomPoint.z += 32.0f;
-
-	if( g_pynavmesh_debug.GetBool() )
-		DevMsg("RandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
-
-	return vRandomPoint;
-#endif // 0
 }
 
 #if 0
@@ -266,14 +228,6 @@ int GetActiveNavMesh()
 		return -1;
 
 	return pArea->GetID();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-Vector GetEditingCursor()
-{
-	return TheNavMesh->GetEditCursorPosition();
 }
 #endif // 0
 
@@ -919,7 +873,7 @@ class CoverSpotCollector
 {
 public:
 	CoverSpotCollector( CUtlVector< CoverSpotResult_t > &coverSpots, const Vector &vPos, float fRadius, CUnitBase *pUnit, const Vector *pSortPos ) : 
-			m_CoverSpots( coverSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pOrderArea(NULL), m_pSortPos( pSortPos )
+			m_CoverSpots( coverSpots ), m_vPos( vPos ), m_pUnit(pUnit), m_pSortPos( pSortPos )
 	{
 		m_fRadius = fRadius;
 
@@ -1022,7 +976,6 @@ public:
 private:
 	CUnitBase *m_pUnit;
 	CRecastMesh *m_pMesh;
-	CNavArea *m_pOrderArea;
 	float m_fRadius;
 	const Vector &m_vPos;
 	const Vector *m_pSortPos;

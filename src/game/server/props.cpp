@@ -44,7 +44,7 @@
 #include "vehicle_base.h"
 #include "tier0/icommandline.h"
 #include "pushentity.h"
-
+#include "recast/recast_mgr.h"
 
 
 #include "vstdlib/ikeyvaluessystem.h"
@@ -283,6 +283,16 @@ void CBaseProp::Activate( void )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseProp::UpdateOnRemove()
+{
+	BaseClass::UpdateOnRemove();
+
+	RecastMgr().RemoveEntObstacles( this );
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Handles keyvalues from the BSP. Called before spawning.
 //-----------------------------------------------------------------------------
 bool CBaseProp::KeyValue( const char *szKeyName, const char *szValue )
@@ -361,6 +371,48 @@ int CBaseProp::ParsePropData( void )
 	int iResult = g_PropDataSystem.ParsePropFromKV( this, dynamic_cast<IBreakableWithPropData *>(this), pkvPropData, modelKeyValues );
 	modelKeyValues->deleteThis();
 	return iResult;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CBaseProp::UpdateNavObstacle( bool bForce )
+{
+	if( !m_bCanBecomeObstacle || !IsSolid() || HasSpawnFlags( SF_PHYSPROP_DEBRIS ) )
+		return;
+
+	if( !RecastMgr().HasMeshes() )
+		return;
+
+	IPhysicsObject *pPhysObject = VPhysicsGetObject();
+	if( !pPhysObject )
+		return;
+
+	if( m_fNextCanUpdateObstacle > gpGlobals->curtime )
+		return;
+
+	if( !bForce && m_vNavObstaclePos != vec3_origin && m_vNavObstaclePos.DistToSqr( GetAbsOrigin() ) < 32.0f*32.0f )
+		return;
+
+	RecastMgr().RemoveEntObstacles( this );
+
+	const CPhysCollide *pCollide = pPhysObject->GetCollide();
+	Vector mins, maxs;
+	physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
+
+	//NDebugOverlay::BoxAngles( GetAbsOrigin(), mins, maxs, GetAbsAngles(), 255, 0, 255, 200, 60.0f );
+		
+	/*Msg("Adding obstacle: %f %f %f, %f %f %f (height: %f)\n", 
+		mins.x, mins.y, mins.z, 
+		maxs.x, maxs.y, maxs.z,
+		maxs.z - mins.z );*/
+	if( !RecastMgr().AddEntBoxObstacle( this, mins, maxs, maxs.z - mins.z ) )
+	{
+		Warning("UpdateNavObstacle: could not add prop obstacle to nav mesh\n");
+	}
+
+	m_vNavObstaclePos = GetAbsOrigin();
+	m_fNextCanUpdateObstacle = gpGlobals->curtime + 1.5f;
 }
 
 //-----------------------------------------------------------------------------
@@ -2813,8 +2865,8 @@ void CPhysicsProp::Spawn( )
 	}
 #endif // USE_NAV_MESH
 
-	if( !HasSpawnFlags( SF_PHYSPROP_DEBRIS ) )
-		DensityMap()->SetType( DENSITY_GAUSSIAN );
+	//if( !HasSpawnFlags( SF_PHYSPROP_DEBRIS ) )
+	//	DensityMap()->SetType( DENSITY_GAUSSIAN );
 
 	QAngle qPreffered;
 	if( GetPropDataAngles( "preferred_carryangles", qPreffered ) )
@@ -2839,6 +2891,16 @@ void CPhysicsProp::Precache( void )
 	}
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CPhysicsProp::Activate()
+{
+	BaseClass::Activate();
+
+	m_bCanBecomeObstacle = true;
+	UpdateNavObstacle();
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -3250,7 +3312,7 @@ void CPhysicsProp::VPhysicsUpdate( IPhysicsObject *pPhysics )
 		}
 	}
 
-
+	UpdateNavObstacle();
 }
 
 #ifdef USE_NAV_MESH

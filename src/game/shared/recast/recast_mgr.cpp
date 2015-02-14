@@ -14,6 +14,7 @@
 #ifndef CLIENT_DLL
 #include "recast/recast_mapmesh.h"
 #include "hl2wars_player.h"
+#include "props.h"
 #else
 #include "c_hl2wars_player.h"
 #endif // CLIENT_DLL
@@ -67,6 +68,8 @@ void CRecastMgr::Init()
 //-----------------------------------------------------------------------------
 void CRecastMgr::Reset()
 {
+	m_bLoaded = false;
+
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
@@ -253,6 +256,7 @@ bool CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 
 //-----------------------------------------------------------------------------
 // Purpose: Adds an obstacle based on bounds and height for entity
+// TODO: 
 //-----------------------------------------------------------------------------
 bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height )
 {
@@ -260,11 +264,10 @@ bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 		return false;
 
 	matrix3x4_t transform; // model to world transformation
-	AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform );
+	AngleMatrix( QAngle(0, pEntity->GetAbsAngles()[YAW], 0), pEntity->GetAbsOrigin(), transform );
+	//AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform );
 
 	Vector convexHull[4];
-
-	//Msg("Add obstacle %f %f %f\n", pEntity->GetAbsOrigin().x, pEntity->GetAbsOrigin().y, pEntity->GetAbsOrigin().z);
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
 
@@ -282,6 +285,12 @@ bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 		VectorTransform( Vector(mins.x, maxs.y, mins.z) + Vector(-erodeDist, erodeDist, 0), transform, convexHull[1] );
 		VectorTransform( Vector(maxs.x, maxs.y, mins.z) + Vector(erodeDist, erodeDist, 0), transform, convexHull[2] );
 		VectorTransform( Vector(maxs.x, mins.y, mins.z) + Vector(erodeDist, -erodeDist, 0), transform, convexHull[3] );
+
+		/*for( int j = 0; j < 4; j++ )
+		{
+			int next = (j+1) == 4 ? 0 : j + 1;
+			NDebugOverlay::Line( convexHull[j], convexHull[next], 0, 255, 0, true, 10.0f );
+		}*/
 
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
@@ -415,6 +424,20 @@ CON_COMMAND_F( cl_recast_listmeshes, "", FCVAR_CHEAT )
 	}
 }
 
+#ifndef CLIENT_DLL
+CON_COMMAND_F( recast_readd_phys_props, "", FCVAR_CHEAT )
+{
+	for( CBaseEntity *pEntity = gEntList.FirstEnt(); pEntity != NULL; pEntity = gEntList.NextEnt( pEntity ) )
+	{
+		if( FClassnameIs( pEntity, "prop_physics" ) )
+		{
+			CBaseProp *pProp = dynamic_cast< CBaseProp * >( pEntity );
+			if( pProp )
+				pProp->UpdateNavObstacle( true );
+		}
+	}
+}
+#endif // CLIENT_DLL
 
 #ifndef CLIENT_DLL
 CON_COMMAND_F( recast_addobstacle, "", FCVAR_CHEAT )

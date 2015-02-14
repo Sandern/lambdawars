@@ -198,8 +198,17 @@ void CRecastMesh::Init( const char *name )
 void CRecastMesh::Update( float dt )
 {
 	if( !IsLoaded() )
+	{
 		return;
-	m_tileCache->update( dt, m_navMesh );
+	}
+
+	dtStatus status = m_tileCache->update( dt, m_navMesh );
+	if( !dtStatusSucceed( status ) )
+	{
+		Warning("CRecastMesh::Update failed: \n");
+		if( status & DT_OUT_OF_MEMORY )
+			Warning("\tOut of memory\n");
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -706,6 +715,14 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, fl
 	dtStatus status = m_tileCache->addObstacle( pos, radius, height, &result );
 	if( !dtStatusSucceed( status ) )
 	{
+		if( status & DT_BUFFER_TOO_SMALL )
+		{
+			Warning("CRecastMesh::AddTempObstacle: request buffer too small\n");
+		}
+		if( status & DT_OUT_OF_MEMORY )
+		{
+			Warning("CRecastMesh::AddTempObstacle: out of memory\n");
+		}
 		return 0;
 	}
 	return result;
@@ -731,6 +748,14 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *co
 	dtStatus status = m_tileCache->addObstacle( pos, verts, numConvexHull, height, &result );
 	if( !dtStatusSucceed( status ) )
 	{
+		if( status & DT_BUFFER_TOO_SMALL )
+		{
+			Warning("CRecastMesh::AddTempObstacle: request buffer too small\n");
+		}
+		if( status & DT_OUT_OF_MEMORY )
+		{
+			Warning("CRecastMesh::AddTempObstacle: out of memory\n");
+		}
 		return 0;
 	}
 	return result;
@@ -744,6 +769,14 @@ bool CRecastMesh::RemoveObstacle( const dtObstacleRef ref )
 	dtStatus status = m_tileCache->removeObstacle( ref );
 	if( !dtStatusSucceed( status ) )
 	{
+		if( status & DT_BUFFER_TOO_SMALL )
+		{
+			Warning("CRecastMesh::RemoveObstacle: request buffer too small\n");
+		}
+		if( status & DT_OUT_OF_MEMORY )
+		{
+			Warning("CRecastMesh::RemoveObstacle: out of memory\n");
+		}
 		return false;
 	}
 	return true;

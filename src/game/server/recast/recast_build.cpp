@@ -351,7 +351,7 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 	tcparams.walkableClimb = m_agentMaxClimb;
 	tcparams.maxSimplificationError = m_edgeMaxError;
 	tcparams.maxTiles = tw*th*EXPECTED_LAYERS_PER_TILE;
-	tcparams.maxObstacles = 128;
+	tcparams.maxObstacles = 2048;
 
 	dtFreeTileCache(m_tileCache);
 

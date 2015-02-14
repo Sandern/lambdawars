@@ -29,6 +29,7 @@
 #include "ai_debug_shared.h"
 #include "collisionutils.h"
 #include "unit_baseanimstate.h"
+#include "recast/recast_mgr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -217,6 +218,8 @@ void CUnitBase::UpdateOnRemove( void )
 	}
 
 	BaseClass::UpdateOnRemove();
+
+	RecastMgr().RemoveEntObstacles( this );
 }
 
 //-----------------------------------------------------------------------------
