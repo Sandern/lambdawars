@@ -150,6 +150,25 @@ struct CBaseProp_wrapper : CBaseProp, bp::wrapper< CBaseProp > {
         CBaseProp::Spawn( );
     }
 
+    virtual void UpdateOnRemove(  ) {
+        PY_OVERRIDE_CHECK( CBaseProp, UpdateOnRemove )
+        PY_OVERRIDE_LOG( _entities, CBaseProp, UpdateOnRemove )
+        bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
+        if( func_UpdateOnRemove.ptr() != Py_None )
+            try {
+                func_UpdateOnRemove(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CBaseProp::UpdateOnRemove(  );
+            }
+        else
+            this->CBaseProp::UpdateOnRemove(  );
+    }
+    
+    void default_UpdateOnRemove(  ) {
+        CBaseProp::UpdateOnRemove( );
+    }
+
     virtual bool CanBecomeRagdoll(  ) {
         PY_OVERRIDE_CHECK( CBaseAnimating, CanBecomeRagdoll )
         PY_OVERRIDE_LOG( _entities, CBaseAnimating, CanBecomeRagdoll )
@@ -686,25 +705,6 @@ struct CBaseProp_wrapper : CBaseProp, bp::wrapper< CBaseProp > {
         CBaseEntity::TraceAttack( info, vecDir, ptr );
     }
 
-    virtual void UpdateOnRemove(  ) {
-        PY_OVERRIDE_CHECK( CBaseEntity, UpdateOnRemove )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, UpdateOnRemove )
-        bp::override func_UpdateOnRemove = this->get_override( "UpdateOnRemove" );
-        if( func_UpdateOnRemove.ptr() != Py_None )
-            try {
-                func_UpdateOnRemove(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseEntity::UpdateOnRemove(  );
-            }
-        else
-            this->CBaseEntity::UpdateOnRemove(  );
-    }
-    
-    void default_UpdateOnRemove(  ) {
-        CBaseEntity::UpdateOnRemove( );
-    }
-
     virtual int UpdateTransmitState(  ) {
         PY_OVERRIDE_CHECK( CBaseEntity, UpdateTransmitState )
         PY_OVERRIDE_LOG( _entities, CBaseEntity, UpdateTransmitState )
@@ -813,6 +813,14 @@ void register_CBaseProp_class(){
             "Spawn"
             , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Spawn)
             , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_Spawn) )    
+        .def( 
+            "UpdateNavObstacle"
+            , (void ( ::CBaseProp::* )( bool ) )( &::CBaseProp::UpdateNavObstacle )
+            , ( bp::arg("bForce")=(bool)(false) ) )    
+        .def( 
+            "UpdateOnRemove"
+            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::UpdateOnRemove)
+            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_UpdateOnRemove) )    
         .def( 
             "CanBecomeRagdoll"
             , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
@@ -946,10 +954,6 @@ void register_CBaseProp_class(){
             "TraceAttack"
             , (void ( CBaseProp_wrapper::* )( ::CTakeDamageInfo const &,::Vector const &,::trace_t * ) )(&CBaseProp_wrapper::TraceAttack)
             , ( bp::arg("info"), bp::arg("vecDir"), bp::arg("ptr") ) )    
-        .def( 
-            "UpdateOnRemove"
-            , (void ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateOnRemove)
-            , (void ( CBaseProp_wrapper::* )(  ) )(&CBaseProp_wrapper::default_UpdateOnRemove) )    
         .def( 
             "UpdateTransmitState"
             , (int ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::UpdateTransmitState)

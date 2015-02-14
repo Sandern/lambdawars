@@ -55,6 +55,25 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     
     }
 
+    virtual void Activate(  ) {
+        PY_OVERRIDE_CHECK( CPhysicsProp, Activate )
+        PY_OVERRIDE_LOG( _entities, CPhysicsProp, Activate )
+        bp::override func_Activate = this->get_override( "Activate" );
+        if( func_Activate.ptr() != Py_None )
+            try {
+                func_Activate(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CPhysicsProp::Activate(  );
+            }
+        else
+            this->CPhysicsProp::Activate(  );
+    }
+    
+    void default_Activate(  ) {
+        CPhysicsProp::Activate( );
+    }
+
     virtual bool CreateVPhysics(  ) {
         PY_OVERRIDE_CHECK( CPhysicsProp, CreateVPhysics )
         PY_OVERRIDE_LOG( _entities, CPhysicsProp, CreateVPhysics )
@@ -167,25 +186,6 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     
     void default_VPhysicsCollision( int index, ::gamevcollisionevent_t * pEvent ) {
         CPhysicsProp::VPhysicsCollision( index, pEvent );
-    }
-
-    virtual void Activate(  ) {
-        PY_OVERRIDE_CHECK( CBaseProp, Activate )
-        PY_OVERRIDE_LOG( _entities, CBaseProp, Activate )
-        bp::override func_Activate = this->get_override( "Activate" );
-        if( func_Activate.ptr() != Py_None )
-            try {
-                func_Activate(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->CBaseProp::Activate(  );
-            }
-        else
-            this->CBaseProp::Activate(  );
-    }
-    
-    void default_Activate(  ) {
-        CBaseProp::Activate( );
     }
 
     virtual bool CanBecomeRagdoll(  ) {
@@ -782,6 +782,10 @@ void register_CPhysicsProp_class(){
     bp::class_< CPhysicsProp_wrapper, bp::bases< CBreakableProp >, boost::noncopyable >( "CPhysicsProp", bp::no_init )    
         .def( bp::init< >() )    
         .def( 
+            "Activate"
+            , (void ( ::CPhysicsProp::* )(  ) )(&::CPhysicsProp::Activate)
+            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_Activate) )    
+        .def( 
             "CanBePickedUpByPhyscannon"
             , (bool ( ::CPhysicsProp::* )(  ) )( &::CPhysicsProp::CanBePickedUpByPhyscannon ) )    
         .def( 
@@ -885,10 +889,6 @@ void register_CPhysicsProp_class(){
             "VPhysicsUpdate"
             , (void ( ::CPhysicsProp::* )( ::IPhysicsObject * ) )( &::CPhysicsProp::VPhysicsUpdate )
             , ( bp::arg("pPhysics") ) )    
-        .def( 
-            "Activate"
-            , (void ( ::CBaseProp::* )(  ) )(&::CBaseProp::Activate)
-            , (void ( CPhysicsProp_wrapper::* )(  ) )(&CPhysicsProp_wrapper::default_Activate) )    
         .def( 
             "CanBecomeRagdoll"
             , (bool ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::CanBecomeRagdoll)
