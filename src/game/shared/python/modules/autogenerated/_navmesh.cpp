@@ -160,23 +160,23 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::RandomNavAreaPosition
     
-        typedef ::Vector ( *RandomNavAreaPosition_function_type )( float,int );
+        typedef ::Vector ( *RandomNavAreaPosition_function_type )( ::C_BaseEntity * );
         
         bp::def( 
             "RandomNavAreaPosition"
             , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition )
-            , ( bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
+            , ( bp::arg("unit")=bp::object() ) );
     
     }
 
     { //::RandomNavAreaPositionWithin
     
-        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const &,float,int );
+        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const &,::C_BaseEntity * );
         
         bp::def( 
             "RandomNavAreaPositionWithin"
             , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("unit")=bp::object() ) );
     
     }
 }
@@ -339,23 +339,23 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::RandomNavAreaPosition
     
-        typedef ::Vector ( *RandomNavAreaPosition_function_type )( float,int );
+        typedef ::Vector ( *RandomNavAreaPosition_function_type )( ::CBaseEntity * );
         
         bp::def( 
             "RandomNavAreaPosition"
             , RandomNavAreaPosition_function_type( &::RandomNavAreaPosition )
-            , ( bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
+            , ( bp::arg("unit")=bp::object() ) );
     
     }
 
     { //::RandomNavAreaPositionWithin
     
-        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const &,float,int );
+        typedef ::Vector ( *RandomNavAreaPositionWithin_function_type )( ::Vector const &,::Vector const &,::CBaseEntity * );
         
         bp::def( 
             "RandomNavAreaPositionWithin"
             , RandomNavAreaPositionWithin_function_type( &::RandomNavAreaPositionWithin )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("minimumarea")=0, bp::arg("maxtries")=(int)(-0x000000001) ) );
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("unit")=bp::object() ) );
     
     }
 }

@@ -24,8 +24,8 @@ bool NavMeshAvailable();
 float NavMeshGetPathDistance( Vector &start, Vector &goal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false, CBaseEntity *unit = NULL );
 Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, CBaseEntity *unit = NULL );
 
-Vector RandomNavAreaPosition( float minimumarea = 0, int maxtries = -1 );
-Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, float minimumarea = 0, int maxtries = -1 );
+Vector RandomNavAreaPosition( CBaseEntity *unit = NULL );
+Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBaseEntity *unit = NULL );
 
 // Nav mesh editing
 int CreateNavArea( const Vector &corner, const Vector &otherCorner );

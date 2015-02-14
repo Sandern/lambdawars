@@ -157,7 +157,7 @@ void DestroyAllNavAreas()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector RandomNavAreaPosition( float minimumarea, int maxtries )
+Vector RandomNavAreaPosition( CBaseEntity *pUnit )
 {
 	if( !GetMapBoundaryList() )
 	{
@@ -181,39 +181,50 @@ Vector RandomNavAreaPosition( float minimumarea, int maxtries )
 		maxs.z = Max(maxs.z, othermaxs.z);
 	}
 
-	return RandomNavAreaPositionWithin( mins, maxs, minimumarea, maxtries );
+	return RandomNavAreaPositionWithin( mins, maxs, pUnit );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // TODO: Remove "tries" and add optional "unit" parameter for mesh selection
 //-----------------------------------------------------------------------------
-Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, float minimumarea, int maxtries )
+Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBaseEntity *pUnit )
 {
-	if( maxtries < 0 )
-		maxtries = 1;
+	Vector center = (maxs - mins) / 2.0f;
+	float radius = maxs.AsVector2D().DistTo(mins.AsVector2D());
 
-	for( int i = 0; i < maxtries; i++ )
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	if( !pMesh )
+		return vec3_origin;
+
+	// The "findRandomPointAroundCircle" is not too random, so pick a random start position, which is used as starting point for the random
+	// point on a poly on the navigation mesh. This function is not really used on the client, so not implemented right now for client.
+#ifndef CLIENT_DLL
+	CUtlVector< CBaseEntity *> startPoints;
+	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "info_start_wars" );
+	while( pEnt )
 	{
-		Vector center = (maxs - mins) / 2.0f;
-		float radius = maxs.AsVector2D().DistTo(mins.AsVector2D()) / 2.0f;
-		CUnitBase *pUnit = NULL;
-		CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
-		if( !pMesh )
-			return vec3_origin;
+		startPoints.AddToTail( pEnt );
+		pEnt = gEntList.FindEntityByClassname( pEnt, "info_start_wars" );
+	}
+	const Vector *vStartPoint = startPoints.Count() > 0 ? &startPoints[random->RandomInt(0, startPoints.Count()-1)]->GetAbsOrigin() : NULL;
+#else
+	// TODO/Maybe. Not really needed.
+	const Vector *vStartPoint = NULL;
+#endif // 0
 
-		Vector vRandomPoint = pMesh->RandomPointWithRadius( center, radius );
-		if( vRandomPoint != vec3_origin )
-		{
-			if( g_pynavmesh_debug.GetBool() )
-				DevMsg("RandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
-			return vRandomPoint + Vector( 0, 0, 32.0f );
-		}
+	Vector vRandomPoint = pMesh->RandomPointWithRadius( center, radius, vStartPoint );
+	if( vRandomPoint != vec3_origin )
+	{
+		if( g_pynavmesh_debug.GetBool() )
+			DevMsg("RandomNavAreaPosition: Found position %f %f %f (center: %f %f %f, radius: %f)\n", 
+			vRandomPoint.x, vRandomPoint.y, vRandomPoint.z, center.x, center.y, center.z, radius );
+		return vRandomPoint + Vector( 0, 0, 32.0f );
 	}
 
 	if( g_pynavmesh_debug.GetBool() )
-		DevMsg("RandomNavAreaPosition: No position found within Mins: %f %f %f, Maxs: %f %f %f\n", 
-				mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z);
+		DevMsg("RandomNavAreaPosition: No position found within Mins: %f %f %f, Maxs: %f %f %f (center: %f %f %f, radius: %f)\n", 
+				mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, center.x, center.y, center.z, radius );
 	return vec3_origin;
 }
 

@@ -449,13 +449,14 @@ Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimi
 static float frand()
 {
 //	return ((float)(rand() & 0xffff)/(float)0xffff);
-	return (float)rand()/(float)RAND_MAX;
+//	return (float)rand()/(float)RAND_MAX;
+	return random->RandomFloat();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius )
+Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius, const Vector *pStartPoint )
 {
 	if( !IsLoaded() )
 		return vec3_origin;
@@ -465,18 +466,30 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius 
 	m_filter.setExcludeFlags(0);
 
 	float pos[3];
-	pos[0] = vCenter[0];
-	pos[1] = vCenter[2];
-	pos[2] = vCenter[1];
+	float center[3];
+	center[0] = vCenter[0];
+	center[1] = vCenter[2];
+	center[2] = vCenter[1];
+
+	if( pStartPoint )
+	{
+		pos[0] = (*pStartPoint)[0];
+		pos[1] = (*pStartPoint)[2];
+		pos[2] = (*pStartPoint)[1];
+	}
+	else
+	{
+		dtVcopy(pos, center);
+	}
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
-	polyPickExt[0] = fRadius;
+	polyPickExt[0] = 256.0f;
 	polyPickExt[1] = MAX_COORD_FLOAT;
-	polyPickExt[2] = fRadius;
+	polyPickExt[2] = 256.0f;
 
 	dtPolyRef closestRef;
-	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &closestRef, 0);
+	dtStatus status = m_navQuery->findNearestPoly( pos, polyPickExt, &m_filter, &closestRef, 0 );
 	if( !dtStatusSucceed( status ) )
 	{
 		return vec3_origin;
@@ -484,7 +497,7 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius 
 
 	dtPolyRef eRef;
 	float epos[3];
-	status = m_navQuery->findRandomPointAroundCircle( closestRef, pos, fRadius, &m_filter, frand, &eRef, epos );
+	status = m_navQuery->findRandomPointAroundCircle( closestRef, center, fRadius, &m_filter, frand, &eRef, epos );
 	if( !dtStatusSucceed( status ) )
 	{
 		return vec3_origin;
