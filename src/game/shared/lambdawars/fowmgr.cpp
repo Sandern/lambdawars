@@ -547,7 +547,7 @@ void CFogOfWarMgr::LoadHeightMap()
 	V_strncat( szNrpFilename, STRING( gpGlobals->mapname ), sizeof(szNrpFilename), COPY_ALL_CHARACTERS );
 #endif // CLIENT_DLL
 	V_strncat( szNrpFilename, "mapheightfielddata.bin", sizeof( szNrpFilename ), COPY_ALL_CHARACTERS );
-	double fStartTime = Plat_FloatTime();
+	//double fStartTime = Plat_FloatTime();
 
 	// Read file
 	CUtlBuffer buf;
@@ -624,7 +624,7 @@ void CFogOfWarMgr::LoadHeightMap()
 	// Copy map to static, used for dynamically updating the heightmap based on fow_blocker entities
 	m_TileHeightsStatic.CopyArray( m_TileHeights.Base(), m_TileHeights.Count() );
 
-	DevMsg("CFogOfWarMgr: Loaded height map in %f seconds\n", Plat_FloatTime() - fStartTime);
+	//DevMsg( "CFogOfWarMgr: Loaded height map in %f seconds\n", Plat_FloatTime() - fStartTime );
 	m_bHeightMapLoaded = true;
 }
 
