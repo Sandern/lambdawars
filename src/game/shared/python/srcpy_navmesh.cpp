@@ -191,15 +191,28 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, floa
 	if( maxtries < 0 )
 		maxtries = 1;
 
-	Vector center = (maxs - mins) / 2.0f;
-	float radius = maxs.AsVector2D().DistTo(mins.AsVector2D()) / 2.0f;
-	CUnitBase *pUnit = NULL;
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
-	if( !pMesh )
-		return vec3_origin;
+	for( int i = 0; i < maxtries; i++ )
+	{
+		Vector center = (maxs - mins) / 2.0f;
+		float radius = maxs.AsVector2D().DistTo(mins.AsVector2D()) / 2.0f;
+		CUnitBase *pUnit = NULL;
+		CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+		if( !pMesh )
+			return vec3_origin;
 
-	return pMesh->RandomPointWithRadius( center, radius ) + Vector( 0, 0, 32.0f );
+		Vector vRandomPoint = pMesh->RandomPointWithRadius( center, radius );
+		if( vRandomPoint != vec3_origin )
+		{
+			if( g_pynavmesh_debug.GetBool() )
+				DevMsg("RandomNavAreaPosition: Found position %f %f %f\n", vRandomPoint.x, vRandomPoint.y, vRandomPoint.z);
+			return vRandomPoint + Vector( 0, 0, 32.0f );
+		}
+	}
 
+	if( g_pynavmesh_debug.GetBool() )
+		DevMsg("RandomNavAreaPosition: No position found within Mins: %f %f %f, Maxs: %f %f %f\n", 
+				mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z);
+	return vec3_origin;
 #if 0
 	Vector random;
 	CNavArea *pArea = NULL;

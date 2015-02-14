@@ -462,9 +462,9 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius 
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
-	polyPickExt[0] = 256.0f;
-	polyPickExt[1] = 1024.0f;
-	polyPickExt[2] = 256.0f;
+	polyPickExt[0] = fRadius;
+	polyPickExt[1] = MAX_COORD_FLOAT;
+	polyPickExt[2] = fRadius;
 
 	dtPolyRef closestRef;
 	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &closestRef, 0);
