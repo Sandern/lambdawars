@@ -37,7 +37,7 @@ CRecastMgr &RecastMgr()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRecastMgr::CRecastMgr() : m_Obstacles( 0, 0, DefLessFunc( int ) )
+CRecastMgr::CRecastMgr() : m_bLoaded(false), m_Obstacles( 0, 0, DefLessFunc( EHANDLE ) )
 {
 #ifndef CLIENT_DLL
 	m_pMapMesh = NULL;
@@ -238,6 +238,9 @@ bool CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
+		// TODO: better check. Needs to filter out obstacles for air mesh
+		if( pMesh->GetAgentHeight() - 50.0f > height )
+			continue;
 
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
@@ -269,6 +272,9 @@ bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
+		// TODO: better check. Needs to filter out obstacles for air mesh
+		if( pMesh->GetAgentHeight() - 50.0f > height )
+			continue;
 
 		float erodeDist = pMesh->GetAgentRadius();
 
@@ -296,7 +302,7 @@ bool CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 		return false;
 
 	bool bSuccess = true;
-	int idx = m_Obstacles.Find( pEntity->entindex() );
+	int idx = m_Obstacles.Find( pEntity );
 	if( m_Obstacles.IsValidIndex( idx ) )
 	{
 		for( int i = 0; i < m_Obstacles[idx].obs.Count(); i++ )
@@ -319,10 +325,10 @@ bool CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
 {
-	int idx = m_Obstacles.Find( pEntity->entindex() );
+	int idx = m_Obstacles.Find( pEntity );
 	if( !m_Obstacles.IsValidIndex( idx ) )
 	{
-		idx = m_Obstacles.Insert( pEntity->entindex() );
+		idx = m_Obstacles.Insert( pEntity );
 	}
 	return m_Obstacles[idx];
 }

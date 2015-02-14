@@ -109,7 +109,7 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 
 	Init( szName );
 
-	DevMsg("Loading mesh %s with cell size %f, cell height %f, tile size %f\n", 
+	DevMsg( 2, "Loading mesh %s with cell size %f, cell height %f, tile size %f\n", 
 		m_Name.Get(), m_cellSize, m_cellHeight, m_tileSize );
 
 	m_navMesh = dtAllocNavMesh();
@@ -170,7 +170,6 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 		return false;
 	}
 
-	DevMsg( "Loaded mesh %s\n", m_Name.Get() );
 	return true;
 }
 
@@ -179,6 +178,9 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Load()
 {
+	double fStartTime = Plat_FloatTime();
+	m_bLoaded = false;
+
 	Reset();
 
 	MDLCACHE_CRITICAL_SECTION();
@@ -254,6 +256,8 @@ bool CRecastMgr::Load()
 		m_Meshes.Insert( pMesh->GetName(), pMesh );
 	}
 	
+	m_bLoaded = true;
+	DevMsg( "CRecastMgr: Loaded %d nav meshes in %f seconds\n", m_Meshes.Count(), Plat_FloatTime() - fStartTime );
 	return true;
 }
 

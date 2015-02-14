@@ -95,13 +95,15 @@ protected:
 	NavObstacleArray_t &FindOrCreateObstacle( CBaseEntity *pEntity );
 
 private:
+	bool m_bLoaded;
+
 #ifndef CLIENT_DLL
 	CMapMesh *m_pMapMesh;
 #endif // CLIENT_DLL
 
 	CUtlDict< CRecastMesh *, int > m_Meshes;
 
-	CUtlMap< int, NavObstacleArray_t > m_Obstacles;
+	CUtlMap< EHANDLE, NavObstacleArray_t > m_Obstacles;
 };
 
 CRecastMgr &RecastMgr();
@@ -113,7 +115,7 @@ inline CUtlDict< CRecastMesh *, int > &CRecastMgr::GetMeshes()
 
 inline bool CRecastMgr::HasMeshes()
 {
-	return m_Meshes.Count() != 0;
+	return m_bLoaded;
 }
 
 inline CRecastMesh *CRecastMgr::GetMesh( const char *name )

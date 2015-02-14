@@ -562,6 +562,7 @@ bool CRecastMgr::Build()
 		}
 	}
 
+	m_bLoaded = true;
 	DevMsg( "CRecastMgr: Finished generating %d meshes in %f seconds\n", m_Meshes.Count(), Plat_FloatTime() - fStartTime );
 	return true;
 }
