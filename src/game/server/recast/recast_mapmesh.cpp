@@ -13,6 +13,7 @@
 #include "gamebspfile.h"
 //#include "datacache/imdlcache.h"
 #include <filesystem.h>
+#include "SkyCamera.h"
 
 #include "ChunkyTriMesh.h"
 
@@ -57,6 +58,35 @@ void CMapMesh::Clear()
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Test if triangle is in valid area. Area should exist and 
+//			not be skybox.
+//-----------------------------------------------------------------------------
+bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
+{
+	Vector vCenter; //, vNormal;
+	vCenter = (vTriangle[0] + vTriangle[1] + vTriangle[2]) / 3.0f;
+	//vNormal = vTriangle[0].Cross( vTriangle[1] );
+	//VectorNormalize( vNormal );
+
+	int area = engine->GetArea( vCenter /*+ vNormal * 1.0f*/ );
+	if( area == 0 )
+		return false;
+
+	CSkyCamera *pCur = GetSkyCameraList();
+	while ( pCur )
+	{
+		if ( engine->CheckAreasConnected( area, pCur->m_skyboxData.area ) )
+		{
+			return false;
+		}
+
+		pCur = pCur->m_pNext;
+	}
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Load displacment verts and triangles
 //-----------------------------------------------------------------------------
 bool CMapMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles )
@@ -89,6 +119,7 @@ bool CMapMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &v
 
 	int iCurVert = 0;
 	int iCurTri = 0;
+	int i;
 	for( int dispInfoIdx = 0; dispInfoIdx < nDispInfo; dispInfoIdx++ )
 	{
 		ddispinfo_t &dispInfo = dispInfoArray[dispInfoIdx];
@@ -151,7 +182,7 @@ bool CMapMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &v
 
 		int numVerts = coreDisp.GetSize();
 		CoreDispVert_t *pVert = coreDisp.GetDispVertList();
-		for (int i = 0; i < numVerts; ++i )
+		for (i = 0; i < numVerts; ++i )
 		{
 			const Vector &dispVert = pVert[i].m_Vert;
 			verts.AddToTail( dispVert[0] );
@@ -161,10 +192,27 @@ bool CMapMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &v
 
 		unsigned short *pIndex = coreDisp.GetRenderIndexList();
 		int numIndices = coreDisp.GetRenderIndexCount();
-
-		int i = 0;
+		
+		Vector trisVerts[3];
+		i = 0;
 		while( i + 2 < numIndices )
 		{
+			for( int k = 0; k < 3; k++ )
+			{
+				int idx = iStartingVertIndex + pIndex[ i + k ];
+				const float *vert = &verts[idx*3];
+				for( int l = 0; l < 3; l++ )
+				{
+					trisVerts[l].Init( vert[0], vert[2], vert[1] );
+				}
+			}
+
+			if( !IsTriangleInValidArea( trisVerts ) )
+			{
+				i += 3;
+				continue;
+			}
+
 			triangles.AddToTail( iStartingVertIndex + pIndex[ i ] );
 			triangles.AddToTail( iStartingVertIndex + pIndex[ i + 1 ] );
 			triangles.AddToTail( iStartingVertIndex + pIndex[ i + 2 ] );
@@ -194,8 +242,8 @@ vcollide_t *LoadModelPhysCollide( const char *pModelName )
 //-----------------------------------------------------------------------------
 // Purpose: Add vertices and triangles of a collision model to mesh
 //-----------------------------------------------------------------------------
-static void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, 
-	CUtlVector<float> &verts, CUtlVector<int> &triangles, int filterContents = CONTENTS_EMPTY )
+void CMapMesh::AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, 
+	CUtlVector<float> &verts, CUtlVector<int> &triangles, int filterContents )
 {
 	ICollisionQuery *pCollisionQuery = physcollision->CreateQueryModel( (CPhysCollide *)pCollisionModel );
 	if( !pCollisionQuery )
@@ -204,20 +252,25 @@ static void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide 
 		return;
 	}
 
+	Vector trisVerts[3];
+	Vector vCenter;
+
 	for( int i = 0; i < pCollisionQuery->ConvexCount(); i++ )
 	{
 		int nTris = pCollisionQuery->TriangleCount( i );
 		for( int j = 0; j < nTris; j++ )
 		{
-			Vector trisVerts[3];
 			pCollisionQuery->GetTriangleVerts( i, j, trisVerts );
+
+			if( !IsTriangleInValidArea( trisVerts ) )
+				continue;
 
 			if( filterContents != CONTENTS_EMPTY )
 			{
 				// UGLY! used for filtering out water of the world collidable.
 				// Preferable we should just have some way to get the material.
+				vCenter = (trisVerts[0] + trisVerts[1] + trisVerts[2]) / 3.0f;
 				Vector offset(0, 0, 2.0f);
-				Vector vCenter = (trisVerts[0] + trisVerts[1] + trisVerts[2]) / 3; 
 				if( enginetrace->GetPointContents_WorldOnly(vCenter-offset, filterContents) & filterContents &&
 					(enginetrace->GetPointContents_WorldOnly(vCenter+offset, filterContents) & filterContents) == 0 )
 				{
