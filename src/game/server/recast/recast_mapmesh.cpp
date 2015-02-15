@@ -66,13 +66,16 @@ void CMapMesh::Clear()
 //-----------------------------------------------------------------------------
 #define SURFACE_TOOLSNODRAW "TOOLS/TOOLSNODRAW"
 #define SURFACE_TOOLSBLACK "TOOLS/TOOLSBLACK"
-static ConVar recast_test_surface("recast_test_surface", "1");
 bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 {
 	Vector vCenter, vNormal;
 	vCenter = (vTriangle[0] + vTriangle[1] + vTriangle[2]) / 3.0f;
-	vNormal = CrossProduct( vTriangle[1] - vTriangle[0], vTriangle[2] - vTriangle[0] );
+	vNormal = CrossProduct( vTriangle[2] - vTriangle[0], vTriangle[1] - vTriangle[0] );
 	VectorNormalize( vNormal );
+
+	//QAngle o;
+	//VectorAngles( vNormal, o );
+	//NDebugOverlay::Cross3DOriented( vCenter + (vNormal * 16.0f), o, 32.0f, 0, 255, 0, false, 20.0f );
 
 	// Should have an area in the direction the triangle is facing
 	// Move 2 units into the area, which usually seems enought to get the proper area
@@ -94,7 +97,7 @@ bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 
 	// Perform trace to get the surface property
 	trace_t tr;
-	UTIL_TraceLine( vCenter + (-vNormal*2.0f), vCenter + (vNormal*2.0f), MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine( vCenter + (vNormal*2.0f), vCenter + (-vNormal*2.0f), MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &tr );
 	if( tr.DidHit() )
 	{
 		// Ignore if trace is inside (npc) clips
@@ -237,10 +240,7 @@ bool CMapMesh::GenerateDispVertsAndTris( void *fileContent, CUtlVector<float> &v
 			{
 				int idx = iStartingVertIndex + pIndex[ i + k ];
 				const float *vert = &verts[idx*3];
-				for( int l = 0; l < 3; l++ )
-				{
-					trisVerts[l].Init( vert[0], vert[2], vert[1] );
-				}
+				trisVerts[k].Init( vert[0], vert[2], vert[1] );
 			}
 
 			if( !IsTriangleInValidArea( trisVerts ) )
