@@ -171,8 +171,6 @@ struct %(convert_from_py_name)s
 
     static void* extract_%(clsname)s(PyObject* op){
        CBaseHandle h = bp::extract<CBaseHandle>(op);
-       if( h.Get() == NULL )
-           return Py_None;
        return h.Get();
     }
 };

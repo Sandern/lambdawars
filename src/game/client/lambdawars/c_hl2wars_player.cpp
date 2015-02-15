@@ -428,8 +428,17 @@ void C_HL2WarsPlayer::PyCamFollowGroup( boost::python::list pyentities, bool for
 
 	for( int i = 0; i < boost::python::len(pyentities); i++ )
 	{
-		CBaseEntity *pEnt = boost::python::extract< CBaseEntity * >( pyentities[i] );
-		entities.AddToTail( pEnt );
+		try
+		{
+			C_BaseEntity *pEnt = boost::python::extract< C_BaseEntity * >( pyentities[i] );
+			if( !pEnt )
+				continue;
+			entities.AddToTail( pEnt );
+		}
+		catch( boost::python::error_already_set & ) 
+		{
+			PyErr_Print();
+		}
 	}
 
 	CamFollowGroup( entities, forced );
@@ -624,10 +633,17 @@ void C_HL2WarsPlayer::PyMakeSelection( boost::python::list selection )
 	int n = boost::python::len(selection);
 	for( int i = 0; i < n; i++ )
 	{
-		CBaseEntity *pEnt = boost::python::extract<CBaseEntity *>( selection[i] );
-		if( !pEnt )
-			continue;
-		newSelection.AddToTail( pEnt );
+		try
+		{
+			C_BaseEntity *pEnt = boost::python::extract< C_BaseEntity * >( selection[i] );
+			if( !pEnt )
+				continue;
+			newSelection.AddToTail( pEnt );
+		}
+		catch( boost::python::error_already_set & ) 
+		{
+			PyErr_Print();
+		}
 	}
 	MakeSelection( newSelection );
 }
