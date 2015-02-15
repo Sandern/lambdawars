@@ -61,17 +61,22 @@ void CMapMesh::Clear()
 // Purpose: Test if triangle is in valid area. Area should exist and 
 //			not be skybox.
 //-----------------------------------------------------------------------------
+#define SURFACE_TOOLSNODRAW "TOOLS/TOOLSNODRAW"
+#define SURFACE_TOOLSBLACK "TOOLS/TOOLSBLACK"
 bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 {
-	Vector vCenter; //, vNormal;
+	Vector vCenter, vNormal;
 	vCenter = (vTriangle[0] + vTriangle[1] + vTriangle[2]) / 3.0f;
-	//vNormal = vTriangle[0].Cross( vTriangle[1] );
-	//VectorNormalize( vNormal );
+	vNormal = CrossProduct( vTriangle[1] - vTriangle[0], vTriangle[2] - vTriangle[0] );
+	VectorNormalize( vNormal );
 
-	int area = engine->GetArea( vCenter /*+ vNormal * 1.0f*/ );
+	// Should have an area in the direction the triangle is facing
+	// Move 2 units into the area, which usually seems enought to get the proper area
+	int area = engine->GetArea( vCenter + (vNormal * 2.0f) );
 	if( area == 0 )
 		return false;
 
+	// The area should not be connected to a skybox entity
 	CSkyCamera *pCur = GetSkyCameraList();
 	while ( pCur )
 	{
@@ -81,6 +86,32 @@ bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 		}
 
 		pCur = pCur->m_pNext;
+	}
+
+	// Perform trace to get the surface property
+	trace_t tr;
+	UTIL_TraceLine( vCenter + (-vNormal*1.0f), vCenter + (vNormal*1.0f), MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &tr );
+	if( tr.DidHit() )
+	{
+		// Can't be in solid
+		if( tr.startsolid || tr.allsolid )
+			return false;
+
+		// Don't care about sky
+		if( tr.surface.flags & (SURF_SKY|SURF_SKY2D) )
+			return false;
+
+		// Filter triangles with certain materials
+		const surfacedata_t *psurf = physprops->GetSurfaceData( tr.surface.surfaceProps );
+		if( psurf )
+		{
+			//Msg("Surface prop tri: %s, game.material: %c\n", tr.surface.name, psurf->game.material);
+			
+			if( V_strncmp( tr.surface.name, SURFACE_TOOLSNODRAW, sizeof( SURFACE_TOOLSNODRAW ) ) == 0 )
+				return false;
+			if( V_strncmp( tr.surface.name, SURFACE_TOOLSBLACK, sizeof( SURFACE_TOOLSBLACK ) ) == 0 )
+				return false;
+		}
 	}
 
 	return true;

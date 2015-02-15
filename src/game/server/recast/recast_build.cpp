@@ -292,6 +292,10 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 
 	Reset(); // Clean any existing data
 
+	float stub;
+	ComputeMeshSettings( GetName(), m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope,
+		stub, stub );
+
 	BuildContext ctx;
 
 	ctx.enableLog( true );
@@ -464,6 +468,7 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 //-----------------------------------------------------------------------------
 bool CRecastMgr::LoadMapMesh()
 {
+	double fStartTime = Plat_FloatTime();
 	if( m_pMapMesh )
 	{
 		delete m_pMapMesh;
@@ -476,6 +481,8 @@ bool CRecastMgr::LoadMapMesh()
 		Warning("CRecastMesh::Load: failed to load map data!\n");
 		return false;
 	}
+
+	DevMsg( "CRecastMgr: Loaded map mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
 	return true;
 }
 
