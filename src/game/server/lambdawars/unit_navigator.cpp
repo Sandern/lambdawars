@@ -2589,13 +2589,15 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	if( unit_route_fallback_direct.GetBool() )
 	{
 		// Fallback to a direct path
-		Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
+		if( unit_navigator_debug.GetBool() )
+			Warning( "#%d BuildNavAreaPath: falling back to a direct path to goal\n", GetOuter()->entindex() );
 		pPath->m_bIsDirectPath = true;
 		return new UnitBaseWaypoint( pPath->m_vGoalPos );
 	}
 
 	// Failure, no path
-	Warning( "#%d BuildNavAreaPath: no path found to goal\n", GetOuter()->entindex() );
+	if( unit_navigator_debug.GetBool() )
+		Warning( "#%d BuildNavAreaPath: no path found to goal\n", GetOuter()->entindex() );
 	pPath->m_iGoalType = GOALTYPE_NONE;
 	return NULL;
 }
