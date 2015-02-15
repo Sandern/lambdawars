@@ -94,6 +94,7 @@ static char* s_DefaultMeshNames[] =
 	"human",
 	"medium",
 	"large",
+	"verylarge",
 	"air"
 };
 

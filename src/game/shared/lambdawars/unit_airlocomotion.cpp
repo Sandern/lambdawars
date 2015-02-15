@@ -24,7 +24,7 @@ UnitBaseAirLocomotion::UnitBaseAirLocomotion( boost::python::object outer )
 	:UnitBaseLocomotion(outer)
 {
 	m_fCurrentHeight = 0;
-	m_fDesiredHeight = 490.0f;
+	m_fDesiredHeight = 450.0f;
 	m_fMaxHeight = 0;
 	m_fFlyNoiseZ = 0.0f;
 	m_fFlyNoiseRate = 0.0f;

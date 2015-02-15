@@ -24,6 +24,7 @@ static ConVar recast_mapmesh_loadbrushes("recast_mapmesh_loadbrushes", "1");
 static ConVar recast_mapmesh_loadstaticprops("recast_mapmesh_loadstaticprops", "1");
 static ConVar recast_mapmesh_loaddynamicprops("recast_mapmesh_loaddynamicprops", "1");
 static ConVar recast_mapmesh_loaddisplacements("recast_mapmesh_loaddisplacements", "1");
+static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "0");
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -73,9 +74,12 @@ bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 	vNormal = CrossProduct( vTriangle[2] - vTriangle[0], vTriangle[1] - vTriangle[0] );
 	VectorNormalize( vNormal );
 
-	//QAngle o;
-	//VectorAngles( vNormal, o );
-	//NDebugOverlay::Cross3DOriented( vCenter + (vNormal * 16.0f), o, 32.0f, 0, 255, 0, false, 20.0f );
+	if( recast_mapmesh_debug_triangles.GetBool() )
+	{
+		QAngle o;
+		VectorAngles( vNormal, o );
+		NDebugOverlay::Cross3DOriented( vCenter + (vNormal * 16.0f), o, 32.0f, 0, 255, 0, false, 20.0f );
+	}
 
 	// Should have an area in the direction the triangle is facing
 	// Move 2 units into the area, which usually seems enought to get the proper area

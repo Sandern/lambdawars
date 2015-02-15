@@ -153,6 +153,15 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		fCellSize = 10.0f;
 		fCellHeight = round( fCellSize / 2.0f );
 	}
+	else if( V_strncmp( name, "verylarge", V_strlen( name ) )== 0 )
+	{
+		// HULL_LARGE, e.g. Antlion Guard Boss
+		fAgentHeight = 150.0f;
+		fAgentRadius = 90.0f; 
+		fAgentMaxClimb = 18.0f;
+		fCellSize = 12.0f;
+		fCellHeight = round( fCellSize / 2.0f );
+	}
 	else if( V_strncmp( name, "air", V_strlen( name ) )== 0 )
 	{
 		// HULL_LARGE_CENTERED, e.g. Strider. Should also be good for gunship/helicop.
@@ -511,7 +520,7 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd )
+UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPath", "RecastNav" );
 
@@ -545,7 +554,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
 	polyPickExt[0] = 256.0f;
-	polyPickExt[1] = 128.0f;
+	polyPickExt[1] = fBeneathLimit;
 	polyPickExt[2] = 256.0f;
 
 	int m_straightPathOptions = 0;

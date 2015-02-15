@@ -25,6 +25,7 @@ UnitBaseAirNavigator::UnitBaseAirNavigator( boost::python::object outer )
 	m_iTestRouteMask = MASK_NPCSOLID_BRUSHONLY;
 	m_bUseSimplifiedRouteBuilding = true;
 	m_bTestRouteWorldOnly = true;
+	m_fCurrentHeight = m_fDesiredHeight = 0.0f;
 }
 #endif // ENABLE_PYTHON
 
@@ -175,8 +176,8 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildNavAreaPath( UnitBasePath *pPath, c
 	CRecastMesh *pNavMesh = GetNavMesh();
 	if( pNavMesh )
 	{
-		const Vector &vStart = GetAbsOrigin(); 
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart - Vector(0, 0, m_fCurrentHeight ), vGoalPos );
+		const Vector &vStart = GetAbsOrigin();
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f );
 		if( pFoundPath )
 			return pFoundPath;
 	}

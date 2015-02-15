@@ -523,6 +523,7 @@ static char* s_MeshNames[] =
 	"human",
 	"medium",
 	"large",
+	"verylarge",
 	"air"
 };
 
