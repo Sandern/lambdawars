@@ -27,6 +27,7 @@ public:
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
 
 	virtual UnitBaseWaypoint *	BuildLocalPath( const Vector &pos );
+	virtual UnitBaseWaypoint *	BuildNavAreaPath( UnitBasePath *pPath, const Vector &pos );
 
 	virtual bool		ShouldConsiderNavMesh( void );
 

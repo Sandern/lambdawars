@@ -166,6 +166,27 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildLocalPath( const Vector &vGoalPos )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+extern ConVar unit_route_navmesh_paths;
+UnitBaseWaypoint *UnitBaseAirNavigator::BuildNavAreaPath( UnitBasePath *pPath, const Vector &vGoalPos )
+{
+	if( !unit_route_navmesh_paths.GetBool() )
+		return NULL;
+
+	CRecastMesh *pNavMesh = GetNavMesh();
+	if( pNavMesh )
+	{
+		const Vector &vStart = GetAbsOrigin(); 
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart - Vector(0, 0, m_fCurrentHeight ), vGoalPos );
+		if( pFoundPath )
+			return pFoundPath;
+	}
+
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 CRecastMesh *UnitBaseAirNavigator::GetNavMesh()
 {
 	int idx = RecastMgr().FindMeshIndex( "air" );
