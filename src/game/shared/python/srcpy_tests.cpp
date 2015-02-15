@@ -18,10 +18,12 @@ void SrcPyTest_EntityArg( CBaseEntity *pEntity )
 		return;
 	if( dynamic_cast<CBaseEntity *>(pEntity) == NULL )
 	{
-		PyErr_SetString(PyExc_Exception, "Invalid entity pointer passed in as argument. Converter bug?" );
+		PyErr_SetString( PyExc_Exception, "Invalid entity pointer passed in as argument. Converter bug?" );
 		throw boost::python::error_already_set(); 
 		return;
 	}
+	// Call a function on the entity
+	pEntity->entindex();
 }
 
 #ifdef CLIENT_DLL
