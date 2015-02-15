@@ -60,9 +60,13 @@ void CMapMesh::Clear()
 //-----------------------------------------------------------------------------
 // Purpose: Test if triangle is in valid area. Area should exist and 
 //			not be skybox.
+// Note: all checks are based on the center of the triangle right now.
+//		 If needed, this would need to be changed, but most of the time it's
+//		 good enough.
 //-----------------------------------------------------------------------------
 #define SURFACE_TOOLSNODRAW "TOOLS/TOOLSNODRAW"
 #define SURFACE_TOOLSBLACK "TOOLS/TOOLSBLACK"
+static ConVar recast_test_surface("recast_test_surface", "1");
 bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 {
 	Vector vCenter, vNormal;
@@ -90,12 +94,13 @@ bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 
 	// Perform trace to get the surface property
 	trace_t tr;
-	UTIL_TraceLine( vCenter + (-vNormal*1.0f), vCenter + (vNormal*1.0f), MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &tr );
+	UTIL_TraceLine( vCenter + (-vNormal*2.0f), vCenter + (vNormal*2.0f), MASK_NPCWORLDSTATIC, NULL, COLLISION_GROUP_NONE, &tr );
 	if( tr.DidHit() )
 	{
-		// Can't be in solid
-		if( tr.startsolid || tr.allsolid )
-			return false;
+		// Ignore if trace is inside (npc) clips
+		// TODO: Would be nice, but ends up filtering too many triangles that touch the clip brush! Requires clipping the triangle.
+		//if( (tr.contents & CONTENTS_MONSTERCLIP) != 0 )
+		//	return false;
 
 		// Don't care about sky
 		if( tr.surface.flags & (SURF_SKY|SURF_SKY2D) )
