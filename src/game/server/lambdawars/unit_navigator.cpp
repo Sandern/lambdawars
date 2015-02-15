@@ -101,7 +101,7 @@ ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 ConVar unit_route_local_paths("unit_route_local_paths", "1");
-ConVar unit_route_fallback_direct("unit_route_fallback_direct", "1");
+ConVar unit_route_fallback_direct("unit_route_fallback_direct", "0");
 ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 
 ConVar unit_blocked_lowvel_check("unit_blocked_lowvel_check", "1");
@@ -1279,9 +1279,23 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				// Update goal target position and recompute
 				GetPath()->m_vGoalPos = vTargetOrigin;
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
-					DoFindPathToPosInRange();
+				{
+					if( !DoFindPathToPosInRange() )
+					{
+						if( unit_navigator_debug.GetBool() )
+							DevMsg("#%d UnitNavigator: could not find updated path to target in range\n", GetOuter()->entindex());
+						return CHS_FAILED;
+					}
+				}
 				else
-					DoFindPathToPos();
+				{
+					if( !DoFindPathToPos() )
+					{
+						if( unit_navigator_debug.GetBool() )
+							DevMsg("#%d UnitNavigator: could not find updated path to target\n", GetOuter()->entindex());
+						return CHS_FAILED;
+					}
+				}
 
 				// Store area id of the goal for the next time we check
 				m_iLastGoalRef = goalRef;
@@ -1395,9 +1409,23 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 
 				// Recompute path
 				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE || GetPath()->m_iGoalType == GOALTYPE_POSITION_INRANGE )
-					DoFindPathToPosInRange();
+				{
+					if( !DoFindPathToPosInRange() )
+					{
+						if( unit_navigator_debug.GetBool() )
+							DevMsg("#%d UnitNavigator: could not find path to goal in range (path blocked recomputing)\n", GetOuter()->entindex());
+						return CHS_FAILED;
+					}
+				}
 				else
-					DoFindPathToPos();
+				{
+					if( !DoFindPathToPos() )
+					{
+						if( unit_navigator_debug.GetBool() )
+							DevMsg("#%d UnitNavigator: could not find path to goal (path blocked recomputing)\n", GetOuter()->entindex());
+						return CHS_FAILED;
+					}
+				}	
 				fWaypointDist = ComputeWaypointDistanceAndDir( vPathDir );
 				m_iBlockedPathRecomputations++;
 
@@ -2354,8 +2382,8 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 
 	const Vector &vOrigin = GetAbsOrigin();
 
-	bool bPathReused = false;
 #if 0
+	bool bPathReused = false;
 	if( pPath->m_pWaypointHead && (pPath->m_vGoalPos - vDestination).Length2D() < 512.0f &&
 		(pPath->m_pWaypointHead->GetPos() - vOrigin).Length2D() < 512.0f )
 	{
@@ -2377,14 +2405,17 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 	pPath->m_bSuccess = false;
 	pPath->m_bAvoidEnemies = bAvoidEnemies;
 
+#if 0
 	if( !bPathReused )
 	{
+#endif // 0
 		if( pPath->m_iGoalType == GOALTYPE_POSITION ||
 				pPath->m_iGoalType == GOALTYPE_TARGETENT )
 			return DoFindPathToPos( pPath );
 		else if( pPath->m_iGoalType == GOALTYPE_POSITION_INRANGE ||
 				pPath->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 			return DoFindPathToPosInRange( pPath );
+#if 0
 	}
 	else
 	{
@@ -2392,6 +2423,7 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 		pPath->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		return true;
 	}
+#endif // 0
 
 	return false;
 }
@@ -2563,8 +2595,8 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	}
 
 	// Failure, no path
-	pPath->Clear();
 	Warning( "#%d BuildNavAreaPath: no path found to goal\n", GetOuter()->entindex() );
+	pPath->m_iGoalType = GOALTYPE_NONE;
 	return NULL;
 }
 
