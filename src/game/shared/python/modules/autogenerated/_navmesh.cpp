@@ -149,12 +149,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::C_BaseEntity * );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,float,::C_BaseEntity * );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("unit")=bp::object() ) );
+            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("maxradius")=2.56e+2f, bp::arg("unit")=bp::object() ) );
     
     }
 
@@ -328,12 +328,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPositionNearestNavArea
     
-        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,::CBaseEntity * );
+        typedef ::Vector ( *NavMeshGetPositionNearestNavArea_function_type )( ::Vector const &,float,float,::CBaseEntity * );
         
         bp::def( 
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("unit")=bp::object() ) );
+            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("maxradius")=2.56e+2f, bp::arg("unit")=bp::object() ) );
     
     }
 

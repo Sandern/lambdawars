@@ -36,7 +36,11 @@
 
 #define MAX_POLYS 256
 
-ConVar recast_edit( "recast_edit", "1", FCVAR_GAMEDLL | FCVAR_CHEAT, "Set to one to interactively edit the Recast Navigation Mesh. Set to zero to leave edit mode." );
+#ifndef CLIENT_DLL
+ConVar recast_findpath_debug( "recast_findpath_debug", "0", FCVAR_CHEAT, "" );
+#else
+ConVar recast_findpath_debug( "cl_recast_findpath_debug", "0", FCVAR_CHEAT, "" );
+#endif // CLIENT_DLL
 
 // Defaults
 static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
@@ -154,8 +158,8 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 		// HULL_LARGE_CENTERED, e.g. Strider. Should also be good for gunship/helicop.
 		fAgentHeight = 450.0f; // Not really that height ever, but don't want to have areas indoor
 		fAgentRadius = 42.0f; 
-		fAgentMaxClimb = 450.0f;
-		fAgentMaxSlope = 90.0f;
+		fAgentMaxClimb =  225.0f;
+		fAgentMaxSlope = 70.0f;
 		fCellSize = 10.0f;
 		fCellHeight = round( fCellSize / 2.0f );
 	}
@@ -283,9 +287,6 @@ ConVar recast_draw_server("recast_draw_server", "1");
 //-----------------------------------------------------------------------------
 void CRecastMesh::DebugRender()
 {
-	//if( !recast_edit.GetBool() )
-	//	return;
-
 	DebugDrawMesh dd;
 
 	if( recast_draw_trimeshslope.GetBool() )
@@ -407,7 +408,7 @@ bool CRecastMesh::IsValidPolyRef( int polyRef )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit )
+Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit, float fRadius )
 {
 	if( !IsLoaded() )
 		return vec3_origin;
@@ -418,14 +419,14 @@ Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimi
 
 	float pos[3];
 	pos[0] = vPoint[0];
-	pos[1] = vPoint[2];
+	pos[1] = vPoint[2] - (fBeneathLimit / 2.0f) + 32.0f;
 	pos[2] = vPoint[1];
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
-	polyPickExt[0] = 256.0f;
-	polyPickExt[1] = fBeneathLimit;
-	polyPickExt[2] = 256.0f;
+	polyPickExt[0] = fRadius;
+	polyPickExt[1] = (fBeneathLimit + 32.0f) / 2.0f;
+	polyPickExt[2] = fRadius;
 
 	dtPolyRef closestRef;
 	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &closestRef, 0);
@@ -434,10 +435,10 @@ Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimi
 		return vec3_origin;
 	}
 
-	bool posOverPoly;
+	//bool posOverPoly;
 	float closest[3];
-	status = m_navQuery->closestPointOnPoly(closestRef, pos, closest, &posOverPoly);
-	if( !dtStatusSucceed( status ) || !posOverPoly )
+	status = m_navQuery->closestPointOnPoly(closestRef, pos, closest, NULL/*, &posOverPoly*/);
+	if( !dtStatusSucceed( status ) )
 	{
 		return vec3_origin;
 	}
@@ -544,7 +545,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
 	polyPickExt[0] = 256.0f;
-	polyPickExt[1] = 600.0f;
+	polyPickExt[1] = 128.0f;
 	polyPickExt[2] = 256.0f;
 
 	int m_straightPathOptions = 0;
@@ -553,8 +554,25 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	dtPolyRef m_straightPathPolys[MAX_POLYS];
 	int m_nstraightPath;
 
-	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
-	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+	// Find the start area
+	status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
+
+	// Find the end area
+	status = m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
+
+	if( recast_findpath_debug.GetBool() )
+	{
+		NDebugOverlay::Box( Vector(spos[0], spos[2], spos[1]), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 255, 5.0f);
+		NDebugOverlay::Box( Vector(epos[0], epos[2], epos[1]), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, 255, 5.0f);
+	}
 
 	status = m_navQuery->findPath(startRef, endRef, spos, epos, &m_filter, m_polys, &m_npolys, MAX_POLYS);
 	if( !dtStatusSucceed( status ) )
@@ -569,6 +587,11 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 		dtVcopy(epos2, epos);
 		if (m_polys[m_npolys-1] != endRef)
 			m_navQuery->closestPointOnPoly(m_polys[m_npolys-1], epos, epos2, 0);
+
+		if( recast_findpath_debug.GetBool() )
+		{
+			NDebugOverlay::Box( Vector(epos2[0], epos[2], epos[1] + 16.0f), -Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
+		}
 				
 		status = m_navQuery->findStraightPath(spos, epos2, m_polys, m_npolys,
 										m_straightPath, m_straightPathFlags,

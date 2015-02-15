@@ -1670,16 +1670,19 @@ void UnitBaseLocomotion::DoUnstuck()
 		CRecastMesh *pMesh = RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) );
 		if( pMesh )
 		{
-			Vector vClosestPoint = pMesh->ClosestPointOnMesh( mv->origin, 10000.0f );
+			Vector vClosestPoint = pMesh->ClosestPointOnMesh( mv->origin, 10000.0f, 2048.0f );
 
-			positioninfo_t info( vClosestPoint, m_vecMins, m_vecMaxs, 0, 1024.0f, 0, 0, NULL,
-								 8.0f, 256.0f, MASK_NPCSOLID, true );
-			UTIL_FindPosition( info );
-			if( info.m_bSuccess )
+			if( vClosestPoint != vec3_origin )
 			{
-				mv->origin = info.m_vPosition;
-				mv->origin.z += 16.0f;
-				bFoundPosition = true;
+				positioninfo_t info( vClosestPoint, m_vecMins, m_vecMaxs, 0, 1024.0f, 0, 0, NULL,
+									 8.0f, 256.0f, MASK_NPCSOLID, true );
+				UTIL_FindPosition( info );
+				if( info.m_bSuccess )
+				{
+					mv->origin = info.m_vPosition;
+					mv->origin.z += 16.0f;
+					bFoundPosition = true;
+				}
 			}
 		}
 	}

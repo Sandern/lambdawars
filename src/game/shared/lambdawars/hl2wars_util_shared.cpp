@@ -86,17 +86,16 @@ void UTIL_FindPositionInRadius( positioninradius_t &info, CBaseEntity *navMeshEn
 
 		Vector vEndPos;
 
+#ifdef ENABLE_PYTHON
 		if( RecastMgr().HasMeshes() )
 		{
-#ifdef ENABLE_PYTHON
-			vEndPos = NavMeshGetPositionNearestNavArea(vecTest, info.m_fBeneathLimit, navMeshEnt);
-#else
-			vEndPos = vec3_origin;
-#endif // ENABLE_PYTHON
+
+			vEndPos = NavMeshGetPositionNearestNavArea( vecTest, info.m_fBeneathLimit, 128.0f, navMeshEnt );
             if( vEndPos == vec3_origin )
                 continue;
 		}
 		else
+#endif // ENABLE_PYTHON
 		{
 			UTIL_TraceLine( vecTest, vecTest - Vector( 0, 0, MAX_TRACE_LENGTH ), MASK_SHOT, info.m_hIgnore.Get(), COLLISION_GROUP_NONE, &tr );
 			if( tr.fraction == 1.0 )
@@ -149,15 +148,17 @@ void UTIL_FindPosition( positioninfo_t &info, CBaseEntity *navMeshEnt )
 		if( RecastMgr().HasMeshes() )
 		{
 #ifdef ENABLE_PYTHON
-			vEndPos = NavMeshGetPositionNearestNavArea(info.m_vPosition, info.m_fBeneathLimit);
-#else
-			vEndPos= vec3_origin;
-#endif // ENABLE_PYTHON
+			vEndPos = NavMeshGetPositionNearestNavArea( info.m_vPosition, info.m_fBeneathLimit, info.m_fMaxRadius, navMeshEnt );
+			if( vEndPos == vec3_origin )
+				vEndPos = info.m_vPosition;
 		}
+#endif // ENABLE_PYTHON
 		else
 		{
 			UTIL_TraceLine( info.m_vPosition, info.m_vPosition - Vector( 0, 0, MAX_TRACE_LENGTH ), MASK_SHOT, info.m_hIgnore.Get(), COLLISION_GROUP_NONE, &tr );
 			vEndPos = ( tr.fraction == 1.0 ) ? tr.endpos : vec3_origin;
+			if( vEndPos == vec3_origin )
+				vEndPos = info.m_vPosition;
 		}
 
 		info.m_fRadius += info.m_fRadiusGrow;

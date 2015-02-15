@@ -22,7 +22,7 @@
 bool NavMeshAvailable();
 //bool NavMeshTestHasArea( Vector &pos, float beneathLimt = 120.0f );
 float NavMeshGetPathDistance( Vector &start, Vector &goal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false, CBaseEntity *unit = NULL );
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, CBaseEntity *unit = NULL );
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, float maxradius=256.0f, CBaseEntity *unit = NULL );
 
 Vector RandomNavAreaPosition( CBaseEntity *unit = NULL );
 Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBaseEntity *unit = NULL );

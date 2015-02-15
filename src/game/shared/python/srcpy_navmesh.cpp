@@ -96,13 +96,13 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float ma
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, CBaseEntity *pUnit )
+Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, float maxradius, CBaseEntity *pUnit )
 {
 	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
 		return vec3_origin;
 
-	return pMesh->ClosestPointOnMesh( pos, beneathlimit );
+	return pMesh->ClosestPointOnMesh( pos, beneathlimit, maxradius );
 }
 
 //-----------------------------------------------------------------------------
