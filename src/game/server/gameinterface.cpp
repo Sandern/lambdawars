@@ -2660,6 +2660,16 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 		    bIsReplay == ( pInfo->m_pTransmitAlways != NULL) );
 #endif
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 	for ( int i=0; i < nEdicts; i++ )
 	{
 		int iEdict = pEdictIndices[i];
@@ -2706,9 +2716,8 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 // =======================================
 #ifdef ENABLE_PYTHON
 				// Python networkvars: mark player as transmit
-				int iClientIdx = ENTINDEX( pInfo->m_pClientEnt ) - 1; // Client index is 0 based
 				pEnt->GetBaseEntity()->m_PyNetworkVarsPlayerTransmitBits.Set( iClientIdx );
-				PyNetworkVarsUpdateClient(pEnt->GetBaseEntity(), pInfo->m_pClientEnt );
+				PyNetworkVarsUpdateClient( pEnt->GetBaseEntity(), pInfo->m_pClientEnt );
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
@@ -2877,10 +2886,8 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 	// Due this the "known" information of fog of war entities is lost
 	// Here we reset this info for certain units like control points (although regular player buildings will still be lost).
 	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( pRecipientPlayer );
-	if( pPlayer )
+	if( pPlayer && pPlayer->IsConnected() )
 	{
-		int iClientIdx = pRecipientPlayer->GetClientIndex();
-
 		// GetEntityTransmitBitsForClient returns NULL if no previous frame exists for the client
 		// This means the client just connected or is requesting a full update due packet loss
 		const CBitVec<MAX_EDICTS>* transmitBits = engine->GetEntityTransmitBitsForClient( iClientIdx );
@@ -2917,8 +2924,6 @@ void CServerGameEnts::CheckTransmit( CCheckTransmitInfo *pInfo, const unsigned s
 				int iCurAckTickCount = pClient->GetMaxAckTickCount();
 				if( iCurAckTickCount - pPlayer->GetLastAckTickCount() > wars_reset_known_on_dropspackets.GetInt() )
 				{
-					int iClientIdx = ENTINDEX(pPlayer) - 1;
-
 					DevMsg( "Detected player %s not receiving new frames. Resetting known entities because player likely got a full update\n", pPlayer->GetPlayerName() );
 
 					// Seems this information gets lost upon receiving a full update

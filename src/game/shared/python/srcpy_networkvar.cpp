@@ -10,6 +10,9 @@
 #include "srcpy_usermessage.h"
 #include "unit_base_shared.h"
 
+#include "INetChannel.h"
+#include "IClient.h"
+
 #ifndef CLIENT_DLL
 #include "enginecallback.h"
 #else
@@ -503,6 +506,15 @@ void PyNetworkVarsUpdateClient( CBaseEntity *pEnt, edict_t *pClientEdict )
 	int iClient = ENTINDEX( pClientEdict ) - 1; // Client index is 0 based
 
 	if( pEnt->m_PyNetworkVarsPlayerTransmitBits.Get( iClient ) == false )
+		return;
+
+	// Make sure the player to who we are sending is active
+	INetChannel *nc = (INetChannel *)engine->GetPlayerNetInfo( ENTINDEX( pClientEdict ) ); 
+	if ( !nc )
+		return;
+
+	IClient *pClient = (IClient *)nc->GetMsgHandler();
+	if( !pClient || !pClient->IsActive() )
 		return;
 
 #ifdef USE_WARS_NETWORK
