@@ -791,7 +791,12 @@ void CWarsFlora::InsertInFloraGrid()
 	m_iKey = WARSGRID_KEY( GetAbsOrigin() );
 	if( m_iKey < 0 || m_iKey > WarsGrid().GetGrid().Count() )
 	{
-		Warning("InsertInFloraGrid: Could not insert flora entity with key %d\n", m_iKey );
+#ifdef CLIENT_DLL
+		Warning("CLIENT_");
+#else
+		Warning("SERVER_");
+#endif // CLIENT_DLL
+		Warning("InsertInFloraGrid: Could not insert flora entity with key %d (max %d)\n", m_iKey, WarsGrid().GetGrid().Count() );
 		m_iKey = -1;
 		return;
 	}
