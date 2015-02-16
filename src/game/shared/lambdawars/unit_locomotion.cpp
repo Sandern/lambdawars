@@ -175,8 +175,11 @@ void UnitBaseLocomotion::SetupMove( UnitBaseMoveCommand &mv )
 	mv.origin = m_pOuter->GetAbsOrigin();
 #endif // CLIENT_DLL
 
+	// Clamp interval. After hibernate server, it might end up very high,
+	// causing issues in movement code.
+	mv.interval = Min( mv.interval, 2.0f );
 	// Clamp maxspeed
-	mv.maxspeed = Min(mv.maxspeed, 5000.0f);
+	mv.maxspeed = Min( mv.maxspeed, 5000.0f );
 
 	SetupMovementBounds( mv );
 }
