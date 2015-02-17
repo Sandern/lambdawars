@@ -17,12 +17,23 @@ BOOST_PYTHON_MODULE(_srctests){
 
     { //::SrcPyTest_EntityArg
     
-        typedef void ( *SrcPyTest_EntityArg_function_type )( ::C_BaseEntity * );
+        typedef bool ( *SrcPyTest_EntityArg_function_type )( ::C_BaseEntity * );
         
         bp::def( 
             "SrcPyTest_EntityArg"
             , SrcPyTest_EntityArg_function_type( &::SrcPyTest_EntityArg )
             , ( bp::arg("pEntity") ) );
+    
+    }
+
+    { //::SrcPyTest_ExtractEntityArg
+    
+        typedef bool ( *SrcPyTest_ExtractEntityArg_function_type )( ::boost::python::api::object );
+        
+        bp::def( 
+            "SrcPyTest_ExtractEntityArg"
+            , SrcPyTest_ExtractEntityArg_function_type( &::SrcPyTest_ExtractEntityArg )
+            , ( bp::arg("entity") ) );
     
     }
 }
@@ -42,12 +53,23 @@ BOOST_PYTHON_MODULE(_srctests){
 
     { //::SrcPyTest_EntityArg
     
-        typedef void ( *SrcPyTest_EntityArg_function_type )( ::CBaseEntity * );
+        typedef bool ( *SrcPyTest_EntityArg_function_type )( ::CBaseEntity * );
         
         bp::def( 
             "SrcPyTest_EntityArg"
             , SrcPyTest_EntityArg_function_type( &::SrcPyTest_EntityArg )
             , ( bp::arg("pEntity") ) );
+    
+    }
+
+    { //::SrcPyTest_ExtractEntityArg
+    
+        typedef bool ( *SrcPyTest_ExtractEntityArg_function_type )( ::boost::python::api::object );
+        
+        bp::def( 
+            "SrcPyTest_ExtractEntityArg"
+            , SrcPyTest_ExtractEntityArg_function_type( &::SrcPyTest_ExtractEntityArg )
+            , ( bp::arg("entity") ) );
     
     }
 }

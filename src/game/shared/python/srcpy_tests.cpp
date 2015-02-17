@@ -12,18 +12,48 @@
 //-----------------------------------------------------------------------------
 // Purpose: Used to test the entity converters between python and c++
 //-----------------------------------------------------------------------------
-void SrcPyTest_EntityArg( CBaseEntity *pEntity )
+bool SrcPyTest_EntityArg( CBaseEntity *pEntity )
 {
 	if( pEntity == NULL )
-		return;
+	{
+		Msg("Entity argument is null\n");
+		return false;
+	}
 	if( dynamic_cast<CBaseEntity *>(pEntity) == NULL )
 	{
 		PyErr_SetString( PyExc_Exception, "Invalid entity pointer passed in as argument. Converter bug?" );
 		throw boost::python::error_already_set(); 
-		return;
+		return false;
 	}
 	// Call a function on the entity
-	pEntity->entindex();
+	Msg( "Entindex: %d\n", pEntity->entindex() );
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Extracts a CBaseEntity from a python object
+//-----------------------------------------------------------------------------
+bool SrcPyTest_ExtractEntityArg( boost::python::object entity )
+{
+	CBaseEntity *pEntity = boost::python::extract< CBaseEntity * >( entity );
+
+	if( pEntity != NULL )
+	{
+		if( dynamic_cast<CBaseEntity *>(pEntity) == NULL )
+		{
+			PyErr_SetString( PyExc_Exception, "Invalid entity pointer passed in as argument. Converter bug?" );
+			throw boost::python::error_already_set(); 
+			return false;
+		}
+
+		// Call a function on the entity
+		Msg( "Entindex: %d\n", pEntity->entindex() );
+	}
+	else
+	{
+		Msg("Extracted entity is null\n");
+	}
+	return pEntity != NULL;
 }
 
 #ifdef CLIENT_DLL

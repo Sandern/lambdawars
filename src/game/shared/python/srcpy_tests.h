@@ -15,6 +15,8 @@
 class CBaseEntity;
 
 // Entity Converter related function tests
-void SrcPyTest_EntityArg( CBaseEntity *pEntity );
+bool SrcPyTest_EntityArg( CBaseEntity *pEntity );
+
+bool SrcPyTest_ExtractEntityArg( boost::python::object entity );
 
 #endif // SRCPYTHON_TESTS_H
