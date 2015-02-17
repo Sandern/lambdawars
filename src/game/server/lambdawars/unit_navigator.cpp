@@ -101,7 +101,7 @@ ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
 ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 ConVar unit_route_local_paths("unit_route_local_paths", "1");
-ConVar unit_route_fallback_direct("unit_route_fallback_direct", "0");
+ConVar unit_route_fallback_direct("unit_route_fallback_direct", "1");
 ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
 
 ConVar unit_blocked_lowvel_check("unit_blocked_lowvel_check", "1");
