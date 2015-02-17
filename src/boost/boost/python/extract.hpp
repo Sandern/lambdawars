@@ -231,7 +231,8 @@ namespace converter
       if (m_result == 0 && m_source != Py_None)
           (throw_no_pointer_from_python)(m_source, registered_pointee<Ptr>::converters);
       
-      return Ptr(m_result);
+	  // Similar to pointer_arg_from_python, this should return 0 if it encounters Py_None as result.
+      return Ptr(m_result == Py_None ? 0 : m_result);
   }
 
   template <class T>
