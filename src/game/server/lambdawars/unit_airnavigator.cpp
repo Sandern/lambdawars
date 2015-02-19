@@ -190,6 +190,15 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildNavAreaPath( UnitBasePath *pPath, c
 //-----------------------------------------------------------------------------
 CRecastMesh *UnitBaseAirNavigator::GetNavMesh()
 {
+	// Make something better, but for now prefer the regular mesh for units flying below 100 units.
+	// Mainly intended for manhacks.
+	if( m_fCurrentHeight != 0 && m_fCurrentHeight < 100.0f )
+	{
+		CRecastMesh *pMesh = BaseClass::GetNavMesh();
+		if( pMesh )
+			return pMesh;
+	}
+
 	int idx = RecastMgr().FindMeshIndex( "air" );
 	return RecastMgr().GetMesh( idx );
 }

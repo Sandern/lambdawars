@@ -4895,6 +4895,15 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("v") ) );
         
         }
+        { //::C_BaseEntity::SetForceAllowVPhysics
+        
+            typedef void ( ::C_BaseEntity::*SetForceAllowVPhysics_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetForceAllowVPhysics"
+                , SetForceAllowVPhysics_function_type( &::C_BaseEntity::SetForceAllowVPhysics ) );
+        
+        }
         { //::C_BaseEntity::SetFriction
         
             typedef void ( ::C_BaseEntity::*SetFriction_function_type )( float ) ;

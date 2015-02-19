@@ -79,6 +79,9 @@ public:
 	virtual void DebugRender();
 #endif // CLIENT_DLL
 
+	// Dynamic tile building
+	virtual bool RebuildTilesAt( const Vector &vMins, const Vector &vMaxs );
+
 	// Mesh Querying
 	int GetPolyRef( const Vector &vPoint, float fBeneathLimit = 120.0f );
 	bool IsValidPolyRef( int polyRef );

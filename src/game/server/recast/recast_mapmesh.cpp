@@ -11,11 +11,14 @@
 #include "recast/recast_mesh.h"
 #include "builddisp.h"
 #include "gamebspfile.h"
-//#include "datacache/imdlcache.h"
 #include <filesystem.h>
 #include "SkyCamera.h"
 
 #include "ChunkyTriMesh.h"
+
+#ifdef ENABLE_PYTHON
+	#include "srcpy.h"
+#endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -55,6 +58,27 @@ void CMapMesh::Clear()
 	{
 		delete m_chunkyMesh;
 		m_chunkyMesh = 0;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CMapMesh::AddEntity( CBaseEntity *pEntity )
+{
+	if( !pEntity )
+		return;
+
+	//if( pEntity->GetSolid() == SOLID_VPHYSICS )
+	{
+		matrix3x4_t transform; // model to world transformation
+		AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform);
+
+		IPhysicsObject *pPhysObj = pEntity->VPhysicsGetObject();
+		if( pPhysObj )
+		{
+			AddCollisionModelToMesh( transform, pPhysObj->GetCollide(), m_Vertices, m_Triangles );
+		}
 	}
 }
 
@@ -717,6 +741,24 @@ bool CMapMesh::Load()
 		}
 	}
 #endif // _DEBUG
+
+#ifdef ENABLE_PYTHON
+	// Fire signal to postprocess the mesh if desired
+	if( SrcPySystem()->IsPythonRunning() )
+	{
+		try
+		{
+			boost::python::dict kwargs;
+			kwargs["sender"] = boost::python::object();
+			kwargs["mapmesh"] = boost::python::ptr( this );
+			SrcPySystem()->CallSignal( SrcPySystem()->Get("recast_mapmesh_postprocess", "core.signals", true), kwargs );
+		}
+		catch( boost::python::error_already_set & ) 
+		{
+			PyErr_Print();
+		}
+	}
+#endif // ENABLE_PYTHON
 
 	Msg( "Recast Load map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, GetNumVerts(), GetNumTris(), length, header->m_nVersion );
 

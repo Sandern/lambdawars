@@ -23,6 +23,10 @@
 #include "detourtilecache/DetourTileCache.h"
 #include "detourtilecache/DetourTileCacheBuilder.h"
 
+#ifdef ENABLE_PYTHON
+	#include "srcpy.h"
+#endif // ENABLE_PYTHON
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -258,6 +262,13 @@ bool CRecastMgr::Load()
 	
 	m_bLoaded = true;
 	DevMsg( "CRecastMgr: Loaded %d nav meshes in %f seconds\n", m_Meshes.Count(), Plat_FloatTime() - fStartTime );
+
+#ifdef ENABLE_PYTHON
+	// Fire loaded signal
+	if( SrcPySystem()->IsPythonRunning() )
+		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "navmeshloaded", "core.signals", true ) );
+#endif // ENABLE_PYTHON
+
 	return true;
 }
 

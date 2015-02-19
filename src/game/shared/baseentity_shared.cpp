@@ -1390,7 +1390,7 @@ bool CBaseEntity::VPhysicsInitSetup()
 {
 #ifndef CLIENT_DLL
 	// don't support logical ents
-	if ( !edict() || IsMarkedForDeletion() )
+	if ( (!edict() && !m_bForceAllowVPhysics) || IsMarkedForDeletion() )
 		return false;
 #endif
 

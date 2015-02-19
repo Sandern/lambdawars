@@ -10,6 +10,7 @@ class Recast(SemiSharedModuleGenerator):
         'cbase.h',
         'recast/recast_mgr.h',
         'recast/recast_mesh.h',
+        '#recast/recast_mapmesh.h',
         #'unit_base_shared.h',
     ]
  
@@ -35,6 +36,10 @@ class Recast(SemiSharedModuleGenerator):
         cls.calldefs().exclude()
         cls.mem_funs().virtuality = 'not virtual'
         
+        if self.isserver:
+            cls.mem_fun('Build').include()
+            cls.mem_fun('Save').include()
+        
         cls.mem_fun('AddEntRadiusObstacle').include()
         cls.mem_fun('AddEntBoxObstacle').include()
         cls.mem_fun('RemoveEntObstacles').include()
@@ -44,4 +49,14 @@ class Recast(SemiSharedModuleGenerator):
         
         mb.free_function('RecastMgr').include()
         mb.free_function('RecastMgr').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
+        
+        if self.isserver:
+            cls = mb.class_('CMapMesh')
+            cls.include()
+            cls.no_init = True
+            cls.calldefs().exclude()
+            cls.mem_funs().virtuality = 'not virtual'
+            
+            cls.mem_fun('AddEntity').include()
+        
         

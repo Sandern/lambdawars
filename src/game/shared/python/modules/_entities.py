@@ -823,7 +823,7 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('ForceVPhysicsCollide').exclude() # Don't care
             mb.mem_funs('GetGroundVelocityToApply').exclude() # Don't care
             mb.mem_funs('GetMaxHealth').exclude() # Use property maxhealth
-            mb.mem_funs('SetModelIndex').exclude()
+            #mb.mem_funs('SetModelIndex').exclude()
             
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetEntityNameAsCStr').exclude() # Always use GetEntityName()

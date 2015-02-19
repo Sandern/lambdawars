@@ -116,6 +116,8 @@ BOOST_PYTHON_MODULE(_recast){
 
 #include "recast/recast_mesh.h"
 
+#include "recast/recast_mapmesh.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -124,6 +126,12 @@ namespace bp = boost::python;
 
 BOOST_PYTHON_MODULE(_recast){
     bp::docstring_options doc_options( true, true, false );
+
+    bp::class_< CMapMesh, boost::noncopyable >( "CMapMesh", bp::no_init )    
+        .def( 
+            "AddEntity"
+            , (void ( ::CMapMesh::* )( ::CBaseEntity * ) )( &::CMapMesh::AddEntity )
+            , ( bp::arg("pEnt") ) );
 
     { //::CRecastMesh
         typedef bp::class_< CRecastMesh > CRecastMesh_exposer_t;
@@ -192,6 +200,9 @@ BOOST_PYTHON_MODULE(_recast){
             , (bool ( ::CRecastMgr::* )( ::CBaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
         .def( 
+            "Build"
+            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Build ) )    
+        .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("index") )
@@ -204,7 +215,10 @@ BOOST_PYTHON_MODULE(_recast){
         .def( 
             "RemoveEntObstacles"
             , (bool ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
-            , ( bp::arg("pEntity") ) );
+            , ( bp::arg("pEntity") ) )    
+        .def( 
+            "Save"
+            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Save ) );
 
     { //::RecastMgr
     

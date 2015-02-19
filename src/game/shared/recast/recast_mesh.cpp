@@ -332,7 +332,7 @@ void CRecastMesh::DebugRender()
 	}
 #endif // 0
 
-	if( recast_draw_navmesh.GetBool() && m_navMesh != NULL )
+	if( recast_draw_navmesh.GetBool() )
 	{
 		dtNavMesh *navMesh = NULL;
 		dtNavMeshQuery *navQuery = NULL;
@@ -366,6 +366,57 @@ void CRecastMesh::DebugRender()
 	}
 }
 #endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CRecastMesh::RebuildTilesAt( const Vector &vMins, const Vector &vMaxs )
+{
+	if( !IsLoaded() )
+		return false;
+
+	float bmin[3];
+	float bmax[3];
+
+	bmin[0] = vMins.x;
+	bmin[1] = vMins.z;
+	bmin[2] = vMins.y;
+
+	bmax[0] = vMaxs.x;
+	bmax[1] = vMaxs.z;
+	bmax[2] = vMaxs.y;
+
+	// Find tiles to rebuild
+	dtCompressedTileRef results[128];
+	int resultCount;
+	const int maxResults = 128;
+	dtStatus status = m_tileCache->queryTiles( bmin, bmax, results, &resultCount, maxResults );
+	if( !dtStatusSucceed( status ) )
+	{
+		return false;
+	}
+
+	// Remove tiles
+	for( int i = 0; i < resultCount; i++ )
+	{
+		unsigned char* data; 
+		int dataSize;
+		m_tileCache->removeTile( results[i], &data, &dataSize );
+	}
+
+	// Build minimal map mesh only for specified bounds
+	// m_pMapMesh = new CMapMesh();
+
+	// Rasterize
+	//TileCacheData tiles[MAX_LAYERS];
+	//memset(tiles, 0, sizeof(tiles));
+	//int ntiles = rasterizeTileLayers(&ctx, pMapMesh, x, y, m_cfg, tiles, MAX_LAYERS);
+
+	// Build nav mesh tiles
+	//m_tileCache->buildNavMeshTile( ..., m_navMesh );
+
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -5189,6 +5189,15 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("minFadeDist"), bp::arg("maxFadeDist") ) );
         
         }
+        { //::CBaseEntity::SetForceAllowVPhysics
+        
+            typedef void ( ::CBaseEntity::*SetForceAllowVPhysics_function_type )(  ) ;
+            
+            CBaseEntity_exposer.def( 
+                "SetForceAllowVPhysics"
+                , SetForceAllowVPhysics_function_type( &::CBaseEntity::SetForceAllowVPhysics ) );
+        
+        }
         { //::CBaseEntity::SetFriction
         
             typedef void ( ::CBaseEntity::*SetFriction_function_type )( float ) ;
@@ -5297,6 +5306,16 @@ void register_CBaseEntity_class(){
                 "SetModel"
                 , SetModel_function_type( &::CBaseEntity::SetModel )
                 , ( bp::arg("szModelName") ) );
+        
+        }
+        { //::CBaseEntity::SetModelIndex
+        
+            typedef void ( ::CBaseEntity::*SetModelIndex_function_type )( int ) ;
+            
+            CBaseEntity_exposer.def( 
+                "SetModelIndex"
+                , SetModelIndex_function_type( &::CBaseEntity::SetModelIndex )
+                , ( bp::arg("index") ) );
         
         }
         { //::CBaseEntity::SetModelName

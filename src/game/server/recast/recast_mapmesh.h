@@ -29,6 +29,8 @@ public:
 	const float *GetNorms();
 	const rcChunkyTriMesh *GetChunkyMesh();
 
+	void AddEntity( CBaseEntity *pEnt );
+
 private:
 	bool IsTriangleInValidArea( const Vector *vTriangle );
 	void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, 

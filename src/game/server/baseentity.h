@@ -1951,11 +1951,14 @@ public:
 	
 	// Hack for keeper package due edict limit
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
+	// Hack for keeper package to force vphysics creation for entities without edicts (tiles/blocks)
+	void SetForceAllowVPhysics() { m_bForceAllowVPhysics = true; }
 
 private:
 	DensityWeightsMap m_DensityMap;
 
 	bool m_bDoNotRegisterEntity;
+	bool m_bForceAllowVPhysics;
 
 	bool					m_bAllowNavIgnore;
 	CNetworkHandle( CBaseEntity, m_hMousePassEntity ); // Passes mouse to this entity
