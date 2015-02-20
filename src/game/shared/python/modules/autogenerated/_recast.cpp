@@ -213,6 +213,10 @@ BOOST_PYTHON_MODULE(_recast){
             , ( bp::arg("name") )
             , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
+            "RebuildPartial"
+            , (bool ( ::CRecastMgr::* )( ::Vector const &,::Vector const & ) )( &::CRecastMgr::RebuildPartial )
+            , ( bp::arg("vMins"), bp::arg("vMaxs") ) )    
+        .def( 
             "RemoveEntObstacles"
             , (bool ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
             , ( bp::arg("pEntity") ) )    

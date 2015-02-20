@@ -367,6 +367,7 @@ void CRecastMesh::DebugRender()
 }
 #endif // CLIENT_DLL
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -417,6 +418,7 @@ bool CRecastMesh::RebuildTilesAt( const Vector &vMins, const Vector &vMaxs )
 
 	return true;
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -27,8 +27,8 @@
 #include "tier0/memdbgon.h"
 
 static ConVar recast_build_single( "recast_build_single", "" );
-static ConVar recast_build_threaded( "recast_build_threaded", "1" );
-static ConVar recast_build_numthreads( "recast_build_numthreads", "4" );
+static ConVar recast_build_threaded( "recast_build_threaded", "1", FCVAR_ARCHIVE );
+static ConVar recast_build_numthreads( "recast_build_numthreads", "8", FCVAR_ARCHIVE );
 
 // This value specifies how many layers (or "floors") each navmesh tile is expected to have.
 static const int EXPECTED_LAYERS_PER_TILE = 4;
@@ -458,7 +458,84 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 			navmeshMemUsage += tile->dataSize;
 	}
 
-	DevMsg( "CRecastMesh: Generated navigation mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
+	DevMsg( "CRecastMesh: Generated navigation mesh %s in %f seconds\n", m_Name.Get(), Plat_FloatTime() - fStartTime );
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Partial rebuild. Destroys tiles at bounds touching the mesh and 
+//			rebuilds those tiles.
+//-----------------------------------------------------------------------------
+bool CRecastMesh::RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const Vector &vMaxs )
+{
+	double fStartTime = Plat_FloatTime();
+
+	BuildContext ctx;
+	dtStatus status;
+
+	const dtTileCacheParams &tcparams = *m_tileCache->getParams();
+
+	float bmin[3];
+	float bmax[3];
+	
+	bmin[0] = vMins.x;
+	bmin[1] = vMins.z;
+	bmin[2] = vMins.y;
+	bmax[0] = vMaxs.x;
+	bmax[1] = vMaxs.z;
+	bmax[2] = vMaxs.y;
+
+	const float tw = tcparams.width * tcparams.cs;
+	const float th = tcparams.height * tcparams.cs;
+	const int tx0 = (int)dtMathFloorf((bmin[0]-tcparams.orig[0]) / tw);
+	const int tx1 = (int)dtMathFloorf((bmax[0]-tcparams.orig[0]) / tw);
+	const int ty0 = (int)dtMathFloorf((bmin[2]-tcparams.orig[2]) / th);
+	const int ty1 = (int)dtMathFloorf((bmax[2]-tcparams.orig[2]) / th);
+	
+	TileCacheData tiles[MAX_LAYERS];
+	int ntiles;
+	dtCompressedTileRef results[128];
+
+	for (int ty = ty0; ty <= ty1; ++ty)
+	{
+		for (int tx = tx0; tx <= tx1; ++tx)
+		{
+			int nCount = m_tileCache->getTilesAt( tx, ty, results, 128 );
+			for( int i = 0; i < nCount; i++ )
+			{
+				unsigned char* data; 
+				int dataSize;
+				m_tileCache->removeTile( results[i], &data, &dataSize );
+			}
+
+			memset(tiles, 0, sizeof(tiles));
+			ntiles = rasterizeTileLayers(&ctx, pMapMesh, tx, ty, m_cfg, tiles, MAX_LAYERS);
+
+			for (int i = 0; i < ntiles; ++i)
+			{
+				TileCacheData* tile = &tiles[i];
+				status = m_tileCache->addTile(tile->data, tile->dataSize, DT_COMPRESSEDTILE_FREE_DATA, 0);
+				if (dtStatusFailed(status))
+				{
+					dtFree(tile->data);
+					tile->data = 0;
+					continue;
+				}
+			}
+		}
+	}
+
+	// Build initial meshes
+	for (int ty = ty0; ty <= ty1; ++ty)
+	{
+		for (int tx = tx0; tx <= tx1; ++tx)
+		{
+			m_tileCache->buildNavMeshTilesAt(tx,ty, m_navMesh);
+		}
+	}
+
+	DevMsg( "CRecastMesh: Generated partical mesh update %s in %f seconds\n", m_Name.Get(), Plat_FloatTime() - fStartTime );
 
 	return true;
 }
@@ -466,7 +543,7 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 //-----------------------------------------------------------------------------
 // Purpose: Loads the map mesh (geometry)
 //-----------------------------------------------------------------------------
-bool CRecastMgr::LoadMapMesh()
+bool CRecastMgr::LoadMapMesh( bool bLog )
 {
 	double fStartTime = Plat_FloatTime();
 	if( m_pMapMesh )
@@ -475,7 +552,7 @@ bool CRecastMgr::LoadMapMesh()
 		m_pMapMesh = NULL;
 	}
 
-	m_pMapMesh = new CMapMesh();
+	m_pMapMesh = new CMapMesh( bLog );
 	if( !m_pMapMesh->Load() )
 	{
 		Warning("CRecastMesh::Load: failed to load map data!\n");
@@ -518,6 +595,13 @@ void CRecastMgr::ThreadedBuildMesh( CRecastMesh *&pMesh )
 	pMesh->Build( (CMapMesh *)RecastMgr().GetMapMesh() );
 }
 
+static Vector s_RebuildPartialMesh_Mins;
+static Vector s_RebuildPartialMesh_Maxs;
+void CRecastMgr::ThreadedRebuildPartialMesh( CRecastMesh *&pMesh )
+{
+	pMesh->RebuildPartial( (CMapMesh *)RecastMgr().GetMapMesh(), s_RebuildPartialMesh_Mins, s_RebuildPartialMesh_Maxs );
+}
+
 static char* s_MeshNames[] = 
 {
 	"human",
@@ -537,7 +621,7 @@ bool CRecastMgr::Build()
 	// Load map mesh
 	if( !LoadMapMesh() )
 	{
-		Warning("CRecastMesh::Load: failed to load map data!\n");
+		Warning("CRecastMesh::Build: failed to load map data!\n");
 		return false;
 	}
 
@@ -553,7 +637,7 @@ bool CRecastMgr::Build()
 		// Build threaded
 		CParallelProcessor<CRecastMesh *, CFuncJobItemProcessor<CRecastMesh *>, 2 > processor;
 		processor.m_ItemProcessor.Init( &ThreadedBuildMesh, &PreThreadedBuildMesh, &PostThreadedBuildMesh );
-		processor.Run( meshesToBuild.Base(), meshesToBuild.Count(), 1, INT_MAX, g_pThreadPool );
+		processor.Run( meshesToBuild.Base(), meshesToBuild.Count(), 1, recast_build_numthreads.GetInt(), g_pThreadPool );
 	}
 	else
 	{
@@ -572,6 +656,32 @@ bool CRecastMgr::Build()
 
 	m_bLoaded = true;
 	DevMsg( "CRecastMgr: Finished generating %d meshes in %f seconds\n", m_Meshes.Count(), Plat_FloatTime() - fStartTime );
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Rebuilds a part of the navigation mesh
+//-----------------------------------------------------------------------------
+bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
+{
+	// Load map mesh
+	if( !LoadMapMesh( false ) )
+	{
+		Warning("CRecastMesh::RebuildPartial: failed to load map data!\n");
+		return false;
+	}
+
+	s_RebuildPartialMesh_Mins = vMins;
+	s_RebuildPartialMesh_Maxs = vMaxs;
+
+	CUtlVector<CRecastMesh *> meshesToBuild;
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+		meshesToBuild.AddToTail( m_Meshes[i] );
+
+	CParallelProcessor<CRecastMesh *, CFuncJobItemProcessor<CRecastMesh *>, 2 > processor;
+	processor.m_ItemProcessor.Init( &ThreadedRebuildPartialMesh, &PreThreadedBuildMesh, &PostThreadedBuildMesh );
+	processor.Run( meshesToBuild.Base(), meshesToBuild.Count(), 1, recast_build_numthreads.GetInt(), g_pThreadPool );
+
 	return true;
 }
 

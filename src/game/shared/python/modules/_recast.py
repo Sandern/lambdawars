@@ -39,6 +39,7 @@ class Recast(SemiSharedModuleGenerator):
         if self.isserver:
             cls.mem_fun('Build').include()
             cls.mem_fun('Save').include()
+            cls.mem_fun('RebuildPartial').include()
         
         cls.mem_fun('AddEntRadiusObstacle').include()
         cls.mem_fun('AddEntBoxObstacle').include()

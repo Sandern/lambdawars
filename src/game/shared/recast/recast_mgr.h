@@ -68,12 +68,16 @@ public:
 	
 #ifndef CLIENT_DLL
 	// Generation methods
-	virtual bool LoadMapMesh();
+	virtual bool LoadMapMesh( bool bLog = true );
 	virtual bool Build();
 	virtual bool Save();
 
+	// Rebuilds mesh partial. Clears and rebuilds tiles touching the bounds.
+	virtual bool RebuildPartial( const Vector &vMins, const Vector& vMaxs );
+
 	// threaded mesh building
 	static void ThreadedBuildMesh( CRecastMesh *&pMesh );
+	static void ThreadedRebuildPartialMesh( CRecastMesh *&pMesh );
 #endif // CLIENT_DLL
 
 	// Obstacle management

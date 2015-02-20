@@ -16,7 +16,7 @@
 class CMapMesh : public IMapMesh
 {
 public:
-	CMapMesh();
+	CMapMesh( bool bLog = true );
 	~CMapMesh();
 
 	bool Load();
@@ -42,6 +42,8 @@ private:
 	virtual bool GenerateBrushData( void *fileContent, CUtlVector<float> &verts, CUtlVector<int> &triangles );
 
 private:
+	bool m_bLog;
+
 	CUtlVector< float > m_Vertices;
 	CUtlVector< int > m_Triangles; // Indices into m_Vertices
 	CUtlVector< float > m_Normals;

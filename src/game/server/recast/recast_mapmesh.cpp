@@ -29,12 +29,14 @@ static ConVar recast_mapmesh_loaddynamicprops("recast_mapmesh_loaddynamicprops",
 static ConVar recast_mapmesh_loaddisplacements("recast_mapmesh_loaddisplacements", "1");
 static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "0");
 
+static ConVar recast_mapmesh_debug("recast_mapmesh_debug", "0");
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CMapMesh::CMapMesh() : m_chunkyMesh(0)
+CMapMesh::CMapMesh( bool bLog ) : m_chunkyMesh(0)
 {
-
+	m_bLog = bLog || recast_mapmesh_debug.GetBool();
 }
 
 //-----------------------------------------------------------------------------
@@ -393,7 +395,8 @@ bool CMapMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &ver
 		// Read models
 		CUtlBuffer staticPropData( (void *)((char *)fileContent + staticPropLumpHeader->fileofs), staticPropLumpHeader->filelen, CUtlBuffer::READ_ONLY );
 		int dictEntries = staticPropData.GetInt();
-		Msg("Listening %d static prop dict entries\n", dictEntries);
+		if( m_bLog )
+			Msg("Listening %d static prop dict entries\n", dictEntries);
 		StaticPropDictLump_t staticPropDictLump;
 
 		CUtlVector<vcollide_t *> modelsVCollides;
@@ -402,7 +405,8 @@ bool CMapMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &ver
 		for( int i = 0; i < dictEntries; i++ )
 		{
 			staticPropData.Get( &staticPropDictLump, sizeof( staticPropDictLump ) );
-			Msg("%d: %s\n", i, staticPropDictLump.m_Name);
+			if( m_bLog )
+				Msg("%d: %s\n", i, staticPropDictLump.m_Name);
 
 			vcollide_t *vcollide = LoadModelPhysCollide( staticPropDictLump.m_Name );
 			if( !vcollide )
@@ -416,7 +420,8 @@ bool CMapMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &ver
 		// Read static prop leafs
 		int leafEntries = staticPropData.GetInt();
 		StaticPropLeafLump_t staticPropLeaf;
-		Msg("Listening %d static prop leaf entries\n", leafEntries);
+		if( m_bLog )
+			Msg("Listening %d static prop leaf entries\n", leafEntries);
 		for( int i = 0; i < leafEntries; i++ )
 		{
 			staticPropData.Get( &staticPropLeaf, sizeof( staticPropLeaf ) );
@@ -466,7 +471,8 @@ bool CMapMesh::GenerateStaticPropData( void *fileContent, CUtlVector<float> &ver
 			//Msg("%d: %f %f %f\n", i, staticProp.m_Origin.x, staticProp.m_Origin.y, staticProp.m_Origin.z);
 		}
 
-		Msg("Listened %d static prop entries, of which %d have vphysics, and %d bbox\n", staticPropEntries, propsWithCollision, propsWithCollisionBB);
+		if( m_bLog )
+			Msg("Listened %d static prop entries, of which %d have vphysics, and %d bbox\n", staticPropEntries, propsWithCollision, propsWithCollisionBB);
 	}
 	else
 	{
@@ -597,9 +603,10 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 	{
 		dmodel_t *pModel = &brushmodels[ i ];
 
-		int contents = CalcBrushContents( fileContent, pModel->headnode );
+		//int contents = CalcBrushContents( fileContent, pModel->headnode );
 
 		// Only parse the first brush (world) and clips
+		// TODO: Should probably parse certain brush entities too
 		if( i != 0 /*&& (contents & (CONTENTS_MONSTERCLIP)) == 0*/ )
 		{
 			continue;
@@ -608,7 +615,6 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 		matrix3x4_t transform; // model to world transformation
 		AngleMatrix( vec3_angle, pModel->origin, transform);
 
-		DevMsg( "Brush %d: solid count %d, contents: %d\n", i, parsedphysmodels[i].solidCount, contents );
 		for( int j = 0; j < parsedphysmodels[i].solidCount; j++ )
 		{
 			AddCollisionModelToMesh( transform, parsedphysmodels[i].solids[j], verts, triangles, CONTENTS_WATER );
@@ -760,7 +766,8 @@ bool CMapMesh::Load()
 	}
 #endif // ENABLE_PYTHON
 
-	Msg( "Recast Load map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, GetNumVerts(), GetNumTris(), length, header->m_nVersion );
+	if( m_bLog )
+		Msg( "Recast Load map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, GetNumVerts(), GetNumTris(), length, header->m_nVersion );
 
 	// Calculate normals.
 	float *verts = m_Vertices.Base();

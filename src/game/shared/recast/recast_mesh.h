@@ -73,6 +73,8 @@ public:
 #ifndef CLIENT_DLL
 	virtual bool Build( CMapMesh *pMapMesh );
 	virtual bool Save( CUtlBuffer &fileBuffer );
+
+	virtual bool RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const Vector &vMaxs );
 #endif // CLIENT_DLL
 
 #ifdef CLIENT_DLL
@@ -80,7 +82,7 @@ public:
 #endif // CLIENT_DLL
 
 	// Dynamic tile building
-	virtual bool RebuildTilesAt( const Vector &vMins, const Vector &vMaxs );
+	//virtual bool RebuildTilesAt( const Vector &vMins, const Vector &vMaxs );
 
 	// Mesh Querying
 	int GetPolyRef( const Vector &vPoint, float fBeneathLimit = 120.0f );
