@@ -233,7 +233,6 @@ void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar
 //-----------------------------------------------------------------------------
 CCefSystem::CCefSystem() : m_bIsRunning(false), m_bHasKeyFocus(false), m_bHasDeadChar(false)
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -255,15 +254,18 @@ bool CCefSystem::Init()
 	const bool bCefEnableGPU = CommandLine() && CommandLine()->FindParm("-cefenablegpu") != 0;
 
 	// Get path to subprocess browser
-	char browser_subprocess_path[_MAX_PATH];
-	filesystem->RelativePathToFullPath( "bin/lambdawars_browser.exe", "MOD", browser_subprocess_path, _MAX_PATH );
+	// Note: use relative path, because otherwise the path may be invalid.
+	// Working directory is changed to the game folder by CSrcPython.
+	char browser_subprocess_path[MAX_PATH];
+	V_strncpy( browser_subprocess_path, "bin/lambdawars_browser.exe", sizeof( browser_subprocess_path ) );
+	//filesystem->RelativePathToFullPath( "bin/lambdawars_browser.exe", "MOD", browser_subprocess_path, sizeof( browser_subprocess_path ) );
 
 	// The process sub process file should exist. Error out, because otherwise we can't display the main menu
-	if( filesystem->FileExists( browser_subprocess_path ) == false )
+	/*if( filesystem->FileExists( browser_subprocess_path ) == false )
 	{
 		Error( "Could not locate \"%s\". Please check your installation.\n", browser_subprocess_path );
 		return false;
-	}
+	}*/
 
 #ifdef WIN32 
 	// Find and set the main window

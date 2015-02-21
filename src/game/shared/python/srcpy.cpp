@@ -283,6 +283,8 @@ bool CSrcPython::InitInterpreter( void )
 	filesystem->AddVPKFile( "python\\pythonlib_dir.vpk" );
 
 	const int iVerbose = CommandLine() ? CommandLine()->ParmValue("-pythonverbose", 0) : 0;
+	const int iDebugPython = CommandLine() ? CommandLine()->ParmValue("-pythondebug", 0) : 0;
+	g_debug_python.SetValue( iDebugPython );
 
 #ifdef CLIENT_DLL
 	// WarsSplitscreen: only one player
@@ -304,7 +306,7 @@ bool CSrcPython::InitInterpreter( void )
 	
 #define PY_MAX_PATH 2048
 
-	char buf[PY_MAX_PATH];
+	//char buf[PY_MAX_PATH];
 	char pythonpath[PY_MAX_PATH];
 	pythonpath[0] = '\0';
 	char pythonhome[PY_MAX_PATH];
@@ -317,27 +319,27 @@ bool CSrcPython::InitInterpreter( void )
 #endif // WIN32
 
 	// Set PYTHONHOME
-	filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonhome, buf, sizeof(pythonhome) );
+	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonhome, "python", sizeof(pythonhome) );
 	
 	// Set PYTHONPATH
 #ifdef WIN32
 #ifdef CLIENT_DLL
-	filesystem->RelativePathToFullPath("python/ClientDLLs", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	//filesystem->RelativePathToFullPath("python/ClientDLLs", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, "python/ClientDLLs", sizeof(pythonpath) );
 #else
-	filesystem->RelativePathToFullPath("python/DLLs", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	//filesystem->RelativePathToFullPath("python/DLLs", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, "python/DLLs", sizeof(pythonpath) );
 #endif // CLIENT_DLL
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 #endif // WIN32
 
-	filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, "python", sizeof(pythonpath) );
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 
 	// Workaround for adding these paths
@@ -350,20 +352,20 @@ bool CSrcPython::InitInterpreter( void )
 		filesystem->CreateDirHierarchy( "python/srclib", "MOD" );
 	}
 
-	filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	//filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, "python/Lib", sizeof(pythonpath) );
 	
 #ifdef OSX
-	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	filesystem->RelativePathToFullPath("python/plat-darwin", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	//V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
+	//filesystem->RelativePathToFullPath("python/plat-darwin", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, "python/plat-darwin", sizeof(pythonpath) );
 	
-	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	V_FixupPathName(buf, sizeof(buf), buf);
-	V_strcat( pythonpath, buf, sizeof(pythonpath) );
+	//V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
+	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
+	//V_FixupPathName(buf, sizeof(buf), buf);
+	V_strcat( pythonpath, "python", sizeof(pythonpath) );
 #endif // OSX
 	
 	if( g_debug_python.GetBool() )
@@ -1206,23 +1208,51 @@ void CSrcPython::Run( const char *pString, boost::python::object module )
 //-----------------------------------------------------------------------------
 bool CSrcPython::ExecuteFile( const char* pScript )
 {
-	char char_filename[ _MAX_PATH ];
-	char char_output_full_filename[ _MAX_PATH ];
-
-	V_strncpy( char_filename, pScript, sizeof( char_filename ) );
-	filesystem->RelativePathToFullPath( char_filename, "MOD", char_output_full_filename, sizeof( char_output_full_filename ) );
-
-	const char *constcharpointer = reinterpret_cast<const char *>( char_output_full_filename );
-
-	if( !filesystem->FileExists( constcharpointer ) )
+	if( !filesystem->FileExists( pScript ) )
 	{
-		Warning( "[Python] IFileSystem Cannot find the file: %s\n", constcharpointer );
+		Warning( "[Python] IFileSystem Cannot find the file: %s\n", pScript );
 		return false;
 	}
 
 	try
 	{
-		exec_file( constcharpointer, mainnamespace, mainnamespace );
+		// Read in file using source filesystem, to prevent issues with encoding in path name
+		PyObject *filename;
+		filename = PyUnicode_DecodeFSDefault(pScript);
+		if (filename == NULL)
+		{
+			Warning( "[Python] IFileSystem Cannot find the file: %s\n", pScript );
+			return false;
+		}
+
+		boost::python::object global = mainnamespace;
+		boost::python::object local = mainnamespace;
+
+		// Set suitable default values for global and local dicts.
+		if (global.is_none())
+		{
+			if (PyObject *g = PyEval_GetGlobals())
+				global = boost::python::object(boost::python::detail::borrowed_reference(g));
+			else
+				global = boost::python::dict();
+		}
+		if (local.is_none()) local = global;
+
+		CUtlBuffer content;
+		if( !filesystem->ReadFile( pScript, NULL, content ) )
+		{
+			Warning( "[Python] IFileSystem Cannot find the file: %s\n", pScript );
+			Py_DECREF(filename);
+			return false;
+		}
+
+		PyCompilerFlags cf;
+		cf.cf_flags = PyCF_SOURCE_IS_UTF8;
+
+		PyObject *v = PyRun_StringFlags((const char *)content.Base(), Py_file_input, global.ptr(), local.ptr(), &cf);
+
+		Py_DECREF(v);
+		Py_DECREF(filename);
 	}
 	catch( bp::error_already_set & )
 	{
@@ -1280,14 +1310,14 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 	bp::object append = Get("append", Get("path", "sys", true), true);
 
 	// Fixup path
-	char char_output_full_filename[MAX_PATH];
-	char p_out[MAX_PATH];
-	filesystem->RelativePathToFullPath( path, NULL, char_output_full_filename, sizeof( char_output_full_filename ) );
-	V_FixupPathName( char_output_full_filename, sizeof( char_output_full_filename ), char_output_full_filename );
-	V_StrSubst( char_output_full_filename, "\\", "/", p_out, sizeof( p_out ) ); 
+	//char char_output_full_filename[MAX_PATH];
+	//char p_out[MAX_PATH];
+	//filesystem->RelativePathToFullPath( path, NULL, char_output_full_filename, sizeof( char_output_full_filename ) );
+	//V_FixupPathName( char_output_full_filename, sizeof( char_output_full_filename ), char_output_full_filename );
+	//V_StrSubst( char_output_full_filename, "\\", "/", p_out, sizeof( p_out ) ); 
 	
 	// Append
-	Run<const char *>( append, p_out, true );
+	Run<const char *>( append, path, true );
 
 	// Check for sub dirs
 	if( inclsubdirs )
