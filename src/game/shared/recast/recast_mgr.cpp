@@ -77,9 +77,9 @@ void CRecastMgr::Reset()
 	}
 	m_Meshes.PurgeAndDeleteElements();
 
+#ifndef CLIENT_DLL
 	m_pendingPartialMeshUpdates.Purge();
 
-#ifndef CLIENT_DLL
 	if( m_pMapMesh )
 	{
 		delete m_pMapMesh;
