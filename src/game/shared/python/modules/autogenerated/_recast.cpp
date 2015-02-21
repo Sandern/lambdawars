@@ -84,6 +84,14 @@ BOOST_PYTHON_MODULE(_recast){
             , (bool ( ::CRecastMgr::* )( ::C_BaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
         .def( 
+            "FindBestMeshNameForEntity"
+            , (char const * ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::FindBestMeshNameForEntity )
+            , ( bp::arg("pEntity") ) )    
+        .def( 
+            "FindBestMeshNameForRadiusHeight"
+            , (char const * ( ::CRecastMgr::* )( float,float ) )( &::CRecastMgr::FindBestMeshNameForRadiusHeight )
+            , ( bp::arg("radius"), bp::arg("height") ) )    
+        .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("index") )
@@ -93,6 +101,10 @@ BOOST_PYTHON_MODULE(_recast){
             , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("name") )
             , bp::return_value_policy< bp::reference_existing_object >() )    
+        .def( 
+            "IsMeshLoaded"
+            , (bool ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::IsMeshLoaded )
+            , ( bp::arg("name") ) )    
         .def( 
             "RemoveEntObstacles"
             , (bool ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
@@ -203,6 +215,14 @@ BOOST_PYTHON_MODULE(_recast){
             "Build"
             , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Build ) )    
         .def( 
+            "FindBestMeshNameForEntity"
+            , (char const * ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::FindBestMeshNameForEntity )
+            , ( bp::arg("pEntity") ) )    
+        .def( 
+            "FindBestMeshNameForRadiusHeight"
+            , (char const * ( ::CRecastMgr::* )( float,float ) )( &::CRecastMgr::FindBestMeshNameForRadiusHeight )
+            , ( bp::arg("radius"), bp::arg("height") ) )    
+        .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("index") )
@@ -212,6 +232,10 @@ BOOST_PYTHON_MODULE(_recast){
             , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
             , ( bp::arg("name") )
             , bp::return_value_policy< bp::reference_existing_object >() )    
+        .def( 
+            "IsMeshLoaded"
+            , (bool ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::IsMeshLoaded )
+            , ( bp::arg("name") ) )    
         .def( 
             "RebuildPartial"
             , (bool ( ::CRecastMgr::* )( ::Vector const &,::Vector const & ) )( &::CRecastMgr::RebuildPartial )

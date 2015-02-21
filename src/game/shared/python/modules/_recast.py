@@ -48,6 +48,10 @@ class Recast(SemiSharedModuleGenerator):
         cls.mem_funs('GetMesh').include()
         cls.mem_funs('GetMesh', matchers.calldef_matcher_t(return_type=pointer_t(declarated_t(meshcls)))).call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
         
+        cls.mem_funs('IsMeshLoaded').include()
+        cls.mem_funs('FindBestMeshNameForRadiusHeight').include()
+        cls.mem_funs('FindBestMeshNameForEntity').include()
+        
         mb.free_function('RecastMgr').include()
         mb.free_function('RecastMgr').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
         

@@ -55,11 +55,15 @@ public:
 	bool HasMeshes();
 	CRecastMesh *GetMesh( int index );
 	CRecastMesh *GetMesh( const char *name );
+	bool IsMeshLoaded( const char *name );
 	int FindMeshIndex( const char *name );
 	CUtlDict< CRecastMesh *, int > &GetMeshes();
 
 	int FindBestMeshForRadiusHeight( float radius, float height );
 	int FindBestMeshForEntity( CBaseEntity *pEntity );
+
+	const char *FindBestMeshNameForRadiusHeight( float radius, float height );
+	const char *FindBestMeshNameForEntity( CBaseEntity *pEntity );
 
 	// Used for debugging purposes on client
 	virtual dtNavMesh* GetNavMesh( const char *meshName );

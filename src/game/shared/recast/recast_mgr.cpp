@@ -157,6 +157,15 @@ int CRecastMgr::FindMeshIndex( const char *name )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CRecastMgr::IsMeshLoaded( const char *name )
+{
+	CRecastMesh *pMesh = GetMesh( name );
+	return pMesh != NULL && pMesh->IsLoaded();
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Determines best nav mesh radius/height
 //-----------------------------------------------------------------------------
 int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
@@ -199,6 +208,26 @@ int CRecastMgr::FindBestMeshForEntity( CBaseEntity *pEntity )
 	if( !pEntity )
 		return -1;
 	return FindBestMeshForRadiusHeight( pEntity->CollisionProp()->BoundingRadius2D(), pEntity->CollisionProp()->OBBSize().z );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+const char *CRecastMgr::FindBestMeshNameForRadiusHeight( float radius, float height )
+{
+	int idx = FindBestMeshForRadiusHeight( radius, height );
+	CRecastMesh *pMesh = GetMesh( idx );
+	return pMesh ? pMesh->GetName() : NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+const char *CRecastMgr::FindBestMeshNameForEntity( CBaseEntity *pEntity )
+{
+	int idx = FindBestMeshForEntity( pEntity );
+	CRecastMesh *pMesh = GetMesh( idx );
+	return pMesh ? pMesh->GetName() : NULL;
 }
 
 //-----------------------------------------------------------------------------
