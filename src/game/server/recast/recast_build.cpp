@@ -547,19 +547,35 @@ bool CRecastMesh::RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const
 //-----------------------------------------------------------------------------
 // Purpose: Loads the map mesh (geometry)
 //-----------------------------------------------------------------------------
-bool CRecastMgr::LoadMapMesh( bool bLog )
+bool CRecastMgr::LoadMapMesh( bool bLog, bool bDynamicOnly )
 {
-	double fStartTime = Plat_FloatTime();
-	if( m_pMapMesh )
+	if( bDynamicOnly && !m_pMapMesh )
 	{
-		delete m_pMapMesh;
-		m_pMapMesh = NULL;
+		Warning("CRecastMesh::LoadMapMesh: load dynamic specified, but no existing static map mesh data!\n");
+		return false;
 	}
 
-	m_pMapMesh = new CMapMesh( bLog );
-	if( !m_pMapMesh->Load() )
+	double fStartTime = Plat_FloatTime();
+
+	// Create a new map mesh if we are loading everything
+	if( !bDynamicOnly )
 	{
-		Warning("CRecastMesh::Load: failed to load map data!\n");
+		if( m_pMapMesh )
+		{
+			delete m_pMapMesh;
+			m_pMapMesh = NULL;
+		}
+
+		m_pMapMesh = new CMapMesh( bLog );
+	}
+	else
+	{
+		m_pMapMesh->SetLog( bLog );
+	}
+
+	if( !m_pMapMesh->Load( bDynamicOnly ) )
+	{
+		Warning("CRecastMesh::LoadMapMesh: failed to load map data!\n");
 		return false;
 	}
 
@@ -696,7 +712,7 @@ bool CRecastMgr::Build()
 bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
 {
 	// Load map mesh
-	if( !LoadMapMesh( recast_build_partial_debug.GetBool() ) )
+	if( !LoadMapMesh( recast_build_partial_debug.GetBool(), true ) )
 	{
 		Warning("CRecastMesh::RebuildPartial: failed to load map data!\n");
 		return false;

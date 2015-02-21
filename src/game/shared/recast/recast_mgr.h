@@ -68,7 +68,7 @@ public:
 	
 #ifndef CLIENT_DLL
 	// Generation methods
-	virtual bool LoadMapMesh( bool bLog = true );
+	virtual bool LoadMapMesh( bool bLog = true, bool bDynamicOnly = false );
 	virtual bool Build();
 	virtual bool Save();
 

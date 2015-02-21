@@ -19,8 +19,9 @@ public:
 	CMapMesh( bool bLog = true );
 	~CMapMesh();
 
-	bool Load();
-	void Clear();
+	bool Load( bool bDynamicOnly = false );
+	void Clear( bool bDynamicOnly = false );
+	void SetLog( bool bLog ) { m_bLog = bLog; }
 
 	const float *GetVerts();
 	int GetNumVerts();
@@ -49,6 +50,9 @@ private:
 	CUtlVector< float > m_Normals;
 
 	rcChunkyTriMesh* m_chunkyMesh;
+
+	int m_iStaticVertCountEnd;
+	int m_iStaticTrisCountEnd;
 };
 
 inline const float *CMapMesh::GetVerts()

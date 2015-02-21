@@ -32,7 +32,7 @@ static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CMapMesh::CMapMesh( bool bLog ) : m_chunkyMesh(0)
+CMapMesh::CMapMesh( bool bLog ) : m_chunkyMesh(0), m_iStaticVertCountEnd(0), m_iStaticTrisCountEnd(0)
 {
 	m_bLog = bLog;
 }
@@ -48,10 +48,18 @@ CMapMesh::~CMapMesh()
 //-----------------------------------------------------------------------------
 // Purpose: Clears loaded map data
 //-----------------------------------------------------------------------------
-void CMapMesh::Clear()
+void CMapMesh::Clear( bool bDynamicOnly )
 {
-	m_Vertices.Purge();
-	m_Triangles.Purge();
+	if( bDynamicOnly )
+	{
+		m_Vertices.RemoveMultiple( m_iStaticVertCountEnd, m_Vertices.Count() - m_iStaticVertCountEnd );
+		m_Triangles.RemoveMultiple( m_iStaticTrisCountEnd, m_Triangles.Count() - m_iStaticTrisCountEnd );
+	}
+	else
+	{
+		m_Vertices.Purge();
+		m_Triangles.Purge();
+	}
 	m_Normals.Purge();
 
 	if( m_chunkyMesh )
@@ -625,116 +633,47 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CMapMesh::Load()
+bool CMapMesh::Load( bool bDynamicOnly )
 {
-	Clear();
+	Clear( bDynamicOnly );
 
-	// nav filename is derived from map filename
-	char filename[256];
-	V_snprintf( filename, sizeof( filename ), "maps\\%s.bsp", STRING( gpGlobals->mapname ) );
-
-	CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::READ_ONLY );
-	if ( !filesystem->ReadFile( filename, "MOD", fileBuffer ) )	// this ignores .nav files embedded in the .bsp ...
+	if( !bDynamicOnly )
 	{
-		Warning("Recast LoadMapData: unable to read bsp");
-		return false;
-	}
+		// nav filename is derived from map filename
+		char filename[256];
+		V_snprintf( filename, sizeof( filename ), "maps\\%s.bsp", STRING( gpGlobals->mapname ) );
 
-	int length = fileBuffer.TellMaxPut();
-	void *fileContent = fileBuffer.Base();
-
-	BSPHeader_t *header = (BSPHeader_t *)fileContent;
-
-#if 0
-	// Load vertices
-	dvertex_t *vertices = (dvertex_t *)((char *)fileContent + header->lumps[LUMP_VERTEXES].fileofs);
-	int nvertsLump = (header->lumps[LUMP_VERTEXES].filelen) / sizeof(dvertex_t);
-	for( int i = 0; i < nvertsLump; i++ )
-	{
-		m_Vertices.AddToTail( vertices[i].point[0] );
-		m_Vertices.AddToTail( vertices[i].point[2] );
-		m_Vertices.AddToTail( vertices[i].point[1] );
-	}
-
-	// Load edges and Surfedge array
-	//dedge_t *edges = (dedge_t *)((char *)fileContent + header->lumps[LUMP_EDGES].fileofs);
-	//int nEdges = (header->lumps[LUMP_EDGES].filelen) / sizeof(dedge_t);
-	//int *surfedge = (int *)((char *)fileContent + header->lumps[LUMP_SURFEDGES].fileofs);
-	//int nSurfEdges = (header->lumps[LUMP_SURFEDGES].filelen) / sizeof(int);
-
-	// Load texinfo
-	//texinfo_s *texinfo = (texinfo_s *)((char *)fileContent + header->lumps[LUMP_TEXINFO].fileofs);
-	//int nTexInfo = (header->lumps[LUMP_TEXINFO].filelen) / sizeof(texinfo_s);
-
-	// Load triangles, parse from faces
-	dface_t *faces = (dface_t *)((char *)fileContent + header->lumps[LUMP_FACES].fileofs);
-	int nFaces = (header->lumps[LUMP_FACES].filelen) / sizeof(dface_t);
-	for( int i = 0; i < nFaces; i++ )
-	{
-		if ( faces[i].dispinfo == -1 )
+		CUtlBuffer fileBuffer( 4096, 1024*1024, CUtlBuffer::READ_ONLY );
+		if ( !filesystem->ReadFile( filename, "MOD", fileBuffer ) )	// this ignores .nav files embedded in the .bsp ...
 		{
-			// Test texture info
-			if( faces[i].texinfo > 0 && faces[i].texinfo < nTexInfo )
-			{
-				texinfo_s &faceTexinfo = texinfo[faces[i].texinfo];
-				if( faceTexinfo.flags & (SURF_SKY2D|SURF_SKY|SURF_TRIGGER|SURF_HINT|SURF_SKIP) )
-				{
-					continue;
-				}
-			}
+			Warning("Recast LoadMapData: unable to read bsp");
+			return false;
+		}
 
-			// Create vertex at face origin
-			float x = 0, y = 0, z = 0;
-			for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
-			{
-				float *p1 = m_Vertices.Base() + (edges[abs(surfedge[j])].v[0] * 3);
-				float *p2 = m_Vertices.Base() + (edges[abs(surfedge[j])].v[1] * 3);
-				x += p1[0];
-				y += p1[1];
-				z += p1[2];
-				x += p2[0];
-				y += p2[1];
-				z += p2[2];
-			}
+		int length = fileBuffer.TellMaxPut();
+		void *fileContent = fileBuffer.Base();
 
-			x /= (float)(faces[i].numedges * 2);
-			y /= (float)(faces[i].numedges * 2);
-			z /= (float)(faces[i].numedges * 2);
+		// Static world geometry
+		if( recast_mapmesh_loaddisplacements.GetBool() )
+			GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
+		if( recast_mapmesh_loadstaticprops.GetBool() )
+			GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
+		if( recast_mapmesh_loadbrushes.GetBool() )
+			GenerateBrushData( fileContent, m_Vertices, m_Triangles );
 
-			int connectingVertIdx = m_Vertices.Count() / 3;
-			m_Vertices.AddToTail( x );
-			m_Vertices.AddToTail( y );
-			m_Vertices.AddToTail( z );
+		m_iStaticVertCountEnd = m_Vertices.Count();
+		m_iStaticTrisCountEnd = m_Triangles.Count();
 
-			//Msg( "\tface: %d, firstedge: %d, numedges: %d\n", i, faces[i].firstedge, faces[i].numedges );
-			// Turn the face into a set of triangles
-			for( int j = faces[i].firstedge; j < faces[i].firstedge+faces[i].numedges; j++ )
-			{
-				if( surfedge[j] < 0 )
-				{
-					m_Triangles.AddToTail( edges[-surfedge[j]].v[1] );
-					m_Triangles.AddToTail( edges[-surfedge[j]].v[0] );
-				}
-				else
-				{
-					m_Triangles.AddToTail( edges[surfedge[j]].v[0] );
-					m_Triangles.AddToTail( edges[surfedge[j]].v[1] );
-				}
-				m_Triangles.AddToTail( connectingVertIdx );
-			}
-
+		if( m_bLog )
+		{
+			BSPHeader_t *header = (BSPHeader_t *)fileContent;
+			Msg( "Recast Load static map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, GetNumVerts(), GetNumTris(), length, header->m_nVersion );
 		}
 	}
-#endif // 0
 
-	if( recast_mapmesh_loaddisplacements.GetBool() )
-		GenerateDispVertsAndTris( fileContent, m_Vertices, m_Triangles );
-	if( recast_mapmesh_loadstaticprops.GetBool() )
-		GenerateStaticPropData( fileContent, m_Vertices, m_Triangles );
+	// World geometry coming from entities
 	if( recast_mapmesh_loaddynamicprops.GetBool() )
 		GenerateDynamicPropData( m_Vertices, m_Triangles );
-	if( recast_mapmesh_loadbrushes.GetBool() )
-		GenerateBrushData( fileContent, m_Vertices, m_Triangles );
 
 #if defined(_DEBUG)
 	for( int i = 0; i < m_Triangles.Count(); i++ )
@@ -765,7 +704,7 @@ bool CMapMesh::Load()
 #endif // ENABLE_PYTHON
 
 	if( m_bLog )
-		Msg( "Recast Load map data for %s: %d verts and %d tris (bsp size: %d, version: %d)\n", filename, GetNumVerts(), GetNumTris(), length, header->m_nVersion );
+		Msg( "Recast Load static + dynamic map data: %d verts and %d tris\n", GetNumVerts(), GetNumTris() );
 
 	// Calculate normals.
 	float *verts = m_Vertices.Base();
