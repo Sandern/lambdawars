@@ -575,8 +575,11 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone(m_vFacingTargetPos, m_fFacingCone) );
 	}
+#if 0
 	// Face enemy for shooting by default
-	// TODO: This should be controlled from the AI action
+	// => Disabled this code, when needed the AI action will already do this. Otherwise introduces
+	//	  bugs because between switching action after a facing action, the unit may try to face
+	//    the enemy again.
 	else if( m_pOuter->GetEnemy() )
 	{
 		Vector dir = m_pOuter->GetEnemy()->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
@@ -584,6 +587,7 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
 	}
+#endif // 0
 	// Face path dir if we are following a path
 	else if( pPathDir ) 
 	{
