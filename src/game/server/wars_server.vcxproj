@@ -289,6 +289,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\recast\recast_file.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mgr_ent.cpp" />
     <ClCompile Include="..\shared\recast\recast_tilecache_helpers.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_server.cpp" />
     <ClCompile Include="lambdawars\unit_vehiclenavigator.cpp" />
@@ -1075,6 +1076,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\recast\recast_imgr.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="..\shared\recast\recast_mgr.h" />
+    <ClInclude Include="..\shared\recast\recast_mgr_ent.h" />
     <ClInclude Include="..\shared\recast\recast_tilecache_helpers.h" />
     <ClInclude Include="deferred\cdeferred_manager_server.h" />
     <ClInclude Include="deferred\deferred_server_common.h" />

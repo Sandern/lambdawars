@@ -1984,6 +1984,9 @@
     <ClCompile Include="recast\recast_offmesh_connection.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_mgr_ent.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3865,6 +3868,9 @@
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_imapmesh.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_mgr_ent.h">
       <Filter>Source Files\Recast</Filter>
     </ClInclude>
   </ItemGroup>

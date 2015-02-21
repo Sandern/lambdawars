@@ -98,6 +98,7 @@ static char* s_DefaultMeshNames[] =
 	"air"
 };
 
+
 bool CRecastMgr::InitDefaultMeshes()
 {
 	// Ensures default meshes exists, even if they don't have a mesh loaded.
@@ -160,6 +161,10 @@ int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
 		CRecastMesh *pMesh = m_Meshes[ i ];
+		if( !pMesh->IsLoaded() )
+		{
+			continue;
+		}
 
 		// Only consider fitting meshes
 		if( radius > pMesh->GetAgentRadius() || height > pMesh->GetAgentHeight() )

@@ -11,6 +11,7 @@
 #include "recast/recast_mesh.h"
 #include "recast/recast_mapmesh.h"
 #include "recast/recast_tilecache_helpers.h"
+#include "recast/recast_mgr_ent.h"
 #include "vstdlib/jobthread.h"
 
 #include "detour/DetourNavMesh.h"
@@ -612,6 +613,28 @@ static char* s_MeshNames[] =
 };
 
 //-----------------------------------------------------------------------------
+// Purpose: Checks if building this mesh is disabled
+//-----------------------------------------------------------------------------
+bool CRecastMgr::IsMeshBuildDisabled( const char *meshName )
+{
+	CRecastMgrEnt *pMgrEnt = GetRecastMgrEnt();
+	if( pMgrEnt )
+	{
+		if( pMgrEnt->HasSpawnFlags( SF_DISABLE_MESH_HUMAN ) && V_strcmp( "human", meshName ) == 0 )
+			return true;
+		else if( pMgrEnt->HasSpawnFlags( SF_DISABLE_MESH_MEDIUM ) && V_strcmp( "medium", meshName ) == 0 )
+			return true;
+		else if( pMgrEnt->HasSpawnFlags( SF_DISABLE_MESH_LARGE ) && V_strcmp( "large", meshName ) == 0 )
+			return true;
+		else if( pMgrEnt->HasSpawnFlags( SF_DISABLE_MESH_VERYLARGE ) && V_strcmp( "verylarge", meshName ) == 0 )
+			return true;
+		else if( pMgrEnt->HasSpawnFlags( SF_DISABLE_MESH_AIR ) && V_strcmp( "air", meshName ) == 0 )
+			return true;
+	}
+	return false;
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Builds all navigation meshes
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Build()
@@ -629,7 +652,11 @@ bool CRecastMgr::Build()
 	InitDefaultMeshes();
 	CUtlVector<CRecastMesh *> meshesToBuild;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		if( IsMeshBuildDisabled( m_Meshes[i]->GetName() ) )
+			continue;
 		meshesToBuild.AddToTail( m_Meshes[i] );
+	}
 
 	// Create meshes
 	if( recast_build_threaded.GetBool() )
@@ -676,7 +703,11 @@ bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
 
 	CUtlVector<CRecastMesh *> meshesToBuild;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		if( IsMeshBuildDisabled( m_Meshes[i]->GetName() ) )
+			continue;
 		meshesToBuild.AddToTail( m_Meshes[i] );
+	}
 
 	CParallelProcessor<CRecastMesh *, CFuncJobItemProcessor<CRecastMesh *>, 2 > processor;
 	processor.m_ItemProcessor.Init( &ThreadedRebuildPartialMesh, &PreThreadedBuildMesh, &PostThreadedBuildMesh );

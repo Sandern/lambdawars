@@ -302,6 +302,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\recast\recast_file.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
+    <ClCompile Include="..\shared\recast\recast_mgr_ent.cpp" />
     <ClCompile Include="..\shared\recast\recast_tilecache_helpers.cpp" />
     <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
     <ClCompile Include="cef\src_cef_local_handler.cpp" />
@@ -1524,6 +1525,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\recast\recast_imgr.h" />
     <ClInclude Include="..\shared\recast\recast_mesh.h" />
     <ClInclude Include="..\shared\recast\recast_mgr.h" />
+    <ClInclude Include="..\shared\recast\recast_mgr_ent.h" />
     <ClInclude Include="..\shared\recast\recast_tilecache_helpers.h" />
     <ClInclude Include="cef\src_cef_avatar_handler.h" />
     <ClInclude Include="cef\src_cef_local_handler.h" />

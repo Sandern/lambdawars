@@ -72,6 +72,8 @@ public:
 	virtual bool Build();
 	virtual bool Save();
 
+	virtual bool IsMeshBuildDisabled( const char *meshName );
+
 	// Rebuilds mesh partial. Clears and rebuilds tiles touching the bounds.
 	virtual bool RebuildPartial( const Vector &vMins, const Vector& vMaxs );
 
