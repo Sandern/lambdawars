@@ -350,16 +350,25 @@ bool CRecastMgr::Save()
 	unsigned int bspSize  = filesystem->Size( bspFilename );
 	DevMsg( "Size of bsp file '%s' is %u bytes.\n", bspFilename, bspSize );
 
+	CUtlVector< CRecastMesh * > meshesToSave;
+	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	{
+		// Mesh is not build, but could still be there from previous build when it was not disabled.
+		if( IsMeshBuildDisabled( m_Meshes[i]->GetName() ) )
+			continue;
+		meshesToSave.AddToTail( m_Meshes[i] );
+	}
+
 	NavMgrHeader header;
 	header.magic = NAVMESHSET_MAGIC;
 	header.version = NAVMESHSET_VERSION;
-	header.numMeshes = m_Meshes.Count();
+	header.numMeshes = meshesToSave.Count();
 	header.bspSize = bspSize;
 	fileBuffer.Put( &header, sizeof( header ) );
 
-	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
+	for( int i = 0; i < meshesToSave.Count(); i++ )
 	{
-		m_Meshes[i]->Save( fileBuffer );
+		meshesToSave[i]->Save( fileBuffer );
 	}
 
 	if ( !filesystem->WriteFile( filename, "MOD", fileBuffer ) )
