@@ -27,9 +27,11 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar recast_build_single( "recast_build_single", "" );
+static ConVar recast_build_single( "recast_build_single", "", 0, "Limit building to a single mesh named in this convar" );
 static ConVar recast_build_threaded( "recast_build_threaded", "1", FCVAR_ARCHIVE );
 static ConVar recast_build_numthreads( "recast_build_numthreads", "8", FCVAR_ARCHIVE );
+
+static ConVar recast_build_partial_debug( "recast_build_partial_debug", "0", 0, "debug partial mesh rebuilding" );
 
 // This value specifies how many layers (or "floors") each navmesh tile is expected to have.
 static const int EXPECTED_LAYERS_PER_TILE = 4;
@@ -536,7 +538,8 @@ bool CRecastMesh::RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const
 		}
 	}
 
-	DevMsg( "CRecastMesh: Generated partical mesh update %s in %f seconds\n", m_Name.Get(), Plat_FloatTime() - fStartTime );
+	if( recast_build_partial_debug.GetBool() )
+		DevMsg( "CRecastMesh: Generated partial mesh update %s in %f seconds\n", m_Name.Get(), Plat_FloatTime() - fStartTime );
 
 	return true;
 }
@@ -560,7 +563,8 @@ bool CRecastMgr::LoadMapMesh( bool bLog )
 		return false;
 	}
 
-	DevMsg( "CRecastMgr: Loaded map mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
+	if( bLog )
+		DevMsg( "CRecastMgr: Loaded map mesh in %f seconds\n", Plat_FloatTime() - fStartTime );
 	return true;
 }
 
@@ -692,7 +696,7 @@ bool CRecastMgr::Build()
 bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
 {
 	// Load map mesh
-	if( !LoadMapMesh( false ) )
+	if( !LoadMapMesh( recast_build_partial_debug.GetBool() ) )
 	{
 		Warning("CRecastMesh::RebuildPartial: failed to load map data!\n");
 		return false;

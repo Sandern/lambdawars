@@ -29,14 +29,12 @@ static ConVar recast_mapmesh_loaddynamicprops("recast_mapmesh_loaddynamicprops",
 static ConVar recast_mapmesh_loaddisplacements("recast_mapmesh_loaddisplacements", "1");
 static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "0");
 
-static ConVar recast_mapmesh_debug("recast_mapmesh_debug", "0");
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 CMapMesh::CMapMesh( bool bLog ) : m_chunkyMesh(0)
 {
-	m_bLog = bLog || recast_mapmesh_debug.GetBool();
+	m_bLog = bLog;
 }
 
 //-----------------------------------------------------------------------------
