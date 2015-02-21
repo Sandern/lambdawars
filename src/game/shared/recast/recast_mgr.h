@@ -68,7 +68,8 @@ public:
 	
 #ifndef CLIENT_DLL
 	// Generation methods
-	virtual bool LoadMapMesh( bool bLog = true, bool bDynamicOnly = false );
+	virtual bool LoadMapMesh( bool bLog = true, bool bDynamicOnly = false, 
+		const Vector &vMinBounds = vec3_origin, const Vector &vMaxBounds = vec3_origin );
 	virtual bool Build();
 	virtual bool Save();
 
@@ -76,6 +77,7 @@ public:
 
 	// Rebuilds mesh partial. Clears and rebuilds tiles touching the bounds.
 	virtual bool RebuildPartial( const Vector &vMins, const Vector& vMaxs );
+	virtual void UpdateRebuildPartial();
 
 	// threaded mesh building
 	static void ThreadedBuildMesh( CRecastMesh *&pMesh );
@@ -104,7 +106,15 @@ private:
 	bool m_bLoaded;
 
 #ifndef CLIENT_DLL
+	// Map mesh used for generation. May not be set.
 	CMapMesh *m_pMapMesh;
+	// Pending partial updates
+	struct PartialMeshUpdate_t
+	{
+		Vector vMins;
+		Vector vMaxs;
+	};
+	CUtlVector< PartialMeshUpdate_t > m_pendingPartialMeshUpdates;
 #endif // CLIENT_DLL
 
 	CUtlDict< CRecastMesh *, int > m_Meshes;

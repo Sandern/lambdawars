@@ -13,6 +13,7 @@
 #include "recast/recast_tilecache_helpers.h"
 #include "recast/recast_mgr_ent.h"
 #include "vstdlib/jobthread.h"
+#include "collisionutils.h"
 
 #include "detour/DetourNavMesh.h"
 #include "detour/DetourNavMeshBuilder.h"
@@ -547,7 +548,7 @@ bool CRecastMesh::RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const
 //-----------------------------------------------------------------------------
 // Purpose: Loads the map mesh (geometry)
 //-----------------------------------------------------------------------------
-bool CRecastMgr::LoadMapMesh( bool bLog, bool bDynamicOnly )
+bool CRecastMgr::LoadMapMesh( bool bLog, bool bDynamicOnly, const Vector &vMinBounds, const Vector &vMaxBounds )
 {
 	if( bDynamicOnly && !m_pMapMesh )
 	{
@@ -573,6 +574,7 @@ bool CRecastMgr::LoadMapMesh( bool bLog, bool bDynamicOnly )
 		m_pMapMesh->SetLog( bLog );
 	}
 
+	m_pMapMesh->SetBounds( vMinBounds, vMaxBounds );
 	if( !m_pMapMesh->Load( bDynamicOnly ) )
 	{
 		Warning("CRecastMesh::LoadMapMesh: failed to load map data!\n");
@@ -616,11 +618,10 @@ void CRecastMgr::ThreadedBuildMesh( CRecastMesh *&pMesh )
 	pMesh->Build( (CMapMesh *)RecastMgr().GetMapMesh() );
 }
 
-static Vector s_RebuildPartialMesh_Mins;
-static Vector s_RebuildPartialMesh_Maxs;
 void CRecastMgr::ThreadedRebuildPartialMesh( CRecastMesh *&pMesh )
 {
-	pMesh->RebuildPartial( (CMapMesh *)RecastMgr().GetMapMesh(), s_RebuildPartialMesh_Mins, s_RebuildPartialMesh_Maxs );
+	CMapMesh *pMapMesh = (CMapMesh *)RecastMgr().GetMapMesh();
+	pMesh->RebuildPartial( pMapMesh, pMapMesh->GetMinBounds(), pMapMesh->GetMaxBounds() );
 }
 
 static char* s_MeshNames[] = 
@@ -707,20 +708,48 @@ bool CRecastMgr::Build()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Rebuilds a part of the navigation mesh
+// Purpose: Performs the actual partial rebuilds of the mesh, merging multiple
+//			updates in one.
 //-----------------------------------------------------------------------------
-bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
+void CRecastMgr::UpdateRebuildPartial()
 {
-	// Load map mesh
-	if( !LoadMapMesh( recast_build_partial_debug.GetBool(), true ) )
+	if( !m_pendingPartialMeshUpdates.Count() )
+		return;
+
+	PartialMeshUpdate_t &curUpdate = m_pendingPartialMeshUpdates.Head();
+
+	bool bDidMerge;
+	int nTests = 0, nMerges = 0;
+	do {
+		bDidMerge = false;
+		for( int i = m_pendingPartialMeshUpdates.Count() - 1; i >= 1; i-- )
+		{
+			if( IsBoxIntersectingBox( curUpdate.vMins, curUpdate.vMaxs,
+				m_pendingPartialMeshUpdates[i].vMins, m_pendingPartialMeshUpdates[i].vMaxs ) )
+			{
+				curUpdate.vMins = VectorMin( curUpdate.vMins, m_pendingPartialMeshUpdates[i].vMins );
+				curUpdate.vMaxs = VectorMax( curUpdate.vMaxs, m_pendingPartialMeshUpdates[i].vMaxs );
+				m_pendingPartialMeshUpdates.Remove( i );
+				bDidMerge = true;
+				nMerges++;
+			}
+		}
+		nTests++;
+	} while( bDidMerge && nTests < 100 );
+
+	if( recast_build_partial_debug.GetBool() && nMerges > 0 )
 	{
-		Warning("CRecastMesh::RebuildPartial: failed to load map data!\n");
-		return false;
+		DevMsg( "CRecastMgr::UpdateRebuildPartial: Merged multiple updates (%d) into one\n", nMerges+1 );
 	}
 
-	s_RebuildPartialMesh_Mins = vMins;
-	s_RebuildPartialMesh_Maxs = vMaxs;
+	// Load map mesh
+	if( !LoadMapMesh( recast_build_partial_debug.GetBool(), true, curUpdate.vMins, curUpdate.vMaxs ) )
+	{
+		Warning( "CRecastMgr::UpdateRebuildPartial: failed to load map data!\n" );
+		return;
+	}
 
+	// Perform the update
 	CUtlVector<CRecastMesh *> meshesToBuild;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{
@@ -732,6 +761,19 @@ bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
 	CParallelProcessor<CRecastMesh *, CFuncJobItemProcessor<CRecastMesh *>, 2 > processor;
 	processor.m_ItemProcessor.Init( &ThreadedRebuildPartialMesh, &PreThreadedBuildMesh, &PostThreadedBuildMesh );
 	processor.Run( meshesToBuild.Base(), meshesToBuild.Count(), 1, recast_build_numthreads.GetInt(), g_pThreadPool );
+
+	m_pendingPartialMeshUpdates.Remove( 0 );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Rebuilds a part of the navigation mesh
+//-----------------------------------------------------------------------------
+bool CRecastMgr::RebuildPartial( const Vector &vMins, const Vector& vMaxs )
+{
+	PartialMeshUpdate_t update;
+	update.vMins = vMins;
+	update.vMaxs = vMaxs;
+	m_pendingPartialMeshUpdates.AddToTail( update );
 
 	return true;
 }

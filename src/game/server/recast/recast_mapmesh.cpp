@@ -35,6 +35,8 @@ static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "
 CMapMesh::CMapMesh( bool bLog ) : m_chunkyMesh(0), m_iStaticVertCountEnd(0), m_iStaticTrisCountEnd(0)
 {
 	m_bLog = bLog;
+	m_vMeshMins = vec3_origin;
+	m_vMeshMaxs = vec3_origin;
 }
 
 //-----------------------------------------------------------------------------
@@ -694,6 +696,16 @@ bool CMapMesh::Load( bool bDynamicOnly )
 			boost::python::dict kwargs;
 			kwargs["sender"] = boost::python::object();
 			kwargs["mapmesh"] = boost::python::ptr( this );
+			if( m_vMeshMins != vec3_origin )
+			{
+				const int fBloatBounds = 416.0f;
+				kwargs["bounds"] = boost::python::make_tuple( m_vMeshMins - Vector(fBloatBounds, fBloatBounds, fBloatBounds), 
+					m_vMeshMaxs + Vector(fBloatBounds, fBloatBounds, fBloatBounds) );
+			}
+			else
+			{
+				kwargs["bounds"] = boost::python::object();
+			}
 			SrcPySystem()->CallSignal( SrcPySystem()->Get("recast_mapmesh_postprocess", "core.signals", true), kwargs );
 		}
 		catch( boost::python::error_already_set & ) 

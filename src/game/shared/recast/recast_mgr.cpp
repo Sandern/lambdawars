@@ -77,6 +77,8 @@ void CRecastMgr::Reset()
 	}
 	m_Meshes.PurgeAndDeleteElements();
 
+	m_pendingPartialMeshUpdates.Purge();
+
 #ifndef CLIENT_DLL
 	if( m_pMapMesh )
 	{
@@ -122,6 +124,10 @@ bool CRecastMgr::InitDefaultMeshes()
 void CRecastMgr::Update( float dt )
 {
 	VPROF_BUDGET( "CRecastMgr::Update", "RecastNav" );
+
+#ifndef CLIENT_DLL
+	UpdateRebuildPartial();
+#endif // CLIENT_DLL
 
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{

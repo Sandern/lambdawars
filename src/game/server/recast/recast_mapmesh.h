@@ -30,6 +30,10 @@ public:
 	const float *GetNorms();
 	const rcChunkyTriMesh *GetChunkyMesh();
 
+	void SetBounds( const Vector &vMins, const Vector &vMaxs );
+	const Vector &GetMinBounds();
+	const Vector &GetMaxBounds();
+
 	void AddEntity( CBaseEntity *pEnt );
 
 private:
@@ -53,7 +57,26 @@ private:
 
 	int m_iStaticVertCountEnd;
 	int m_iStaticTrisCountEnd;
+
+	Vector m_vMeshMins;
+	Vector m_vMeshMaxs;
 };
+
+inline void CMapMesh::SetBounds( const Vector &vMins, const Vector &vMaxs )
+{
+	m_vMeshMins = vMins;
+	m_vMeshMaxs = vMaxs;
+}
+
+inline const Vector &CMapMesh::GetMinBounds()
+{
+	return m_vMeshMins;
+}
+
+inline const Vector &CMapMesh::GetMaxBounds()
+{
+	return m_vMeshMaxs;
+}
 
 inline const float *CMapMesh::GetVerts()
 {
