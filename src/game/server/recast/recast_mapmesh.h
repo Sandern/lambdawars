@@ -37,7 +37,7 @@ public:
 	void AddEntity( CBaseEntity *pEnt );
 
 private:
-	bool IsTriangleInValidArea( const Vector *vTriangle );
+	bool IsTriangleInValidArea( const Vector *vTriangle, bool bCheckNoArea = true );
 	void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, 
 			CUtlVector<float> &verts, CUtlVector<int> &triangles, int filterContents = CONTENTS_EMPTY );
 

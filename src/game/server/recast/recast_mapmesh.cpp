@@ -29,6 +29,10 @@ static ConVar recast_mapmesh_loaddynamicprops("recast_mapmesh_loaddynamicprops",
 static ConVar recast_mapmesh_loaddisplacements("recast_mapmesh_loaddisplacements", "1");
 static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "0");
 
+static ConVar recast_mapmesh_no_triangle_filter("recast_mapmesh_no_triangle_filter", "0");
+static ConVar recast_mapmesh_no_filter_noarea("recast_mapmesh_no_filter_noarea", "0");
+static ConVar recast_mapmesh_no_filter_skybox("recast_mapmesh_no_filter_skybox", "0");
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -101,8 +105,11 @@ void CMapMesh::AddEntity( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 #define SURFACE_TOOLSNODRAW "TOOLS/TOOLSNODRAW"
 #define SURFACE_TOOLSBLACK "TOOLS/TOOLSBLACK"
-bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
+bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle, bool bCheckNoArea )
 {
+	if( recast_mapmesh_no_triangle_filter.GetBool() )
+		return true;
+
 	Vector vCenter, vNormal;
 	vCenter = (vTriangle[0] + vTriangle[1] + vTriangle[2]) / 3.0f;
 	vNormal = CrossProduct( vTriangle[2] - vTriangle[0], vTriangle[1] - vTriangle[0] );
@@ -115,22 +122,28 @@ bool CMapMesh::IsTriangleInValidArea( const Vector *vTriangle )
 		NDebugOverlay::Cross3DOriented( vCenter + (vNormal * 16.0f), o, 32.0f, 0, 255, 0, false, 20.0f );
 	}
 
-	// Should have an area in the direction the triangle is facing
-	// Move 2 units into the area, which usually seems enought to get the proper area
-	int area = engine->GetArea( vCenter + (vNormal * 2.0f) );
-	if( area == 0 )
-		return false;
-
-	// The area should not be connected to a skybox entity
-	CSkyCamera *pCur = GetSkyCameraList();
-	while ( pCur )
+	if( !recast_mapmesh_no_filter_noarea.GetBool() )
 	{
-		if ( engine->CheckAreasConnected( area, pCur->m_skyboxData.area ) )
-		{
+		// Should have an area in the direction the triangle is facing
+		// Move 2 units into the area, which usually seems enought to get the proper area
+		int area = engine->GetArea( vCenter + (vNormal * 2.0f) );
+		if( bCheckNoArea && area == 0 )
 			return false;
-		}
 
-		pCur = pCur->m_pNext;
+		if( area != 0 && !recast_mapmesh_no_filter_skybox.GetBool() )
+		{
+			// The area should not be connected to a skybox entity
+			CSkyCamera *pCur = GetSkyCameraList();
+			while ( pCur )
+			{
+				if ( engine->CheckAreasConnected( area, pCur->m_skyboxData.area ) )
+				{
+					return false;
+				}
+
+				pCur = pCur->m_pNext;
+			}
+		}
 	}
 
 	// Perform trace to get the surface property
@@ -336,7 +349,7 @@ void CMapMesh::AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysColli
 		{
 			pCollisionQuery->GetTriangleVerts( i, j, trisVerts );
 
-			if( !IsTriangleInValidArea( trisVerts ) )
+			if( !IsTriangleInValidArea( trisVerts, filterContents != CONTENTS_EMPTY ) )
 				continue;
 
 			if( filterContents != CONTENTS_EMPTY )
