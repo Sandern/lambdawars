@@ -250,7 +250,7 @@ int GetNavAreaAt( const Vector &pos, float beneathlimit )
 	CUnitBase *pUnit = NULL;
 	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
-		return -1;
+		return 0;
 	return pMesh->GetPolyRef( pos, beneathlimit );
 }
 

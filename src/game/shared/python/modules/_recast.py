@@ -36,6 +36,7 @@ class Recast(SemiSharedModuleGenerator):
         cls.calldefs().exclude()
         cls.mem_funs().virtuality = 'not virtual'
         
+        cls.mem_fun('Update').include()
         if self.isserver:
             cls.mem_fun('Build').include()
             cls.mem_fun('Save').include()

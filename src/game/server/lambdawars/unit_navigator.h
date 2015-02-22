@@ -538,6 +538,8 @@ private:
 
 	float m_fLastPathRecomputation;
 	//float m_fNextReactivePathUpdate;
+	bool m_bReactivePathBlocked;
+	float m_fReactivePathBlockedStartTime;
 	float m_fNextAllowPathRecomputeTime;
 	bool m_bNoNavAreasNearby;
 	float m_fIgnoreNavMeshTime;

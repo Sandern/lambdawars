@@ -95,39 +95,6 @@ CheckGoalStatus_t UnitBaseAirNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand 
 	return BaseClass::MoveUpdateWaypoint( MoveCommand );
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool UnitBaseAirNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPos )
-{
-	Vector vStart = vStartPos;
-	vStart.z += m_fCurrentHeight;
-	Vector vEnd = vEndPos;
-	vEnd.z += m_fDesiredHeight;
-
-	trace_t tr;
-
-	if( m_bTestRouteWorldOnly )
-	{
-		CTraceFilterWorldOnly filter;
-		UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-			&filter, &tr);
-		//NDebugOverlay::SweptBox( vStart, tr.endpos, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 255, 0.1f );
-	}
-	else
-	{
-		CTraceFilterSimple filter( GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS );
-		UTIL_TraceHull( vStart, vEnd, WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-			&filter, &tr);
-	}
-
-	if( tr.DidHit() )
-		return false;
-	return true;
-}
-#endif // 0
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -177,7 +144,7 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildNavAreaPath( UnitBasePath *pPath, c
 	if( pNavMesh )
 	{
 		const Vector &vStart = GetAbsOrigin();
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f );
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f, pPath->GetTarget() );
 		if( pFoundPath )
 			return pFoundPath;
 	}

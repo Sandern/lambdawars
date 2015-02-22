@@ -46,10 +46,6 @@
 #include "hl2wars_util_shared.h"
 #include "fowmgr.h"
 
-//#include "nav_mesh.h"
-//#include "nav_pathfind.h"
-//#include "hl2wars_nav_pathfind.h"
-
 #include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
 
@@ -62,11 +58,9 @@
 
 // Settings
 ConVar unit_reactivepath("unit_reactivepath", "1", 0, "Optimize the current path each update."); // TODO: Update for recast mesh
-ConVar unit_reactivepath_maxlookahead("unit_reactivepath_maxlookahead", "2048.0", 0, "Max distance a path is optimized each update.");
-ConVar unit_reactivepath_maxwaypointsahead("unit_reactivepath_maxwaypointsahead", "5", 0, "Max number of waypoints being looked ahead.");
+ConVar unit_reactivepath_blocked_repath_delay("unit_reactivepath_blocked_repath_delay", "0.4", 0, "Time before a repath is triggered when a waypoint is blocked on the nav mesh. Needed for tolerance when moving to waypoints.");
 ConVar unit_nonavigator("unit_nonavigator", "0", 0, "Do not perform navigation");
 ConVar unit_navigator_eattest("unit_navigator_eattest", "0", 0, "Perform navigation, but do not output the calculated move values.");
-ConVar unit_route_requirearea("unit_route_requirearea", "1", 0, "Only try to build a route though the nav mesh if a start and goal area can be found");
 
 ConVar unit_consider_multiplier("unit_consider_multiplier", "2.5", 0, "Multiplies the distance used for computing the entity consider list. The base distance is the unit 2D bounding radius.");
 
@@ -92,14 +86,11 @@ ConVar unit_cost_nonavareacheck("unit_cost_nonavareacheck", "0", FCVAR_CHEAT, ""
 ConVar unit_nogoal_mindiff("unit_nogoal_mindiff", "0.25");
 ConVar unit_nogoal_mindest("unit_nogoal_mindest", "0.4");
 
-ConVar unit_testroute_stepsize("unit_testroute_stepsize", "48.0");
-ConVar unit_testroute_bloatscale("unit_testroute_bloatscale", "1.2");
-
 ConVar unit_seed_radius_bloat("unit_seed_radius_bloat", "2.0");
 ConVar unit_seed_density("unit_seed_density", "0.12");
 ConVar unit_seed_historytime("unit_seed_historytime", "0.5");
 
-ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
+//ConVar unit_allow_cached_paths("unit_allow_cached_paths", "1");
 ConVar unit_route_local_paths("unit_route_local_paths", "1");
 ConVar unit_route_fallback_direct("unit_route_fallback_direct", "1");
 ConVar unit_route_navmesh_paths("unit_route_navmesh_paths", "1");
@@ -1274,7 +1265,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 			if( pMesh->IsValidPolyRef( m_iLastGoalRef ) )
 				goalRef = pMesh->GetPolyRef( GetPath()->m_vGoalPos, 256.0f );
 
-			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime && targetRef != -1 && goalRef != -1 && targetRef != goalRef )
+			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime && targetRef != 0 && goalRef != 0 && targetRef != goalRef )
 			{
 				if( unit_navigator_debug.GetBool() )
 					DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
@@ -1389,7 +1380,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		}
 
 		// Path might be blocked. Recompute or add density seeds
-		if( bPathBlocked || GetBlockedStatus() > BS_NONE )
+		if( (bPathBlocked && (gpGlobals->curtime - m_fReactivePathBlockedStartTime) > unit_reactivepath_blocked_repath_delay.GetFloat()) || GetBlockedStatus() > BS_NONE )
 		{
 			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime )
 			{
@@ -1867,7 +1858,10 @@ void UnitBaseNavigator::AdvancePath()
 bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 {
 	if( !GetPath()->m_pWaypointHead )
+	{
+		m_bReactivePathBlocked = false;
 		return false;
+	}
 
 	bool bBlocked = false;
 
@@ -1900,6 +1894,11 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 		}
 	}
 
+	if( m_bReactivePathBlocked != bBlocked )
+	{
+		m_bReactivePathBlocked = bBlocked;
+		m_fReactivePathBlockedStartTime = gpGlobals->curtime;
+	}
 	return bBlocked;
 }
 //-----------------------------------------------------------------------------
@@ -1923,120 +1922,6 @@ float UnitBaseNavigator::ComputeWaypointDistanceAndDir( Vector &vPathDir )
 	return fWaypointDist;
 }
 
-#if 0 // TODO: Remove, shouldn't be needed anymore.
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::IsCompleteInArea( CNavArea *pArea, const Vector &vPos )
-{
-	const Vector &vWorldMins = WorldAlignMins();
-	const Vector &vWorldMaxs = WorldAlignMaxs();
-	const Vector &vMins = pArea->GetCorner(NORTH_WEST);
-	const Vector &vMaxs = pArea->GetCorner(SOUTH_EAST);
-	return (vPos.x+vWorldMins.x) >= vMins.x && (vPos.x+vWorldMaxs.x) <= vMaxs.x &&
-		(vPos.y+vWorldMins.y) >= vMins.y && (vPos.y+vWorldMaxs.y) <= vMaxs.y;
-}
-#endif // 0
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Test end waypoint
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::TestRouteEnd( UnitBaseWaypoint *pWaypoint )
-{
-	// Test if testing end waypoint
-	if( pWaypoint->GetNext() != NULL )
-		return false;
-
-	// Try direct trace if we have a target as end point
-	// Buildings block the nav mesh, so test route will fail
-	if( GetPath()->m_hTarget )
-	{
-		trace_t tr;
-		UTIL_TraceHull( GetAbsOrigin() + Vector(0, 0, 16), GetPath()->m_vGoalPos + Vector(0, 0, 16), 
-			WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-			GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
-		if( tr.fraction == 1.0f || tr.m_pEnt == GetPath()->m_hTarget )
-		{
-			while( GetPath()->m_pWaypointHead->GetNext() )
-				AdvancePath();
-			return true;
-		}
-	}
-
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Test route from start to end by using the nav mesh
-//			It tests in steps of x units in the direction of end.
-//			For each tested point it tests if there is a nav mesh below.
-//		    It tests for two additional points using the bounding radius.
-//-----------------------------------------------------------------------------
-#define TEST_BENEATH_LIMIT 2000.0f
-//#define DEBUG_TESTROUTE
-bool UnitBaseNavigator::TestRoute( const Vector &vStartPos, const Vector &vEndPos )
-{
-	VPROF_BUDGET( "UnitBaseNavigator::TestRoute", VPROF_BUDGETGROUP_UNITS );
-	Vector vNewStart( vStartPos );
-	vNewStart.z += 16.0f;
-	Vector nNewEnd( vEndPos );
-	nNewEnd.z += 16.0f;
-
-	// First do a trace. This detects if something is blocking.
-	//CTraceFilterWorldOnly filter;
-	trace_t tr;
-	UTIL_TraceHull( vNewStart, nNewEnd, 
-		WorldAlignMins(), WorldAlignMaxs(), m_iTestRouteMask, 
-		GetOuter(), WARS_COLLISION_GROUP_IGNORE_ALL_UNITS, &tr);
-	if( tr.fraction != 1.0f )
-	{
-#ifdef DEBUG_TESTROUTE
-		NDebugOverlay::SweptBox( vNewStart, tr.endpos, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 255, 0, 0, 0, 0.5f );
-#endif // DEBUG_TESTROUTE
-		return false;
-	}
-
-#ifdef DEBUG_TESTROUTE
-	NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
-#endif // DEBUG_TESTROUTE
-
-	// Second test, take rough steps along the path and check if there is a nav area below
-	CNavArea *pCur;
-	float fDist, fCur, teststepsize;
-	Vector vDir, vPos;
-	
-	vDir = nNewEnd - vNewStart;
-	vDir.z = 0.0f;
-	fDist = VectorNormalize(vDir);
-	fCur = 16.0f;
-	vPos = vNewStart;
-	vPos.z += 16.0f;
-
-	teststepsize = unit_testroute_stepsize.GetFloat();
-
-	do
-	{
-		vPos += vDir * teststepsize;
-		vPos.z += 16.0f;
-
-		pCur = TheNavMesh->GetNavArea(vPos, 120.0f);
-		if( !pCur )
-			return false;
-
-		vPos.z = pCur->GetZ(vPos);
-
-		fCur += teststepsize;
-	} while( fCur < fDist );
-
-#ifdef DEBUG_TESTROUTE
-	NDebugOverlay::SweptBox( vNewStart, nNewEnd, WorldAlignMins(), WorldAlignMaxs(), QAngle(0,0,0), 0, 255, 0, 0, 0.5f );
-#endif // DEBUG_TESTROUTE
-
-	return true;
-}
-#endif // 0
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -2049,6 +1934,7 @@ void UnitBaseNavigator::ResetBlockedStatus()
 	m_bBlockedLongDistanceDetected = false;
 	m_fLastWaypointDistance = -MAX_COORD_FLOAT;
 	m_bLowVelocityDetectionActive = false;
+	m_bReactivePathBlocked = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -2534,7 +2420,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	if( pNavMesh )
 	{
 		const Vector &vStart = GetAbsOrigin(); 
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f );
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f, pPath->GetTarget() );
 		if( pFoundPath )
 			return pFoundPath;
 	}

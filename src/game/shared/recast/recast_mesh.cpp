@@ -4,6 +4,12 @@
 //
 // Note: Recasts expects "y" to be up, so y and z must be swapped everywhere. 
 //
+// TODO: 
+// - Merge common code FindPath and FindPathDistance
+// - Fix case with finding the shortest path to neutral obstacle (might try to go from other side)
+// - Move m_polys and various into class?
+// - Cache paths computed for unit type in same frame?
+//
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
@@ -426,7 +432,7 @@ bool CRecastMesh::RebuildTilesAt( const Vector &vMins, const Vector &vMaxs )
 int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
 {
 	if( !IsLoaded() )
-		return -1;
+		return 0;
 
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
@@ -447,7 +453,7 @@ int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
 	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &ref, 0);
 	if( !dtStatusSucceed( status ) )
 	{
-		return -1;
+		return 0;
 	}
 	return ref;
 }
@@ -573,7 +579,7 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit )
+UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit, CBaseEntity *pTarget )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPath", "RecastNav" );
 
@@ -600,9 +606,22 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	spos[2] = vStart[1];
 
 	float epos[3];
-	epos[0] = vEnd[0];
-	epos[1] = vEnd[2];
-	epos[2] = vEnd[1];
+	if( pTarget )
+	{
+		Vector vDir = vStart - vEnd;
+		VectorNormalize( vDir );
+		Vector vModifiedEnd = vEnd + vDir * pTarget->CollisionProp()->BoundingRadius2D();
+
+		epos[0] = vModifiedEnd[0];
+		epos[1] = vModifiedEnd[2];
+		epos[2] = vModifiedEnd[1];
+	}
+	else
+	{
+		epos[0] = vEnd[0];
+		epos[1] = vEnd[2];
+		epos[2] = vEnd[1];
+	}
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
@@ -679,7 +698,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 #endif // CLIENT_DLL
 
 // TODO: Merge common with FindPath
-float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd )
+float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPathDistance", "RecastNav" );
 
@@ -704,9 +723,22 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd )
 	spos[2] = vStart[1];
 
 	float epos[3];
-	epos[0] = vEnd[0];
-	epos[1] = vEnd[2];
-	epos[2] = vEnd[1];
+	if( pTarget )
+	{
+		Vector vDir = vStart - vEnd;
+		VectorNormalize( vDir );
+		Vector vModifiedEnd = vEnd + vDir * pTarget->CollisionProp()->BoundingRadius2D();
+
+		epos[0] = vModifiedEnd[0];
+		epos[1] = vModifiedEnd[2];
+		epos[2] = vModifiedEnd[1];
+	}
+	else
+	{
+		epos[0] = vEnd[0];
+		epos[1] = vEnd[2];
+		epos[2] = vEnd[1];
+	}
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
@@ -766,6 +798,7 @@ bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 	if( !IsLoaded() )
 		return false;
 
+	dtStatus status;
 	dtQueryFilter m_filter;
 	m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
 	m_filter.setExcludeFlags(0);
@@ -784,17 +817,25 @@ bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 	epos[2] = vEnd[1];
 
 	float polyPickExt[3];
-	polyPickExt[0] = 256.0f;
+	polyPickExt[0] = 128.0f;
 	polyPickExt[1] = 600.0f;
-	polyPickExt[2] = 256.0f;
+	polyPickExt[2] = 128.0f;
 
-	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
-	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+	status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return false;
+	}
+	status = m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return false;
+	}
 
 	dtRaycastHit rayHit;
 	rayHit.maxPath = 0;
 	rayHit.pathCost = rayHit.t = 0;
-	dtStatus status = m_navQuery->raycast( startRef, spos, epos, &m_filter, 0, &rayHit );
+	status = m_navQuery->raycast( startRef, spos, epos, &m_filter, 0, &rayHit );
 	if( !dtStatusSucceed( status ) )
 	{
 		return false;

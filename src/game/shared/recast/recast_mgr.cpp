@@ -288,7 +288,7 @@ bool CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
-		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), radius, height );
+		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), radius + 1.0f, height );
 		if( obstacle.obs.Tail().ref == 0 )
 			bSuccess = false;
 	}
@@ -320,7 +320,7 @@ bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 		if( pMesh->GetAgentHeight() - 50.0f > height )
 			continue;
 
-		float erodeDist = pMesh->GetAgentRadius();
+		float erodeDist = pMesh->GetAgentRadius() + 8.0f;
 
 		VectorTransform( mins + Vector(-erodeDist, -erodeDist, 0), transform, convexHull[0] );
 		VectorTransform( Vector(mins.x, maxs.y, mins.z) + Vector(-erodeDist, erodeDist, 0), transform, convexHull[1] );

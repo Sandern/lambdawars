@@ -108,7 +108,11 @@ BOOST_PYTHON_MODULE(_recast){
         .def( 
             "RemoveEntObstacles"
             , (bool ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
-            , ( bp::arg("pEntity") ) );
+            , ( bp::arg("pEntity") ) )    
+        .def( 
+            "Update"
+            , (void ( ::CRecastMgr::* )( float ) )( &::CRecastMgr::Update )
+            , ( bp::arg("dt") ) );
 
     { //::RecastMgr
     
@@ -246,7 +250,11 @@ BOOST_PYTHON_MODULE(_recast){
             , ( bp::arg("pEntity") ) )    
         .def( 
             "Save"
-            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Save ) );
+            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Save ) )    
+        .def( 
+            "Update"
+            , (void ( ::CRecastMgr::* )( float ) )( &::CRecastMgr::Update )
+            , ( bp::arg("dt") ) );
 
     { //::RecastMgr
     
