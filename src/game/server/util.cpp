@@ -824,6 +824,11 @@ void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, f
 	{
 		CBasePlayer *pPlayer = UTIL_PlayerByIndex( i );
 
+#ifdef HL2WARS_DLL
+		// Wars players are always in the air, but still want the shaking as an effect
+		bAirShake = true;
+#endif // HL2WARS_DLL
+
 		//
 		// Only start shakes for players that are on the ground unless doing an air shake.
 		//
