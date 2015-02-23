@@ -2457,11 +2457,14 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 		// "Expensive": use nav mesh
 		waypoints = BuildNavAreaPath( pPath, vEnterPoint );
 		
-		UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( pPath->m_vGoalPos );
-		pEndWaypoint->SpecialGoalStatus = CHS_NOSIMPLIFY;
-		UnitBaseWaypoint *pLast = waypoints->GetLast();
-		pLast->SetNext( pEndWaypoint );
-		return waypoints;
+		if( waypoints )
+		{
+			UnitBaseWaypoint *pEndWaypoint = new UnitBaseWaypoint( pPath->m_vGoalPos );
+			pEndWaypoint->SpecialGoalStatus = CHS_NOSIMPLIFY;
+			UnitBaseWaypoint *pLast = waypoints->GetLast();
+			pLast->SetNext( pEndWaypoint );
+			return waypoints;
+		}
 	}
 	else
 	{
