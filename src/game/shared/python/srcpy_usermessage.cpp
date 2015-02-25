@@ -15,6 +15,8 @@
 	#include "usermessages.h"
 #endif // CLIENT_DLL
 
+#include "wars_network.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -315,8 +317,14 @@ ConVar g_debug_pyusermessage("g_debug_pyusermessage", "0", FCVAR_CHEAT|FCVAR_GAM
 //-----------------------------------------------------------------------------
 // Purpose: Sends a user message
 //-----------------------------------------------------------------------------
-void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg )
+void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg, bool bUseSteamP2P )
 {
+	if( bUseSteamP2P )
+	{
+		WarsNet_WriteMessageData( filter, messagename, msg );
+		return;
+	}
+
 	// Skip parsing if none
 	if( msg.ptr() == Py_None )
 	{

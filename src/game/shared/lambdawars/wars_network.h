@@ -46,13 +46,22 @@ typedef struct WarsEntityUpdateMessage_t : public WarsMessage_t
 } WarsEntityUpdateMessage_t;
 
 #ifndef CLIENT_DLL
+// Entity data updates
 void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent );
 bool WarsNet_EndEntityUpdate();
 void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool changecallback );
+
+// Generic messages
+void WarsNet_WriteMessageData( IRecipientFilter& filter, const char *name, boost::python::object msg );
 #else
 void WarsNet_Init();
 void WarsNet_Shutdown();
+
+// Receiving entity data updates
 void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data );
+
+// Receiving generic messages
+void WarsNet_ReceiveMessageUpdate( CUtlBuffer &data );
 #endif // CLIENT_DLL
 
 #endif // ENABLE_PYTHON

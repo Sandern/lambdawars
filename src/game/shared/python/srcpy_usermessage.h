@@ -38,7 +38,7 @@
 	void PyFillWriteElement( pywrite &w, boost::python::object data );
 	void PyWriteElement( pywrite &w );
 	void PyPrintElement( pywrite &w, int indent = 0 );
-	void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg );
+	void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg, bool usesteamp2p = false );
 #else
 	boost::python::object PyReadElement( bf_read &msg );
 	void HookPyMessage();

@@ -775,6 +775,11 @@ void ProcessWarsMessages()
 					WarsNet_ReceiveEntityUpdate( messageData->buf );
 #endif // ENABLE_PYTHON
 					break;
+				case k_EMsgClient_PyMessageUpdate:
+#ifdef ENABLE_PYTHON
+					WarsNet_ReceiveMessageUpdate( messageData->buf );
+#endif // ENABLE_PYTHON
+					break;
 				default:
 					Warning("Unknown client message type %d\n", eMsg); 
 					break;

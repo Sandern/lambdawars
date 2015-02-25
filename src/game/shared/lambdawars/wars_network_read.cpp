@@ -20,8 +20,11 @@
 #ifdef ENABLE_PYTHON
 ConVar wars_net_debug_receive( "wars_net_debug_receive", "0", FCVAR_CHEAT );
 
-static boost::python::object WarsNet_ReadEntityVarData( CUtlBuffer &data, bool &success );
+static boost::python::object WarsNet_ReadPythonVarData( CUtlBuffer &data, bool &success );
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadVector( CUtlBuffer &data )
 {
 	Vector vecData;
@@ -29,6 +32,9 @@ static boost::python::object WarsNet_ReadVector( CUtlBuffer &data )
 	return boost::python::object( vecData );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadQAngle( CUtlBuffer &data )
 {
 	QAngle vecData;
@@ -36,6 +42,9 @@ static boost::python::object WarsNet_ReadQAngle( CUtlBuffer &data )
 	return boost::python::object( vecData );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadColor( CUtlBuffer &data )
 {
 	Color c;
@@ -43,6 +52,9 @@ static boost::python::object WarsNet_ReadColor( CUtlBuffer &data )
 	return boost::python::object( c );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadSteamID( CUtlBuffer &data )
 {
 	uint64 steamIDUint64;
@@ -50,6 +62,9 @@ static boost::python::object WarsNet_ReadSteamID( CUtlBuffer &data )
 	return boost::python::object( CSteamID( steamIDUint64 ) );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadHandle( CUtlBuffer &data )
 {
 	int iSerialNum, iEntryIndex;
@@ -80,6 +95,9 @@ static boost::python::object WarsNet_ReadHandle( CUtlBuffer &data )
 	return boost::python::object();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadList( CUtlBuffer &data )
 {
 	bool success;
@@ -87,11 +105,14 @@ static boost::python::object WarsNet_ReadList( CUtlBuffer &data )
 	int len = data.GetInt();
 	for( int i = 0; i < len; i++ )
 	{
-		l.append( WarsNet_ReadEntityVarData( data, success ) );
+		l.append( WarsNet_ReadPythonVarData( data, success ) );
 	}
 	return l;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadDict( CUtlBuffer &data )
 {
 	bool success;
@@ -99,11 +120,14 @@ static boost::python::object WarsNet_ReadDict( CUtlBuffer &data )
 	int len = data.GetInt();
 	for( int i = 0; i < len; i++ )
 	{
-		d[ WarsNet_ReadEntityVarData( data, success ) ] = WarsNet_ReadEntityVarData( data, success );
+		d[ WarsNet_ReadPythonVarData( data, success ) ] = WarsNet_ReadPythonVarData( data, success );
 	}
 	return d;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static boost::python::object WarsNet_ReadString( CUtlBuffer &data )
 {
 	int lenStr = data.GetInt();
@@ -115,7 +139,10 @@ static boost::python::object WarsNet_ReadString( CUtlBuffer &data )
 	return pyData;
 }
 
-static boost::python::object WarsNet_ReadEntityVarData( CUtlBuffer &data, bool &success )
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+static boost::python::object WarsNet_ReadPythonVarData( CUtlBuffer &data, bool &success )
 {
 	success = true;
 	WarsNetType_e type = (WarsNetType_e)data.GetUnsignedChar();
@@ -153,13 +180,13 @@ static boost::python::object WarsNet_ReadEntityVarData( CUtlBuffer &data, bool &
 		case WARSNET_STEAMID:
 			return WarsNet_ReadSteamID( data );
 		default:
-			Warning("WarsNet_ReadEntityVar: Type %d not handled\n", type);
+			Warning("WarsNet_ReadPythonVarData: Type %d not handled\n", type);
 			break;
 		}
 	}
 	catch( boost::python::error_already_set & ) 
 	{
-		Warning( "WarsNet_ReadEntityVarData: failed to parse data for type %d: \n", type );
+		Warning( "WarsNet_ReadPythonVarData: failed to parse data for type %d: \n", type );
 		PyErr_Print();
 		PyErr_Clear();
 	}
@@ -169,6 +196,9 @@ static boost::python::object WarsNet_ReadEntityVarData( CUtlBuffer &data, bool &
 	return boost::python::object();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 {
 	// Read expected start type
@@ -190,7 +220,7 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 	varName[lenName] = 0;
 
 	bool success;
-	boost::python::object pyData = WarsNet_ReadEntityVarData( data, success );
+	boost::python::object pyData = WarsNet_ReadPythonVarData( data, success );
 
 	if( success )
 	{
@@ -218,6 +248,9 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 	return success;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data )
 {
 	if( data.TellMaxPut() <  sizeof(WarsEntityUpdateMessage_t) )
@@ -245,6 +278,52 @@ void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data )
 		continue;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WarsNet_ReceiveMessageUpdate( CUtlBuffer &data )
+{
+	if( data.TellMaxPut() <  sizeof(WarsMessage_t) )
+	{
+		Warning("Received invalid WarsMessage!\n");
+		return;
+	}
+
+	data.SeekGet( CUtlBuffer::SEEK_HEAD, sizeof(WarsMessage_t) );
+
+	// Read message name
+	int lenName = data.GetInt();
+	if( lenName == 0 )
+	{
+		Warning("WarsNet_ReceiveMessageUpdate: Reading message name, but no name written\n");
+		return;
+	}
+	char *msgName = (char *)stackalloc( lenName + 1 );
+	data.Get( msgName, lenName );
+	msgName[lenName] = 0;
+
+	if( wars_net_debug_receive.GetBool() )
+	{
+		Msg( "WarsNet_ReceiveMessageUpdate: got message update %s of size %d bytes\n", msgName, data.TellMaxPut() );
+	}
+
+	bool success;
+	boost::python::object pyData = WarsNet_ReadPythonVarData( data, success );
+
+	if( success )
+	{
+		SrcPySystem()->Run<const char *, boost::python::object>( SrcPySystem()->Get("_DispatchMessage", "core.usermessages", true ), msgName, pyData );
+	}
+	else
+	{
+		Warning( "WarsNet_ReceiveMessageUpdate: Failed to read message %s\n", msgName );
+		return;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 class CWarsNet
 {
 public:

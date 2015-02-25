@@ -29,6 +29,7 @@ enum EMessageClient
 	k_EMsgClientRequestGameDenied,
 	k_EMsgClient_PyEntityClasses,
 	k_EMsgClient_PyEntityUpdate,
+	k_EMsgClient_PyMessageUpdate,
 };
 
 enum EMessageServer

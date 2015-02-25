@@ -5854,12 +5854,12 @@ BOOST_PYTHON_MODULE(_gameinterface){
 
     { //::PySendUserMessage
     
-        typedef void ( *SendUserMessage_function_type )( ::IRecipientFilter &,char const *,::boost::python::list );
+        typedef void ( *SendUserMessage_function_type )( ::IRecipientFilter &,char const *,::boost::python::list,bool );
         
         bp::def( 
             "SendUserMessage"
             , SendUserMessage_function_type( &::PySendUserMessage )
-            , ( bp::arg("filter"), bp::arg("messagename"), bp::arg("msg") ) );
+            , ( bp::arg("filter"), bp::arg("messagename"), bp::arg("msg"), bp::arg("usesteamp2p")=(bool)(false) ) );
     
     }
 
