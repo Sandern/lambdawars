@@ -1899,16 +1899,6 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("pCustomOfset")=bp::object() ) );
         
         }
-        { //::C_UnitBase::SetEnergy
-        
-            typedef void ( ::C_UnitBase::*SetEnergy_function_type )( int ) ;
-            
-            C_UnitBase_exposer.def( 
-                "SetEnergy"
-                , SetEnergy_function_type( &::C_UnitBase::SetEnergy )
-                , ( bp::arg("iEnergy") ) );
-        
-        }
         { //::C_UnitBase::SetEnterOffset
         
             typedef void ( ::C_UnitBase::*SetEnterOffset_function_type )( ::Vector const & ) ;
@@ -1927,16 +1917,6 @@ void register_C_UnitBase_class(){
                 "SetHealth"
                 , SetHealth_function_type( &::C_UnitBase::SetHealth )
                 , ( bp::arg("iHealth") ) );
-        
-        }
-        { //::C_UnitBase::SetMaxEnergy
-        
-            typedef void ( ::C_UnitBase::*SetMaxEnergy_function_type )( int ) ;
-            
-            C_UnitBase_exposer.def( 
-                "SetMaxEnergy"
-                , SetMaxEnergy_function_type( &::C_UnitBase::SetMaxEnergy )
-                , ( bp::arg("iMaxEnergy") ) );
         
         }
         { //::C_UnitBase::SetUseCustomCanBeSeenCheck
@@ -2308,22 +2288,26 @@ void register_C_UnitBase_class(){
                 , fset( &::C_UnitBase::SetAttackPriority ) );
         
         }
-        { //property "energy"[fget=::C_UnitBase::GetEnergy]
+        { //property "energy"[fget=::C_UnitBase::GetEnergy, fset=::C_UnitBase::SetEnergy]
         
             typedef int ( ::C_UnitBase::*fget )(  ) const;
+            typedef void ( ::C_UnitBase::*fset )( int ) ;
             
             C_UnitBase_exposer.add_property( 
                 "energy"
-                , fget( &::C_UnitBase::GetEnergy ) );
+                , fget( &::C_UnitBase::GetEnergy )
+                , fset( &::C_UnitBase::SetEnergy ) );
         
         }
-        { //property "maxenergy"[fget=::C_UnitBase::GetMaxEnergy]
+        { //property "maxenergy"[fget=::C_UnitBase::GetMaxEnergy, fset=::C_UnitBase::SetMaxEnergy]
         
             typedef int ( ::C_UnitBase::*fget )(  ) const;
+            typedef void ( ::C_UnitBase::*fset )( int ) ;
             
             C_UnitBase_exposer.add_property( 
                 "maxenergy"
-                , fget( &::C_UnitBase::GetMaxEnergy ) );
+                , fget( &::C_UnitBase::GetMaxEnergy )
+                , fset( &::C_UnitBase::SetMaxEnergy ) );
         
         }
         { //property "kills"[fget=::C_UnitBase::GetKills, fset=::C_UnitBase::SetKills]

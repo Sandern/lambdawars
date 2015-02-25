@@ -1838,22 +1838,26 @@ void register_C_FuncUnit_class(){
                 , fset( &::C_FuncUnit::SetAttackPriority ) );
         
         }
-        { //property "energy"[fget=::C_FuncUnit::GetEnergy]
+        { //property "energy"[fget=::C_FuncUnit::GetEnergy, fset=::C_FuncUnit::SetEnergy]
         
             typedef int ( ::C_FuncUnit::*fget )(  ) const;
+            typedef void ( ::C_FuncUnit::*fset )( int ) ;
             
             C_FuncUnit_exposer.add_property( 
                 "energy"
-                , fget( &::C_FuncUnit::GetEnergy ) );
+                , fget( &::C_FuncUnit::GetEnergy )
+                , fset( &::C_FuncUnit::SetEnergy ) );
         
         }
-        { //property "maxenergy"[fget=::C_FuncUnit::GetMaxEnergy]
+        { //property "maxenergy"[fget=::C_FuncUnit::GetMaxEnergy, fset=::C_FuncUnit::SetMaxEnergy]
         
             typedef int ( ::C_FuncUnit::*fget )(  ) const;
+            typedef void ( ::C_FuncUnit::*fset )( int ) ;
             
             C_FuncUnit_exposer.add_property( 
                 "maxenergy"
-                , fget( &::C_FuncUnit::GetMaxEnergy ) );
+                , fget( &::C_FuncUnit::GetMaxEnergy )
+                , fset( &::C_FuncUnit::SetMaxEnergy ) );
         
         }
         { //property "kills"[fget=::C_FuncUnit::GetKills, fset=::C_FuncUnit::SetKills]

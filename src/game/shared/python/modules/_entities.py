@@ -1442,12 +1442,8 @@ class Entities(SemiSharedModuleGenerator):
         self.AddProperty(cls, 'selectionpriority', 'GetSelectionPriority', 'SetSelectionPriority')
         self.AddProperty(cls, 'attackpriority', 'GetAttackPriority', 'SetAttackPriority')
 
-        if self.isclient:
-            self.AddProperty(cls, 'energy', 'GetEnergy')
-            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy')
-        else:
-            self.AddProperty(cls, 'energy', 'GetEnergy', 'SetEnergy')
-            self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy', 'SetMaxEnergy')
+        self.AddProperty(cls, 'energy', 'GetEnergy', 'SetEnergy')
+        self.AddProperty(cls, 'maxenergy', 'GetMaxEnergy', 'SetMaxEnergy')
         self.AddProperty(cls, 'kills', 'GetKills', 'SetKills')
         
     def ParseUnitBase(self, mb):

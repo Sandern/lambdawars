@@ -152,10 +152,8 @@ public:
 	// Energy
 	virtual int			GetEnergy() const { return m_iEnergy; }
 	virtual int			GetMaxEnergy()  const	{ return m_iMaxEnergy; }
-#ifndef CLIENT_DLL
 	virtual void		SetEnergy( int iEnergy ) { m_iEnergy = iEnergy; }
 	virtual void		SetMaxEnergy( int iMaxEnergy ) { m_iMaxEnergy = iMaxEnergy; }
-#endif // CLIENT_DLL
 
 	// Kills
 	int					GetKills() const { return m_iKills; }
