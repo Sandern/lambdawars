@@ -910,7 +910,15 @@ void CUnitBase::UpdateEnemy( UnitBaseSense &senses )
 
 		// Don't change enemy if very nearby
 		if( pBest && pEnemy && pEnemy->GetAbsOrigin().DistToSqr( pBest->GetAbsOrigin() ) < m_fEnemyChangeToleranceSqr )
-			return;
+		{
+			// But only if the cur enemy has an equal or better attack priority
+			int iBestEnemyAttackPrio = IRelationPriority( pBest );
+			int iCurEnemyAttackPrio = IRelationPriority( pEnemy );
+			if( iCurEnemyAttackPrio >= iBestEnemyAttackPrio )
+			{
+				return;
+			}
+		}
 	}
 
 	if( pBest )

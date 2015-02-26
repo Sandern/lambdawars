@@ -450,6 +450,23 @@ Disposition_t CUnitBase::IRelationType( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 int CUnitBase::IRelationPriority( CBaseEntity *pTarget )
 {
+	if( pTarget )
+	{
+		// First check for specific relationship with this edict
+		for( int i = 0; i < m_Relationship.Count(); i++ ) 
+		{
+			if( pTarget == m_Relationship[i].entity ) 
+			{
+				return m_Relationship[i].priority;
+			}
+		}
+
+		// If target is an unit, return the attack priority as alternative
+		if( pTarget->MyUnitPointer() )
+		{
+			return pTarget->MyUnitPointer()->GetAttackPriority();
+		}
+	}
 	return 0;
 }
 
