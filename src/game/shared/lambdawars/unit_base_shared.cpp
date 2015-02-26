@@ -462,9 +462,10 @@ int CUnitBase::IRelationPriority( CBaseEntity *pTarget )
 		}
 
 		// If target is an unit, return the attack priority as alternative
-		if( pTarget->MyUnitPointer() )
+		CUnitBase *pUnit = pTarget->MyUnitPointer();
+		if( pUnit )
 		{
-			return pTarget->MyUnitPointer()->GetAttackPriority();
+			return pUnit->GetAttackPriority();
 		}
 	}
 	return 0;
