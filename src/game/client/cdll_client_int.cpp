@@ -780,6 +780,16 @@ void ProcessWarsMessages()
 					WarsNet_ReceiveMessageUpdate( messageData->buf );
 #endif // ENABLE_PYTHON
 					break;
+				case k_EMsgClient_Ping:
+				{
+					WarsSendPongMessage( messageData->steamIDRemote );
+					break;
+				}
+				case k_EMsgClient_Pong:
+				{
+					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_received_pong", "core.signals", true ) );
+					break;
+				}
 				default:
 					Warning("Unknown client message type %d\n", eMsg); 
 					break;

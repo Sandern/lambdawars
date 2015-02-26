@@ -69,4 +69,31 @@ void WarsFireMMSessionJoinFailedSignal()
 	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("mm_joinsessionfailed", "core.signals", true) );
 #endif // ENABLE_PYTHON
 }
+
+void WarsSendPingMessage( CSteamID steamId )
+{
+	if( !steamapicontext->SteamNetworking() )
+		return;
+
+	WarsMessage_t msgData;
+	msgData.type = k_EMsgClient_Ping;
+
+	CUtlBuffer buf;
+	buf.Put( &msgData, sizeof( msgData ) );
+
+	steamapicontext->SteamNetworking()->SendP2PPacket( steamId, buf.Base(), buf.TellMaxPut(), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
+}
+void WarsSendPongMessage( CSteamID steamId )
+{
+	if( !steamapicontext->SteamNetworking() )
+		return;
+
+	WarsMessage_t msgData;
+	msgData.type = k_EMsgClient_Pong;
+
+	CUtlBuffer buf;
+	buf.Put( &msgData, sizeof( msgData ) );
+
+	steamapicontext->SteamNetworking()->SendP2PPacket( steamId, buf.Base(), buf.TellMaxPut(), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
+}
 #endif // CLIENT_DLL

@@ -52,6 +52,9 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 
 #ifdef CLIENT_DLL
 void WarsFireMMSessionJoinFailedSignal();
+
+void WarsSendPingMessage( CSteamID steamId );
+void WarsSendPongMessage( CSteamID steamId );
 #endif // CLIENT_DLL
 
 #endif // WARS_MATCHMAKING_H

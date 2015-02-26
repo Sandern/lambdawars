@@ -43,4 +43,7 @@ class MatchMaking(SemiSharedModuleGenerator):
             mb.free_function('GetWarsGameServerState').include()
             mb.free_function('SetWarsGameServerState').include()
             mb.free_function('GetActiveGameLobbySteamID').include()
+        else:
+            mb.free_function('WarsSendPingMessage').include()
+            mb.free_function('WarsSendPongMessage').include()
             

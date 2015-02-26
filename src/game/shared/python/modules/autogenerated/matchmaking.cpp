@@ -91,6 +91,28 @@ BOOST_PYTHON_MODULE(matchmaking){
             , ( bp::arg("serverSteamId"), bp::arg("lobbySteamId"), bp::arg("pGameData") ) );
     
     }
+
+    { //::WarsSendPingMessage
+    
+        typedef void ( *WarsSendPingMessage_function_type )( ::CSteamID );
+        
+        bp::def( 
+            "WarsSendPingMessage"
+            , WarsSendPingMessage_function_type( &::WarsSendPingMessage )
+            , ( bp::arg("steamId") ) );
+    
+    }
+
+    { //::WarsSendPongMessage
+    
+        typedef void ( *WarsSendPongMessage_function_type )( ::CSteamID );
+        
+        bp::def( 
+            "WarsSendPongMessage"
+            , WarsSendPongMessage_function_type( &::WarsSendPongMessage )
+            , ( bp::arg("steamId") ) );
+    
+    }
 }
 #else
 #include "cbase.h"
