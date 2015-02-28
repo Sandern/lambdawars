@@ -103,6 +103,8 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 	worldfriction = 4.0f;
 	stopspeed = 100.0f;
 
+	m_fNextAllowUnstuckTime = 0;
+
 	mv = NULL;
 
 	m_pTraceListData = NULL;
@@ -1666,6 +1668,10 @@ int UnitBaseLocomotion::ClipVelocity( Vector& in, Vector& normal, Vector& out, f
 //-----------------------------------------------------------------------------
 void UnitBaseLocomotion::DoUnstuck()
 {
+	if( m_fNextAllowUnstuckTime > gpGlobals->curtime )
+		return;
+	m_fNextAllowUnstuckTime = gpGlobals->curtime + 2.0f;
+
 	// Prefer finding a position in radius
 	bool bFoundPosition = false;
 	if( RecastMgr().HasMeshes() )

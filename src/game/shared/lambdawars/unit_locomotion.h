@@ -269,6 +269,8 @@ private:
 	Vector m_vecMins, m_vecMaxs;
 
 	ITraceListData	*m_pTraceListData;
+
+	bool m_fNextAllowUnstuckTime;
 };
 
 //-----------------------------------------------------------------------------
