@@ -787,7 +787,19 @@ void ProcessWarsMessages()
 				}
 				case k_EMsgClient_Pong:
 				{
-					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_received_pong", "core.signals", true ) );
+#ifdef ENABLE_PYTHON
+					try
+					{
+						boost::python::dict kwargs;
+						kwargs["sender"] = boost::python::object();
+						kwargs["steamidremote"] = messageData->steamIDRemote;
+						SrcPySystem()->CallSignal( SrcPySystem()->Get( "lobby_received_pong", "core.signals", true ), kwargs );
+					}
+					catch( boost::python::error_already_set & ) 
+					{
+						PyErr_Print();
+					}
+#endif // ENABLE_PYTHON
 					break;
 				}
 				default:

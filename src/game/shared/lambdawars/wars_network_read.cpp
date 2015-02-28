@@ -352,8 +352,15 @@ void CWarsNet::OnP2PSessionRequest( P2PSessionRequest_t *pCallback )
 //-----------------------------------------------------------------------------
 void CWarsNet::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallback )
 {
-
 	Warning( "CWarsNet::OnP2PSessionConnectFail: %s\n", WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
+
+#ifdef ENABLE_PYTHON
+	boost::python::dict kwargs;
+	kwargs["sender"] = boost::python::object();
+	kwargs["steamidremote"] = pCallback->m_steamIDRemote;
+	kwargs["p2psessionerror"] = pCallback->m_eP2PSessionError;
+	SrcPySystem()->CallSignal( SrcPySystem()->Get( "steam_p2p_connectfail", "core.signals", true ), kwargs );
+#endif // ENABLE_PYTHON
 }
 
 void WarsNet_Init()
