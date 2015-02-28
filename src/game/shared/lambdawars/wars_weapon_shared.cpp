@@ -110,6 +110,7 @@ void CWarsWeapon::PrimaryAttack( void )
 	info.m_iTracerFreq = 2;
 	info.m_vecSpread = m_vBulletSpread;
 	info.m_flDamage = m_fOverrideAmmoDamage;
+	info.m_Attributes = m_PrimaryAttackAttributes;
 
 	pOwner->FireBullets( info );
 

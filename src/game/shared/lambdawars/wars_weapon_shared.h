@@ -120,6 +120,10 @@ public:
 	bool m_bEnableBurst;
 	int m_nBurstShotsRemaining;
 
+#ifdef ENABLE_PYTHON
+	boost::python::object m_PrimaryAttackAttributes;
+#endif // ENABLE_PYTHON
+
 private:
 	Activity m_PrimaryAttackActivity;
 	Activity m_SecondaryAttackActivity;

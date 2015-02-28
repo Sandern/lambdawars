@@ -1005,6 +1005,7 @@ void register_C_WarsWeapon_class(){
                 , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) );
         
         }
+        C_WarsWeapon_exposer.def_readwrite( "primaryattackattributes", &C_WarsWeapon::m_PrimaryAttackAttributes );
         C_WarsWeapon_exposer.def_readwrite( "enableburst", &C_WarsWeapon::m_bEnableBurst );
         C_WarsWeapon_exposer.def_readwrite( "firerate", &C_WarsWeapon::m_fFireRate );
         C_WarsWeapon_exposer.def_readwrite( "maxbulletrange", &C_WarsWeapon::m_fMaxBulletRange );

@@ -1086,6 +1086,7 @@ void register_CWarsWeapon_class(){
                 , ( bp::arg("sound_type"), bp::arg("soundtime")=0.0f ) );
         
         }
+        CWarsWeapon_exposer.def_readwrite( "primaryattackattributes", &CWarsWeapon::m_PrimaryAttackAttributes );
         CWarsWeapon_exposer.def_readwrite( "enableburst", &CWarsWeapon::m_bEnableBurst );
         CWarsWeapon_exposer.def_readwrite( "firerate", &CWarsWeapon::m_fFireRate );
         CWarsWeapon_exposer.def_readwrite( "maxbulletrange", &CWarsWeapon::m_fMaxBulletRange );

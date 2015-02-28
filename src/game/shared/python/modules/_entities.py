@@ -1566,6 +1566,7 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_fMaxRestTime', 'maxresttime')
         self.IncludeVarAndRename('m_bEnableBurst', 'enableburst')
         self.IncludeVarAndRename('m_nBurstShotsRemaining', 'burstshotsremaining')
+        self.IncludeVarAndRename('m_PrimaryAttackAttributes', 'primaryattackattributes')
         
         if self.isclient:
             self.IncludeVarAndRename('m_vTracerColor', 'tracercolor')
