@@ -1633,7 +1633,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 
 		if( GetPath()->m_iGoalFlags & GF_REQUIREVISION )
 		{
-			if( !FogOfWarMgr()->PointInFOW( GetPath()->m_hTarget->EyePosition(), m_pOuter->GetOwnerNumber() ) )
+			if( FogOfWarMgr()->PointInFOW( GetPath()->m_hTarget->EyePosition(), m_pOuter->GetOwnerNumber() ) )
 			{
 				if( unit_navigator_debug_inrange.GetBool() )
 					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No vision\n", GetOuter()->entindex() );
@@ -1691,7 +1691,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 
 		if( GetPath()->m_iGoalFlags & GF_REQUIREVISION )
 		{
-			if( !FogOfWarMgr()->PointInFOW( GetPath()->m_vGoalPos, m_pOuter->GetOwnerNumber() ) )
+			if( FogOfWarMgr()->PointInFOW( GetPath()->m_vGoalPos, m_pOuter->GetOwnerNumber() ) )
 			{
 				if( unit_navigator_debug_inrange.GetBool() )
 					DevMsg("#%d: UnitBaseNavigator::IsInRangeGoal: No vision\n", GetOuter()->entindex() );
