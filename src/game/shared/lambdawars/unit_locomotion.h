@@ -223,6 +223,7 @@ public:
 
 	// Friction
 	void	Friction( void );
+	void	IgnoreFriction( float duration );
 
 	// Decompoosed gravity
 	void	StartGravity( void );
@@ -270,7 +271,8 @@ private:
 
 	ITraceListData	*m_pTraceListData;
 
-	bool m_fNextAllowUnstuckTime;
+	float m_fIgnoreFrictionEndTime;
+	float m_fNextAllowUnstuckTime;
 };
 
 //-----------------------------------------------------------------------------
@@ -284,6 +286,14 @@ inline void UnitBaseLocomotion::ClearBlockers()
 inline void UnitBaseLocomotion::AddBlocker( CBaseEntity *pBlocker, const Vector &blocker_hitpos, const Vector &blocker_dir )
 {
 	mv->blockers.AddToTail( UnitBlocker_t( pBlocker, blocker_hitpos, blocker_dir ) );
+}
+
+//-----------------------------------------------------------------------------
+// Temporary ignores friction (e.g. for jumping)
+//-----------------------------------------------------------------------------
+inline void UnitBaseLocomotion::IgnoreFriction( float duration )
+{
+	m_fIgnoreFrictionEndTime = gpGlobals->curtime + duration;
 }
 
 //-----------------------------------------------------------------------------

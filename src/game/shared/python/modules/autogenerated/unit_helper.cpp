@@ -2013,6 +2013,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , default_HandleJump_function_type(&UnitBaseLocomotion_wrapper::default_HandleJump) );
         
         }
+        { //::UnitBaseLocomotion::IgnoreFriction
+        
+            typedef void ( ::UnitBaseLocomotion::*IgnoreFriction_function_type )( float ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "IgnoreFriction"
+                , IgnoreFriction_function_type( &::UnitBaseLocomotion::IgnoreFriction )
+                , ( bp::arg("duration") ) );
+        
+        }
         { //::UnitBaseLocomotion::Move
         
             typedef void ( ::UnitBaseLocomotion::*Move_function_type )( float,::UnitBaseMoveCommand & ) ;
@@ -5349,6 +5359,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "HandleJump"
                 , HandleJump_function_type(&::UnitBaseLocomotion::HandleJump)
                 , default_HandleJump_function_type(&UnitBaseLocomotion_wrapper::default_HandleJump) );
+        
+        }
+        { //::UnitBaseLocomotion::IgnoreFriction
+        
+            typedef void ( ::UnitBaseLocomotion::*IgnoreFriction_function_type )( float ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "IgnoreFriction"
+                , IgnoreFriction_function_type( &::UnitBaseLocomotion::IgnoreFriction )
+                , ( bp::arg("duration") ) );
         
         }
         { //::UnitBaseLocomotion::Move

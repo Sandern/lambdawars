@@ -103,6 +103,7 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 	worldfriction = 4.0f;
 	stopspeed = 100.0f;
 
+	m_fIgnoreFrictionEndTime = 0;
 	m_fNextAllowUnstuckTime = 0;
 
 	mv = NULL;
@@ -975,9 +976,9 @@ void UnitBaseLocomotion::Friction( void )
 	float	friction;
 	float	drop;
 	
-	// If we are in water jump cycle, don't apply friction
-	//if (m_pOuter->m_flWaterJumpTime)
-	//	return;
+	// Temporary ignores friction (e.g. for jumping)
+	if( m_fIgnoreFrictionEndTime > gpGlobals->curtime )
+		return;
 
 	// Calculate speed
 	speed = VectorLength( mv->velocity );
