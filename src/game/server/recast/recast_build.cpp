@@ -296,10 +296,6 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 
 	Reset(); // Clean any existing data
 
-	float stub;
-	ComputeMeshSettings( GetName(), m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope,
-		stub, stub );
-
 	BuildContext ctx;
 
 	ctx.enableLog( true );
@@ -311,8 +307,6 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 	// Init cache
 	rcCalcBounds( pMapMesh->GetVerts(), pMapMesh->GetNumVerts(), m_cfg.bmin, m_cfg.bmax );
 	rcCalcGridSize(m_cfg.bmin, m_cfg.bmax, m_cfg.cs, &m_cfg.width, &m_cfg.height);
-	//const float* bmin = pMapMesh->getMeshBoundsMin();
-	//const float* bmax = pMapMesh->getMeshBoundsMax();
 	int gw = 0, gh = 0;
 	rcCalcGridSize(m_cfg.bmin, m_cfg.bmax, m_cellSize, &gw, &gh);
 	const int ts = (int)m_tileSize;
@@ -658,7 +652,7 @@ bool CRecastMgr::IsMeshBuildDisabled( const char *meshName )
 //-----------------------------------------------------------------------------
 // Purpose: Builds all navigation meshes
 //-----------------------------------------------------------------------------
-bool CRecastMgr::Build()
+bool CRecastMgr::Build( bool loadDefaultMeshes )
 {
 	double fStartTime = Plat_FloatTime();
 
@@ -670,7 +664,10 @@ bool CRecastMgr::Build()
 	}
 
 	// Insert all meshes first
-	InitDefaultMeshes();
+	if( loadDefaultMeshes )
+	{
+		InitDefaultMeshes();
+	}
 	CUtlVector<CRecastMesh *> meshesToBuild;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
 	{

@@ -58,6 +58,7 @@ public:
 
 	const char *GetName();
 	void Init( const char *name );
+	void Init( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope );
 	bool IsLoaded();
 
 	virtual void Update( float dt );
@@ -108,6 +109,8 @@ public:
 
 	float GetAgentRadius() { return m_agentRadius; }
 	float GetAgentHeight() { return m_agentHeight; }
+	float GetAgentMaxClimb() { return m_agentMaxClimb; }
+	float GetAgentMaxSlope() { return m_agentMaxSlope; }
 
 	// Getters/setters for various build settings:
 	float GetCellSize() { return m_cellSize; }

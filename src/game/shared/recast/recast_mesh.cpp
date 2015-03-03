@@ -214,6 +214,27 @@ void CRecastMesh::Init( const char *name )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CRecastMesh::Init( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope )
+{
+	m_Name.Set( name );
+
+	m_navQuery = dtAllocNavMeshQuery();
+
+	m_talloc = new LinearAllocator(32000);
+	m_tcomp = new FastLZCompressor;
+	m_tmproc = new MeshProcess( name );
+
+	m_agentHeight = agentHeight;
+	m_agentRadius = agentRadius;
+	m_agentMaxClimb = agentMaxClimb;
+	m_agentMaxSlope = agentMaxSlope;
+	m_cellSize = round( m_agentRadius / 3.0f );
+	m_cellHeight = round( m_cellSize / 2.0f );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CRecastMesh::Update( float dt )
 {
 	if( !IsLoaded() )

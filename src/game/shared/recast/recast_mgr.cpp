@@ -121,6 +121,24 @@ bool CRecastMgr::InitDefaultMeshes()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CRecastMgr::InsertMesh( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope )
+{
+	CRecastMesh *pMesh = GetMesh( name );
+	if( pMesh )
+	{
+		Warning( "CRecastMgr::InsertMesh: %s already exists!\n", name );
+		return false;
+	}
+
+	pMesh = new CRecastMesh();
+	pMesh->Init( name, agentRadius, agentHeight, agentMaxClimb, agentMaxSlope );
+	m_Meshes.Insert( pMesh->GetName(), pMesh );
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CRecastMgr::Update( float dt )
 {
 	VPROF_BUDGET( "CRecastMgr::Update", "RecastNav" );
@@ -390,6 +408,19 @@ NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
 void CRecastMgr::DebugRender()
 {
 	int idx = m_Meshes.Find( recast_debug_mesh.GetString() );
+	if( idx == m_Meshes.InvalidIndex() )
+	{
+		// Might be visualizing a server mesh that does not exist on the client
+		// Insert dummy mesh on the fly.
+		IRecastMgr *pRecastMgr = warsextension->GetRecastMgr();
+		if( pRecastMgr->GetNavMesh( recast_debug_mesh.GetString() ) )
+		{
+			CRecastMesh *pMesh = new CRecastMesh();
+			pMesh->Init( recast_debug_mesh.GetString() );
+			idx = m_Meshes.Insert( pMesh->GetName(), pMesh );
+		}
+	}
+
 	if( m_Meshes.IsValidIndex( idx ) )
 	{
 		m_Meshes[idx]->DebugRender();
@@ -460,7 +491,11 @@ CON_COMMAND_F( cl_recast_listmeshes, "", FCVAR_CHEAT )
 	int idx = meshes.First();
 	while( meshes.IsValidIndex( idx ) )
 	{
-		Msg( "%d: %s\n", idx, meshes.Element(idx)->GetName() );
+		CRecastMesh *pMesh = meshes.Element(idx);
+		Msg( "%d: %s (agent radius: %f, height: %f, climb: %f, slope: %f, cell size: %f, cell height: %f)\n", idx, 
+			pMesh->GetName(),
+			pMesh->GetAgentRadius(), pMesh->GetAgentHeight(), pMesh->GetAgentMaxClimb(), pMesh->GetAgentMaxSlope(),
+			pMesh->GetCellSize(), pMesh->GetCellHeight());
 		idx = meshes.Next( idx );
 	}
 }

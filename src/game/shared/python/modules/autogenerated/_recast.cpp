@@ -102,6 +102,16 @@ BOOST_PYTHON_MODULE(_recast){
             , ( bp::arg("name") )
             , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
+            "Init"
+            , (void ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Init ) )    
+        .def( 
+            "InitDefaultMeshes"
+            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::InitDefaultMeshes ) )    
+        .def( 
+            "InsertMesh"
+            , (bool ( ::CRecastMgr::* )( char const *,float,float,float,float ) )( &::CRecastMgr::InsertMesh )
+            , ( bp::arg("name"), bp::arg("agentRadius"), bp::arg("agentHeight"), bp::arg("agentMaxClimb"), bp::arg("agentMaxSlope") ) )    
+        .def( 
             "IsMeshLoaded"
             , (bool ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::IsMeshLoaded )
             , ( bp::arg("name") ) )    
@@ -109,6 +119,9 @@ BOOST_PYTHON_MODULE(_recast){
             "RemoveEntObstacles"
             , (bool ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
             , ( bp::arg("pEntity") ) )    
+        .def( 
+            "Reset"
+            , (void ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Reset ) )    
         .def( 
             "Update"
             , (void ( ::CRecastMgr::* )( float ) )( &::CRecastMgr::Update )
@@ -217,7 +230,8 @@ BOOST_PYTHON_MODULE(_recast){
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
         .def( 
             "Build"
-            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Build ) )    
+            , (bool ( ::CRecastMgr::* )( bool ) )( &::CRecastMgr::Build )
+            , ( bp::arg("loadDefaultMeshes")=(bool)(true) ) )    
         .def( 
             "FindBestMeshNameForEntity"
             , (char const * ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::FindBestMeshNameForEntity )
@@ -237,6 +251,16 @@ BOOST_PYTHON_MODULE(_recast){
             , ( bp::arg("name") )
             , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
+            "Init"
+            , (void ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Init ) )    
+        .def( 
+            "InitDefaultMeshes"
+            , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::InitDefaultMeshes ) )    
+        .def( 
+            "InsertMesh"
+            , (bool ( ::CRecastMgr::* )( char const *,float,float,float,float ) )( &::CRecastMgr::InsertMesh )
+            , ( bp::arg("name"), bp::arg("agentRadius"), bp::arg("agentHeight"), bp::arg("agentMaxClimb"), bp::arg("agentMaxSlope") ) )    
+        .def( 
             "IsMeshLoaded"
             , (bool ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::IsMeshLoaded )
             , ( bp::arg("name") ) )    
@@ -248,6 +272,9 @@ BOOST_PYTHON_MODULE(_recast){
             "RemoveEntObstacles"
             , (bool ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::RemoveEntObstacles )
             , ( bp::arg("pEntity") ) )    
+        .def( 
+            "Reset"
+            , (void ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Reset ) )    
         .def( 
             "Save"
             , (bool ( ::CRecastMgr::* )(  ) )( &::CRecastMgr::Save ) )    

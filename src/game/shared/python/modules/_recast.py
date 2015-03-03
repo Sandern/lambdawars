@@ -36,6 +36,10 @@ class Recast(SemiSharedModuleGenerator):
         cls.calldefs().exclude()
         cls.mem_funs().virtuality = 'not virtual'
         
+        cls.mem_fun('Init').include()
+        cls.mem_fun('InitDefaultMeshes').include()
+        cls.mem_fun('InsertMesh').include()
+        cls.mem_fun('Reset').include()
         cls.mem_fun('Update').include()
         if self.isserver:
             cls.mem_fun('Build').include()

@@ -48,6 +48,7 @@ public:
 
 	// Load methods
 	virtual bool InitDefaultMeshes();
+	virtual bool InsertMesh( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope );
 	virtual bool Load();
 	virtual void Reset();
 	
@@ -74,7 +75,7 @@ public:
 	// Generation methods
 	virtual bool LoadMapMesh( bool bLog = true, bool bDynamicOnly = false, 
 		const Vector &vMinBounds = vec3_origin, const Vector &vMaxBounds = vec3_origin );
-	virtual bool Build();
+	virtual bool Build( bool loadDefaultMeshes = true );
 	virtual bool Save();
 
 	virtual bool IsMeshBuildDisabled( const char *meshName );

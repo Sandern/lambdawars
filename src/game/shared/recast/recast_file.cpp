@@ -182,6 +182,9 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Load()
 {
+	if( m_bLoaded )
+		return true;
+
 	double fStartTime = Plat_FloatTime();
 	m_bLoaded = false;
 
