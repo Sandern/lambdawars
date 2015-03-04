@@ -773,8 +773,16 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 	dtPolyRef m_straightPathPolys[MAX_POLYS];
 	int m_nstraightPath;
 
-	m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
-	m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+	status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_filter, &startRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return -1;
+	}
+	status = m_navQuery->findNearestPoly(epos, polyPickExt, &m_filter, &endRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return -1;
+	}
 
 	status = m_navQuery->findPath(startRef, endRef, spos, epos, &m_filter, m_polys, &m_npolys, MAX_POLYS);
 	if( !dtStatusSucceed( status ) )
