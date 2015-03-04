@@ -182,6 +182,12 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 //-----------------------------------------------------------------------------
 bool CRecastMgr::Load()
 {
+#ifdef ENABLE_PYTHON
+	// Fire pre loaded signal, so other code can override the behavior if desired
+	if( SrcPySystem()->IsPythonRunning() )
+		SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "navmesh_preload", "core.signals", true ) );
+#endif // ENABLE_PYTHON
+
 	if( m_bLoaded )
 		return true;
 
