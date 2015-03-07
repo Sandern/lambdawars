@@ -146,6 +146,7 @@ UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animco
 	m_flLastAnimationStateClearTime = 0.0f;
 
 	m_bPlayFallActInAir = true;
+	m_fForceAirActEndTime = 0;
 	m_fMainPlaybackRate = 1.0f;
 
 	m_iMoveX = -1;
@@ -490,13 +491,11 @@ Activity UnitAnimState::CalcMainActivity()
 	}
 	else
 	{
-		float flSpeed = GetOuterXYSpeed();
-
-		if( m_bPlayFallActInAir && (GetFlags() & FL_ONGROUND) == 0 )
+		if( m_bPlayFallActInAir && ((GetFlags() & FL_ONGROUND) == 0 || m_fForceAirActEndTime > gpGlobals->curtime) )
 		{
 			idealActivity = ACT_MP_JUMP_FLOAT;
 		}
-		else if ( flSpeed > MOVING_MINIMUM_SPEED )
+		else if ( GetOuterXYSpeed() > MOVING_MINIMUM_SPEED )
 		{
 			idealActivity = ACT_RUN;
 		}

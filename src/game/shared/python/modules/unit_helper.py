@@ -147,6 +147,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.var('m_fMiscPlaybackRate').rename('miscplaybackrate')
     
         cls.var('m_nSpecificMainActivity').rename('specificmainactivity')
+        cls.var('m_fForceAirActEndTime').rename('forceairactendtime')
         
         cls.var('m_bUseCombatState').rename('usecombatstate')
         cls.var('m_fCombatStateTime').rename('combatstatetime')

@@ -363,6 +363,8 @@ private:
 public:
 	// Specific full-body sequence to play
 	Activity		m_nSpecificMainActivity;
+	// Forces air animation to be played until time ended
+	float			m_fForceAirActEndTime;
 
 private:
 	string_t m_sAimLayerSequence;

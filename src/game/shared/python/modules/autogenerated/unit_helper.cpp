@@ -1655,6 +1655,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "playermisc", &UnitAnimState::m_bPlayingMisc );
         UnitAnimState_exposer.def_readwrite( "usecombatstate", &UnitAnimState::m_bUseCombatState );
         UnitAnimState_exposer.def_readwrite( "combatstatetime", &UnitAnimState::m_fCombatStateTime );
+        UnitAnimState_exposer.def_readwrite( "forceairactendtime", &UnitAnimState::m_fForceAirActEndTime );
         UnitAnimState_exposer.def_readwrite( "mainplaybackrate", &UnitAnimState::m_fMainPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "miscplaybackrate", &UnitAnimState::m_fMiscPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "facefronttime", &UnitAnimState::m_flFaceFrontTime );
@@ -5003,6 +5004,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitAnimState_exposer.def_readwrite( "playermisc", &UnitAnimState::m_bPlayingMisc );
         UnitAnimState_exposer.def_readwrite( "usecombatstate", &UnitAnimState::m_bUseCombatState );
         UnitAnimState_exposer.def_readwrite( "combatstatetime", &UnitAnimState::m_fCombatStateTime );
+        UnitAnimState_exposer.def_readwrite( "forceairactendtime", &UnitAnimState::m_fForceAirActEndTime );
         UnitAnimState_exposer.def_readwrite( "mainplaybackrate", &UnitAnimState::m_fMainPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "miscplaybackrate", &UnitAnimState::m_fMiscPlaybackRate );
         UnitAnimState_exposer.def_readwrite( "facefronttime", &UnitAnimState::m_flFaceFrontTime );
