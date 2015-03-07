@@ -43,7 +43,9 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 {
 	flSpeed = Max( 1.0f, flSpeed );
 
-	float flGravity = sv_gravity.GetFloat();
+	float ent_gravity = pEdict && pEdict->GetGravity() ? pEdict->GetGravity() : 1.0f;
+
+	float flGravity = sv_gravity.GetFloat() * ent_gravity;
 
 	Vector vecGrenadeVel = (vecSpot2 - vecSpot1);
 
