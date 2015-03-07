@@ -40,6 +40,7 @@ local.properties
 *.suo
 *.user
 *.sln.docstates
+*.lastbuildstate
 
 # Build results
 #[Dd]ebug/ # Boost library contains folders with debug..
@@ -181,16 +182,33 @@ src/game/client/Release_swarm/*
 src/game/server/Release_swarm/*
 src/game/client/Debug_swarm/*
 src/game/server/Debug_swarm/*
-src/game/missionchooser/*
+src/game/client/Release_wars/*
+src/game/server/Release_wars/*
+src/game/client/Debug_wars/*
+src/game/server/Debug_wars/*
+src/game/editorstorage/Debug/*
+src/game/editorstorage/Release/*
 src/boost/libs/python/build/VisualStudio/release-obj/*
-src/thirdparty/python/Srcbuild/Win32-temp-Release/*
-src/thirdparty/python/Srcbuild/Win32-temp-Debug/*
+src/boost/libs/python/build/VisualStudio/debug-obj/*
+src/thirdparty/python/PCBuild/Win32-temp-Release/*
+src/thirdparty/python/PCBuild/Win32-temp-Debug/*
+src/thirdparty/python/PCBuild/Win32-temp-Release_Client/*
+src/thirdparty/python/PCBuild/Win32-temp-Debug_Client/*
+src/thirdparty/python/Client/*
+src/thirdparty/python/PCBuild/Client/*
+src/thirdparty/python/PCBuild/Win32-pgi/*
+src/cef_process_helper/Debug
+src/cef_process_helper/Release
+
+exposed_decl.pypp.txt
+named_tuple.py
 
 # Shaders
 .vcs
 src/materialsystem/stdshaders/fxctmp9_tmp/*
 src/materialsystem/stdshaders/vshtmp9_tmp/*
 src/materialsystem/stdshaders/Release_dx9/*
+src/materialsystem/stdshaders/Debug_dx9/*
 
 src/materialsystem/stdshaders/buildsdkshaders_wars_dev.bat
 src/materialsystem/stdshaders/stdshader_dx9_20b_wars_dev.txt
@@ -207,5 +225,6 @@ src/materialsystem/stdshaders/shaders/*
 src/lib/public/shaderlib.lib
 src/lib/public/boost_python.lib
 src/lib/public/python34.lib
-
-
+src/lib/public/python34_d.lib
+src/lib/public/libcef_d.lib
+src/lib/public/libcef_dll_wrapper_d.lib
