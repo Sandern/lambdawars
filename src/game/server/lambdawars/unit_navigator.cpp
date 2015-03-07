@@ -1871,24 +1871,28 @@ bool UnitBaseNavigator::UpdateReactivePath( bool bNoRecomputePath )
 		const Vector &vOrigin = GetAbsOrigin();
 		UnitBaseWaypoint *pCur = GetPath()->m_pWaypointHead;
 
-		if( GetPath()->CurWaypointIsGoal() )
+		bool bCurIsGoal = GetPath()->CurWaypointIsGoal();
+		if( bCurIsGoal || pCur->SpecialGoalStatus == CHS_NOGOAL )
 		{
-			bBlocked = !pNavMesh->TestRoute( vOrigin, pCur->GetPos() );
-		}
-		else
-		{
-			// Try skipping directly to the next waypoint
-			// If not possible, just test if the current waypoint is still ok
-			UnitBaseWaypoint *pNext = pCur->GetNext();
-			if( pNext )
+			if( bCurIsGoal )
 			{
-				if( pNavMesh->TestRoute( vOrigin, pNext->GetPos() ) )
+				bBlocked = !pNavMesh->TestRoute( vOrigin, pCur->GetPos() );
+			}
+			else
+			{
+				// Try skipping directly to the next waypoint
+				// If not possible, just test if the current waypoint is still ok
+				UnitBaseWaypoint *pNext = pCur->GetNext();
+				if( pNext && pNext->SpecialGoalStatus == CHS_NOGOAL )
 				{
-					AdvancePath();
-				}
-				else
-				{
-					bBlocked = !pNavMesh->TestRoute( vOrigin, pCur->GetPos() );
+					if( pNavMesh->TestRoute( vOrigin, pNext->GetPos() ) )
+					{
+						AdvancePath();
+					}
+					else
+					{
+						bBlocked = !pNavMesh->TestRoute( vOrigin, pCur->GetPos() );
+					}
 				}
 			}
 		}

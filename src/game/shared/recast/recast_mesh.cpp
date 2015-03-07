@@ -706,10 +706,19 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 		pResultPath = new UnitBaseWaypoint( Vector(epos2[0], epos2[2], epos2[1]) );
 		for (int i = m_nstraightPath - 1; i >= 0; i--)
 		{
+			
+			const dtOffMeshConnection *pOffmeshCon = m_navMesh->getOffMeshConnectionByRef( m_straightPathPolys[i] );
+
 			Vector pos( m_straightPath[i*3], m_straightPath[i*3+2], m_straightPath[i*3+1] );
 
 			UnitBaseWaypoint *pNewPath = new UnitBaseWaypoint( pos );
 			pNewPath->SetNext( pResultPath );
+			// For now, offmesh connections are always considered as edges.
+			if( pOffmeshCon )
+			{
+				pResultPath->SpecialGoalStatus = CHS_EDGEDOWNDEST;
+				pNewPath->SpecialGoalStatus = CHS_EDGEDOWN;
+			}
 			pResultPath = pNewPath;
 		}
 	}
