@@ -708,7 +708,7 @@ dtStatus dtNavMeshQuery::getPolyHeight(dtPolyRef ref, const float* pos, float* h
 ///
 dtStatus dtNavMeshQuery::findNearestPoly(const float* center, const float* extents,
 										 const dtQueryFilter* filter,
-										 dtPolyRef* nearestRef, float* nearestPt) const
+										 dtPolyRef* nearestRef, float* nearestPt, const float* testPt) const
 {
 	dtAssert(m_nav);
 
@@ -730,11 +730,11 @@ dtStatus dtNavMeshQuery::findNearestPoly(const float* center, const float* exten
 		float diff[3];
 		bool posOverPoly = false;
 		float d = 0;
-		closestPointOnPoly(ref, center, closestPtPoly, &posOverPoly);
+		closestPointOnPoly(ref, testPt ? testPt : center, closestPtPoly, &posOverPoly);
 
 		// If a point is directly over a polygon and closer than
 		// climb height, favor that instead of straight line nearest point.
-		dtVsub(diff, center, closestPtPoly);
+		dtVsub(diff, testPt ? testPt : center, closestPtPoly);
 		if (posOverPoly)
 		{
 			const dtMeshTile* tile = 0;

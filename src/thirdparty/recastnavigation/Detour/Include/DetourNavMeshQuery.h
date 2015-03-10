@@ -292,10 +292,11 @@ public:
 	///  @param[in]		filter		The polygon filter to apply to the query.
 	///  @param[out]	nearestRef	The reference id of the nearest polygon.
 	///  @param[out]	nearestPt	The nearest point on the polygon. [opt] [(x, y, z)]
+	///  @param[in]		testPt		The point used for searching, rather than center [opt] [(x, y, z)]
 	/// @returns The status flags for the query.
 	dtStatus findNearestPoly(const float* center, const float* extents,
 							 const dtQueryFilter* filter,
-							 dtPolyRef* nearestRef, float* nearestPt) const;
+							 dtPolyRef* nearestRef, float* nearestPt, const float* testPt = NULL) const;
 	
 	/// Finds polygons that overlap the search box.
 	///  @param[in]		center		The center of the search box. [(x, y, z)]

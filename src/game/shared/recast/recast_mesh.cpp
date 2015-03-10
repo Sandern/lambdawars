@@ -394,59 +394,6 @@ void CRecastMesh::DebugRender()
 }
 #endif // CLIENT_DLL
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CRecastMesh::RebuildTilesAt( const Vector &vMins, const Vector &vMaxs )
-{
-	if( !IsLoaded() )
-		return false;
-
-	float bmin[3];
-	float bmax[3];
-
-	bmin[0] = vMins.x;
-	bmin[1] = vMins.z;
-	bmin[2] = vMins.y;
-
-	bmax[0] = vMaxs.x;
-	bmax[1] = vMaxs.z;
-	bmax[2] = vMaxs.y;
-
-	// Find tiles to rebuild
-	dtCompressedTileRef results[128];
-	int resultCount;
-	const int maxResults = 128;
-	dtStatus status = m_tileCache->queryTiles( bmin, bmax, results, &resultCount, maxResults );
-	if( !dtStatusSucceed( status ) )
-	{
-		return false;
-	}
-
-	// Remove tiles
-	for( int i = 0; i < resultCount; i++ )
-	{
-		unsigned char* data; 
-		int dataSize;
-		m_tileCache->removeTile( results[i], &data, &dataSize );
-	}
-
-	// Build minimal map mesh only for specified bounds
-	// m_pMapMesh = new CMapMesh();
-
-	// Rasterize
-	//TileCacheData tiles[MAX_LAYERS];
-	//memset(tiles, 0, sizeof(tiles));
-	//int ntiles = rasterizeTileLayers(&ctx, pMapMesh, x, y, m_cfg, tiles, MAX_LAYERS);
-
-	// Build nav mesh tiles
-	//m_tileCache->buildNavMeshTile( ..., m_navMesh );
-
-	return true;
-}
-#endif // 0
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -507,9 +454,14 @@ Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimi
 	m_filter.setExcludeFlags(0);
 
 	float pos[3];
+	float center[3];
 	pos[0] = vPoint[0];
-	pos[1] = vPoint[2] - (fBeneathLimit / 2.0f) + 32.0f;
+	pos[1] = vPoint[2];
 	pos[2] = vPoint[1];
+
+	center[0] = pos[0];
+	center[1] = pos[1] - (fBeneathLimit / 2.0f) + 32.0f;
+	center[2] = pos[2];
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
@@ -518,13 +470,12 @@ Vector CRecastMesh::ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimi
 	polyPickExt[2] = fRadius;
 
 	dtPolyRef closestRef;
-	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_filter, &closestRef, 0);
+	dtStatus status = m_navQuery->findNearestPoly(center, polyPickExt, &m_filter, &closestRef, 0, pos);
 	if( !dtStatusSucceed( status ) )
 	{
 		return vec3_origin;
 	}
 
-	//bool posOverPoly;
 	float closest[3];
 	status = m_navQuery->closestPointOnPoly(closestRef, pos, closest, NULL/*, &posOverPoly*/);
 	if( !dtStatusSucceed( status ) )
