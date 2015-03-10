@@ -91,11 +91,12 @@ void UnitBaseSense::UpdateRememberedSeen()
 
 		for( int i = 0; i < m_SeenEnemies.Count(); i++ )
 		{
-			if( !m_SeenEnemies[i].entity->IsUnit() )
+			CUnitBase *pEnemy = m_SeenEnemies[i].entity->MyUnitPointer();
+			if( !pEnemy )
 				continue;
 
 			// Test if best nearest enemy
-			iAttackPriority = m_SeenEnemies[i].entity->MyUnitPointer()->GetAttackPriority();
+			iAttackPriority = pEnemy->GetAttackPriority();
 			if( iAttackPriority > iBestAttackPriority 
 				|| (iAttackPriority == iBestAttackPriority && m_SeenEnemies[i].distancesqr < fBestEnemyDist) )
 			{
