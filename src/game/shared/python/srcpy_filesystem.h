@@ -24,6 +24,7 @@ void PyFS_WriteFile( const char *filepath, const char *pathid, const char *conte
 boost::python::object PyFS_FullPathToRelativePath( const char *path, const char *pathid = 0, boost::python::object defaultvalue = boost::python::object() );
 boost::python::object PyFS_RelativePathToFullPath( const char *path, const char *pathid = 0, boost::python::object defaultvalue = boost::python::object() );
 
+void PyFS_CreateDirHierarchy( const char *path, const char *pathID = 0 );
 boost::python::list PyFS_ListDir( const char *path, const char *pathid = NULL, const char *wildcard = "*", bool appendslashdir = true );
 bool PyFS_IsDirectory( const char *pFileName, const char *pathID = 0 );
 

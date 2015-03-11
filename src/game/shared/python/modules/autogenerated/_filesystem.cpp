@@ -17,6 +17,17 @@ namespace bp = boost::python;
 BOOST_PYTHON_MODULE(_filesystem){
     bp::docstring_options doc_options( true, true, false );
 
+    { //::PyFS_CreateDirHierarchy
+    
+        typedef void ( *CreateDirHierarchy_function_type )( char const *,char const * );
+        
+        bp::def( 
+            "CreateDirHierarchy"
+            , CreateDirHierarchy_function_type( &::PyFS_CreateDirHierarchy )
+            , ( bp::arg("path"), bp::arg("pathID")=bp::object() ) );
+    
+    }
+
     { //::PyFS_FileExists
     
         typedef bool ( *FileExists_function_type )( char const *,char const * );

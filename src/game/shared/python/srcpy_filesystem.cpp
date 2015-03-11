@@ -192,6 +192,23 @@ boost::python::object PyFS_RelativePathToFullPath( const char *path, const char 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void PyFS_CreateDirHierarchy( const char *path, const char *pathID )
+{
+	if( !path )
+		return;
+
+	if( !SrcPyPathIsInGameFolder( path ) )
+	{
+		PyErr_SetString(PyExc_IOError, "filesystem module only allows paths in the game folder" );
+		throw boost::python::error_already_set(); 
+	}
+
+	filesystem->CreateDirHierarchy( path, pathID );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 boost::python::list PyFS_ListDir( const char *pPath, const char *pPathID, const char *pWildCard, bool appendslashdir )
 {
 	if( !pPath || !pWildCard )
