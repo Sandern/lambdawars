@@ -1250,8 +1250,11 @@ bool CSrcPython::ExecuteFile( const char* pScript )
 		cf.cf_flags = PyCF_SOURCE_IS_UTF8;
 
 		PyObject *v = PyRun_StringFlags((const char *)content.Base(), Py_file_input, global.ptr(), local.ptr(), &cf);
+		if( v )
+		{
+			Py_DECREF(v);
+		}
 
-		Py_DECREF(v);
 		Py_DECREF(filename);
 	}
 	catch( bp::error_already_set & )
