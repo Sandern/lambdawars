@@ -150,58 +150,90 @@ boost::python::object PyKeyValuesToDictFromFile( const char *pFileName )
 
 static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::object value, KeyValues *pKV )
 {
-	boost::python::object valuetype = fntype( value );
+	try
+	{
+		boost::python::object valuetype = fntype( value );
 
-	if( value == boost::python::object() )
-	{
-		pKV->SetInt( pKeyName, 0 );
-	}
-	else if( valuetype == builtins.attr("int") )
-	{
-		pKV->SetInt( pKeyName, boost::python::extract<int>(value) );
-	}
-	else if( valuetype == builtins.attr("float") )
-	{
-		pKV->SetFloat( pKeyName, boost::python::extract<float>(value) );
-	}
-	else if( valuetype == builtins.attr("str") )
-	{
-		pKV->SetString( pKeyName, boost::python::extract<const char *>(value) );
-	}
-	else if( valuetype == builtins.attr("bool") )
-	{
-		pKV->SetBool( pKeyName, boost::python::extract<bool>(value) );
-	}
-	else if( valuetype == srcbuiltins.attr("Color") )
-	{
-		pKV->SetColor( pKeyName, boost::python::extract<Color>(value) );
-	}
-#if PY_VERSION_HEX >= 0x03000000
-	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
-#else
-	else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
-#endif // PY_VERSION_HEX >= 0x03000000
-	{
-		boost::python::object elements = boost::python::list( value );
-		for( int i = 0; i < boost::python::len( elements ); i++ ) 
+		if( value == boost::python::object() )
 		{
-			// Assume lists for one key only contain dictionaries
-			pKV->AddSubKey( PyDictToKeyValues( elements[i] ) );
+			pKV->SetInt( pKeyName, 0 );
+		}
+		else if( valuetype == builtins.attr("int") )
+		{
+			pKV->SetInt( pKeyName, boost::python::extract<int>(value) );
+		}
+		else if( valuetype == builtins.attr("float") )
+		{
+			pKV->SetFloat( pKeyName, boost::python::extract<float>(value) );
+		}
+		else if( valuetype == builtins.attr("str") )
+		{
+			pKV->SetString( pKeyName, boost::python::extract<const char *>(value) );
+		}
+		else if( valuetype == builtins.attr("bool") )
+		{
+			pKV->SetBool( pKeyName, boost::python::extract<bool>(value) );
+		}
+		else if( valuetype == srcbuiltins.attr("Color") )
+		{
+			pKV->SetColor( pKeyName, boost::python::extract<Color>(value) );
+		}
+	#if PY_VERSION_HEX >= 0x03000000
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") || valuetype == builtins.attr("map") )
+	#else
+		else if( valuetype == builtins.attr("list") || valuetype == builtins.attr("tuple") )
+	#endif // PY_VERSION_HEX >= 0x03000000
+		{
+			int n = boost::python::len( value );
+			if( n > 0 )
+			{
+				bool bIsDict = fntype( boost::python::object( value[0] ) ) == builtins.attr("dict");
+				if( bIsDict )
+				{
+					for( int i = 0; i < n; i++ ) 
+					{
+						// Assume lists for one key only contain dictionaries
+						pKV->AddSubKey( PyDictToKeyValues( value[i], pKeyName ) );
+					}
+				}
+				else
+				{
+					KeyValues *pListSubKey = pKV->CreateNewKey();
+					pListSubKey->SetName( pKeyName );
+
+					for( int i = 0; i < n; i++ ) 
+					{
+						char buf[5];
+						itoa( i, buf, 10 );
+						PyDictToKeyValuesConvertValue( buf, value[i], pListSubKey );
+					}
+				}
+			}
+			else
+			{
+				KeyValues *pEmpty = pKV->CreateNewKey();
+				pEmpty->SetName( pKeyName );
+			}
+		}
+		else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
+		{
+			pKV->AddSubKey( PyDictToKeyValues( value, pKeyName ) );
+		}
+		else
+		{
+			pKV->SetString( pKeyName, boost::python::extract< const char * >( value ) );
 		}
 	}
-	else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
+	catch( boost::python::error_already_set & ) 
 	{
-		pKV->AddSubKey( PyDictToKeyValues( value ) );
-	}
-	else
-	{
-		pKV->SetString( pKeyName, boost::python::extract< const char * >( value ) );
+		Warning( "PyDictToKeyValuesConvertValue: failed to convert key %s\n", pKeyName );
+		PyErr_Print();
 	}
 }
 
-KeyValues *PyDictToKeyValues( boost::python::object d )
+KeyValues *PyDictToKeyValues( boost::python::object d, const char *name )
 {
-	KeyValues *pKV = new KeyValues("Data");
+	KeyValues *pKV = new KeyValues( name ? name : "Data" );
 
 	boost::python::object items = d.attr("items")();
 	boost::python::object iterator = items.attr("__iter__")();
@@ -217,6 +249,11 @@ KeyValues *PyDictToKeyValues( boost::python::object d )
 	}
 
 	return pKV;
+}
+
+bool PyWriteKeyValuesToFile( KeyValues *pKV, const char *filename, const char *pathid )
+{
+	return pKV->SaveToFile( filesystem, filename, pathid );
 }
 
 //-----------------------------------------------------------------------------

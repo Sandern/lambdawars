@@ -848,12 +848,12 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::PyDictToKeyValues
     
-        typedef ::KeyValues * ( *DictToKeyValues_function_type )( ::boost::python::api::object );
+        typedef ::KeyValues * ( *DictToKeyValues_function_type )( ::boost::python::api::object,char const * );
         
         bp::def( 
             "DictToKeyValues"
             , DictToKeyValues_function_type( &::PyDictToKeyValues )
-            , ( bp::arg("d") )
+            , ( bp::arg("d"), bp::arg("name")=bp::object() )
             , bp::return_value_policy< bp::return_by_value >() );
     
     }
@@ -877,6 +877,17 @@ BOOST_PYTHON_MODULE(srcbuiltins){
             "KeyValuesToDictFromFile"
             , KeyValuesToDictFromFile_function_type( &::PyKeyValuesToDictFromFile )
             , ( bp::arg("pFileName") ) );
+    
+    }
+
+    { //::PyWriteKeyValuesToFile
+    
+        typedef bool ( *WriteKeyValuesToFile_function_type )( ::KeyValues *,char const *,char const * );
+        
+        bp::def( 
+            "WriteKeyValuesToFile"
+            , WriteKeyValuesToFile_function_type( &::PyWriteKeyValuesToFile )
+            , ( bp::arg("pKV"), bp::arg("filename"), bp::arg("pathid")=bp::object() ) );
     
     }
 

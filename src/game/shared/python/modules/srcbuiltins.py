@@ -66,6 +66,8 @@ class SrcBuiltins(SharedModuleGenerator):
         mb.free_function('PyDictToKeyValues').include()
         mb.free_function('PyDictToKeyValues').rename('DictToKeyValues')
         mb.free_function('PyDictToKeyValues').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        mb.free_function('PyWriteKeyValuesToFile').include()
+        mb.free_function('PyWriteKeyValuesToFile').rename('WriteKeyValuesToFile')
         
         #mb.add_registration_code( "bp::to_python_converter<\r\n\tRay_t,\r\n\tray_t_to_python_ray>();")
     
