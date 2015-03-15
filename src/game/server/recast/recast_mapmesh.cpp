@@ -97,6 +97,26 @@ void CMapMesh::AddEntity( CBaseEntity *pEntity )
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CMapMesh::AddEntityBBox( CBaseEntity *pEntity, const Vector &vMins, const Vector &vMaxs )
+{
+	if( !pEntity )
+		return;
+
+	CPhysCollide *pCollide = physcollision->BBoxToCollide( vMins, vMaxs );
+	if( pCollide )
+	{
+		matrix3x4_t transform; // model to world transformation
+		AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform);
+
+		AddCollisionModelToMesh( transform, pCollide, m_Vertices, m_Triangles );
+
+		physcollision->DestroyCollide( pCollide );
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Test if triangle is in valid area. Area should exist and 
 //			not be skybox.
 // Note: all checks are based on the center of the triangle right now.

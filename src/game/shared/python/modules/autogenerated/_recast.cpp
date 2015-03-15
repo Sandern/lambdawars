@@ -160,7 +160,11 @@ BOOST_PYTHON_MODULE(_recast){
         .def( 
             "AddEntity"
             , (void ( ::CMapMesh::* )( ::CBaseEntity * ) )( &::CMapMesh::AddEntity )
-            , ( bp::arg("pEnt") ) );
+            , ( bp::arg("pEnt") ) )    
+        .def( 
+            "AddEntityBBox"
+            , (void ( ::CMapMesh::* )( ::CBaseEntity *,::Vector const &,::Vector const & ) )( &::CMapMesh::AddEntityBBox )
+            , ( bp::arg("pEnt"), bp::arg("vMins"), bp::arg("vMaxs") ) );
 
     { //::CRecastMesh
         typedef bp::class_< CRecastMesh > CRecastMesh_exposer_t;

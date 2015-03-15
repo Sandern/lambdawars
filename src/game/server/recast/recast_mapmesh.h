@@ -35,6 +35,7 @@ public:
 	const Vector &GetMaxBounds();
 
 	void AddEntity( CBaseEntity *pEnt );
+	void AddEntityBBox( CBaseEntity *pEnt, const Vector &vMins, const Vector &vMaxs );
 
 private:
 	bool IsTriangleInValidArea( const Vector *vTriangle, bool bCheckNoArea = true );

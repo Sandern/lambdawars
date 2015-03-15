@@ -68,5 +68,6 @@ class Recast(SemiSharedModuleGenerator):
             cls.mem_funs().virtuality = 'not virtual'
             
             cls.mem_fun('AddEntity').include()
-        
+            cls.mem_fun('AddEntityBBox').include()
+            
         
