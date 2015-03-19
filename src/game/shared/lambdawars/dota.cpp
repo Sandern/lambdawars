@@ -48,9 +48,9 @@ void CEnvDeferredLight::Spawn()
 	
 	KeyValue( "power", UTIL_VarArgs( "%f", m_fStartFalloff ) );
 
-	KeyValue( "vis_dist", UTIL_VarArgs( "%d", 2048 ) );
+	KeyValue( "vis_dist", UTIL_VarArgs( "%d", 1024 ) );
 	KeyValue( "vis_range", UTIL_VarArgs( "%d", 512 ) );
-	KeyValue( "shadow_dist", UTIL_VarArgs( "%d", 1536 ) );
+	KeyValue( "shadow_dist", UTIL_VarArgs( "%d", 1024 ) );
 	KeyValue( "shadow_range", UTIL_VarArgs( "%d", 512 ) );
 
 	KeyValue( "spot_cone_inner", UTIL_VarArgs( "%f", 35.0 ) );
