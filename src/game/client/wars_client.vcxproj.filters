@@ -2435,18 +2435,6 @@
     <ClCompile Include="recast\recast_debugdrawmesh.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\public\disp_common.cpp">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\public\disp_powerinfo.cpp">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\public\dispcoll_common.cpp">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\public\builddisp.cpp">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClCompile>
     <ClCompile Include="..\shared\recast\recast_mgr.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
@@ -4965,24 +4953,6 @@
     </ClInclude>
     <ClInclude Include="recast\recast_debugdrawmesh.h">
       <Filter>Source Files\Recast</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\disp_common.h">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\disp_powerinfo.h">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\disp_tesselate.h">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\disp_vertindex.h">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\dispcoll_common.h">
-      <Filter>Source Files\Recast\DispBuild</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\public\builddisp.h">
-      <Filter>Source Files\Recast\DispBuild</Filter>
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_mgr.h">
       <Filter>Source Files\Recast</Filter>

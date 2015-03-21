@@ -98,7 +98,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;Imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;boost_python.lib;python34.lib;libcef_d.lib;libcef_dll_wrapper_d.lib;Imm32.lib;Recast.lib;Detour.lib;DetourTileCache.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)client.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -234,18 +234,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <None Include="vscript_client.nut" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\public\builddisp.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\public\dispcoll_common.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\public\disp_common.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\public\disp_powerinfo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\shared\baseprojectile.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLight.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLightContainer.cpp" />
@@ -298,6 +286,8 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\recast\fastlz\fastlz.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
     </ClCompile>
     <ClCompile Include="..\shared\recast\recast_file.cpp" />
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
@@ -1490,12 +1480,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="toolframework_client.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\public\builddisp.h" />
-    <ClInclude Include="..\..\public\dispcoll_common.h" />
-    <ClInclude Include="..\..\public\disp_common.h" />
-    <ClInclude Include="..\..\public\disp_powerinfo.h" />
-    <ClInclude Include="..\..\public\disp_tesselate.h" />
-    <ClInclude Include="..\..\public\disp_vertindex.h" />
     <ClInclude Include="..\shared\baseprojectile.h" />
     <ClInclude Include="..\shared\deferred\CDefLight.h" />
     <ClInclude Include="..\shared\deferred\CDefLightContainer.h" />
