@@ -20,6 +20,8 @@
 	#include "srcpy_boostpython.h"
 #endif // ENABLE_PYTHON
 
+#include "datacache/imdlcache.h"
+
 #ifdef CLIENT_DLL
 	class C_BaseAnimatingOverlay;
 	#define CBaseAnimatingOverlay C_BaseAnimatingOverlay
@@ -421,6 +423,7 @@ inline Activity UnitAnimState::GetCurrentMainSequenceActivity() const
 
 inline bool UnitAnimState::HasActivity( Activity actDesired ) 
 { 
+	MDLCACHE_CRITICAL_SECTION();
 	return SelectWeightedSequence( TranslateActivity( actDesired ) ) > 0; 
 }
 

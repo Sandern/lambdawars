@@ -7447,6 +7447,7 @@ void CBaseWorldBlendViewDeferred::DrawOpaqueRenderablesDeferred( bool bNoDecals 
 	CClientRenderablesList::CEntry *itEntity;
 	if( r_drawothermodels.GetBool() )
 	{
+		MDLCACHE_CRITICAL_SECTION();
 		for ( int i = 0; i < numOpaqueEnts; ++i )
 		{
 			itEntity = otherRenderables[i];

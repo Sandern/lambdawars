@@ -351,6 +351,7 @@ void UnitAnimState::RestartMainSequence()
 	// Then AutoMovement can be directly executed afterwards, so we don't miss any part.
 	if ( m_nSpecificMainActivity != ACT_INVALID )
 	{
+		MDLCACHE_CRITICAL_SECTION();
 		if ( pUnit->GetSequenceActivity( pUnit->GetSequence() ) != m_nSpecificMainActivity )
 		{
 			pUnit->ResetSequence( SelectWeightedSequence( m_nSpecificMainActivity ) );
