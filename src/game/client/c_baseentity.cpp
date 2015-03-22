@@ -1513,6 +1513,20 @@ const CBaseHandle& C_BaseEntity::GetRefEHandle() const
 //-----------------------------------------------------------------------------
 void C_BaseEntity::Release()
 {
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	if( m_bPyManaged && m_pyInstance.ptr() == Py_None )
+	{
+		Warning("Called Release on an already released Python managed entity!\n");
+		return;
+	}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 	{
 		C_BaseAnimating::AutoAllowBoneAccess boneaccess( true, true );
 		UnlinkFromHierarchy();
