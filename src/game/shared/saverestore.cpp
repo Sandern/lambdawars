@@ -892,17 +892,13 @@ int CSave::PyWriteAll( boost::python::object instance )
 	try
 	{
 		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
-		//Msg("Starting writing python fields for %s\n", pName );
 
 		int iHeaderPos = m_pData->GetCurPos();
 		int count = -1;
 		WriteInt( pName, &count, 1 );
 
 		count = 0;
-
-		boost::python::object fields;
-
-		fields = instance.attr("fields");
+		boost::python::object fields = instance.attr("fields");
 
 		boost::python::object items = fields.attr("items")();
 		boost::python::object iterator = items.attr("__iter__")();
@@ -919,11 +915,10 @@ int CSave::PyWriteAll( boost::python::object instance )
 
 			try
 			{
-				boost::python::object data = field.attr("Save")( instance );
-
 				const char *pFieldName = boost::python::extract<const char *>(item[0]);
+				boost::python::object data = field.attr("Save")( instance );
+				
 				const char *pFieldData = boost::python::extract<const char *>(data);
-				//Msg("SAVE field: %s value: %s\n", pFieldName, pFieldData);
 				WriteString( pFieldName, pFieldData );
 
 				count++;
@@ -940,8 +935,6 @@ int CSave::PyWriteAll( boost::python::object instance )
 		WriteInt( pName, &count, 1 );
 		iCurPos = m_pData->GetCurPos();
 		m_pData->MoveCurPos( iRewind - ( iCurPos - iHeaderPos ) );
-
-		//Msg( "Wrote %d python fields to save file\n", count );
 	}
 	catch (boost::python::error_already_set &)
 	{

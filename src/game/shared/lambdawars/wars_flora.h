@@ -34,6 +34,8 @@ public:
 	virtual void InitFloraData();
 	virtual void InitFloraSequences();
 
+	virtual	int ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_DONT_SAVE; }
+
 	// For managing flora in ingame prop editor
 	bool HasFloraUUID();
 	void GenerateFloraUUID();

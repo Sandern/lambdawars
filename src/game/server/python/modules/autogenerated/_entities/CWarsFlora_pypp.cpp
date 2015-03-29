@@ -843,6 +843,9 @@ void register_CWarsFlora_class(){
             "IsEditorManaged"
             , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::IsEditorManaged ) )    
         .def( 
+            "ObjectCaps"
+            , (int ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::ObjectCaps ) )    
+        .def( 
             "PlayDestructionAnimation"
             , (void ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::PlayDestructionAnimation ) )    
         .def( 

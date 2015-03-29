@@ -710,6 +710,9 @@ void register_CWarsFlora_class(){
             , (bool ( CWarsFlora_wrapper::* )( char const *,char const * ) )(&CWarsFlora_wrapper::default_KeyValue)
             , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
+            "ObjectCaps"
+            , (int ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::ObjectCaps ) )    
+        .def( 
             "ParseEntity"
             , (char const * (*)( char const * ))( &::CWarsFlora::ParseEntity )
             , ( bp::arg("pEntData") ) )    
