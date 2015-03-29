@@ -162,6 +162,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls = mb.class_('UnitVehicleAnimState')
         cls.include()
         cls.calldefs().virtuality = 'not virtual'
+        cls.mem_fun('Update').virtuality = 'virtual'
         
         cls.var('m_iVehicleSteer').rename('vehiclesteer')
         cls.var('m_iVehicleFLSpin').rename('vehicleflspin')

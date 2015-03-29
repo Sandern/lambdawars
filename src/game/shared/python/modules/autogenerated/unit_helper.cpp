@@ -618,6 +618,25 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
     
     }
 
+    virtual void Update( float eyeYaw, float eyePitch ) {
+        PY_OVERRIDE_CHECK( UnitVehicleAnimState, Update )
+        PY_OVERRIDE_LOG( unit_helper, UnitVehicleAnimState, Update )
+        bp::override func_Update = this->get_override( "Update" );
+        if( func_Update.ptr() != Py_None )
+            try {
+                func_Update( eyeYaw, eyePitch );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitVehicleAnimState::Update( eyeYaw, eyePitch );
+            }
+        else
+            this->UnitVehicleAnimState::Update( eyeYaw, eyePitch );
+    }
+    
+    void default_Update( float eyeYaw, float eyePitch ) {
+        UnitVehicleAnimState::Update( eyeYaw, eyePitch );
+    }
+
     void GetOuterAbsVelocity( ::Vector & vel ) const {
         UnitBaseAnimState::GetOuterAbsVelocity( vel );
     }
@@ -2388,10 +2407,12 @@ BOOST_PYTHON_MODULE(unit_helper){
         { //::UnitVehicleAnimState::Update
         
             typedef void ( ::UnitVehicleAnimState::*Update_function_type )( float,float ) ;
+            typedef void ( UnitVehicleAnimState_wrapper::*default_Update_function_type )( float,float ) ;
             
             UnitVehicleAnimState_exposer.def( 
                 "Update"
-                , Update_function_type( &::UnitVehicleAnimState::Update )
+                , Update_function_type(&::UnitVehicleAnimState::Update)
+                , default_Update_function_type(&UnitVehicleAnimState_wrapper::default_Update)
                 , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) );
         
         }
@@ -3431,6 +3452,25 @@ struct UnitVehicleAnimState_wrapper : UnitVehicleAnimState, bp::wrapper< UnitVeh
       , bp::wrapper< UnitVehicleAnimState >(){
         // constructor
     
+    }
+
+    virtual void Update( float eyeYaw, float eyePitch ) {
+        PY_OVERRIDE_CHECK( UnitVehicleAnimState, Update )
+        PY_OVERRIDE_LOG( unit_helper, UnitVehicleAnimState, Update )
+        bp::override func_Update = this->get_override( "Update" );
+        if( func_Update.ptr() != Py_None )
+            try {
+                func_Update( eyeYaw, eyePitch );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitVehicleAnimState::Update( eyeYaw, eyePitch );
+            }
+        else
+            this->UnitVehicleAnimState::Update( eyeYaw, eyePitch );
+    }
+    
+    void default_Update( float eyeYaw, float eyePitch ) {
+        UnitVehicleAnimState::Update( eyeYaw, eyePitch );
     }
 
     void GetOuterAbsVelocity( ::Vector & vel ) const {
@@ -6476,10 +6516,12 @@ BOOST_PYTHON_MODULE(unit_helper){
         { //::UnitVehicleAnimState::Update
         
             typedef void ( ::UnitVehicleAnimState::*Update_function_type )( float,float ) ;
+            typedef void ( UnitVehicleAnimState_wrapper::*default_Update_function_type )( float,float ) ;
             
             UnitVehicleAnimState_exposer.def( 
                 "Update"
-                , Update_function_type( &::UnitVehicleAnimState::Update )
+                , Update_function_type(&::UnitVehicleAnimState::Update)
+                , default_Update_function_type(&UnitVehicleAnimState_wrapper::default_Update)
                 , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) );
         
         }

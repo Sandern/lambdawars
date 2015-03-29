@@ -368,6 +368,8 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.var('m_iPlayerDamage' if self.settings.branch == 'source2013' else 'm_flPlayerDamage').rename('playerdamage')
         cls.var('m_Attributes').rename('attributes')
         
+        mb.enum('FireBulletsFlags_t').include()
+        
         # CShotManipulator
         cls = mb.class_('CShotManipulator')
         cls.include()
