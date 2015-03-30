@@ -334,6 +334,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('GetAttacker').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         
         self.SetupProperty(cls, 'attributes', 'GetAttributes', 'SetAttributes')
+        self.SetupProperty(cls, 'forcefriendlyfire', 'IsForceFriendlyFire', 'SetForceFriendlyFire')
         
         cls = mb.class_('CMultiDamage')
         cls.include()

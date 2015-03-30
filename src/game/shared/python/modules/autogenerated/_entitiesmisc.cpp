@@ -2040,15 +2040,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CTakeDamageInfo::IsForceFriendlyFire
-        
-            typedef bool ( ::CTakeDamageInfo::*IsForceFriendlyFire_function_type )(  ) const;
-            
-            CTakeDamageInfo_exposer.def( 
-                "IsForceFriendlyFire"
-                , IsForceFriendlyFire_function_type( &::CTakeDamageInfo::IsForceFriendlyFire ) );
-        
-        }
         { //::CTakeDamageInfo::ScaleDamage
         
             typedef void ( ::CTakeDamageInfo::*ScaleDamage_function_type )( float ) ;
@@ -2189,16 +2180,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ( bp::arg("bitsDamageType") ) );
         
         }
-        { //::CTakeDamageInfo::SetForceFriendlyFire
-        
-            typedef void ( ::CTakeDamageInfo::*SetForceFriendlyFire_function_type )( bool ) ;
-            
-            CTakeDamageInfo_exposer.def( 
-                "SetForceFriendlyFire"
-                , SetForceFriendlyFire_function_type( &::CTakeDamageInfo::SetForceFriendlyFire )
-                , ( bp::arg("bValue") ) );
-        
-        }
         { //::CTakeDamageInfo::SetInflictor
         
             typedef void ( ::CTakeDamageInfo::*SetInflictor_function_type )( ::C_BaseEntity * ) ;
@@ -2269,6 +2250,17 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 "attributes"
                 , fget( &::CTakeDamageInfo::GetAttributes )
                 , fset( &::CTakeDamageInfo::SetAttributes ) );
+        
+        }
+        { //property "forcefriendlyfire"[fget=::CTakeDamageInfo::IsForceFriendlyFire, fset=::CTakeDamageInfo::SetForceFriendlyFire]
+        
+            typedef bool ( ::CTakeDamageInfo::*fget )(  ) const;
+            typedef void ( ::CTakeDamageInfo::*fset )( bool ) ;
+            
+            CTakeDamageInfo_exposer.add_property( 
+                "forcefriendlyfire"
+                , fget( &::CTakeDamageInfo::IsForceFriendlyFire )
+                , fset( &::CTakeDamageInfo::SetForceFriendlyFire ) );
         
         }
     }
@@ -5178,15 +5170,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CTakeDamageInfo::IsForceFriendlyFire
-        
-            typedef bool ( ::CTakeDamageInfo::*IsForceFriendlyFire_function_type )(  ) const;
-            
-            CTakeDamageInfo_exposer.def( 
-                "IsForceFriendlyFire"
-                , IsForceFriendlyFire_function_type( &::CTakeDamageInfo::IsForceFriendlyFire ) );
-        
-        }
         { //::CTakeDamageInfo::ScaleDamage
         
             typedef void ( ::CTakeDamageInfo::*ScaleDamage_function_type )( float ) ;
@@ -5327,16 +5310,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ( bp::arg("bitsDamageType") ) );
         
         }
-        { //::CTakeDamageInfo::SetForceFriendlyFire
-        
-            typedef void ( ::CTakeDamageInfo::*SetForceFriendlyFire_function_type )( bool ) ;
-            
-            CTakeDamageInfo_exposer.def( 
-                "SetForceFriendlyFire"
-                , SetForceFriendlyFire_function_type( &::CTakeDamageInfo::SetForceFriendlyFire )
-                , ( bp::arg("bValue") ) );
-        
-        }
         { //::CTakeDamageInfo::SetInflictor
         
             typedef void ( ::CTakeDamageInfo::*SetInflictor_function_type )( ::CBaseEntity * ) ;
@@ -5407,6 +5380,17 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 "attributes"
                 , fget( &::CTakeDamageInfo::GetAttributes )
                 , fset( &::CTakeDamageInfo::SetAttributes ) );
+        
+        }
+        { //property "forcefriendlyfire"[fget=::CTakeDamageInfo::IsForceFriendlyFire, fset=::CTakeDamageInfo::SetForceFriendlyFire]
+        
+            typedef bool ( ::CTakeDamageInfo::*fget )(  ) const;
+            typedef void ( ::CTakeDamageInfo::*fset )( bool ) ;
+            
+            CTakeDamageInfo_exposer.add_property( 
+                "forcefriendlyfire"
+                , fget( &::CTakeDamageInfo::IsForceFriendlyFire )
+                , fset( &::CTakeDamageInfo::SetForceFriendlyFire ) );
         
         }
     }
