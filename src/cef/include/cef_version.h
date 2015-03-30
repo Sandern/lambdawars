@@ -35,14 +35,16 @@
 #ifndef CEF_INCLUDE_CEF_VERSION_H_
 #define CEF_INCLUDE_CEF_VERSION_H_
 
+#define CEF_VERSION "3.2272.25.g0b795ee"
 #define CEF_VERSION_MAJOR 3
-#define CEF_REVISION 2050
+#define CEF_COMMIT_NUMBER 25
+#define CEF_COMMIT_HASH "0b795eed1071254801b5031ba3b1563972c90ee6"
 #define COPYRIGHT_YEAR 2015
 
 #define CHROME_VERSION_MAJOR 41
 #define CHROME_VERSION_MINOR 0
 #define CHROME_VERSION_BUILD 2272
-#define CHROME_VERSION_PATCH 76
+#define CHROME_VERSION_PATCH 104
 
 #define DO_MAKE_STRING(p) #p
 #define MAKE_STRING(p) DO_MAKE_STRING(p)
@@ -70,16 +72,10 @@ extern "C" {
 #define CEF_API_HASH_PLATFORM "df91279f546fd2e34684a3bc02abb7e70c35e5a1"
 #endif
 
-///
-// Returns the CEF build revision for the libcef library.
-///
-CEF_EXPORT int cef_build_revision();
-
-///
 // Returns CEF version information for the libcef library. The |entry|
 // parameter describes which version component will be returned:
 // 0 - CEF_VERSION_MAJOR
-// 1 - CEF_REVISION
+// 1 - CEF_COMMIT_NUMBER
 // 2 - CHROME_VERSION_MAJOR
 // 3 - CHROME_VERSION_MINOR
 // 4 - CHROME_VERSION_BUILD
@@ -93,6 +89,7 @@ CEF_EXPORT int cef_version_info(int entry);
 // hash value will be returned:
 // 0 - CEF_API_HASH_PLATFORM
 // 1 - CEF_API_HASH_UNIVERSAL
+// 2 - CEF_COMMIT_HASH
 ///
 CEF_EXPORT const char* cef_api_hash(int entry);
 
