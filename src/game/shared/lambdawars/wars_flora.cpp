@@ -55,6 +55,7 @@ extern "C"
 ConVar cl_flora_disable( "cl_flora_disable", "0" );
 ConVar cl_flora_animate( "cl_wars_flora_animate", "1", FCVAR_ARCHIVE );
 ConVar cl_flora_avoid_units( "cl_wars_flora_avoid_units", "1", FCVAR_ARCHIVE );
+ConVar cl_flora_avoid_units_debug( "cl_flora_avoid_units_debug", "0", 0 );
 ConVar cl_flora_sway_speed( "cl_wars_flora_sway_speed", "10" );
 #endif // CLIENT_DLL
 
@@ -407,17 +408,29 @@ void CWarsFlora::UpdateUnitAvoid()
 			vecAvoidAvg /= c;
 			VectorNormalize( vecAvoidAvg );
 
+			if( cl_flora_avoid_units_debug.GetBool() )
+			{
+				NDebugOverlay::HorzArrow( vOrigin, vOrigin + vecAvoidAvg * 64.0f, 
+									2.0f, 0, 255, 0, 200, true, 0 );
+			}
+
 			VectorYawRotate( vecAvoidAvg, -GetAbsAngles()[YAW], vecAvoidAvg );
+
+			if( cl_flora_avoid_units_debug.GetBool() )
+			{
+				NDebugOverlay::EntityTextAtPosition( vOrigin, 0, VarArgs("Yaw: %.2f\n", GetAbsAngles()[YAW]), gpGlobals->frametime, 255, 255, 255, 255 );
+				NDebugOverlay::EntityTextAtPosition( vOrigin, 1, VarArgs("x: %.2f, y: %.2f, z: %.2f\n", vecAvoidAvg.x, vecAvoidAvg.y, vecAvoidAvg.z), gpGlobals->frametime, 255, 255, 255, 255 );
+			}
 		}
 
 		float frac = gpGlobals->frametime * cl_flora_sway_speed.GetFloat();
 		for ( i = 0; i < 3; i++ )
 		{
-			m_vCurrentSway[ i ] = m_vCurrentSway[ i ] + frac * ( vecAvoidAvg[ i] - m_vCurrentSway[ i ] );
+			m_vCurrentSway[ i ] = m_vCurrentSway[ i ] + frac * ( vecAvoidAvg[ i ] - m_vCurrentSway[ i ] );
 		}
 
-		SetPoseParameter( m_iPoseX, m_vCurrentSway.x );
-		SetPoseParameter( m_iPoseY, m_vCurrentSway.y );
+		SetPoseParameter( m_iPoseX, m_vCurrentSway.y );
+		SetPoseParameter( m_iPoseY, -m_vCurrentSway.x );
 		SetPoseParameter( m_iPoseZ, m_vCurrentSway.z );
 	}
 	else if( m_iSqueezeDownSequence != -1 )
