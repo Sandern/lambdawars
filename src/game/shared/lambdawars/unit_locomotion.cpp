@@ -1767,25 +1767,25 @@ void UnitBaseLocomotion::CheckVelocity( void )
 		// See if it's bogus.
 		if (IS_NAN(mv->velocity[i]))
 		{
-			DevMsg( 1, "PM  Got a NaN velocity %s\n", DescribeAxis( i ) );
+			DevMsg( 1, "%s: PM  Got a NaN velocity %s\n", m_pOuter->GetClassname(), DescribeAxis( i ) );
 			mv->velocity[i] = 0;
 		}
 
 		if (IS_NAN(mv->origin[i]))
 		{
-			DevMsg( 1, "PM  Got a NaN origin on %s\n", DescribeAxis( i ) );
+			DevMsg( 1, "%s: PM  Got a NaN origin on %s\n", m_pOuter->GetClassname(), DescribeAxis( i ) );
 			mv->origin[ i ] = 0;
 		}
 
 		// Bound it.
 		if (mv->velocity[i] > sv_maxvelocity.GetFloat()) 
 		{
-			DevMsg( 1, "PM  Got a velocity too high on %s\n", DescribeAxis( i ) );
+			DevMsg( 1, "%s: PM  Got a velocity too high on %s\n", m_pOuter->GetClassname(), DescribeAxis( i ) );
 			mv->velocity[i] = sv_maxvelocity.GetFloat();
 		}
 		else if (mv->velocity[i] < -sv_maxvelocity.GetFloat())
 		{
-			DevMsg( 1, "PM  Got a velocity too low on %s\n", DescribeAxis( i ) );
+			DevMsg( 1, "%s: PM  Got a velocity too low on %s\n", m_pOuter->GetClassname(), DescribeAxis( i ) );
 			mv->velocity[i] = -sv_maxvelocity.GetFloat();
 		}
 	}
