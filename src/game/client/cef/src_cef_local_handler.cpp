@@ -16,6 +16,8 @@
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
+ConVar cef_scheme_debug_local_handler("cef_scheme_debug_local_handler", "0");
+
 LocalSchemeHandlerFactory::LocalSchemeHandlerFactory()
 {
 
@@ -50,9 +52,12 @@ CefRefPtr<CefResourceHandler> LocalSchemeHandlerFactory::Create(CefRefPtr<CefBro
 	{
 		const char *pExtension = V_GetFileExtension( path );
 
-		//Msg( "Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d, resource type: %d\n", 
-		//	CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ),
-		//	request->GetResourceType() );
+		if( cef_scheme_debug_local_handler.GetBool() )
+		{
+			Msg( "Local scheme request => Path: %s, Extension: %s, Mime Type: %s, modified path: %s, exists: %d, resource type: %d\n", 
+				CefString(&parts.path).ToString().c_str(), pExtension, CefGetMimeType(pExtension).ToString().c_str(), path, filesystem->FileExists( path ),
+				request->GetResourceType() );
+		}
 
 		CUtlBuffer buf( 0, filesystem->Size( path, NULL ) );
 		if( filesystem->ReadFile( path, NULL, buf ) )
