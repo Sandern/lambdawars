@@ -23,8 +23,11 @@ public:
 #endif // ENABLE_PYTHON
 
 	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir = NULL );
+	virtual void		CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle angles, float speed );
 
 	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+
+	virtual float		CalcNeededDistanceForTurn( UnitBaseMoveCommand &MoveCommand, float turn );
 };
 
 #endif // UNIT_VEHICLENAVIGATOR_H

@@ -9,6 +9,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar unit_vehicle_angle_tolerance("unit_vehicle_angle_tolerance", "15.0");
+ConVar unit_vehicle_waypoint_tolerance("unit_vehicle_waypoint_tolerance", "16.0");
+ConVar unit_vehicle_min_dist_turnmod("unit_vehicle_min_dist_turnmod", "4.0");
+
 #ifdef ENABLE_PYTHON
 UnitVehicleNavigator::UnitVehicleNavigator( boost::python::object outer ) : UnitBaseNavigator( outer )
 {
@@ -73,4 +77,62 @@ void UnitVehicleNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &Move
 	{
 
 	}*/
+}
+
+extern float UnitComputePathDirection2( const Vector &start, UnitBaseWaypoint *pEnd, Vector &pDirection );
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void UnitVehicleNavigator::CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle angles, float speed )
+{
+	if( GetPath()->m_iGoalType != GOALTYPE_NONE )
+	{
+		// Check if we need to back the vehicle to make a turn (estimated)
+		UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
+		if( pCurWaypoint )
+		{
+			Vector vDir;
+			float waypointDist = UnitComputePathDirection2(GetAbsOrigin(), pCurWaypoint, vDir);
+			QAngle turnAngles;
+			VectorAngles( vDir, turnAngles );
+			float angle = anglemod( MoveCommand.viewangles[YAW] - turnAngles[YAW] );
+			if( angle > 180.0f )
+				angle = fabs( angle - 360 );
+
+			float distNeeded = CalcNeededDistanceForTurn( MoveCommand, angle );
+			if( angle > unit_vehicle_angle_tolerance.GetFloat() &&
+				waypointDist > unit_vehicle_waypoint_tolerance.GetFloat() && 
+				distNeeded * unit_vehicle_min_dist_turnmod.GetFloat() > waypointDist )
+			{
+				MoveCommand.forwardmove = -Min( distNeeded, MoveCommand.maxspeed );
+				MoveCommand.sidemove = 0;
+				return;
+			}
+		}
+	}
+
+	BaseClass::CalcMove( MoveCommand, angles, speed );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Returns a very rough estimate for distance needed to turn
+//-----------------------------------------------------------------------------
+float UnitVehicleNavigator::CalcNeededDistanceForTurn( UnitBaseMoveCommand &MoveCommand, float turn )
+{
+	float turnPerInterval = MoveCommand.yawspeed * 10.0f * MoveCommand.interval;
+	float turnStep, speedWeight;
+
+	Vector dir( 1, 0, 0 );
+	Vector end(0, 0, 0);
+	int i = 0;
+	for( i = 0; turn > 0 && i < 1000; i++ )
+	{
+		turnStep = Min( turnPerInterval, turn - turnPerInterval );
+		speedWeight = turnStep / turnPerInterval;
+		turn -= turnPerInterval;
+		VectorYawRotate( dir, turnStep, dir );
+		end += dir * (MoveCommand.maxspeed * speedWeight * MoveCommand.interval);
+	}
+	return end.Length2D();
 }
