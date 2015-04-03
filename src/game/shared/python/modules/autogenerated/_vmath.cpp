@@ -470,6 +470,16 @@ BOOST_PYTHON_MODULE(_vmath){
                 , ( bp::arg("vVec") ) );
         
         }
+        { //::VMatrix::As3x4
+        
+            typedef ::matrix3x4_t const & ( ::VMatrix::*As3x4_function_type )(  ) const;
+            
+            VMatrix_exposer.def( 
+                "As3x4"
+                , As3x4_function_type( &::VMatrix::As3x4 )
+                , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
         { //::VMatrix::CopyFrom3x4
         
             typedef void ( ::VMatrix::*CopyFrom3x4_function_type )( ::matrix3x4_t const & ) ;
@@ -515,6 +525,15 @@ BOOST_PYTHON_MODULE(_vmath){
             VMatrix_exposer.def( 
                 "GetScale"
                 , GetScale_function_type( &::VMatrix::GetScale ) );
+        
+        }
+        { //::VMatrix::GetTranslation
+        
+            typedef ::Vector ( ::VMatrix::*GetTranslation_function_type )(  ) const;
+            
+            VMatrix_exposer.def( 
+                "GetTranslation"
+                , GetTranslation_function_type( &::VMatrix::GetTranslation ) );
         
         }
         { //::VMatrix::GetUp

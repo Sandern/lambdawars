@@ -378,9 +378,10 @@ class VMath(SharedModuleGenerator):
         cls.mem_opers('=').exclude() # Breaks debug mode and don't really need it
         cls.mem_opers('[]').exclude()
         cls.mem_funs('Base').exclude()
-        cls.mem_funs('As3x4').exclude()
-        cls.mem_funs('GetTranslation').exclude()
         cls.vars('m').exclude()
+        
+        cls.mem_fun('As3x4', matchers.calldef_matcher_t(return_type=reference_t(declarated_t(mb.class_('matrix3x4_t'))))).exclude()
+        cls.mem_fun('GetTranslation', matchers.calldef_matcher_t(return_type=reference_t(declarated_t(mb.class_('Vector'))))).exclude()
         
         cls.add_wrapper_code( str_vmatrix_wrapper % {'cls_name':'VMatrix'} )
         cls.add_registration_code( str_reg % {'cls_name':'VMatrix'}, False)
