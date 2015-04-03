@@ -141,6 +141,7 @@
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
 #include "srcpy_networkvar.h"
+#include "srcpy_saverestore.h"
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
@@ -878,7 +879,15 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetAchievementSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetVScriptSaveRestoreBlockHandler() );
 
-
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	g_pGameSaveRestoreBlockSet->AddBlockHandler( GetPythonSaveRestoreBlockHandler() );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	bool bInitSuccess = false;
 	if ( sv_threaded_init.GetBool() )
@@ -966,6 +975,15 @@ void CServerGameDLL::DLLShutdown( void )
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetPythonSaveRestoreBlockHandler() );
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	char *pFilename = g_TextStatsMgr.GetStatsFilename();
 	if ( !pFilename || !pFilename[0] )

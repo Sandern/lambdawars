@@ -39,6 +39,7 @@ struct matrix3x4_t;
 
 class CSaveRestoreData;
 class CGameSaveRestoreInfo;
+class CSaveRestoreSegment;
 
 class ISave;
 class IRestore;
@@ -216,6 +217,7 @@ public:
 	//---------------------------------
 	// Back door to support somewhat awkward ownership of game save/restore data
 	virtual CGameSaveRestoreInfo *GetGameSaveRestoreInfo() = 0;
+	virtual CSaveRestoreSegment *GetSaveRestoreSegment() = 0;
 
 protected:
 	virtual ~ISave() {};

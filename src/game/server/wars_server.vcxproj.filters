@@ -1987,6 +1987,9 @@
     <ClCompile Include="..\shared\recast\recast_mgr_ent.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\python\srcpy_saverestore.cpp">
+      <Filter>Source Files\Python</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3872,6 +3875,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_mgr_ent.h">
       <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\python\srcpy_saverestore.h">
+      <Filter>Source Files\Python</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

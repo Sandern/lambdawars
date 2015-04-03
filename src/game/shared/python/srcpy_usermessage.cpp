@@ -352,7 +352,6 @@ void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost
 	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		return;
 	}
 
@@ -441,8 +440,7 @@ boost::python::object PyReadElement( bf_read &msg )
 			catch(boost::python::error_already_set &) 
 			{					
 				Warning("PyReadElement: Failed to create a PyHandle\n");				
-				PyErr_Print();																		
-				PyErr_Clear();												
+				PyErr_Print();											
 			}	
 			return bp::object();
 		case PYTYPE_LIST:
@@ -477,7 +475,6 @@ boost::python::object PyReadElement( bf_read &msg )
 	{
 		Warning( "PyReadElement: failed to parse element: \n" );
 		PyErr_Print();
-		PyErr_Clear();
 		return bp::object("<error>");
 	}
 
@@ -512,7 +509,6 @@ void __MsgFunc_PyMessage( bf_read &msg )
 		{
 			Warning( "__MsgFunc_PyMessage failed to parse message: \n" );
 			PyErr_Print();
-			PyErr_Clear();
 			return;
 		}
 	}

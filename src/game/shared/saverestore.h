@@ -146,6 +146,7 @@ public:
 	int				EntityFlagsSet( int entityIndex, int flags );
 
 	CGameSaveRestoreInfo *GetGameSaveRestoreInfo()	{ return m_pGameInfo; }
+	CSaveRestoreSegment *GetSaveRestoreSegment() { return m_pData; }
 
 private:
 
