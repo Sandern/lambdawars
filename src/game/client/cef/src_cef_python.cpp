@@ -407,4 +407,24 @@ bool PyCefFrame::operator !=( const PyCefFrame &other ) const
 	return m_Frame->GetIdentifier() != other.m_Frame->GetIdentifier();
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+bool PyCefFrame::IsMain()
+{
+	if( !m_Frame )
+		return false;
+	return m_Frame->IsMain();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+const char *PyCefFrame::GetURL()
+{
+	if( !m_Frame )
+		return "";
+	return m_Frame->GetURL().ToString().c_str();
+}
+
 #endif // ENABLE_PYTHON

@@ -52,6 +52,9 @@ public:
 	bool operator ==( const PyCefFrame &other ) const;
 	bool operator !=( const PyCefFrame &other ) const;
 
+	bool IsMain();
+	const char *GetURL();
+
 private:
 	CefRefPtr<CefFrame> m_Frame;
 };

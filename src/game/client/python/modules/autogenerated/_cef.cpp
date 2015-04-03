@@ -312,6 +312,24 @@ BOOST_PYTHON_MODULE(_cef){
         bp::scope CefFrame_scope( CefFrame_exposer );
         CefFrame_exposer.def( bp::init< CefRefPtr< CefFrame > >(( bp::arg("frame") )) );
         bp::implicitly_convertible< CefRefPtr< CefFrame >, PyCefFrame >();
+        { //::PyCefFrame::GetURL
+        
+            typedef char const * ( ::PyCefFrame::*GetURL_function_type )(  ) ;
+            
+            CefFrame_exposer.def( 
+                "GetURL"
+                , GetURL_function_type( &::PyCefFrame::GetURL ) );
+        
+        }
+        { //::PyCefFrame::IsMain
+        
+            typedef bool ( ::PyCefFrame::*IsMain_function_type )(  ) ;
+            
+            CefFrame_exposer.def( 
+                "IsMain"
+                , IsMain_function_type( &::PyCefFrame::IsMain ) );
+        
+        }
         CefFrame_exposer.def( bp::self != bp::self );
         CefFrame_exposer.def( bp::self == bp::self );
     }
