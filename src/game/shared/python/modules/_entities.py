@@ -1465,6 +1465,7 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
         self.IncludeVarAndRename('m_bFriendlyDamage', 'friendlydamage')
         self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
+        self.IncludeVarAndRename('m_fModelYawRotation', 'modelyawrotation')
         
         # Pathfinding/Navmesh
         self.IncludeVarAndRename('m_fDeathDrop', 'deathdrop')

@@ -2022,6 +2022,7 @@ void register_C_UnitBase_class(){
         C_UnitBase_exposer.def_readwrite( "eyeyaw", &C_UnitBase::m_fEyeYaw );
         C_UnitBase_exposer.def_readwrite( "maxclimbheight", &C_UnitBase::m_fMaxClimbHeight );
         C_UnitBase_exposer.def_readwrite( "minslope", &C_UnitBase::m_fMinSlope );
+        C_UnitBase_exposer.def_readwrite( "modelyawrotation", &C_UnitBase::m_fModelYawRotation );
         C_UnitBase_exposer.def_readwrite( "savedrop", &C_UnitBase::m_fSaveDrop );
         C_UnitBase_exposer.def_readwrite( "testroutestartheight", &C_UnitBase::m_fTestRouteStartHeight );
         C_UnitBase_exposer.def_readwrite( "maxhealth", &C_UnitBase::m_iMaxHealth );

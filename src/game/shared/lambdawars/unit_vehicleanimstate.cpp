@@ -10,8 +10,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-ConVar wars_vehicle_yaw_adjustment("wars_vehicle_yaw_adjustment", "90");
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -131,7 +129,7 @@ const QAngle& UnitVehicleAnimState::GetRenderAngles()
 //-----------------------------------------------------------------------------
 void UnitVehicleAnimState::Update( float eyeYaw, float eyePitch )
 {
-	m_angRender[YAW] = eyeYaw - wars_vehicle_yaw_adjustment.GetFloat();
+	m_angRender[YAW] = eyeYaw - m_pOuter->m_fModelYawRotation;
 	m_angRender[PITCH] = eyePitch;
 	m_angRender[ROLL] = 0.0f;
 

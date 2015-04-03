@@ -459,12 +459,12 @@ protected:
 public:
 	COutputEvent m_OnIgnite;
 
-
+protected:
+	CThreadFastMutex	m_BoneSetupMutex;
 
 private:
 	CStudioHdr			*m_pStudioHdr;
 	CThreadFastMutex	m_StudioHdrInitLock;
-	CThreadFastMutex	m_BoneSetupMutex;
 
 // FIXME: necessary so that cyclers can hack m_bSequenceFinished
 friend class CFlexCycler;

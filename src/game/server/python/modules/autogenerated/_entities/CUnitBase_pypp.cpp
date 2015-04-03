@@ -2236,6 +2236,16 @@ void register_CUnitBase_class(){
                 , ( bp::arg("iClientIndex"), bp::arg("state") ) );
         
         }
+        { //::CUnitBase::SetupBones
+        
+            typedef void ( ::CUnitBase::*SetupBones_function_type )( ::matrix3x4a_t *,int ) ;
+            
+            CUnitBase_exposer.def( 
+                "SetupBones"
+                , SetupBones_function_type( &::CUnitBase::SetupBones )
+                , ( bp::arg("pBoneToWorld"), bp::arg("boneMask") ) );
+        
+        }
         { //::CUnitBase::Spawn
         
             typedef void ( ::CUnitBase::*Spawn_function_type )(  ) ;
@@ -2371,6 +2381,7 @@ void register_CUnitBase_class(){
         CUnitBase_exposer.def_readwrite( "eyeyaw", &CUnitBase::m_fEyeYaw );
         CUnitBase_exposer.def_readwrite( "maxclimbheight", &CUnitBase::m_fMaxClimbHeight );
         CUnitBase_exposer.def_readwrite( "minslope", &CUnitBase::m_fMinSlope );
+        CUnitBase_exposer.def_readwrite( "modelyawrotation", &CUnitBase::m_fModelYawRotation );
         CUnitBase_exposer.def_readwrite( "savedrop", &CUnitBase::m_fSaveDrop );
         CUnitBase_exposer.def_readwrite( "testroutestartheight", &CUnitBase::m_fTestRouteStartHeight );
         { //::CBaseAnimating::Activate

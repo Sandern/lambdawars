@@ -23,6 +23,11 @@
 	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
+#include "studio.h"
+#include "bone_setup.h"
+#include "datacache/imdlcache.h"
+#include "tier0/threadtools.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -31,6 +36,8 @@ static ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0" );
 ConVar g_unit_force_minimal_sendtable("g_unit_force_minimal_sendtable", "0", FCVAR_CHEAT);
 static ConVar g_unit_minimal_sendtable_updaterate("g_unit_minimal_sendtable_updaterate", "0.4", FCVAR_CHEAT);
 static ConVar unit_nextserveranimupdatetime("unit_nextserveranimupdatetime", "0.2", FCVAR_CHEAT);
+
+extern ConVar ai_setupbones_debug;
 
 //-----------------------------------------------------------------------------
 // Grenade tossing
@@ -1271,6 +1278,121 @@ int CUnitBase::TakeHealth( float flHealth, int bitsDamageType )
 	if( !bFullHealth && m_iHealth >= m_iMaxHealth )
 		OnFullHealth();
 	return rv;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: HACKY! Jeep unit is rendered at -90 degrees angle. The client
+// base animating already uses GetRenderAngles for setting up bones, so at the
+// server side we also need to setup bones at the rotated angle. Function is copied
+// from baseanimating, so no modification is needed in the baseclass.
+//-----------------------------------------------------------------------------
+void CUnitBase::SetupBones( matrix3x4a_t *pBoneToWorld, int boneMask )
+{
+	AUTO_LOCK( m_BoneSetupMutex );
+	
+	VPROF_BUDGET( "CBaseAnimating::SetupBones", VPROF_BUDGETGROUP_SERVER_ANIM );
+	
+	MDLCACHE_CRITICAL_SECTION();
+
+	Assert( GetModelPtr() );
+
+	CStudioHdr *pStudioHdr = GetModelPtr( );
+
+	if(!pStudioHdr)
+	{
+		Assert(!"CBaseAnimating::GetSkeleton() without a model");
+		return;
+	}
+
+	Assert( !IsEFlagSet( EFL_SETTING_UP_BONES ) );
+
+	AddEFlags( EFL_SETTING_UP_BONES );
+
+	Vector pos[MAXSTUDIOBONES];
+	QuaternionAligned q[MAXSTUDIOBONES];
+
+	QAngle angles = GetAbsAngles();
+	if( m_fModelYawRotation != 0 )
+	{
+		angles[YAW] -= m_fModelYawRotation;
+	}
+
+	// adjust hit boxes based on IK driven offset
+	Vector adjOrigin = GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
+
+	if ( CanSkipAnimation() )
+	{
+		IBoneSetup boneSetup( pStudioHdr, boneMask, GetPoseParameterArray() );
+		boneSetup.InitPose( pos, q );
+		// Msg( "%.03f : %s:%s not in pvs\n", gpGlobals->curtime, GetClassname(), GetEntityName().ToCStr() );
+	}
+	else 
+	{
+		if ( m_pIk )
+		{
+			// FIXME: pass this into Studio_BuildMatrices to skip transforms
+			CBoneBitList boneComputed;
+			m_iIKCounter++;
+			m_pIk->Init( pStudioHdr, angles, adjOrigin, gpGlobals->curtime, m_iIKCounter, boneMask );
+			GetSkeleton( pStudioHdr, pos, q, boneMask );
+
+			m_pIk->UpdateTargets( pos, q, pBoneToWorld, boneComputed );
+			CalculateIKLocks( gpGlobals->curtime );
+			m_pIk->SolveDependencies( pos, q, pBoneToWorld, boneComputed );
+		}
+		else
+		{
+			// Msg( "%.03f : %s:%s\n", gpGlobals->curtime, GetClassname(), GetEntityName().ToCStr() );
+			GetSkeleton( pStudioHdr, pos, q, boneMask );
+		}
+	}
+	
+	if ( GetMoveParent() )
+	{
+		CBaseAnimating *pParent = GetMoveParent()->GetBaseAnimating();
+		if ( pParent )
+		{
+			// We're doing bone merging, so do special stuff here.
+			CBoneCache *pParentCache = pParent->GetBoneCache();
+			if ( pParentCache )
+			{
+				BuildMatricesWithBoneMerge( 
+					pStudioHdr, 
+					angles, 
+					adjOrigin, 
+					pos, 
+					q, 
+					pBoneToWorld, 
+					pParent, 
+					pParentCache );
+				
+				RemoveEFlags( EFL_SETTING_UP_BONES );
+				if (ai_setupbones_debug.GetBool())
+				{
+					DrawRawSkeleton( pBoneToWorld, boneMask, true, 0.11 );
+				}
+				return;
+			}
+		}
+	}
+
+	Studio_BuildMatrices( 
+		pStudioHdr, 
+		angles, 
+		adjOrigin, 
+		pos, 
+		q, 
+		-1,
+		GetModelScale(), // Scaling
+		pBoneToWorld,
+		boneMask );
+
+	if (ai_setupbones_debug.GetBool())
+	{
+		// Msg("%s:%s:%s (%x)\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask );
+		DrawRawSkeleton( pBoneToWorld, boneMask, true, 0.11 );
+	}
+	RemoveEFlags( EFL_SETTING_UP_BONES );
 }
 
 //-----------------------------------------------------------------------------

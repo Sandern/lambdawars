@@ -229,7 +229,8 @@ public:
 	virtual bool		OnInternalDrawModel( ClientModelRenderInfo_t *pInfo );
 	void				EnableTeamColorGlow( );
 	void				DisableTeamColorGlow( );
-
+#else
+	virtual void SetupBones( matrix3x4a_t *pBoneToWorld, int boneMask );
 #endif // CLIENT_DLL
 	virtual void		DoMuzzleFlash();
 
@@ -466,6 +467,9 @@ public:
 	float m_fTestRouteStartHeight;
 	float m_fMinSlope;
 
+	// Model parameter, mainly here for the jeep model. Rotates the model with the specified yaw.
+	float m_fModelYawRotation;
+
 #ifndef CLIENT_DLL
 	// SERVER VARIABLES
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED( m_iHealth );
@@ -507,7 +511,6 @@ private:
 
 	// Entity relationships
 	CUtlVector<UnitRelationship_t> m_Relationship;
-
 
 	bool m_bHasEnterOffset;
 	Vector m_vEnterOffset; 
