@@ -569,8 +569,34 @@ IMPLEMENT_SERVERCLASS_ST( CUnitBase, DT_UnitBase )
 END_SEND_TABLE()
 
 BEGIN_DATADESC( CUnitBase )
+	DEFINE_FIELD( m_bFOWFilterFriendly, FIELD_BOOLEAN ),
+
+	DEFINE_FIELD( m_fEyeYaw, FIELD_FLOAT ),
+	DEFINE_FIELD( m_fEyePitch, FIELD_FLOAT ),
+	
+	DEFINE_FIELD( m_bNeverIgnoreAttacks, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_bBodyTargetOriginBased, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_bFriendlyDamage, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_bServerDoImpactAndTracer, FIELD_BOOLEAN ),
+
+	DEFINE_FIELD( m_fAccuracy, FIELD_FLOAT ),
+
+	DEFINE_FIELD( m_fSaveDrop, FIELD_FLOAT ),
+	DEFINE_FIELD( m_fDeathDrop, FIELD_FLOAT ),
+	DEFINE_FIELD( m_fMaxClimbHeight, FIELD_FLOAT ),
+	DEFINE_FIELD( m_fTestRouteStartHeight, FIELD_FLOAT ),
+	DEFINE_FIELD( m_fMinSlope, FIELD_FLOAT ),
+
+	DEFINE_FIELD( m_fModelYawRotation, FIELD_FLOAT ),
+
+	DEFINE_FIELD( m_fEnemyChangeToleranceSqr, FIELD_FLOAT ),
+
 	DEFINE_FIELD( m_bCanBeSeen, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_bUseCustomCanBeSeenCheck, FIELD_BOOLEAN ),
+	DEFINE_FIELD( m_iSelectionPriority, FIELD_INTEGER ),
+	DEFINE_FIELD( m_iAttackPriority, FIELD_INTEGER ),
+
+	DEFINE_FIELD( m_vDefaultEyeOffset, FIELD_VECTOR ),
 
 	DEFINE_FIELD( m_bHasEnterOffset, FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_vEnterOffset, FIELD_VECTOR ),

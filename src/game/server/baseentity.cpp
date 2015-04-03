@@ -2247,6 +2247,21 @@ class CThinkContextsSaveDataOps : public CDefSaveRestoreOps
 			else
 			{
 				*ppV = NULL;
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+				// Could still have a Python defined context think function.
+				// Note we look it up by string name on the instance, which should cover about 99% of the cases (but could be wrong).
+				if( (*pUtlVector)[i].m_iszPyThinkMethodName != NULL_STRING && pOwner->GetPyInstance().ptr() != Py_None )
+				{
+					(*pUtlVector)[i].m_pyThink = pOwner->GetPyInstance().attr( STRING( (*pUtlVector)[i].m_iszPyThinkMethodName ) );
+				}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 			}
 		}
 		pRestore->EndBlock();
@@ -2273,6 +2288,16 @@ BEGIN_SIMPLE_DATADESC( thinkfunc_t )
 	// DEFINE_FIELD( m_pfnThink,		FIELD_FUNCTION ),		// Manually written
 	DEFINE_FIELD( m_nNextThinkTick,	FIELD_TICK	),
 	DEFINE_FIELD( m_nLastThinkTick,	FIELD_TICK	),
+
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	DEFINE_FIELD( m_iszPyThinkMethodName,	FIELD_STRING ),
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 END_DATADESC()
 
@@ -2506,10 +2531,18 @@ BEGIN_DATADESC_NO_BASE( CBaseEntity )
 
 	DEFINE_KEYFIELD( m_bLagCompensate, FIELD_BOOLEAN, "LagCompensate" ),
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	DEFINE_THINKFUNC( PyThink ),
 	DEFINE_ENTITYFUNC( PyTouch ),
+	DEFINE_FIELD( m_iszPyThinkMethodName, FIELD_STRING ),
+	DEFINE_FIELD( m_iszPyTouchMethodName, FIELD_STRING ),
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 #ifdef HL2WARS_DLL
 	DEFINE_FIELD( m_iOwnerNumber, FIELD_INTEGER ),
@@ -3891,6 +3924,27 @@ void CBaseEntity::OnSave( IEntitySaveUtils *pUtils )
 //-----------------------------------------------------------------------------
 void CBaseEntity::OnRestore()
 {
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+	if( GetPyInstance().ptr() != Py_None )
+	{
+		if( m_iszPyThinkMethodName != NULL_STRING )
+		{
+			SetPyThink( GetPyInstance().attr( STRING( m_iszPyThinkMethodName ) ) );
+		}
+
+		if( m_iszPyTouchMethodName != NULL_STRING )
+		{
+			SetPyTouch( GetPyInstance().attr( STRING( m_iszPyTouchMethodName ) ) );
+		}
+	}
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 	SimThink_EntityChanged( this );
 
 	// touchlinks get recomputed
@@ -3942,8 +3996,10 @@ void CBaseEntity::OnRestore()
 	// We're not save/loading the PVS dirty state. Assume everything is dirty after a restore
 	NetworkProp()->MarkPVSInformationDirty();
 
+#ifdef HL2WARS_DLL
 	// Readd entity to fow lists if needed
 	RecalculateFOWFlags();
+#endif // HL2WARS_DLL
 }
 
 

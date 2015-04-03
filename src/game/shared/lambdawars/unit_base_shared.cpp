@@ -728,18 +728,22 @@ void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 
 			// Effects only, FireBullets should be called on the client.
 			// Dispatching on the server generates far too many events/data!
-#ifdef CLIENT_DLL 
-			DoImpactEffect( tr, nDamageType );
-
-			Vector vecTracerSrc = vec3_origin;
-			ComputeTracerStartPosition( info.m_vecSrc, &vecTracerSrc );
-
-			trace_t Tracer;
-			Tracer = tr;
-			Tracer.endpos = vecTracerDest;
-
-			MakeTracer( vecTracerSrc, Tracer, pAmmoDef->TracerType(info.m_iAmmoType) );
+			// So disabled by default.
+#ifndef CLIENT_DLL 
+			if( m_bServerDoImpactAndTracer )
 #endif // CLIENT_DLL
+			{
+				DoImpactEffect( tr, nDamageType );
+
+				Vector vecTracerSrc = vec3_origin;
+				ComputeTracerStartPosition( info.m_vecSrc, &vecTracerSrc );
+
+				trace_t Tracer;
+				Tracer = tr;
+				Tracer.endpos = vecTracerDest;
+
+				MakeTracer( vecTracerSrc, Tracer, pAmmoDef->TracerType(info.m_iAmmoType) );
+			}
 		}
 	}
 

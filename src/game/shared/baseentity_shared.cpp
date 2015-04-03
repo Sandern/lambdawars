@@ -2852,9 +2852,19 @@ void CBaseEntity::SetPyTouch( boost::python::object touch_method )
 	m_pyTouchMethod = touch_method;
 
 	if( m_pyTouchMethod.ptr() != Py_None )
+	{
 		SetTouch( &CBaseEntity::PyTouch );
+#ifndef CLIENT_DLL
+		m_iszPyTouchMethodName = MAKE_STRING( boost::python::extract< const char * >( touch_method.attr("__name__") ) );
+#endif // CLIENT_DLL
+	}
 	else
+	{
 		SetTouch( NULL );
+#ifndef CLIENT_DLL
+		m_iszPyTouchMethodName = NULL_STRING;
+#endif // CLIENT_DLL
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2876,11 +2886,17 @@ void CBaseEntity::SetPyThink( boost::python::object func, float thinkTime, const
 		{
 			SetThink(NULL);
 			m_pyThink = func;
+#ifndef CLIENT_DLL
+			m_iszPyThinkMethodName = NULL_STRING;
+#endif // CLIENT_DLL
 		}
 		else 
 		{
 			SetThink( &CBaseEntity::PyThink );
 			m_pyThink = func;
+#ifndef CLIENT_DLL
+			m_iszPyThinkMethodName = MAKE_STRING( boost::python::extract< const char * >( func.attr("__name__") ) );
+#endif // CLIENT_DLL
 			int thinkTick = ( thinkTime == TICK_NEVER_THINK ) ? TICK_NEVER_THINK : TIME_TO_TICKS( thinkTime );
 			if ( thinkTick != 0 )
 			{
@@ -2899,6 +2915,11 @@ void CBaseEntity::SetPyThink( boost::python::object func, float thinkTime, const
 	}
 
 	m_aThinkFunctions[ iIndex ].m_pyThink = func;
+#ifndef CLIENT_DLL
+	// For save/restore
+	m_aThinkFunctions[ iIndex ].m_iszPyThinkMethodName = MAKE_STRING( 
+		boost::python::extract< const char * >( func.attr("__name__") ) );
+#endif // CLIENT_DLL
 
 	if ( thinkTime != 0 )
 	{

@@ -264,6 +264,7 @@ struct thinkfunc_t
 // PySource Additions
 // =======================================
 #ifdef ENABLE_PYTHON
+	string_t	m_iszPyThinkMethodName;
 	// MUST BE LAST
 	boost::python::object  m_pyThink;			// If not Py_None and m_pfnThink != NULL, then call the python method
 #endif // ENABLE_PYTHON
@@ -2065,6 +2066,10 @@ private:
 	boost::python::object m_pyHandle;			// Holds a ref to a handle to the instance. 
 	boost::python::object m_pyTouchMethod;
 	boost::python::object m_pyThink;
+
+	// Save/restore for touch and think
+	string_t	m_iszPyTouchMethodName;
+	string_t	m_iszPyThinkMethodName;
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions

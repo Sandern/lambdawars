@@ -457,6 +457,8 @@ public:
 	bool m_bNeverIgnoreAttacks;
 	bool m_bBodyTargetOriginBased;
 	bool m_bFriendlyDamage;
+	// Controls if impact/tracer events are generated on server
+	bool m_bServerDoImpactAndTracer;
 
 	float m_fAccuracy;
 

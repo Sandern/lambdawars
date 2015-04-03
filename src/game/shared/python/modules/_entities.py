@@ -1464,6 +1464,7 @@ class Entities(SemiSharedModuleGenerator):
         self.IncludeVarAndRename('m_bNeverIgnoreAttacks', 'neverignoreattacks')
         self.IncludeVarAndRename('m_bBodyTargetOriginBased', 'bodytargetoriginbased')
         self.IncludeVarAndRename('m_bFriendlyDamage', 'friendlydamage')
+        self.IncludeVarAndRename('m_bServerDoImpactAndTracer', 'serverdoimpactandtracer')
         self.IncludeVarAndRename('m_fAccuracy', 'accuracy')
         self.IncludeVarAndRename('m_fModelYawRotation', 'modelyawrotation')
         
