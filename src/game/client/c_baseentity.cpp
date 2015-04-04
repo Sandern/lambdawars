@@ -6052,6 +6052,11 @@ void C_BaseEntity::OnRestore()
 	CollisionProp()->UpdatePartition();
 
 	UpdateVisibility();
+
+#ifdef HL2WARS_DLL
+	// Do not retrigger changed functions for owner (should be done in restore if needed)
+	m_iOldOwnerNumber = m_iOwnerNumber;
+#endif // HL2WARS_DLL
 }
 
 //-----------------------------------------------------------------------------

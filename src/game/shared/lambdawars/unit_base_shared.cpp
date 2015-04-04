@@ -229,6 +229,14 @@ void CUnitBase::OnRestore()
 {
 	BaseClass::OnRestore();
 
+	// Ensure we are in the right list for our owner
+	Assert( m_pUnitList ); 
+	if( m_pUnitList )
+	{
+		RemoveFromUnitList();
+		AddToUnitList();
+	}
+
 #ifndef CLIENT_DLL
 	SetUnitType( GetUnitType() );
 #endif // CLIENT_DLL
@@ -241,7 +249,7 @@ void CUnitBase::OnChangeOwnerNumberInternal( int old_owner_number )
 {
 	BaseClass::OnChangeOwnerNumberInternal(old_owner_number);
 
-	Assert(m_pUnitList); 
+	Assert( m_pUnitList ); 
 	if( m_pUnitList )
 	{
 		RemoveFromUnitList();

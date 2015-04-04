@@ -2917,8 +2917,15 @@ void CBaseEntity::SetPyThink( boost::python::object func, float thinkTime, const
 	m_aThinkFunctions[ iIndex ].m_pyThink = func;
 #ifndef CLIENT_DLL
 	// For save/restore
-	m_aThinkFunctions[ iIndex ].m_iszPyThinkMethodName = MAKE_STRING( 
-		boost::python::extract< const char * >( func.attr("__name__") ) );
+	if( func.ptr() != Py_None )
+	{
+		m_aThinkFunctions[ iIndex ].m_iszPyThinkMethodName = MAKE_STRING( 
+			boost::python::extract< const char * >( func.attr("__name__") ) );
+	}
+	else
+	{
+		m_aThinkFunctions[ iIndex ].m_iszPyThinkMethodName = NULL_STRING;
+	}
 #endif // CLIENT_DLL
 
 	if ( thinkTime != 0 )
