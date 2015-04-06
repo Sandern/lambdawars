@@ -1871,7 +1871,7 @@ int CRestore::PyReadAll( boost::python::object instance )
 	{
 		PyRestoreHelper restoreHelper( this );
 
-		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
+		const char *pName = boost::python::extract< const char * >( instance.attr("__class__").attr("__name__") );
 
 		Verify( ReadShort() == sizeof(int) );			// First entry should be an int
 		int symName = m_pData->FindCreateSymbol( pName );
@@ -1903,7 +1903,16 @@ int CRestore::PyReadAll( boost::python::object instance )
 			boost::python::object field = fields.attr("get")( pFieldName, boost::python::object() );
 			if( field.ptr() != Py_None ) 
 			{
-				field.attr("Restore")( instance, boost::python::ptr( &restoreHelper ) );
+				try
+				{
+					field.attr("Restore")( instance, boost::python::ptr( &restoreHelper ) );
+				}
+				catch( boost::python::error_already_set & )
+				{
+					Msg( "Skipping reading field %s due error in restore:\n", m_pData->StringFromSymbol( header.symbol ) );
+					PyErr_Print();
+					BufferSkipBytes( header.size );			// Advance to next field
+				}
 			} 
 			else 
 			{
