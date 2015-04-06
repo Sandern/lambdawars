@@ -916,10 +916,23 @@ int CSave::PyWriteAll( boost::python::object instance )
 			try
 			{
 				const char *pFieldName = boost::python::extract<const char *>(item[0]);
-				boost::python::object data = field.attr("Save")( instance );
+
+				bool isembeddedobject = boost::python::extract< bool >( field.attr("isembeddedobject") );
+				if( isembeddedobject )
+				{
+					StartBlock( pFieldName );
+
+					PyWriteAll( instance.attr( pFieldName ) );
+
+					EndBlock();
+				}
+				else
+				{
+					boost::python::object data = field.attr("Save")( instance );
 				
-				const char *pFieldData = boost::python::extract<const char *>(data);
-				WriteString( pFieldName, pFieldData );
+					const char *pFieldData = boost::python::extract<const char *>(data);
+					WriteString( pFieldName, pFieldData );
+				}
 
 				count++;
 			}
@@ -1889,18 +1902,36 @@ int CRestore::PyReadAll( boost::python::object instance )
 		{
 			ReadHeader( &header );
 		
-			boost::python::object field = fields.attr("get")( m_pData->StringFromSymbol( header.symbol ), boost::python::object() );
+			const char *pFieldName = m_pData->StringFromSymbol( header.symbol );
+			boost::python::object field = fields.attr("get")( pFieldName, boost::python::object() );
 			if( field.ptr() != Py_None ) 
 			{
-				ReadString( buf, sizeof(buf), 0 ) ;
-				//Msg( "Reading data for field %s, applying: %s\n", m_pData->StringFromSymbol( header.symbol ), buf );
-				try
+				bool isembeddedobject = boost::python::extract< bool >( field.attr("isembeddedobject") );
+
+				if( isembeddedobject )
 				{
-					field.attr("Restore")( instance, buf );
+					try
+					{
+						PyReadAll( instance.attr( pFieldName ) );
+
+						field.attr("OnRestore")( instance );
+					}
+					catch( boost::python::error_already_set & )
+					{
+						PyErr_Print();
+					}
 				}
-				catch (boost::python::error_already_set &)
+				else
 				{
-					PyErr_Print();
+					ReadString( buf, sizeof(buf), 0 ) ;
+					try
+					{
+						field.attr("Restore")( instance, buf );
+					}
+					catch( boost::python::error_already_set & )
+					{
+						PyErr_Print();
+					}
 				}
 			} 
 			else 
@@ -1910,7 +1941,7 @@ int CRestore::PyReadAll( boost::python::object instance )
 			}
 		}
 	}
-	catch (boost::python::error_already_set &)
+	catch( boost::python::error_already_set & )
 	{
 		PyErr_Print();
 		return 0;
