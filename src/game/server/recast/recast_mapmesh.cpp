@@ -28,6 +28,7 @@ static ConVar recast_mapmesh_loadstaticprops("recast_mapmesh_loadstaticprops", "
 static ConVar recast_mapmesh_loaddynamicprops("recast_mapmesh_loaddynamicprops", "1");
 static ConVar recast_mapmesh_loaddisplacements("recast_mapmesh_loaddisplacements", "1");
 static ConVar recast_mapmesh_debug_triangles("recast_mapmesh_debug_triangles", "0");
+static ConVar recast_mapmesh_calc_normals("recast_mapmesh_calc_normals", "1");
 
 static ConVar recast_mapmesh_no_triangle_filter("recast_mapmesh_no_triangle_filter", "0");
 static ConVar recast_mapmesh_no_filter_noarea("recast_mapmesh_no_filter_noarea", "0");
@@ -751,31 +752,34 @@ bool CMapMesh::Load( bool bDynamicOnly )
 	if( m_bLog )
 		Msg( "Recast Load static + dynamic map data: %d verts and %d tris\n", GetNumVerts(), GetNumTris() );
 
-	// Calculate normals.
-	float *verts = m_Vertices.Base();
-	m_Normals.EnsureCapacity( GetNumTris()*3 );
-	for (int i = 0; i < GetNumTris()*3; i += 3)
+	if( recast_mapmesh_calc_normals.GetBool() )
 	{
-		const float* v0 = verts + m_Triangles[i]*3;
-		const float* v1 = verts + m_Triangles[i+1]*3;
-		const float* v2 = verts + m_Triangles[i+2]*3;
-		float e0[3], e1[3];
-		for (int j = 0; j < 3; ++j)
+		// Calculate normals.
+		float *verts = m_Vertices.Base();
+		m_Normals.EnsureCapacity( GetNumTris()*3 );
+		for (int i = 0; i < GetNumTris()*3; i += 3)
 		{
-			e0[j] = v1[j] - v0[j];
-			e1[j] = v2[j] - v0[j];
-		}
-		float* n = m_Normals.Base() + i;
-		n[0] = e0[1]*e1[2] - e0[2]*e1[1];
-		n[1] = e0[2]*e1[0] - e0[0]*e1[2];
-		n[2] = e0[0]*e1[1] - e0[1]*e1[0];
-		float d = sqrtf(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
-		if (d > 0)
-		{
-			d = 1.0f/d;
-			n[0] *= d;
-			n[1] *= d;
-			n[2] *= d;
+			const float* v0 = verts + m_Triangles[i]*3;
+			const float* v1 = verts + m_Triangles[i+1]*3;
+			const float* v2 = verts + m_Triangles[i+2]*3;
+			float e0[3], e1[3];
+			for (int j = 0; j < 3; ++j)
+			{
+				e0[j] = v1[j] - v0[j];
+				e1[j] = v2[j] - v0[j];
+			}
+			float* n = m_Normals.Base() + i;
+			n[0] = e0[1]*e1[2] - e0[2]*e1[1];
+			n[1] = e0[2]*e1[0] - e0[0]*e1[2];
+			n[2] = e0[0]*e1[1] - e0[1]*e1[0];
+			float d = sqrtf(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
+			if (d > 0)
+			{
+				d = 1.0f/d;
+				n[0] *= d;
+				n[1] *= d;
+				n[2] *= d;
+			}
 		}
 	}
 

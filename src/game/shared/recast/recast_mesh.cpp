@@ -333,7 +333,7 @@ void CRecastMesh::DebugRender()
 		if( pRecastMgr )
 		{
 			IMapMesh *pMapMesh = pRecastMgr->GetMapMesh();
-			if( pMapMesh )
+			if( pMapMesh && pMapMesh->GetNorms() )
 			{
 				duDebugDrawTriMeshSlope(&dd, pMapMesh->GetVerts(), pMapMesh->GetNumVerts(),
 										pMapMesh->GetTris(), pMapMesh->GetNorms(), pMapMesh->GetNumTris(),
