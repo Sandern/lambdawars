@@ -20,6 +20,8 @@
 
 #include "srcpy_entities.h"
 
+#include "srcpy_saverestore.h"
+
 #include "isaverestore.h"
 
 #include "saverestore.h"
@@ -2564,6 +2566,61 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (::IMouse * ( PyMouse_wrapper::* )(  ) )(&PyMouse_wrapper::default_GetIMouse)
             , bp::return_value_policy< bp::return_by_value >() );
 
+    { //::PyRestoreHelper
+        typedef bp::class_< PyRestoreHelper > PyRestoreHelper_exposer_t;
+        PyRestoreHelper_exposer_t PyRestoreHelper_exposer = PyRestoreHelper_exposer_t( "PyRestoreHelper", bp::no_init );
+        bp::scope PyRestoreHelper_scope( PyRestoreHelper_exposer );
+        PyRestoreHelper_exposer.def( bp::init< CRestore * >(( bp::arg("restore") )) );
+        bp::implicitly_convertible< CRestore *, PyRestoreHelper >();
+        { //::PyRestoreHelper::ReadFields
+        
+            typedef void ( ::PyRestoreHelper::*ReadFields_function_type )( ::boost::python::api::object ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadFields"
+                , ReadFields_function_type( &::PyRestoreHelper::ReadFields )
+                , ( bp::arg("instance") ) );
+        
+        }
+        { //::PyRestoreHelper::ReadString
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadString_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadString"
+                , ReadString_function_type( &::PyRestoreHelper::ReadString ) );
+        
+        }
+    }
+
+    { //::PySaveHelper
+        typedef bp::class_< PySaveHelper > PySaveHelper_exposer_t;
+        PySaveHelper_exposer_t PySaveHelper_exposer = PySaveHelper_exposer_t( "PySaveHelper", bp::no_init );
+        bp::scope PySaveHelper_scope( PySaveHelper_exposer );
+        PySaveHelper_exposer.def( bp::init< CSave * >(( bp::arg("save") )) );
+        bp::implicitly_convertible< CSave *, PySaveHelper >();
+        { //::PySaveHelper::WriteFields
+        
+            typedef void ( ::PySaveHelper::*WriteFields_function_type )( char const *,::boost::python::api::object ) ;
+            
+            PySaveHelper_exposer.def( 
+                "WriteFields"
+                , WriteFields_function_type( &::PySaveHelper::WriteFields )
+                , ( bp::arg("fieldname"), bp::arg("instance") ) );
+        
+        }
+        { //::PySaveHelper::WriteString
+        
+            typedef void ( ::PySaveHelper::*WriteString_function_type )( char const *,char const * ) ;
+            
+            PySaveHelper_exposer.def( 
+                "WriteString"
+                , WriteString_function_type( &::PySaveHelper::WriteString )
+                , ( bp::arg("fieldname"), bp::arg("fieldvalue") ) );
+        
+        }
+    }
+
     { //::SpatializationInfo_t
         typedef bp::class_< SpatializationInfo_t > SpatializationInfo_t_exposer_t;
         SpatializationInfo_t_exposer_t SpatializationInfo_t_exposer = SpatializationInfo_t_exposer_t( "SpatializationInfo_t" );
@@ -2893,6 +2950,8 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
 #include "studio.h"
 
 #include "srcpy_entities.h"
+
+#include "srcpy_saverestore.h"
 
 #include "isaverestore.h"
 
@@ -5822,6 +5881,81 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "Set"
             , (void ( ::PyOutputEvent::* )( ::variant_t ) )( &::PyOutputEvent::Set )
             , ( bp::arg("value") ) );
+
+    { //::PyRestoreHelper
+        typedef bp::class_< PyRestoreHelper > PyRestoreHelper_exposer_t;
+        PyRestoreHelper_exposer_t PyRestoreHelper_exposer = PyRestoreHelper_exposer_t( "PyRestoreHelper", bp::no_init );
+        bp::scope PyRestoreHelper_scope( PyRestoreHelper_exposer );
+        PyRestoreHelper_exposer.def( bp::init< CRestore * >(( bp::arg("restore") )) );
+        bp::implicitly_convertible< CRestore *, PyRestoreHelper >();
+        { //::PyRestoreHelper::ReadFields
+        
+            typedef void ( ::PyRestoreHelper::*ReadFields_function_type )( ::boost::python::api::object ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadFields"
+                , ReadFields_function_type( &::PyRestoreHelper::ReadFields )
+                , ( bp::arg("instance") ) );
+        
+        }
+        { //::PyRestoreHelper::ReadOutputEvent
+        
+            typedef void ( ::PyRestoreHelper::*ReadOutputEvent_function_type )( ::PyOutputEvent & ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadOutputEvent"
+                , ReadOutputEvent_function_type( &::PyRestoreHelper::ReadOutputEvent )
+                , ( bp::arg("ev") ) );
+        
+        }
+        { //::PyRestoreHelper::ReadString
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadString_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadString"
+                , ReadString_function_type( &::PyRestoreHelper::ReadString ) );
+        
+        }
+    }
+
+    { //::PySaveHelper
+        typedef bp::class_< PySaveHelper > PySaveHelper_exposer_t;
+        PySaveHelper_exposer_t PySaveHelper_exposer = PySaveHelper_exposer_t( "PySaveHelper", bp::no_init );
+        bp::scope PySaveHelper_scope( PySaveHelper_exposer );
+        PySaveHelper_exposer.def( bp::init< CSave * >(( bp::arg("save") )) );
+        bp::implicitly_convertible< CSave *, PySaveHelper >();
+        { //::PySaveHelper::WriteFields
+        
+            typedef void ( ::PySaveHelper::*WriteFields_function_type )( char const *,::boost::python::api::object ) ;
+            
+            PySaveHelper_exposer.def( 
+                "WriteFields"
+                , WriteFields_function_type( &::PySaveHelper::WriteFields )
+                , ( bp::arg("fieldname"), bp::arg("instance") ) );
+        
+        }
+        { //::PySaveHelper::WriteOutputEvent
+        
+            typedef void ( ::PySaveHelper::*WriteOutputEvent_function_type )( char const *,::PyOutputEvent & ) ;
+            
+            PySaveHelper_exposer.def( 
+                "WriteOutputEvent"
+                , WriteOutputEvent_function_type( &::PySaveHelper::WriteOutputEvent )
+                , ( bp::arg("fieldname"), bp::arg("ev") ) );
+        
+        }
+        { //::PySaveHelper::WriteString
+        
+            typedef void ( ::PySaveHelper::*WriteString_function_type )( char const *,char const * ) ;
+            
+            PySaveHelper_exposer.def( 
+                "WriteString"
+                , WriteString_function_type( &::PySaveHelper::WriteString )
+                , ( bp::arg("fieldname"), bp::arg("fieldvalue") ) );
+        
+        }
+    }
 
     bp::class_< ServerClass >( "ServerClass", bp::no_init )    
         .def( 

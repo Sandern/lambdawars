@@ -10,12 +10,87 @@
 #include "cbase.h"
 #include "srcpy_saverestore.h"
 #include "srcpy.h"
-#include "isaverestore.h"
+#include "saverestore.h"
 #include "saverestoretypes.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+//-----------------------------------------------------------------------------
+// Helper interface exposed to fields in Python
+//-----------------------------------------------------------------------------
+void PySaveHelper::WriteString( const char *fieldname, const char *fieldvalue )
+{
+	m_pSave->WriteString( fieldname, fieldvalue );
+}
+
+void PySaveHelper::WriteFields( const char *fieldname, boost::python::object instance )
+{
+	m_pSave->StartBlock( fieldname );
+	m_pSave->PyWriteAll( instance );
+	m_pSave->EndBlock();
+}
+
+#ifndef CLIENT_DLL
+void PySaveHelper::WriteOutputEvent( const char *fieldname, PyOutputEvent &ev )
+{
+	// Hacky code duplicated from CSave::WriteBasicField
+	typedescription_t typeDesc = { FIELD_CUSTOM, fieldname, -1, 1, FTYPEDESC_OUTPUT | FTYPEDESC_SAVE | FTYPEDESC_KEY, "", eventFuncs };
+
+	m_pSave->StartBlock( fieldname );
+
+	SaveRestoreFieldInfo_t fieldInfo =
+	{
+		(char *)&ev,
+		NULL,
+		&typeDesc
+	};
+	typeDesc.pSaveRestoreOps->Save( fieldInfo, m_pSave );
+			
+	m_pSave->EndBlock();
+}
+#endif // CLIENT_DLL
+
+boost::python::object PyRestoreHelper::ReadString()
+{
+	char buf[2048];
+	m_pRestore->ReadString( buf, sizeof(buf), 0 );
+	return boost::python::object( buf );
+}
+
+void PyRestoreHelper::ReadFields( boost::python::object instance )
+{
+	m_pRestore->PyReadAll( instance );
+}
+
+#ifndef CLIENT_DLL
+void PyRestoreHelper::ReadOutputEvent( PyOutputEvent &ev )
+{
+	// Hacky code duplicated from CRestore::ReadBasicField
+	const char *pFieldName = m_pRestore->GetSaveRestoreSegment()->StringFromSymbol( m_pActiveHeader->symbol );
+
+	typedescription_t typeDesc = { FIELD_CUSTOM, pFieldName, -1, 1, FTYPEDESC_OUTPUT | FTYPEDESC_SAVE | FTYPEDESC_KEY, "" /* output name */, eventFuncs };
+
+	// No corresponding "block" (see write) as it was used as the header of the field
+	int posNextField = m_pRestore->GetReadPos() + m_pActiveHeader->size;
+
+	SaveRestoreFieldInfo_t fieldInfo =
+	{
+		(char *)&ev,
+		NULL,
+		&typeDesc
+	};
+			
+	typeDesc.pSaveRestoreOps->Restore( fieldInfo, m_pRestore );
+			
+	Assert( posNextField >= GetReadPos() );
+	m_pRestore->SetReadPos( posNextField );
+}
+#endif // CLIENT_DLL
+
+//-----------------------------------------------------------------------------
+// Block handler for data not directly related to entities in Python
+//-----------------------------------------------------------------------------
 static short PYTHON_SAVE_RESTORE_VERSION = 1;
 
 class CPython_SaveRestoreBlockHandler : public CDefSaveRestoreBlockHandler

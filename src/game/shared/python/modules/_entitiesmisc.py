@@ -35,6 +35,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         'npcevent.h',
         'studio.h',
         'srcpy_entities.h',
+        'srcpy_saverestore.h',
         'isaverestore.h',
         'saverestore.h',
         'mapentities_shared.h',
@@ -404,7 +405,16 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         mb.free_functions('GetAutoMultiplayerPhysicsMode').include()
         mb.free_functions('PropBreakableCreateAll').include()
         mb.free_functions('PrecacheGibsForModel').include()
-    
+        
+        # Save/restore helpers for Python
+        cls = mb.class_('PySaveHelper')
+        cls.include()
+        cls.no_init = True
+        cls = mb.class_('PyRestoreHelper')
+        cls.include()
+        cls.no_init = True
+        cls.mem_fun('SetActiveField').exclude()
+        
         # Enums
         mb.enums('MoveType_t').include()
         mb.enums('MoveCollide_t').include()

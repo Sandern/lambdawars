@@ -25,6 +25,16 @@
 #include "datacache/imdlcache.h"
 #include "tier0/vprof.h"
 
+// =======================================
+// PySource Additions
+// =======================================
+#ifdef ENABLE_PYTHON
+#include "python/srcpy_saverestore.h"
+#endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
+
 #if !defined( CLIENT_DLL )
 
 #include "globalstate.h"
@@ -891,6 +901,8 @@ int CSave::PyWriteAll( boost::python::object instance )
 {
 	try
 	{
+		PySaveHelper saveHelper( this );
+
 		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
 
 		int iHeaderPos = m_pData->GetCurPos();
@@ -915,24 +927,7 @@ int CSave::PyWriteAll( boost::python::object instance )
 
 			try
 			{
-				const char *pFieldName = boost::python::extract<const char *>(item[0]);
-
-				bool isembeddedobject = boost::python::extract< bool >( field.attr("isembeddedobject") );
-				if( isembeddedobject )
-				{
-					StartBlock( pFieldName );
-
-					PyWriteAll( instance.attr( pFieldName ) );
-
-					EndBlock();
-				}
-				else
-				{
-					boost::python::object data = field.attr("Save")( instance );
-				
-					const char *pFieldData = boost::python::extract<const char *>(data);
-					WriteString( pFieldName, pFieldData );
-				}
+				field.attr("Save")( instance, boost::python::ptr( &saveHelper ) );
 
 				count++;
 			}
@@ -1874,10 +1869,12 @@ int CRestore::PyReadAll( boost::python::object instance )
 {
 	try
 	{
+		PyRestoreHelper restoreHelper( this );
+
 		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
 
 		Verify( ReadShort() == sizeof(int) );			// First entry should be an int
-		int symName = m_pData->FindCreateSymbol(pName);
+		int symName = m_pData->FindCreateSymbol( pName );
 
 		// Check the struct name
 		int curSym = ReadShort();
@@ -1894,45 +1891,19 @@ int CRestore::PyReadAll( boost::python::object instance )
 		int i;
 		int nFieldsSaved = ReadInt();						// Read field count
 		SaveRestoreRecordHeader_t header;
-		char buf[2048];
 
 		boost::python::object fields = instance.attr("fields");
 
 		for ( i = 0; i < nFieldsSaved; i++ )
 		{
 			ReadHeader( &header );
+			restoreHelper.SetActiveField( &header );
 		
 			const char *pFieldName = m_pData->StringFromSymbol( header.symbol );
 			boost::python::object field = fields.attr("get")( pFieldName, boost::python::object() );
 			if( field.ptr() != Py_None ) 
 			{
-				bool isembeddedobject = boost::python::extract< bool >( field.attr("isembeddedobject") );
-
-				if( isembeddedobject )
-				{
-					try
-					{
-						PyReadAll( instance.attr( pFieldName ) );
-
-						field.attr("OnRestore")( instance );
-					}
-					catch( boost::python::error_already_set & )
-					{
-						PyErr_Print();
-					}
-				}
-				else
-				{
-					ReadString( buf, sizeof(buf), 0 ) ;
-					try
-					{
-						field.attr("Restore")( instance, buf );
-					}
-					catch( boost::python::error_already_set & )
-					{
-						PyErr_Print();
-					}
-				}
+				field.attr("Restore")( instance, boost::python::ptr( &restoreHelper ) );
 			} 
 			else 
 			{

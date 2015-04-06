@@ -278,6 +278,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_base.cpp" />
     <ClCompile Include="..\shared\python\srcpy_config.cpp" />
     <ClCompile Include="..\shared\python\srcpy_filesystem.cpp" />
+    <ClCompile Include="..\shared\python\srcpy_saverestore.cpp" />
     <ClCompile Include="..\shared\python\srcpy_scclasses.cpp" />
     <ClCompile Include="..\shared\python\srcpy_steam.cpp" />
     <ClCompile Include="..\shared\python\srcpy_usermessage.cpp" />
@@ -1501,6 +1502,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h" />
     <ClInclude Include="..\shared\python\srcpy_filesystem.h" />
     <ClInclude Include="..\shared\python\srcpy_materials.h" />
+    <ClInclude Include="..\shared\python\srcpy_saverestore.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
     <ClInclude Include="..\shared\python\srcpy_steam.h" />
     <ClInclude Include="..\shared\recast\fastlz\fastlz.h" />

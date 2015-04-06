@@ -287,6 +287,7 @@ public:
 	bool			GetPrecacheMode( void ) { return m_precache; }
 
 	CGameSaveRestoreInfo *GetGameSaveRestoreInfo()	{ return m_pGameInfo; }
+	CSaveRestoreSegment *GetSaveRestoreSegment() { return m_pData; }
 
 private:
 	//---------------------------------
