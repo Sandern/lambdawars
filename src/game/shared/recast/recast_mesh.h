@@ -138,6 +138,7 @@ private:
 	} pathfind_resultdata_t;
 
 	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
+	dtStatus DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPolyRef > &endRefs, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
 
 protected:
 	bool m_keepInterResults;

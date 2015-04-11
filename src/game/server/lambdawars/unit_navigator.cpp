@@ -1254,48 +1254,59 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		// Check if the target ent moved into another area. In that case recalculate the path.
 		// In the other case just update the goal pos (quick).
 		// Note that after a path recomputation, we won't try to recompute the path for a while anymore (performance)
-		//const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition(); // Eye position may be too high for some targets
-		const Vector &vTargetOrigin = GetPath()->m_hTarget->WorldSpaceCenter();
+		// Don't do this for nav obstacles, since they probably don't move
 
-		CRecastMesh *pMesh = GetNavMesh();
-		if( pMesh )
+		if( GetPath()->m_hTarget->GetNavObstacleRef() == -1 )
 		{
-			int targetRef = pMesh->GetPolyRef( vTargetOrigin, 256.0f );
-			int goalRef = m_iLastGoalRef;
-			if( pMesh->IsValidPolyRef( m_iLastGoalRef ) )
-				goalRef = pMesh->GetPolyRef( GetPath()->m_vGoalPos, 256.0f );
+			//const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition(); // Eye position may be too high for some targets
+			const Vector &vTargetOrigin = GetPath()->m_hTarget->WorldSpaceCenter();
 
-			if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime && targetRef != 0 && goalRef != 0 && targetRef != goalRef )
+			CRecastMesh *pMesh = GetNavMesh();
+			if( pMesh )
 			{
-				if( unit_navigator_debug.GetBool() )
-					DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
-						GetOuter()->entindex(), goalRef, targetRef );
+				int targetRef = pMesh->GetPolyRef( vTargetOrigin, 256.0f );
+				int goalRef = m_iLastGoalRef;
+				if( pMesh->IsValidPolyRef( m_iLastGoalRef ) )
+					goalRef = pMesh->GetPolyRef( GetPath()->m_vGoalPos, 256.0f );
 
-				// Update goal target position and recompute
-				GetPath()->m_vGoalPos = vTargetOrigin;
-				if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
+				if( m_fNextAllowPathRecomputeTime < gpGlobals->curtime && targetRef != 0 && goalRef != 0 && targetRef != goalRef )
 				{
-					if( !DoFindPathToPosInRange() )
+					if( unit_navigator_debug.GetBool() )
+						DevMsg("#%d UnitNavigator: Target changed area (%d -> %d). Recomputing path...\n", 
+							GetOuter()->entindex(), goalRef, targetRef );
+
+					// Update goal target position and recompute
+					GetPath()->m_vGoalPos = vTargetOrigin;
+					if( GetPath()->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
 					{
-						if( unit_navigator_debug.GetBool() )
-							DevMsg("#%d UnitNavigator: could not find updated path to target in range\n", GetOuter()->entindex());
-						return CHS_FAILED;
+						if( !DoFindPathToPosInRange() )
+						{
+							if( unit_navigator_debug.GetBool() )
+								DevMsg("#%d UnitNavigator: could not find updated path to target in range\n", GetOuter()->entindex());
+							return CHS_FAILED;
+						}
 					}
+					else
+					{
+						if( !DoFindPathToPos() )
+						{
+							if( unit_navigator_debug.GetBool() )
+								DevMsg("#%d UnitNavigator: could not find updated path to target\n", GetOuter()->entindex());
+							return CHS_FAILED;
+						}
+					}
+
+					// Store area id of the goal for the next time we check
+					m_iLastGoalRef = goalRef;
+
+					m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(1.0f, 3.0f);
 				}
 				else
 				{
-					if( !DoFindPathToPos() )
-					{
-						if( unit_navigator_debug.GetBool() )
-							DevMsg("#%d UnitNavigator: could not find updated path to target\n", GetOuter()->entindex());
-						return CHS_FAILED;
-					}
+					// Just update goal target position and update the last waypoint
+					GetPath()->m_vGoalPos = vTargetOrigin;
+					GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 				}
-
-				// Store area id of the goal for the next time we check
-				m_iLastGoalRef = goalRef;
-
-				m_fNextAllowPathRecomputeTime = gpGlobals->curtime + random->RandomFloat(1.0f, 3.0f);
 			}
 			else
 			{
@@ -1303,12 +1314,6 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				GetPath()->m_vGoalPos = vTargetOrigin;
 				GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 			}
-		}
-		else
-		{
-			// Just update goal target position and update the last waypoint
-			GetPath()->m_vGoalPos = vTargetOrigin;
-			GetPath()->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
 		}
 	}
 

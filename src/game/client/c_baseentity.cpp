@@ -1128,6 +1128,10 @@ C_BaseEntity::C_BaseEntity() :
 	m_flCreateTime = 0.0f;
 
 	m_bIsClientCreated = false;
+
+#ifdef HL2WARS_DLL
+	m_NavObstacleRef = -1;
+#endif // HL2WARS_DLL
 }
 
 

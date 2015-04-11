@@ -792,9 +792,14 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 
 	m_pEvent = NULL;
 
+#ifdef HL2WARS_DLL
 	V_memset( &m_bInFOW, sv_fogofwar.GetBool() ? 1 : 0, sizeof(bool)*FOWMAXPLAYERS );
 
 	DensityMap()->Init( this );
+
+	m_NavObstacleRef = -1;
+#endif // HL2WARS_DLL
+
 #ifdef ENABLE_PYTHON
 	m_pyInstance = boost::python::object();
 #endif // ENABLE_PYTHON

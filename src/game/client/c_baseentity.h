@@ -236,9 +236,6 @@ public:
 	DECLARE_ENT_SCRIPTDESC();
 
 									C_BaseEntity();
-#ifndef HL2WARS_DLL // Makes boost python complain.
-protected:
-#endif // HL2WARS_DLL
 	// Use UTIL_Remove to delete!
 	virtual							~C_BaseEntity();
 
@@ -1865,6 +1862,7 @@ protected:
 private:
 	bool							m_bIsBlurred;
 
+#ifdef HL2WARS_DLL
 	// Lambda Wars
 public:
 	friend class CFogOfWarMgr;
@@ -1910,6 +1908,10 @@ public:
 	void							SetTeamColor( Vector &vTeamColor );
 	Vector &						GetTeamColor( bool bDirect=true );
 
+	// Nav obstacle ref for recast mesh.
+	void SetNavObstacleRef( int ref ) { m_NavObstacleRef = ref; }
+	int GetNavObstacleRef() { return m_NavObstacleRef; }
+
 	// Hack for keeper package due edict limit
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
 	// Hack for keeper package to force vphysics creation for entities without edicts (tiles/blocks)
@@ -1938,11 +1940,13 @@ private:
 	bool m_bAllowNavIgnore;
 	float m_flNavIgnoreUntilTime;
 	bool m_bAlwaysIgnoreNav;
+	int m_NavObstacleRef;
 
 	ShouldTransmitState_t m_LastShouldTransmitState;
 
 	bool m_bDoNotRegisterEntity;
 	bool m_bForceAllowVPhysics;
+#endif // HL2WARS_DLL
 
 // =======================================
 // PySource Additions

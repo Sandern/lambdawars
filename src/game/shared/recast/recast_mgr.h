@@ -93,6 +93,7 @@ public:
 	virtual bool AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height );
 	virtual bool AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height );
 	virtual bool RemoveEntObstacles( CBaseEntity *pEntity );
+	//dtObstacleRef GetObstacleRefForMesh( CBaseEntity *pEntity, int meshIdx );
 
 	// Debug
 #ifdef CLIENT_DLL

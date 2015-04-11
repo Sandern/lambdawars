@@ -2142,6 +2142,15 @@ void register_C_BaseEntity_class(){
                 , GetMoveType_function_type( &::C_BaseEntity::GetMoveType ) );
         
         }
+        { //::C_BaseEntity::GetNavObstacleRef
+        
+            typedef int ( ::C_BaseEntity::*GetNavObstacleRef_function_type )(  ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "GetNavObstacleRef"
+                , GetNavObstacleRef_function_type( &::C_BaseEntity::GetNavObstacleRef ) );
+        
+        }
         { //::C_BaseEntity::GetNetworkAngles
         
             typedef ::QAngle const & ( ::C_BaseEntity::*GetNetworkAngles_function_type )(  ) const;
@@ -5142,6 +5151,16 @@ void register_C_BaseEntity_class(){
                 "SetNavIgnore"
                 , SetNavIgnore_function_type( &::C_BaseEntity::SetNavIgnore )
                 , ( bp::arg("duration")=3.4028234663852885981170418348451692544e+38f ) );
+        
+        }
+        { //::C_BaseEntity::SetNavObstacleRef
+        
+            typedef void ( ::C_BaseEntity::*SetNavObstacleRef_function_type )( int ) ;
+            
+            C_BaseEntity_exposer.def( 
+                "SetNavObstacleRef"
+                , SetNavObstacleRef_function_type( &::C_BaseEntity::SetNavObstacleRef )
+                , ( bp::arg("ref") ) );
         
         }
         { //::C_BaseEntity::SetNetworkAngles

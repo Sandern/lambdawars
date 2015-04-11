@@ -384,6 +384,7 @@ bool CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 		}
 
 		m_Obstacles.RemoveAt( idx );
+		pEntity->SetNavObstacleRef( m_Obstacles.InvalidIndex() );
 	}
 	return true;
 }
@@ -397,9 +398,29 @@ NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
 	if( !m_Obstacles.IsValidIndex( idx ) )
 	{
 		idx = m_Obstacles.Insert( pEntity );
+		pEntity->SetNavObstacleRef( idx );
 	}
 	return m_Obstacles[idx];
 }
+
+#if 0
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+dtObstacleRef CRecastMgr::GetObstacleRefForMesh( CBaseEntity *pEntity, int meshIdx )
+{
+	NavObstacleArray_t &obstacles = FindOrCreateObstacle( pEntity );
+
+	for( int i = 0; i < obstacles.obs.Count(); i++ )
+	{
+		if( obstacles.obs.Count() > 0 && obstacles.obs[0].meshIndex == meshIdx )
+		{
+			return obstacles.obs[0].ref;
+		}
+	}
+	return 0;
+}
+#endif // 0
 
 #ifdef CLIENT_DLL
 //-----------------------------------------------------------------------------

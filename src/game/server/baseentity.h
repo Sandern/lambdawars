@@ -1949,6 +1949,9 @@ public:
 	virtual float GetDensityMultiplier() { return 1.0f; }
 	DensityWeightsMap *DensityMap();
 	void SetDensityMapType( int iType );
+	// Nav obstacle ref for recast mesh.
+	void SetNavObstacleRef( int ref ) { m_NavObstacleRef = ref; }
+	int GetNavObstacleRef() { return m_NavObstacleRef; }
 	
 	// Hack for keeper package due edict limit
 	void SetDoNotRegisterEntity() { m_bDoNotRegisterEntity = true; }
@@ -1962,6 +1965,7 @@ private:
 	bool m_bForceAllowVPhysics;
 
 	bool					m_bAllowNavIgnore;
+	int						m_NavObstacleRef;
 	CNetworkHandle( CBaseEntity, m_hMousePassEntity ); // Passes mouse to this entity
 	CNetworkVar( int,		m_iOwnerNumber );
 	int						m_nFOWFlagsIntern;

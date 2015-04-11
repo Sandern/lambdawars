@@ -2417,6 +2417,15 @@ void register_CBaseEntity_class(){
                 , GetMoveType_function_type( &::CBaseEntity::GetMoveType ) );
         
         }
+        { //::CBaseEntity::GetNavObstacleRef
+        
+            typedef int ( ::CBaseEntity::*GetNavObstacleRef_function_type )(  ) ;
+            
+            CBaseEntity_exposer.def( 
+                "GetNavObstacleRef"
+                , GetNavObstacleRef_function_type( &::CBaseEntity::GetNavObstacleRef ) );
+        
+        }
         { //::CBaseEntity::GetNextTarget
         
             typedef ::CBaseEntity * ( ::CBaseEntity::*GetNextTarget_function_type )(  ) ;
@@ -5386,6 +5395,16 @@ void register_CBaseEntity_class(){
                 "SetNavIgnore"
                 , SetNavIgnore_function_type( &::CBaseEntity::SetNavIgnore )
                 , ( bp::arg("duration")=3.4028234663852885981170418348451692544e+38f ) );
+        
+        }
+        { //::CBaseEntity::SetNavObstacleRef
+        
+            typedef void ( ::CBaseEntity::*SetNavObstacleRef_function_type )( int ) ;
+            
+            CBaseEntity_exposer.def( 
+                "SetNavObstacleRef"
+                , SetNavObstacleRef_function_type( &::CBaseEntity::SetNavObstacleRef )
+                , ( bp::arg("ref") ) );
         
         }
         { //::CBaseEntity::SetNetworkQuantizeOriginAngAngles
