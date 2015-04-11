@@ -251,6 +251,8 @@ static void VSPTParmRemove( const char *pParmToCheck )
 	CommandLine()->RemoveParm( pParmToCheck );
 }
 
+#define PY_MAX_PATH 2048
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -294,19 +296,16 @@ bool CSrcPython::InitInterpreter( void )
 	if( !bNoChangeWorkingDirectory )
 	{
 		// Change working directory	
-		char moddir[_MAX_PATH];
-		filesystem->RelativePathToFullPath(".", "MOD", moddir, _MAX_PATH);
-		V_FixupPathName(moddir, _MAX_PATH, moddir);	
-		V_SetCurrentDirectory(moddir);
+		char moddir[MAX_PATH];
+		filesystem->RelativePathToFullPath( ".", "MOD", moddir, sizeof( moddir ) );
+		V_FixupPathName( moddir, sizeof( moddir ), moddir );	
+		V_SetCurrentDirectory( moddir );
 	}
 
 	m_bPythonRunning = true;
 
 	double fStartTime = Plat_FloatTime();
-	
-#define PY_MAX_PATH 2048
 
-	//char buf[PY_MAX_PATH];
 	char pythonpath[PY_MAX_PATH];
 	pythonpath[0] = '\0';
 	char pythonhome[PY_MAX_PATH];
@@ -396,12 +395,16 @@ bool CSrcPython::InitInterpreter( void )
 
 	// Initialize an interpreter
 	Py_InitializeEx( 0 );
+
+	if( developer.GetInt() > 0 )
+	{
 #ifdef CLIENT_DLL
-	ConColorMsg( g_PythonColor, "CLIENT: " );
+		ConColorMsg( g_PythonColor, "CLIENT: " );
 #else
-	ConColorMsg( g_PythonColor, "SERVER: " );
+		ConColorMsg( g_PythonColor, "SERVER: " );
 #endif // CLIENT_DLL
-	ConColorMsg( g_PythonColor, "Initialized Python... (%f seconds)\n", Plat_FloatTime() - fStartTime );
+		ConColorMsg( g_PythonColor, "Initialized Python... (%f seconds)\n", Plat_FloatTime() - fStartTime );
+	}
 	fStartTime = Plat_FloatTime();
 
 	// Save our thread ID
@@ -603,12 +606,15 @@ bool CSrcPython::ShutdownInterpreter( void )
 	m_bPythonIsFinalizing = false;
 	m_bPythonRunning = false;
 
+	if( developer.GetInt() > 0 )
+	{
 #ifdef CLIENT_DLL
-	ConColorMsg( g_PythonColor, "CLIENT: " );
+		ConColorMsg( g_PythonColor, "CLIENT: " );
 #else
-	ConColorMsg( g_PythonColor, "SERVER: " );
+		ConColorMsg( g_PythonColor, "SERVER: " );
 #endif // CLIENT_DLL
-	ConColorMsg( g_PythonColor, "Python is no longer running...\n" );
+		ConColorMsg( g_PythonColor, "Python is no longer running...\n" );
+	}
 
 	return true;
 }
