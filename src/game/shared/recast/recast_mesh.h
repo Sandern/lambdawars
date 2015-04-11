@@ -12,6 +12,7 @@
 #endif
 
 #include <recast/Recast.h>
+#include "detour/DetourNavMeshQuery.h"
 #include "detourtilecache/DetourTileCache.h"
 
 class UnitBaseWaypoint;
@@ -19,7 +20,6 @@ class CMapMesh;
 
 class dtNavMesh;
 class dtTileCache;
-class dtNavMeshQuery;
 
 enum SamplePartitionType
 {
@@ -49,6 +49,8 @@ enum SamplePolyFlags
 	SAMPLE_POLYFLAGS_DISABLED	= 0x10,		// Disabled polygon
 	SAMPLE_POLYFLAGS_ALL		= 0xffff	// All abilities.
 };
+
+#define RECASTMESH_MAX_POLYS 256
 
 class CRecastMesh
 {
@@ -93,7 +95,7 @@ public:
 
 #ifndef CLIENT_DLL
 	// Path find functions
-	virtual UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit = 120.0f, CBaseEntity *pTarget = NULL );
+	UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit = 120.0f, CBaseEntity *pTarget = NULL );
 #endif // CLIENT_DLL
 	bool TestRoute( const Vector &vStart, const Vector &vEnd );
 	float FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget = NULL );
@@ -119,6 +121,23 @@ public:
 	void SetCellHeight( float cellHeight ) { m_cellHeight = cellHeight; }
 	float GetTileSize() { return m_tileSize; }
 	void SetTileSize( float tileSize ) { m_tileSize = tileSize; }
+
+private:
+	// Result data for path finding
+	typedef struct pathfind_resultdata_t {
+		dtPolyRef polys[RECASTMESH_MAX_POLYS];
+		int npolys;
+
+		float adjustedEndPos[3];
+
+		int straightPathOptions;
+		float straightPath[RECASTMESH_MAX_POLYS*3];
+		unsigned char straightPathFlags[RECASTMESH_MAX_POLYS];
+		dtPolyRef straightPathPolys[RECASTMESH_MAX_POLYS];
+		int nstraightPath;
+	} pathfind_resultdata_t;
+
+	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
 
 protected:
 	bool m_keepInterResults;
@@ -168,6 +187,9 @@ private:
 	dtNavMesh* m_navMesh;
 	dtTileCache* m_tileCache;
 	dtNavMeshQuery* m_navQuery;
+
+	dtQueryFilter m_defaultFilter;
+	pathfind_resultdata_t m_pathfindData;
 };
 
 inline const char *CRecastMesh::GetName()
