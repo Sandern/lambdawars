@@ -115,14 +115,14 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::IsBBCoveredByNavAreas
+    { //::NavIsAreaFlat
     
-        typedef bool ( *IsBBCoveredByNavAreas_function_type )( ::Vector const &,::Vector const &,float,bool,float );
+        typedef bool ( *NavIsAreaFlat_function_type )( ::Vector const &,::Vector const &,float,::C_UnitBase * );
         
         bp::def( 
-            "IsBBCoveredByNavAreas"
-            , IsBBCoveredByNavAreas_function_type( &::IsBBCoveredByNavAreas )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("tolerance")=1.00000001490116119384765625e-1f, bp::arg("requireisflat")=(bool)(true), bp::arg("flattol")=6.99999988079071044921875e-1f ) );
+            "NavIsAreaFlat"
+            , NavIsAreaFlat_function_type( &::NavIsAreaFlat )
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("flattol")=6.99999988079071044921875e-1f, bp::arg("unit")=bp::object() ) );
     
     }
 
@@ -294,14 +294,14 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::IsBBCoveredByNavAreas
+    { //::NavIsAreaFlat
     
-        typedef bool ( *IsBBCoveredByNavAreas_function_type )( ::Vector const &,::Vector const &,float,bool,float );
+        typedef bool ( *NavIsAreaFlat_function_type )( ::Vector const &,::Vector const &,float,::CUnitBase * );
         
         bp::def( 
-            "IsBBCoveredByNavAreas"
-            , IsBBCoveredByNavAreas_function_type( &::IsBBCoveredByNavAreas )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("tolerance")=1.00000001490116119384765625e-1f, bp::arg("requireisflat")=(bool)(true), bp::arg("flattol")=6.99999988079071044921875e-1f ) );
+            "NavIsAreaFlat"
+            , NavIsAreaFlat_function_type( &::NavIsAreaFlat )
+            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("flattol")=6.99999988079071044921875e-1f, bp::arg("unit")=bp::object() ) );
     
     }
 

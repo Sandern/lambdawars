@@ -533,6 +533,73 @@ Vector CRecastMesh::RandomPointWithRadius( const Vector &vCenter, float fRadius,
 	return Vector( epos[0], epos[2], epos[1] );
 }
 
+static void calcTriNormal(const float* v0, const float* v1, const float* v2, float* norm)
+{
+	float e0[3], e1[3];
+	rcVsub(e0, v1, v0);
+	rcVsub(e1, v2, v0);
+	rcVcross(norm, e0, e1);
+	rcVnormalize(norm);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+float CRecastMesh::IsAreaFlat( const Vector &vCenter, const Vector &vExtents, float fSlope )
+{
+	dtStatus status;
+
+	float center[3];
+	center[0] = vCenter.x;
+	center[1] = vCenter.z;
+	center[2] = vCenter.y;
+
+	float extents[3];
+	extents[0] = vExtents.x;
+	extents[1] = vExtents.z;
+	extents[2] = vExtents.y;
+
+	dtPolyRef polys[RECASTMESH_MAX_POLYS];
+	int npolys = 0;
+
+	status = m_navQuery->queryPolygons( center, extents, &m_defaultFilter, polys, &npolys, RECASTMESH_MAX_POLYS );
+	if( !dtStatusSucceed( status ) )
+	{
+		return 0;
+	}
+
+	float norm[3];
+	const dtMeshTile* tile = 0;
+	const dtPoly* poly = 0;
+
+	for( int i = 0; i < npolys; i++ )
+	{
+		// Get poly and tile.
+		// The API input has been cheked already, skip checking internal data.
+		m_navMesh->getTileAndPolyByRefUnsafe( polys[i], &tile, &poly );
+
+		if (poly->getType() == DT_POLYTYPE_GROUND)
+		{
+			for( int j = 2; j < poly->vertCount; ++j )
+			{
+				const float* va = &tile->verts[poly->verts[0]*3];
+				const float* vb = &tile->verts[poly->verts[j-1]*3];
+				const float* vc = &tile->verts[poly->verts[j]*3];
+
+				if( fSlope != 0 )
+				{
+					calcTriNormal( va, vb, vc, norm);
+
+					if( norm[1] < fSlope )
+						return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

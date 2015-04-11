@@ -6645,6 +6645,26 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleNavigator_scope( UnitVehicleNavigator_exposer );
         bp::implicitly_convertible< bp::api::object, UnitVehicleNavigator >();
+        { //::UnitVehicleNavigator::CalcMove
+        
+            typedef void ( ::UnitVehicleNavigator::*CalcMove_function_type )( ::UnitBaseMoveCommand &,::QAngle,float ) ;
+            
+            UnitVehicleNavigator_exposer.def( 
+                "CalcMove"
+                , CalcMove_function_type( &::UnitVehicleNavigator::CalcMove )
+                , ( bp::arg("MoveCommand"), bp::arg("angles"), bp::arg("speed") ) );
+        
+        }
+        { //::UnitVehicleNavigator::CalcNeededDistanceForTurn
+        
+            typedef float ( ::UnitVehicleNavigator::*CalcNeededDistanceForTurn_function_type )( ::UnitBaseMoveCommand &,float ) ;
+            
+            UnitVehicleNavigator_exposer.def( 
+                "CalcNeededDistanceForTurn"
+                , CalcNeededDistanceForTurn_function_type( &::UnitVehicleNavigator::CalcNeededDistanceForTurn )
+                , ( bp::arg("MoveCommand"), bp::arg("turn") ) );
+        
+        }
         { //::UnitVehicleNavigator::ComputeConsiderDensAndDirs
         
             typedef void ( ::UnitVehicleNavigator::*ComputeConsiderDensAndDirs_function_type )( ::UnitBaseMoveCommand &,::Vector &,::CheckGoalStatus_t ) ;

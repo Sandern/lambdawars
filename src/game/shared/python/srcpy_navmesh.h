@@ -33,18 +33,10 @@ int CreateNavAreaByCorners( const Vector &nwcorner, const Vector &necorner, cons
 void DestroyNavArea( unsigned int id );
 void DestroyAllNavAreas();
 
-//int GetActiveNavMesh();
-//Vector GetEditingCursor();
-
 int GetNavAreaAt( const Vector &pos, float beneathlimit = 120.0f );
-//boost::python::list GetNavAreasAtBB( const Vector &mins, const Vector &maxs );
-//void SplitAreasAtBB( const Vector &mins, const Vector &maxs );
-//void SetAreasBlocked( boost::python::list areas, bool blocked, CBaseEntity *pOwner = NULL );
-//bool IsAreaBlocked( int areaid );
-//bool TryMergeSurrounding( int id, float tolerance = FLT_EPSILON );
 
 // Nav mesh testing
-bool IsBBCoveredByNavAreas( const Vector &mins, const Vector &maxs, float tolerance = 0.1f, bool requireisflat = true, float flattol = 0.7f );
+bool NavIsAreaFlat( const Vector &mins, const Vector &maxs, float flattol = 0.7f, CUnitBase *unit = NULL );
 
 // Hiding/cover spot functions
 boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *unit = NULL, bool sort = true, const Vector *sortpos = NULL );

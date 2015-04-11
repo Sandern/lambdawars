@@ -92,6 +92,7 @@ public:
 	bool IsValidPolyRef( int polyRef );
 	Vector ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit = 120.0f, float fRadius = 256.0f );
 	Vector RandomPointWithRadius( const Vector &vCenter, float fRadius, const Vector *pStartPoint = NULL );
+	float IsAreaFlat( const Vector &vCenter, const Vector &vExtents, float fSlope = 0 );
 
 #ifndef CLIENT_DLL
 	// Path find functions
