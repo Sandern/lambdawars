@@ -1109,6 +1109,16 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("pUnit"), bp::arg("bTriggerOnSel")=(bool)(true) ) );
         
         }
+        { //::CHL2WarsPlayer::AwardAchievement
+        
+            typedef void ( ::CHL2WarsPlayer::*AwardAchievement_function_type )( int ) ;
+            
+            CHL2WarsPlayer_exposer.def( 
+                "AwardAchievement"
+                , AwardAchievement_function_type( &::CHL2WarsPlayer::AwardAchievement )
+                , ( bp::arg("iAchievement") ) );
+        
+        }
         { //::CHL2WarsPlayer::CalculateHeight
         
             typedef void ( ::CHL2WarsPlayer::*CalculateHeight_function_type )( ::Vector const & ) ;

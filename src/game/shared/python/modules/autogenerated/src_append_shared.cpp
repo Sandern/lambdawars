@@ -29,6 +29,7 @@ extern "C" __declspec(dllexport) PYINIT_DECL(_te)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_fow)();
 extern "C" __declspec(dllexport) PYINIT_DECL(unit_helper)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_editorsystem)();
+extern "C" __declspec(dllexport) PYINIT_DECL(_achievements)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_steam)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_navmesh)();
 extern "C" __declspec(dllexport) PYINIT_DECL(_recast)();
@@ -55,6 +56,7 @@ extern "C" PYINIT_DECL(_te)();
 extern "C" PYINIT_DECL(_fow)();
 extern "C" PYINIT_DECL(unit_helper)();
 extern "C" PYINIT_DECL(_editorsystem)();
+extern "C" PYINIT_DECL(_achievements)();
 extern "C" PYINIT_DECL(_steam)();
 extern "C" PYINIT_DECL(_navmesh)();
 extern "C" PYINIT_DECL(_recast)();
@@ -85,6 +87,7 @@ void AppendSharedModules()
 	APPEND_MODULE(_fow)
 	APPEND_MODULE(unit_helper)
 	APPEND_MODULE(_editorsystem)
+	APPEND_MODULE(_achievements)
 	APPEND_MODULE(_steam)
 	APPEND_MODULE(_navmesh)
 	APPEND_MODULE(_recast)

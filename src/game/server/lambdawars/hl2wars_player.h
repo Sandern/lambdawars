@@ -43,6 +43,8 @@ public:
 
 	virtual bool					ClientCommand( const CCommand &args );
 
+	void							AwardAchievement( int iAchievement );
+
 	virtual void					PreThink( void );
 
 	virtual Vector					EyePosition(void);

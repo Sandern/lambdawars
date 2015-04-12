@@ -71,6 +71,7 @@ modules = [
     # Wars
     ('unit_helper', 'UnitHelper'),
     ('_editorsystem', 'EditorSystem'),
+    ('_achievements', 'Achievements'),
     
     # Misc
     ('_steam', 'Steam'),

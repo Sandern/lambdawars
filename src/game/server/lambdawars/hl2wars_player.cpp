@@ -206,6 +206,20 @@ void CHL2WarsPlayer::UpdateCameraSettings()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void CHL2WarsPlayer::AwardAchievement( int iAchievement )
+{
+	Assert( iAchievement >= 0 && iAchievement < 0xFFFF );		// must fit in short
+
+	CSingleUserRecipientFilter filter( this );
+
+	UserMessageBegin( filter, "AchievementEvent" );
+		WRITE_SHORT( iAchievement );
+	MessageEnd();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::PreThink( void )
 {
 	BaseClass::PreThink();
