@@ -24,6 +24,12 @@ class CGameStringPool : public CStringPool,	public CBaseGameSystem
 	virtual void LevelShutdownPostEntity() 
 	{
 		FreeAll();
+#ifdef HL2WARS_DLL
+		// CStringPool::FreeAll does not purge the memory, just does a RemoveAll on m_Strings
+		// Due the increased usage of pooled strings (from Flora uuid keyvalues), this can cause
+		// an issue when running for a long time.
+		m_Strings.Purge();
+#endif // HL2WARS_DLL
 		CGameString::IncrementSerialNumber();
 	}
 

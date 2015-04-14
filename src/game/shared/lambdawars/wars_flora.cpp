@@ -285,7 +285,7 @@ void CWarsFlora::InitFloraSequences()
 //-----------------------------------------------------------------------------
 bool CWarsFlora::HasFloraUUID()
 {
-	return m_iszFloraUUID != NULL_STRING;
+	return m_iszFloraUUID[0] != '\0';
 }
 
 //-----------------------------------------------------------------------------
@@ -300,7 +300,7 @@ void CWarsFlora::GenerateFloraUUID()
     unsigned char * str;
     if( UuidToStringA ( &uuid, &str ) == RPC_S_OK )
 	{
-		m_iszFloraUUID = AllocPooledString( ( char* ) str );
+		V_strncpy( m_iszFloraUUID, (char *)str, sizeof( m_iszFloraUUID ) );
 
 		RpcStringFreeA ( &str );
 	}
@@ -311,9 +311,7 @@ void CWarsFlora::GenerateFloraUUID()
 #else
     uuid_t uuid;
     uuid_generate_random ( uuid );
-    char s[37];
-    uuid_unparse ( uuid, s );
-	m_iszFloraUUID = AllocPooledString( s );
+    uuid_unparse ( uuid, m_iszFloraUUID );
 #endif
 	//DevMsg("Generated GUID: %s\n", STRING(m_iszFloraUUID));
 }
@@ -323,7 +321,7 @@ void CWarsFlora::GenerateFloraUUID()
 //-----------------------------------------------------------------------------
 const char *CWarsFlora::GetFloraUUID()
 {
-	return STRING( m_iszFloraUUID );
+	return m_iszFloraUUID;
 }
 
 //-----------------------------------------------------------------------------
@@ -585,7 +583,7 @@ bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
 	}
 	else if (FStrEq(szKeyName, "florauuid"))
 	{
-		m_iszFloraUUID = AllocPooledString( szValue );
+		V_strncpy( m_iszFloraUUID, szValue, sizeof( m_iszFloraUUID ) );
 	}
 	else
 	{

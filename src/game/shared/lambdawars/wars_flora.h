@@ -122,7 +122,7 @@ private:
 #endif // CLIENT_DLL
 
 	bool			m_bEditorManaged;
-	string_t		m_iszFloraUUID;
+	char			m_iszFloraUUID[64];
 };
 
 inline bool CWarsFlora::IsEditorManaged()
