@@ -621,6 +621,11 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 		return status;
 	}
 
+	if( recast_findpath_debug.GetBool() && (status & DT_PARTIAL_RESULT) != 0 )
+	{
+		Msg( "Found a partial path to goal\n" );
+	}
+
 	if( m_pathfindData.npolys )
 	{
 		// Make sure end pos is always on a polygon
@@ -645,6 +650,7 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 
 //-----------------------------------------------------------------------------
 // Purpose: 
+// TODO: Unfinished, maybe not use it at all.
 //-----------------------------------------------------------------------------
 dtStatus CRecastMesh::DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPolyRef > &endRefs, float spos[3], float epos[3], pathfind_resultdata_t &findpathData )
 {
