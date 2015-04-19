@@ -45,6 +45,14 @@
 ConVar	cc_achievement_debug("achievement_debug", "0", FCVAR_CHEAT | FCVAR_REPLICATED, "Turn on achievement debug msgs." );
 const char *COM_GetModDirectory();
 
+// Wars temporary: only allow achievements in dev build
+static bool AllowAchievement()
+{
+	char betaName[512];
+	bool ret = steamapicontext->SteamApps()->GetCurrentBetaName( betaName, sizeof( betaName ) );
+	return V_stricmp( COM_GetModDirectory(), "lambdawarsdev" ) == 0 || (ret && V_stricmp( betaName, "dev" ) == 0);
+}
+
 #define matchmaking g_pMatchFramework->GetMatchmaking()
 
 extern ConVar developer;
@@ -875,6 +883,9 @@ ConVar	cc_achievement_disable("achievement_disable", "0", FCVAR_CHEAT | FCVAR_RE
 //-----------------------------------------------------------------------------
 bool CAchievementMgr::CheckAchievementsEnabled( )
 {
+	if( !AllowAchievement() )
+		return false;
+
 	// if PC, Steam must be running and user logged in
 	if ( cc_achievement_disable.GetBool() )
 		return false;
@@ -1564,7 +1575,7 @@ void CAchievementMgr::Steam_OnUserStatsReceived( UserStatsReceived_t *pUserStats
 	for ( int i = 0; i < m_vecAchievement[STEAM_PLAYER_SLOT].Count(); ++i )
 	{
 		CBaseAchievement *pAchievement = m_vecAchievement[STEAM_PLAYER_SLOT][i];
-#ifndef INFESTED_DLL
+#if defined( INFESTED_DLL ) || defined( HL2WARS_DLL )
 		char szFieldName[64];
 #endif
 		int nCount = 0;
@@ -1572,7 +1583,7 @@ void CAchievementMgr::Steam_OnUserStatsReceived( UserStatsReceived_t *pUserStats
 		bool bAchieved = false;
 		bool bRet1 = steamapicontext->SteamUserStats()->GetAchievement( pAchievement->GetName(), &bAchieved );
 
-#ifdef INFESTED_DLL
+#if defined( INFESTED_DLL ) || defined( HL2WARS_DLL )
 		if ( bRet1 )
 #else
 		// TODO: these look hardcoded for L4D2 - remove?
@@ -1739,9 +1750,12 @@ void MsgFunc_AchievementEvent( bf_read &msg )
 	pAchievementMgr->OnAchievementEvent( iAchievementID, STEAM_PLAYER_SLOT );
 }
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 CON_COMMAND_F( achievement_reset_all, "Clears all achievements", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1750,6 +1764,9 @@ CON_COMMAND_F( achievement_reset_all, "Clears all achievements", FCVAR_CHEAT )
 
 CON_COMMAND_F( achievement_reset, "<internal name> Clears specified achievement", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1771,6 +1788,9 @@ CON_COMMAND_F( achievement_reset, "<internal name> Clears specified achievement"
 
 CON_COMMAND_F( achievement_status, "Shows status of all achievement", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1779,6 +1799,9 @@ CON_COMMAND_F( achievement_status, "Shows status of all achievement", FCVAR_CHEA
 
 CON_COMMAND_F( achievement_unlock, "<internal name> Unlocks achievement", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1799,6 +1822,9 @@ CON_COMMAND_F( achievement_unlock, "<internal name> Unlocks achievement", FCVAR_
 
 CON_COMMAND_F( achievement_unlock_all, "Unlocks all achievements", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1816,6 +1842,9 @@ CON_COMMAND_F( achievement_unlock_all, "Unlocks all achievements", FCVAR_CHEAT )
 
 CON_COMMAND_F( achievement_evaluate, "<internal name> Causes failable achievement to be evaluated", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1842,6 +1871,9 @@ CON_COMMAND_F( achievement_evaluate, "<internal name> Causes failable achievemen
 
 CON_COMMAND_F( achievement_test_friend_count, "Counts the # of teammates on local player's friends list", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1857,6 +1889,9 @@ CON_COMMAND_F( achievement_test_friend_count, "Counts the # of teammates on loca
 
 CON_COMMAND_F( achievement_test_clan_count, "Determines if specified # of teammates belong to same clan w/local player", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
@@ -1873,12 +1908,15 @@ CON_COMMAND_F( achievement_test_clan_count, "Determines if specified # of teamma
 
 CON_COMMAND_F( achievement_mark_dirty, "Mark achievement data as dirty", FCVAR_CHEAT )
 {
+	if( !AllowAchievement() )
+		return;
+
 	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
 	if ( !pAchievementMgr )
 		return;
 	pAchievementMgr->SetDirty( true, STEAM_PLAYER_SLOT );
 }
-#endif // _DEBUG
+//#endif // _DEBUG
 
 #endif // CLIENT_DLL
 

@@ -58,6 +58,39 @@ class CAchievement_Test : public CWarsAchievement
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
-DECLARE_ACHIEVEMENT_ORDER( CWarsAchievement, ACHIEVEMENT_WARS_TEST, "WARS_TEST", 5, 1 );
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Test, ACHIEVEMENT_WARS_TEST, "WARS_TEST", 5, 1 );
+
+class CAchievement_MissionRadioTower : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionRadioTower, ACHIEVEMENT_WARS_MISSION_RADIO_TOWER, "WARS_MISSION_RADIO_TOWER", 5, 1 );
+
+class CAchievement_MissionAbandoned : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionAbandoned, ACHIEVEMENT_WARS_MISSION_ABANDONED, "WARS_MISSION_ABANDONED", 5, 1 );
+
+class CAchievement_MissionValley : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionValley, ACHIEVEMENT_WARS_MISSION_VALLEY, "WARS_MISSION_VALLEY", 5, 1 );
 
 #endif
