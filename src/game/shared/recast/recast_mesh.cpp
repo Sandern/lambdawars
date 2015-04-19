@@ -42,8 +42,10 @@
 
 #ifndef CLIENT_DLL
 ConVar recast_findpath_debug( "recast_findpath_debug", "0", FCVAR_CHEAT, "" );
+ConVar recast_areaslope_debug( "recast_areaslope_debug", "0", FCVAR_CHEAT, "" );
 #else
 ConVar recast_findpath_debug( "cl_recast_findpath_debug", "0", FCVAR_CHEAT, "" );
+ConVar recast_areaslope_debug( "cl_recast_areaslope_debug", "0", FCVAR_CHEAT, "" );
 #endif // CLIENT_DLL
 static ConVar recast_target_querytiles_bloat("recast_target_querytiles_bloat", "2.0", FCVAR_REPLICATED);
 
@@ -586,13 +588,18 @@ float CRecastMesh::IsAreaFlat( const Vector &vCenter, const Vector &vExtents, fl
 				const float* vb = &tile->verts[poly->verts[j-1]*3];
 				const float* vc = &tile->verts[poly->verts[j]*3];
 
-				if( fSlope != 0 )
-				{
-					calcTriNormal( va, vb, vc, norm);
+				calcTriNormal( va, vb, vc, norm);
 
-					if( norm[1] < fSlope )
-						return false;
+				if( recast_areaslope_debug.GetBool() )
+				{
+					Vector vPoint( (va[0] + vb[0] + vc[0]) / 3.0f, (va[2] + vb[2] + vc[2]) / 3.0f, (va[1] + vb[1] + vc[1]) / 3.0f );
+					char buf[256];
+					V_snprintf( buf, sizeof( buf ), "%f", norm[1] );
+					NDebugOverlay::Text( vPoint, buf, false, recast_areaslope_debug.GetFloat() );
 				}
+
+				if( norm[1] < fSlope )
+					return false;
 			}
 		}
 	}
@@ -621,7 +628,9 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 		return status;
 	}
 
-	if( recast_findpath_debug.GetBool() && (status & DT_PARTIAL_RESULT) != 0 )
+	m_pathfindData.isPartial = (status & DT_PARTIAL_RESULT) != 0;
+
+	if( recast_findpath_debug.GetBool() && m_pathfindData.isPartial )
 	{
 		Msg( "Found a partial path to goal\n" );
 	}
@@ -929,7 +938,7 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 	}
 
 	status = DoFindPath(startRef, endRef, spos, epos, m_pathfindData );
-	if( dtStatusSucceed( status ) )
+	if( dtStatusSucceed( status ) && !m_pathfindData.isPartial )
 	{
 		float fPathDistance = 0;
 		Vector vPrev = vEnd;

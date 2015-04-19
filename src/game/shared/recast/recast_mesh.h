@@ -136,6 +136,7 @@ private:
 		unsigned char straightPathFlags[RECASTMESH_MAX_POLYS];
 		dtPolyRef straightPathPolys[RECASTMESH_MAX_POLYS];
 		int nstraightPath;
+		bool isPartial;
 	} pathfind_resultdata_t;
 
 	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
