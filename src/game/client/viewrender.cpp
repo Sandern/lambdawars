@@ -997,7 +997,7 @@ PRECACHE_REGISTER_BEGIN( GLOBAL, PrecachePostProcessingEffects )
 	PRECACHE( MATERIAL, "dev/glow_blur_y" )
 	PRECACHE( MATERIAL, "dev/halo_add_to_screen" )
 #endif // INFESTED_DLL
-#if defined( INFESTED_DLL )
+#if defined( INFESTED_DLL ) || defined( HL2WARS_DLL )
 	PRECACHE( MATERIAL, "engine/writestencil" )
 #endif // INFSETED_DLL
 PRECACHE_REGISTER_END( )
