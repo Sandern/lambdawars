@@ -21,6 +21,10 @@ class CMapMesh;
 class dtNavMesh;
 class dtTileCache;
 
+// Number of nodes used during pathfinding.
+// For very large maps we might need a larger number.
+#define RECAST_NAVQUERY_MAXNODES 4096
+
 enum SamplePartitionType
 {
 	SAMPLE_PARTITION_WATERSHED,

@@ -630,10 +630,18 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 
 	m_pathfindData.isPartial = (status & DT_PARTIAL_RESULT) != 0;
 
-	if( recast_findpath_debug.GetBool() && m_pathfindData.isPartial )
+	if( recast_findpath_debug.GetBool() )
 	{
-		Msg( "Found a partial path to goal\n" );
+		if( m_pathfindData.isPartial )
+			Msg( "Found a partial path to goal\n" );
+
+		if( status & DT_OUT_OF_NODES )
+			Warning( "Ran out of nodes during path find\n" );
+
+		if( status & DT_BUFFER_TOO_SMALL )
+			Warning( "Buffer is too small to hold path find result\n" );
 	}
+
 
 	if( m_pathfindData.npolys )
 	{

@@ -394,7 +394,7 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 		return false;
 	}
 	
-	status = m_navQuery->init(m_navMesh, 2048);
+	status = m_navQuery->init( m_navMesh, RECAST_NAVQUERY_MAXNODES );
 	if (dtStatusFailed(status))
 	{
 		ctx.log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
