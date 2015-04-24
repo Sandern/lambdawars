@@ -79,8 +79,6 @@ void UnitVehicleNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &Move
 	}*/
 }
 
-extern float UnitComputePathDirection2( const Vector &start, UnitBaseWaypoint *pEnd, Vector &pDirection );
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -93,7 +91,7 @@ void UnitVehicleNavigator::CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle an
 		if( pCurWaypoint )
 		{
 			Vector vDir;
-			float waypointDist = UnitComputePathDirection2(GetAbsOrigin(), pCurWaypoint, vDir);
+			float waypointDist = UnitComputePathDirection( GetAbsOrigin(), pCurWaypoint->GetPos(), vDir );
 			QAngle turnAngles;
 			VectorAngles( vDir, turnAngles );
 			float angle = anglemod( MoveCommand.viewangles[YAW] - turnAngles[YAW] );

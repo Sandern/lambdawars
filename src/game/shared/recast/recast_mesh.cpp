@@ -633,7 +633,7 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 	if( recast_findpath_debug.GetBool() )
 	{
 		if( m_pathfindData.isPartial )
-			Msg( "Found a partial path to goal\n" );
+			Warning( "Found a partial path to goal\n" );
 
 		if( status & DT_OUT_OF_NODES )
 			Warning( "Ran out of nodes during path find\n" );
@@ -644,17 +644,7 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 
 
 	if( m_pathfindData.npolys )
-	{
-		// Make sure end pos is always on a polygon
-		dtVcopy(m_pathfindData.adjustedEndPos, epos);
-		m_navQuery->closestPointOnPoly(m_pathfindData.polys[m_pathfindData.npolys-1], epos, m_pathfindData.adjustedEndPos, 0);
-
-		if( recast_findpath_debug.GetBool() )
-		{
-			NDebugOverlay::Box( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1] + 16.0f), 
-				-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
-		}
-				
+	{	
 		status = m_navQuery->findStraightPath(spos, m_pathfindData.adjustedEndPos, m_pathfindData.polys, m_pathfindData.npolys,
 										m_pathfindData.straightPath, m_pathfindData.straightPathFlags,
 										m_pathfindData.straightPathPolys, &m_pathfindData.nstraightPath, 
@@ -733,7 +723,7 @@ dtStatus CRecastMesh::DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPo
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit, CBaseEntity *pTarget )
+UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit, CBaseEntity *pTarget, bool *bIsPartial )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPath", "RecastNav" );
 
@@ -861,12 +851,33 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	}
 	else
 	{
-		status = DoFindPath(startRef, endRefs[0], spos, epos, m_pathfindData );
+		// Make sure end pos is always on a polygon
+		dtVcopy(m_pathfindData.adjustedEndPos, epos);
+		status = m_navQuery->closestPointOnPoly(endRefs[0], epos, m_pathfindData.adjustedEndPos, 0);
+		if( !dtStatusSucceed( status ) )
+		{
+			return NULL;
+		}
+
+		if( recast_findpath_debug.GetBool() )
+		{
+			NDebugOverlay::Box( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1] + 16.0f), 
+				-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
+		}
+
+		status = DoFindPath(startRef, endRefs[0], spos, m_pathfindData.adjustedEndPos, m_pathfindData );
 	}
 
 	if( dtStatusSucceed( status ) )
 	{
-		pResultPath = new UnitBaseWaypoint( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1]) );
+		//pResultPath = new UnitBaseWaypoint( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1]) );
+		pResultPath = NULL;
+
+		if( bIsPartial ) 
+		{
+			*bIsPartial = m_pathfindData.isPartial;
+		}
+
 		for (int i = m_pathfindData.nstraightPath - 1; i >= 0; i--)
 		{
 			const dtOffMeshConnection *pOffmeshCon = m_navMesh->getOffMeshConnectionByRef( m_pathfindData.straightPathPolys[i] );

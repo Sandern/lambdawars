@@ -114,49 +114,6 @@ float UnitComputePathDirection( const Vector &start, const Vector &end, Vector &
 
 int UnitBaseNavigator::m_iCurPathRecomputations = 0;
 
-//-----------------------------------------------------------------------------
-// Purpose: Alternative path direction function that computes the direction using
-//			the nav mesh. It picks the direction to the closest point on the portal
-//			of the next target nav area.
-//-----------------------------------------------------------------------------
-float UnitComputePathDirection2( const Vector &start, UnitBaseWaypoint *pEnd, Vector &pDirection )
-{
-	if( pEnd->navDir == NUM_DIRECTIONS )
-	{
-		return UnitComputePathDirection( start, pEnd->GetPos(), pDirection );
-	}
-
-	Vector dir, point1, point2, end;
-	//DirectionToVector2D( DirectionLeft(pEnd->navDir), &(dir.AsVector2D()) );
-	//dir.z = 0.0f;
-	dir = pEnd->areaSlope;
-
-	if( pEnd->navDir == WEST || pEnd->navDir == EAST )
-	{
-		point1 = pEnd->GetPos() + dir * pEnd->flToleranceX;
-		point2 = pEnd->GetPos() + -1 * dir * pEnd->flToleranceX;
-	}
-	else
-	{		point1 = pEnd->GetPos() + dir * pEnd->flToleranceY;
-		point2 = pEnd->GetPos() + -1 * dir * pEnd->flToleranceY;
-	}
-
-	if( point1 == point2 )
-		return UnitComputePathDirection( start, pEnd->GetPos(), pDirection );
-
-	end = UTIL_PointOnLineNearestPoint( point1, point2, start, true ); 
-
-	if( unit_navigator_debug.GetInt() == 2 )
-	{
-		NDebugOverlay::Line( point1, point2, 0, 255, 0, true, 1.0f );
-		NDebugOverlay::Box( end, -Vector(8, 8, 8), Vector(8, 8, 8), 255, 255, 0, true, 1.0f );
-	}
-	
-	VectorSubtract( end, start, pDirection );
-	pDirection.z = 0.0f;
-	return Vector2DNormalize( pDirection.AsVector2D() );
-}
-
 //-------------------------------------
 
 UnitBaseWaypoint *	UnitBaseWaypoint::GetLast()
@@ -1005,7 +962,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 
 	// Dist to next waypoints + speed predicted position
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GoalStatus != CHS_ATGOAL )
-		fDist = UnitComputePathDirection2(m_vTestPositions[iPos], GetPath()->m_pWaypointHead, vPathDir);
+		fDist = UnitComputePathDirection( m_vTestPositions[iPos], GetPath()->m_pWaypointHead->GetPos(), vPathDir );
 	else if( m_vForceGoalVelocity.IsValid() )
 		fDist = ( (m_vForceGoalVelocity * 2) - m_vTestPositions[iPos] ).Length2D();
 	else
@@ -1719,7 +1676,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 {
 	Vector vDir;
 	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
-	float waypointDist = UnitComputePathDirection2(GetAbsOrigin(), pCurWaypoint, vDir);
+	float waypointDist = UnitComputePathDirection( GetAbsOrigin(), pCurWaypoint->GetPos(), vDir );
 	
 	CheckGoalStatus_t SpecialGoalStatus = CHS_NOGOAL;
 
@@ -1742,9 +1699,11 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 		if( waypointDist <= Min(tolerance, GetPath()->m_fGoalTolerance) && m_fGoalDistance >= GetPath()->m_fMinRange )
 		{
 			if( unit_navigator_debug.GetInt() > 1 )
-				DevMsg("#%d: In range goal waypoint (distance: %f, tol: %f, goaltol: %f)\n", 
-						GetOuter()->entindex(), waypointDist, tolerance, GetPath()->m_fGoalTolerance );
-			return CHS_ATGOAL;
+				DevMsg("#%d: In range goal (distance: %f, tol: %f, goaltol: %f, partial: %d)\n", 
+						GetOuter()->entindex(), m_fGoalDistance, tolerance, GetPath()->m_fGoalTolerance, GetPath()->IsPartialPath() );
+
+			// Mark partial path as failed. Only accept if it succeeded through one of the other goal checking methods.
+			return GetPath()->IsPartialPath() ? CHS_FAILED : CHS_ATGOAL;
 		}
 	}
 	else
@@ -1794,6 +1753,7 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 	return CHS_HASGOAL;
 }
 
+#if 0
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1835,6 +1795,7 @@ Vector UnitBaseNavigator::ComputeWaypointTarget( const Vector &start, UnitBaseWa
 	return UTIL_PointOnLineNearestPoint( point1, point2, start, true ); 
 
 }
+#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Advances a waypoint.
@@ -1926,7 +1887,7 @@ float UnitBaseNavigator::ComputeWaypointDistanceAndDir( Vector &vPathDir )
 	else
 	{
 		// Calculate path direction to next waypoint
-		fWaypointDist = UnitComputePathDirection2( GetAbsOrigin(), GetPath()->m_pWaypointHead, vPathDir );
+		fWaypointDist = UnitComputePathDirection( GetAbsOrigin(), GetPath()->m_pWaypointHead->GetPos(), vPathDir );
 	}
 	return fWaypointDist;
 }
@@ -2399,8 +2360,6 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( UnitBasePath *pPath, const 
 
 		NavDbgMsg("#%d BuildLocalPath: builded local route\n", GetOuter()->entindex());
 		UnitBaseWaypoint *pWayPoint = new UnitBaseWaypoint(vGoalPos);
-		pWayPoint->flToleranceX = pPath->m_waypointTolerance + 1.0f;
-		pWayPoint->flToleranceY = pPath->m_waypointTolerance + 1.0f;
 
 		pPath->m_bIsDirectPath = true;
 		return pWayPoint;
@@ -2428,10 +2387,15 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 	CRecastMesh *pNavMesh = GetNavMesh();
 	if( pNavMesh )
 	{
-		const Vector &vStart = GetAbsOrigin(); 
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f, pPath->GetTarget() );
+		const Vector &vStart = GetAbsOrigin();
+		bool bIsPartial;
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f, pPath->GetTarget(), &bIsPartial );
 		if( pFoundPath )
+		{
+			if( bIsPartial )
+				pPath->m_iFlags |= UNITPATH_FLAGS_PARTIAL;
 			return pFoundPath;
+		}
 	}
 
 	return NULL;
@@ -2443,6 +2407,9 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildNavAreaPath( UnitBasePath *pPath, cons
 UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 {
 	UnitBaseWaypoint *waypoints;
+
+	// Could be an old path object, make sure it's not marked as partial
+	pPath->m_iFlags &= ~UNITPATH_FLAGS_PARTIAL;
 
 	// Special case: build a direct path
 	if( pPath->m_iGoalFlags & GF_DIRECTPATH )

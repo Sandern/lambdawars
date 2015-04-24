@@ -85,27 +85,24 @@ class UnitBaseWaypoint
 public:
 	UnitBaseWaypoint()
 	{
-		memset( this, 0, sizeof(*this) );
+		V_memset( this, 0, sizeof(*this) );
 		vecLocation	= vec3_invalid;
-		navDir = NUM_DIRECTIONS;
 	}
 	UnitBaseWaypoint( const Vector &vecPosition, float flYaw=0.0f )
 	{
-		memset( this, 0, sizeof(*this) );
+		V_memset( this, 0, sizeof(*this) );
 		vecLocation = vecPosition;
 		flYaw = flYaw;
-		navDir = NUM_DIRECTIONS;
 	}
 	UnitBaseWaypoint( const UnitBaseWaypoint &from )
 	{
-		memcpy( this, &from, sizeof(*this) );
+		V_memcpy( this, &from, sizeof(*this) );
 		pNext = pPrev = NULL;
-		navDir = NUM_DIRECTIONS;
 	}
 
 	UnitBaseWaypoint &operator=( const UnitBaseWaypoint &from )
 	{
-		memcpy( this, &from, sizeof(*this) );
+		V_memcpy( this, &from, sizeof(*this) );
 		pNext = pPrev = NULL;
 		return *this;
 	}
@@ -146,11 +143,6 @@ public:
 	Vector			vecLocation;
 	float			flYaw;				// Waypoint facing dir
 
-	float			flToleranceX;
-	float			flToleranceY;
-	Vector			areaSlope;
-	NavDirType		navDir;
-
 	CheckGoalStatus_t SpecialGoalStatus; // Leave 0 to be ignored
 
 #if 0 // TODO: REMOVE
@@ -185,6 +177,14 @@ inline void UnitBaseWaypoint::SetNext( UnitBaseWaypoint *p )
 	}
 }
 
+// Waypoint flags
+enum UnitPathFlags
+{
+	UNITPATH_FLAGS_NONE = 0,
+	UNITPATH_FLAGS_PARTIAL = 0x1,
+	UNITPATH_FLAGS_ISDIRECT = 0x2
+};
+
 //-----------------------------------------------------------------------------
 // UnitBasePath: Maintains the list of waypoints to a goal and other related info
 //-----------------------------------------------------------------------------
@@ -210,6 +210,7 @@ public:
 		m_fMaxMoveDist = src.m_fMaxMoveDist;
 		m_bSuccess = src.m_bSuccess;
 		m_bIsDirectPath = src.m_bIsDirectPath;
+		m_iFlags = src.m_iFlags;
 #ifdef ENABLE_PYTHON
 		m_fnCustomLOSCheck = src.m_fnCustomLOSCheck;
 #endif // ENABLE_PYTHON
@@ -267,6 +268,7 @@ public:
 		m_bAvoidEnemies = true;
 		m_fMaxMoveDist = 0;
 		m_bIsDirectPath = false;
+		m_iFlags = 0;
 		SetWaypoint(NULL);
 	}
 
@@ -324,6 +326,8 @@ public:
 	void SetTarget( CBaseEntity *pTarget ) { m_hTarget = pTarget; }
 	CBaseEntity *GetTarget() { return m_hTarget; }
 
+	inline bool IsPartialPath() { return (m_iFlags & UNITPATH_FLAGS_PARTIAL) != 0; }
+
 public:
 	int m_iGoalType; // UnitGoalTypes
 	UnitBaseWaypoint *m_pWaypointHead;
@@ -339,6 +343,7 @@ public:
 	float m_fMaxMoveDist;
 	bool m_bSuccess; // Can be queried after path completion by other components
 	bool m_bIsDirectPath;
+	int m_iFlags;
 #ifdef ENABLE_PYTHON
 	boost::python::object m_fnCustomLOSCheck; // Allows using a custom Python based los check
 	boost::python::object m_pathContext; // Allows setting a context for this path. Could be anything.
@@ -401,7 +406,7 @@ public:
 	virtual CheckGoalStatus_t UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fWaypointDist );
 	virtual bool		IsInRangeGoal( UnitBaseMoveCommand &MoveCommand );
 	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
-	Vector				ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd );
+	//Vector				ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd );
 	virtual void		AdvancePath();
 	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
 	virtual float		ComputeWaypointDistanceAndDir( Vector &vPathDir );

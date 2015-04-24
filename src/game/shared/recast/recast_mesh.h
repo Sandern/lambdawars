@@ -100,7 +100,7 @@ public:
 
 #ifndef CLIENT_DLL
 	// Path find functions
-	UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit = 120.0f, CBaseEntity *pTarget = NULL );
+	UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit = 120.0f, CBaseEntity *pTarget = NULL, bool *bIsPartial = NULL );
 #endif // CLIENT_DLL
 	bool TestRoute( const Vector &vStart, const Vector &vEnd );
 	float FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget = NULL );
