@@ -870,7 +870,6 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 
 	if( dtStatusSucceed( status ) )
 	{
-		//pResultPath = new UnitBaseWaypoint( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1]) );
 		pResultPath = NULL;
 
 		if( bIsPartial ) 
@@ -886,10 +885,12 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 
 			UnitBaseWaypoint *pNewPath = new UnitBaseWaypoint( pos );
 			pNewPath->SetNext( pResultPath );
+
 			// For now, offmesh connections are always considered as edges.
 			if( pOffmeshCon )
 			{
-				pResultPath->SpecialGoalStatus = CHS_EDGEDOWNDEST;
+				if( pResultPath )
+					pResultPath->SpecialGoalStatus = CHS_EDGEDOWNDEST;
 				pNewPath->SpecialGoalStatus = CHS_EDGEDOWN;
 			}
 			pResultPath = pNewPath;
