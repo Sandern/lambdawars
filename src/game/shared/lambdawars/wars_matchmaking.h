@@ -51,7 +51,7 @@ typedef struct WarsAcceptGameMessage_t : public WarsMessage_t
 void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyValues *pGameData );
 
 #ifdef CLIENT_DLL
-void WarsFireMMSessionJoinFailedSignal();
+void WarsFireMMSessionJoinFailedSignal( KeyValues *pEvent );
 
 void WarsSendPingMessage( CSteamID steamId );
 void WarsSendPongMessage( CSteamID steamId );

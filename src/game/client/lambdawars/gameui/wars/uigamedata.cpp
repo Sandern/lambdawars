@@ -54,7 +54,7 @@
 #include "gameui_util.h"
 
 #if defined( HL2WARS_DLL ) && defined( ENABLE_PYTHON )
-extern void WarsFireMMSessionJoinFailedSignal();
+extern void WarsFireMMErrorSignal( KeyValues *pEvent );
 #endif 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1330,7 +1330,7 @@ void CUIGameData::OnEvent( KeyValues *pEvent )
 #ifdef ENABLE_PYTHON
 		if ( !V_stricmp( "error", pEvent->GetString( "state", "" ) ) )
 		{
-			WarsFireMMSessionJoinFailedSignal();
+			WarsFireMMErrorSignal( pEvent );
 		}
 #endif // ENABLE_PYTHON
 #endif // HL2WARS_DLL

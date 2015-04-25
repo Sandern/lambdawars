@@ -63,10 +63,14 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 }
 
 #ifdef CLIENT_DLL
-void WarsFireMMSessionJoinFailedSignal()
+void WarsFireMMErrorSignal( KeyValues *pEvent )
 {
 #ifdef ENABLE_PYTHON
-	SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get("mm_joinsessionfailed", "core.signals", true) );
+	boost::python::dict kwargs;
+	kwargs["sender"] = boost::python::object();
+	kwargs["event"] = *pEvent;
+	boost::python::object signal = SrcPySystem()->Get( "mm_error", "core.signals", true );
+	SrcPySystem()->CallSignal( signal, kwargs );
 #endif // ENABLE_PYTHON
 }
 
