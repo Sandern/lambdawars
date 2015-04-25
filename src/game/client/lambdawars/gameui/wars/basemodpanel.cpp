@@ -1493,6 +1493,15 @@ void CBaseModPanel::OnEvent( KeyValues *pEvent )
 				return;
 
 #ifdef HL2WARS_DLL
+			// Some crappy handler set by Alien Swarm somewhere in the engine?! Use it to ignore the match start!
+			if ( KeyValues *pOnEngineDisconnectReason = g_pMatchFramework->GetEventsSubscription()->GetEventData( "OnEngineDisconnectReason" ) )
+			{
+				if ( !Q_stricmp( "lobby", pOnEngineDisconnectReason->GetString( "disconnecthdlr" ) ) )
+				{
+					return;
+				}
+			}
+
 			// Automatically start the map, no configuration required
 			pSession->Command( KeyValues::AutoDeleteInline( new KeyValues( "Start" ) ) );
 			return;
