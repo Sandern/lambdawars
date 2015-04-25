@@ -1003,7 +1003,7 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 				m_activeMethod();
 
 				// Method might have removed the entry already
-				if( !m_methodTickList.IsValidIndex(i) )
+				if( !m_methodTickList.IsValidIndex(i) || m_methodTickList[i].method != m_activeMethod )
 					continue;
 
 				// Remove tick methods that are not looped (used to call back a function after a set time)
@@ -1084,7 +1084,7 @@ void CSrcPython::UpdateRealtimeTickMethods()
 				m_activeMethod();
 
 				// Method might have removed the entry already
-				if( !m_methodTickList.IsValidIndex(i) )
+				if( !m_methodTickList.IsValidIndex(i) || m_methodTickList[i].method != m_activeMethod )
 					continue;
 
 				// Remove tick methods that are not looped (used to call back a function after a set time)
@@ -1103,8 +1103,10 @@ void CSrcPython::UpdateRealtimeTickMethods()
 			}
 
 			m_methodTickList[i].m_fNextTickTime = Plat_FloatTime() + m_methodTickList[i].m_fTickSignal;
-		}	
+		}
 	}
+
+	m_activeMethod = boost::python::object();
 }
 
 //-----------------------------------------------------------------------------
@@ -1532,13 +1534,13 @@ void CSrcPython::RegisterTickMethod( bp::object method, float ticksignal, bool l
 		throw boost::python::error_already_set(); 
 	}
 
-	py_tick_methods tickmethod;
+	m_methodTickList.AddToTail();
+	py_tick_methods &tickmethod = m_methodTickList.Tail();
 	tickmethod.method = method;
 	tickmethod.m_fTickSignal = ticksignal;
 	tickmethod.m_fNextTickTime = (userealtime ? Plat_FloatTime() : gpGlobals->curtime) + ticksignal;
 	tickmethod.m_bLooped = looped;
 	tickmethod.m_bUseRealTime = userealtime;
-	m_methodTickList.AddToTail(tickmethod);
 }
 
 //-----------------------------------------------------------------------------
@@ -1548,7 +1550,7 @@ void CSrcPython::UnregisterTickMethod( bp::object method )
 {
 	if( m_activeMethod.ptr() != Py_None && method != m_activeMethod )
 	{
-		PyErr_SetString(PyExc_Exception, "Cannot remove methods from a tick method (other than the active tick method itself)" );
+		PyErr_SetString(PyExc_Exception, "Cannot remove methods from tick method (other than the active tick method itself)" );
 		throw boost::python::error_already_set(); 
 	}
 
@@ -1620,7 +1622,7 @@ void CSrcPython::UnregisterPerFrameMethod( bp::object method )
 {
 	if( m_activeMethod.ptr() != Py_None && method != m_activeMethod )
 	{
-		PyErr_SetString(PyExc_Exception, "Cannot remove methods from a perframe method (other than the active perframe method itself)" );
+		PyErr_SetString(PyExc_Exception, "Cannot remove methods from perframe method (other than the active perframe method itself)" );
 		throw boost::python::error_already_set(); 
 	}
 
@@ -1661,7 +1663,7 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 	{
 		// HACK for debug mode, but unstable. bool_type operator causes a crash.
 #if defined( CLIENT_DLL ) && defined( _DEBUG )
-		if( PyObject_IsTrue( (m_methodTickList[i].method == method).ptr() ) )
+		if( PyObject_IsTrue( (m_methodPerFrameList[i].method == method).ptr() ) )
 			return true;
 #else
 		if( m_methodPerFrameList[i] == method )
