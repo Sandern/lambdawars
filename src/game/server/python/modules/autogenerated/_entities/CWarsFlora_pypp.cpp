@@ -55,6 +55,25 @@ struct CWarsFlora_wrapper : CWarsFlora, bp::wrapper< CWarsFlora > {
     
     }
 
+    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
+        PY_OVERRIDE_CHECK( CWarsFlora, KeyValue )
+        PY_OVERRIDE_LOG( _entities, CWarsFlora, KeyValue )
+        bp::override func_KeyValue = this->get_override( "KeyValue" );
+        if( func_KeyValue.ptr() != Py_None )
+            try {
+                return func_KeyValue( szKeyName, szValue );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CWarsFlora::KeyValue( szKeyName, szValue );
+            }
+        else
+            return this->CWarsFlora::KeyValue( szKeyName, szValue );
+    }
+    
+    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
+        return CWarsFlora::KeyValue( szKeyName, szValue );
+    }
+
     virtual void Precache(  ) {
         PY_OVERRIDE_CHECK( CWarsFlora, Precache )
         PY_OVERRIDE_LOG( _entities, CWarsFlora, Precache )
@@ -338,25 +357,6 @@ struct CWarsFlora_wrapper : CWarsFlora, bp::wrapper< CWarsFlora > {
     
     char const * default_GetTracerType(  ) {
         return CBaseEntity::GetTracerType( );
-    }
-
-    virtual bool KeyValue( char const * szKeyName, char const * szValue ) {
-        PY_OVERRIDE_CHECK( CBaseEntity, KeyValue )
-        PY_OVERRIDE_LOG( _entities, CBaseEntity, KeyValue )
-        bp::override func_KeyValue = this->get_override( "KeyValue" );
-        if( func_KeyValue.ptr() != Py_None )
-            try {
-                return func_KeyValue( szKeyName, szValue );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseEntity::KeyValue( szKeyName, szValue );
-            }
-        else
-            return this->CBaseEntity::KeyValue( szKeyName, szValue );
-    }
-    
-    bool default_KeyValue( char const * szKeyName, char const * szValue ) {
-        return CBaseEntity::KeyValue( szKeyName, szValue );
     }
 
     virtual bool KeyValue( char const * szKeyName, float flValue ) {
@@ -843,6 +843,11 @@ void register_CWarsFlora_class(){
             "IsEditorManaged"
             , (bool ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::IsEditorManaged ) )    
         .def( 
+            "KeyValue"
+            , (bool ( ::CWarsFlora::* )( char const *,char const * ) )(&::CWarsFlora::KeyValue)
+            , (bool ( CWarsFlora_wrapper::* )( char const *,char const * ) )(&CWarsFlora_wrapper::default_KeyValue)
+            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
+        .def( 
             "ObjectCaps"
             , (int ( ::CWarsFlora::* )(  ) )( &::CWarsFlora::ObjectCaps ) )    
         .def( 
@@ -937,11 +942,6 @@ void register_CWarsFlora_class(){
             "GetTracerType"
             , (char const * ( ::CBaseEntity::* )(  ) )(&::CBaseEntity::GetTracerType)
             , (char const * ( CWarsFlora_wrapper::* )(  ) )(&CWarsFlora_wrapper::default_GetTracerType) )    
-        .def( 
-            "KeyValue"
-            , (bool ( ::CBaseEntity::* )( char const *,char const * ) )(&::CBaseEntity::KeyValue)
-            , (bool ( CWarsFlora_wrapper::* )( char const *,char const * ) )(&CWarsFlora_wrapper::default_KeyValue)
-            , ( bp::arg("szKeyName"), bp::arg("szValue") ) )    
         .def( 
             "KeyValue"
             , (bool ( ::CBaseEntity::* )( char const *,float ) )(&::CBaseEntity::KeyValue)

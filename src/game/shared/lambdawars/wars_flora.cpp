@@ -114,7 +114,8 @@ BEGIN_DATADESC( CWarsFlora )
 	DEFINE_KEYFIELD( m_iszSqueezeDownIdleAnimationName,	FIELD_STRING,	"squeezedownidleanimation" ),
 	DEFINE_KEYFIELD( m_iszSqueezeUpAnimationName,		FIELD_STRING,	"squeezeupanimation" ),
 	DEFINE_KEYFIELD( m_iszDestructionAnimationName,		FIELD_STRING,	"destructionanimation" ),
-	DEFINE_KEYFIELD( m_iszFloraUUID,		FIELD_STRING,	"florauuid" ),
+	// Custom parse florauuid, to avoid allocating many strings in the stringpool
+	//DEFINE_KEYFIELD( m_iszFloraUUID,		FIELD_STRING,	"florauuid" ),
 END_DATADESC()
 
 //-----------------------------------------------------------------------------
@@ -368,6 +369,79 @@ bool CWarsFlora::FillKeyValues( KeyValues *pEntityKey, int iVisGroupId )
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
+{
+	if ( FStrEq(szKeyName, "health") )
+	{
+		m_iHealth = V_atoi(szValue);
+	}
+	else if (FStrEq(szKeyName, "spawnflags"))
+	{
+		m_spawnflags = V_atoi(szValue);
+	}
+	else if (FStrEq(szKeyName, "model"))
+	{
+		SetModelName( AllocPooledString( szValue ) );
+	}
+#ifdef CLIENT_DLL
+	else if (FStrEq(szKeyName, "fademaxdist"))
+	{
+		float flFadeMaxDist = V_atof(szValue);
+		SetDistanceFade( GetMinFadeDist(), flFadeMaxDist );
+	}
+	else if (FStrEq(szKeyName, "fademindist"))
+	{
+		float flFadeMinDist = V_atof(szValue);
+		SetDistanceFade( flFadeMinDist, GetMaxFadeDist() );
+	}
+	else if (FStrEq(szKeyName, "fadescale"))
+	{
+		SetGlobalFadeScale( V_atof(szValue) );
+	}
+	else if (FStrEq(szKeyName, "skin"))
+	{
+		SetSkin( V_atoi(szValue) );
+	}
+#endif // CLIENT_DLL
+	else if (FStrEq(szKeyName, "idleanimation"))
+	{
+		m_iszIdleAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "squeezedownanimation"))
+	{
+		m_iszSqueezeDownAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "squeezedownidleanimation"))
+	{
+		m_iszSqueezeDownIdleAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "squeezeupanimation"))
+	{
+		m_iszSqueezeUpAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "destructionanimation"))
+	{
+		m_iszDestructionAnimationName = AllocPooledString( szValue );
+	}
+	else if (FStrEq(szKeyName, "florauuid"))
+	{
+		V_strncpy( m_iszFloraUUID, szValue, sizeof( m_iszFloraUUID ) );
+	}
+	else
+	{
+		if ( !BaseClass::KeyValue( szKeyName, szValue ) )
+		{
+			// key hasn't been handled
+			return false;
+		}
+	}
+
+	return true;
+}
+
 // Client Spawning Code
 #ifdef CLIENT_DLL
 //-----------------------------------------------------------------------------
@@ -527,74 +601,6 @@ void CWarsFlora::IgniteLifetime( float flFlameLifetime )
 		return;
 
 	pFlame->SetLifetime( flFlameLifetime );
-}
-
-bool CWarsFlora::KeyValue( const char *szKeyName, const char *szValue )
-{
-	if ( FStrEq(szKeyName, "health") )
-	{
-		m_iHealth = V_atoi(szValue);
-	}
-	else if (FStrEq(szKeyName, "spawnflags"))
-	{
-		m_spawnflags = V_atoi(szValue);
-	}
-	else if (FStrEq(szKeyName, "model"))
-	{
-		SetModelName( AllocPooledString( szValue ) );
-	}
-	else if (FStrEq(szKeyName, "fademaxdist"))
-	{
-		float flFadeMaxDist = V_atof(szValue);
-		SetDistanceFade( GetMinFadeDist(), flFadeMaxDist );
-	}
-	else if (FStrEq(szKeyName, "fademindist"))
-	{
-		float flFadeMinDist = V_atof(szValue);
-		SetDistanceFade( flFadeMinDist, GetMaxFadeDist() );
-	}
-	else if (FStrEq(szKeyName, "fadescale"))
-	{
-		SetGlobalFadeScale( V_atof(szValue) );
-	}
-	else if (FStrEq(szKeyName, "skin"))
-	{
-		SetSkin( V_atoi(szValue) );
-	}
-	else if (FStrEq(szKeyName, "idleanimation"))
-	{
-		m_iszIdleAnimationName = AllocPooledString( szValue );
-	}
-	else if (FStrEq(szKeyName, "squeezedownanimation"))
-	{
-		m_iszSqueezeDownAnimationName = AllocPooledString( szValue );
-	}
-	else if (FStrEq(szKeyName, "squeezedownidleanimation"))
-	{
-		m_iszSqueezeDownIdleAnimationName = AllocPooledString( szValue );
-	}
-	else if (FStrEq(szKeyName, "squeezeupanimation"))
-	{
-		m_iszSqueezeUpAnimationName = AllocPooledString( szValue );
-	}
-	else if (FStrEq(szKeyName, "destructionanimation"))
-	{
-		m_iszDestructionAnimationName = AllocPooledString( szValue );
-	}
-	else if (FStrEq(szKeyName, "florauuid"))
-	{
-		V_strncpy( m_iszFloraUUID, szValue, sizeof( m_iszFloraUUID ) );
-	}
-	else
-	{
-		if ( !BaseClass::KeyValue( szKeyName, szValue ) )
-		{
-			// key hasn't been handled
-			return false;
-		}
-	}
-
-	return true;
 }
 
 //-----------------------------------------------------------------------------

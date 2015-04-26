@@ -34,6 +34,8 @@ public:
 	virtual void InitFloraData();
 	virtual void InitFloraSequences();
 
+	virtual bool KeyValue( const char *szKeyName, const char *szValue );
+
 	virtual	int ObjectCaps( void ) { return BaseClass::ObjectCaps() | FCAP_DONT_SAVE; }
 
 	// For managing flora in ingame prop editor
@@ -50,7 +52,6 @@ public:
 	void Ignite( float flFlameLifetime, float flSize );
 	void IgniteLifetime( float flFlameLifetime );
 
-	bool KeyValue( const char *szKeyName, const char *szValue );
 	bool Initialize();
 
 	// Spawns all flora entities on the client side
