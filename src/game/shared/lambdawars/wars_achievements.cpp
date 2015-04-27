@@ -151,6 +151,27 @@ class CAchievement_DestroyHQWreckingBall : public CWarsAchievement
 	// server fires an event for this achievement, no other code within achievement necessary
 };
 DECLARE_ACHIEVEMENT_ORDER( CAchievement_DestroyHQWreckingBall, ACHIEVEMENT_WARS_DESTROYHQ_WRECKINGBALL, "WARS_DESTROYHQ_WRECKINGBALL", 5, 70 );
-	
+
+class CAchievement_TheClash : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_TheClash, ACHIEVEMENT_WARS_THECLASH, "WARS_THECLASH", 5, 80 );
+
+class CAchievement_DogDog : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_DogDog, ACHIEVEMENT_WARS_DOGDOG, "WARS_DOGDOG", 5, 90 );
 
 #endif
