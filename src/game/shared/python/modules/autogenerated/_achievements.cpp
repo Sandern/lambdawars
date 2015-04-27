@@ -6,6 +6,8 @@
 
 #include "wars_achievements.h"
 
+#include "c_wars_steamstats.h"
+
 #include "srcpy.h"
 
 #include "tier0/memdbgon.h"
@@ -16,12 +18,62 @@ BOOST_PYTHON_MODULE(_achievements){
     bp::docstring_options doc_options( true, true, false );
 
     bp::enum_< WarsAchievements_e>("WarsAchievements_e")
-        .value("ACHIEVEMENT_WARS_TEST", ACHIEVEMENT_WARS_TEST)
+        .value("ACHIEVEMENT_WARS_GRADUATED", ACHIEVEMENT_WARS_GRADUATED)
         .value("ACHIEVEMENT_WARS_MISSION_RADIO_TOWER", ACHIEVEMENT_WARS_MISSION_RADIO_TOWER)
         .value("ACHIEVEMENT_WARS_MISSION_ABANDONED", ACHIEVEMENT_WARS_MISSION_ABANDONED)
         .value("ACHIEVEMENT_WARS_MISSION_VALLEY", ACHIEVEMENT_WARS_MISSION_VALLEY)
+        .value("ACHIEVEMENT_WARS_ANNIHILATION_VICTORIOUS", ACHIEVEMENT_WARS_ANNIHILATION_VICTORIOUS)
+        .value("ACHIEVEMENT_WARS_ANNIHILATION_KINGOFTHEHILL", ACHIEVEMENT_WARS_ANNIHILATION_KINGOFTHEHILL)
+        .value("ACHIEVEMENT_WARS_ANNIHILATION_GLADIATOR", ACHIEVEMENT_WARS_ANNIHILATION_GLADIATOR)
+        .value("ACHIEVEMENT_WARS_DESTROYHQ_VANDALISM", ACHIEVEMENT_WARS_DESTROYHQ_VANDALISM)
+        .value("ACHIEVEMENT_WARS_DESTROYHQ_WRECKINGBALL", ACHIEVEMENT_WARS_DESTROYHQ_WRECKINGBALL)
         .export_values()
         ;
+
+    bp::class_< CWars_Steamstats, boost::noncopyable >( "CWars_Steamstats", bp::no_init )    
+        .def( bp::init< >() )    
+        .def( 
+            "FetchStats"
+            , (bool ( ::CWars_Steamstats::* )( ::CSteamID ) )( &::CWars_Steamstats::FetchStats )
+            , ( bp::arg("playerSteamID") ) )    
+        .def( 
+            "GetUserStats"
+            , (::WarsUserStats_t & ( ::CWars_Steamstats::* )( ::CSteamID & ) )( &::CWars_Steamstats::GetUserStats )
+            , ( bp::arg("steamID") )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "Steam_OnUserStatsReceived"
+            , (void ( ::CWars_Steamstats::* )( ::UserStatsReceived_t * ) )( &::CWars_Steamstats::Steam_OnUserStatsReceived )
+            , ( bp::arg("pParam") ) )    
+        .def( 
+            "Steam_OnUserStatsStored"
+            , (void ( ::CWars_Steamstats::* )( ::UserStatsStored_t * ) )( &::CWars_Steamstats::Steam_OnUserStatsStored )
+            , ( bp::arg("pParam") ) )    
+        .def( 
+            "StoreStats"
+            , (void ( ::CWars_Steamstats::* )(  ) )( &::CWars_Steamstats::StoreStats ) )    
+        .def_readwrite( "m_CallbackUserStatsReceived", &CWars_Steamstats::m_CallbackUserStatsReceived )    
+        .def_readwrite( "m_CallbackUserStatsStored", &CWars_Steamstats::m_CallbackUserStatsStored );
+
+    bp::class_< WarsUserStats_t >( "WarsUserStats_t", bp::init< >() )    
+        .def_readwrite( "annihilation_games", &WarsUserStats_t::annihilation_games )    
+        .def_readwrite( "annihilation_wins", &WarsUserStats_t::annihilation_wins )    
+        .def_readwrite( "destroyhq_games", &WarsUserStats_t::destroyhq_games )    
+        .def_readwrite( "destroyhq_wins", &WarsUserStats_t::destroyhq_wins )    
+        .def_readwrite( "games_total", &WarsUserStats_t::games_total )    
+        .def_readwrite( "pending_steam_stats", &WarsUserStats_t::pending_steam_stats )    
+        .def_readwrite( "valid", &WarsUserStats_t::valid );
+
+    { //::WarsSteamStats
+    
+        typedef ::CWars_Steamstats & ( *WarsSteamStats_function_type )(  );
+        
+        bp::def( 
+            "WarsSteamStats"
+            , WarsSteamStats_function_type( &::WarsSteamStats )
+            , bp::return_value_policy< bp::reference_existing_object >() );
+    
+    }
 }
 #else
 #include "cbase.h"
@@ -38,10 +90,15 @@ BOOST_PYTHON_MODULE(_achievements){
     bp::docstring_options doc_options( true, true, false );
 
     bp::enum_< WarsAchievements_e>("WarsAchievements_e")
-        .value("ACHIEVEMENT_WARS_TEST", ACHIEVEMENT_WARS_TEST)
+        .value("ACHIEVEMENT_WARS_GRADUATED", ACHIEVEMENT_WARS_GRADUATED)
         .value("ACHIEVEMENT_WARS_MISSION_RADIO_TOWER", ACHIEVEMENT_WARS_MISSION_RADIO_TOWER)
         .value("ACHIEVEMENT_WARS_MISSION_ABANDONED", ACHIEVEMENT_WARS_MISSION_ABANDONED)
         .value("ACHIEVEMENT_WARS_MISSION_VALLEY", ACHIEVEMENT_WARS_MISSION_VALLEY)
+        .value("ACHIEVEMENT_WARS_ANNIHILATION_VICTORIOUS", ACHIEVEMENT_WARS_ANNIHILATION_VICTORIOUS)
+        .value("ACHIEVEMENT_WARS_ANNIHILATION_KINGOFTHEHILL", ACHIEVEMENT_WARS_ANNIHILATION_KINGOFTHEHILL)
+        .value("ACHIEVEMENT_WARS_ANNIHILATION_GLADIATOR", ACHIEVEMENT_WARS_ANNIHILATION_GLADIATOR)
+        .value("ACHIEVEMENT_WARS_DESTROYHQ_VANDALISM", ACHIEVEMENT_WARS_DESTROYHQ_VANDALISM)
+        .value("ACHIEVEMENT_WARS_DESTROYHQ_WRECKINGBALL", ACHIEVEMENT_WARS_DESTROYHQ_WRECKINGBALL)
         .export_values()
         ;
 }

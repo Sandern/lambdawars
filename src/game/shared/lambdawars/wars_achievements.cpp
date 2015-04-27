@@ -49,7 +49,7 @@ CWarsAchievement::CWarsAchievement()
 
 // =====================
 
-class CAchievement_Test : public CWarsAchievement
+class CAchievement_Graduated : public CWarsAchievement
 {
 	void Init() 
 	{
@@ -58,7 +58,7 @@ class CAchievement_Test : public CWarsAchievement
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
-DECLARE_ACHIEVEMENT_ORDER( CAchievement_Test, ACHIEVEMENT_WARS_TEST, "WARS_TEST", 5, 1 );
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Graduated, ACHIEVEMENT_WARS_GRADUATED, "WARS_GRADUATED", 5, 1 );
 
 class CAchievement_MissionRadioTower : public CWarsAchievement
 {
@@ -69,7 +69,7 @@ class CAchievement_MissionRadioTower : public CWarsAchievement
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
-DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionRadioTower, ACHIEVEMENT_WARS_MISSION_RADIO_TOWER, "WARS_MISSION_RADIO_TOWER", 5, 1 );
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionRadioTower, ACHIEVEMENT_WARS_MISSION_RADIO_TOWER, "WARS_MISSION_RADIO_TOWER", 5, 10 );
 
 class CAchievement_MissionAbandoned : public CWarsAchievement
 {
@@ -80,7 +80,7 @@ class CAchievement_MissionAbandoned : public CWarsAchievement
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
-DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionAbandoned, ACHIEVEMENT_WARS_MISSION_ABANDONED, "WARS_MISSION_ABANDONED", 5, 1 );
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionAbandoned, ACHIEVEMENT_WARS_MISSION_ABANDONED, "WARS_MISSION_ABANDONED", 5, 20 );
 
 class CAchievement_MissionValley : public CWarsAchievement
 {
@@ -91,6 +91,66 @@ class CAchievement_MissionValley : public CWarsAchievement
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
-DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionValley, ACHIEVEMENT_WARS_MISSION_VALLEY, "WARS_MISSION_VALLEY", 5, 1 );
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionValley, ACHIEVEMENT_WARS_MISSION_VALLEY, "WARS_MISSION_VALLEY", 5, 30 );
+
+class CAchievement_AnnihilationVictorious : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_AnnihilationVictorious, ACHIEVEMENT_WARS_ANNIHILATION_VICTORIOUS, "WARS_ANNIHILATION_VICTORIOUS", 5, 40 );
+
+class CAchievement_AnnihilationKingOfTheHill : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		//SetStoreProgressInSteam( true );
+		SetGoal( 20 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_AnnihilationKingOfTheHill, ACHIEVEMENT_WARS_ANNIHILATION_KINGOFTHEHILL, "WARS_ANNIHILATION_KINGOFTHEHILL", 5, 50 );
+
+class CAchievement_AnnihilationGladiator : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		//SetStoreProgressInSteam( true );
+		SetGoal( 100 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_AnnihilationGladiator, ACHIEVEMENT_WARS_ANNIHILATION_GLADIATOR, "WARS_ANNIHILATION_GLADIATOR", 5, 60 );
+	
+class CAchievement_DestroyHQVandalism : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		//SetStoreProgressInSteam( true );
+		SetGoal( 20 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_DestroyHQVandalism, ACHIEVEMENT_WARS_DESTROYHQ_VANDALISM, "WARS_DESTROYHQ_VANDALISM", 5, 70 );
+
+class CAchievement_DestroyHQWreckingBall : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		//SetStoreProgressInSteam( true );
+		SetGoal( 20 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_DestroyHQWreckingBall, ACHIEVEMENT_WARS_DESTROYHQ_WRECKINGBALL, "WARS_DESTROYHQ_WRECKINGBALL", 5, 70 );
+	
 
 #endif
