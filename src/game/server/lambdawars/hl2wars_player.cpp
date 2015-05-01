@@ -206,15 +206,25 @@ void CHL2WarsPlayer::UpdateCameraSettings()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CHL2WarsPlayer::AwardAchievement( int iAchievement )
+void CHL2WarsPlayer::AwardAchievement( int iAchievement, int nCount )
 {
 	Assert( iAchievement >= 0 && iAchievement < 0xFFFF );		// must fit in short
 
 	CSingleUserRecipientFilter filter( this );
 
-	UserMessageBegin( filter, "AchievementEvent" );
-		WRITE_SHORT( iAchievement );
-	MessageEnd();
+	if( nCount <= 1 )
+	{
+		UserMessageBegin( filter, "AchievementEvent" );
+			WRITE_SHORT( iAchievement );
+		MessageEnd();
+	}
+	else
+	{
+		UserMessageBegin( filter, "AchievementWithCountEvent" );
+			WRITE_SHORT( iAchievement );
+			WRITE_SHORT( nCount );
+		MessageEnd();
+	}
 }
 
 //-----------------------------------------------------------------------------

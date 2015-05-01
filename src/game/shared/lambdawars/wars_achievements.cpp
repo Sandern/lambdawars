@@ -174,4 +174,107 @@ class CAchievement_DogDog : public CWarsAchievement
 };
 DECLARE_ACHIEVEMENT_ORDER( CAchievement_DogDog, ACHIEVEMENT_WARS_DOGDOG, "WARS_DOGDOG", 5, 90 );
 
+class CAchievement_Infestation : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetStoreProgressInSteam( true );
+		SetGoal( 50 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Infestation, ACHIEVEMENT_WARS_INFESTATION, "WARS_INFESTATION", 5, 100 );
+
+class CAchievement_PingPong : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_PingPong, ACHIEVEMENT_WARS_PINGPONG, "WARS_PINGPONG", 5, 110 );
+
+class CAchievement_Striders : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetStoreProgressInSteam( true );
+		SetGoal( 5 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Striders, ACHIEVEMENT_WARS_STRIDERS, "WARS_STRIDERS", 5, 120 );
+	
+class CAchievement_Suppression : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetStoreProgressInSteam( true );
+		SetGoal( 300 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Suppression, ACHIEVEMENT_WARS_SUPPRESSION, "WARS_SUPPRESSION", 5, 120 );
+
+class CAchievement_C4 : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetStoreProgressInSteam( true );
+		SetGoal( 100 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_C4, ACHIEVEMENT_WARS_C4, "WARS_C4", 5, 130 );
+
+class CAchievement_Dog : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Dog, ACHIEVEMENT_WARS_DOG, "WARS_DOG", 5, 140 );
+
+class CAchievement_FriendlyFire : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_FriendlyFire, ACHIEVEMENT_WARS_FRIENDLYFIRE, "WARS_FRIENDLYFIRE", 5, 150 );
+
+class CAchievement_Grenade : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Grenade, ACHIEVEMENT_WARS_GRENADE, "WARS_GRENADE", 5, 160 );
+
+class CAchievement_Partisan : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Partisan, ACHIEVEMENT_WARS_PARTISAN, "WARS_PARTISAN", 5, 160 );
+
 #endif

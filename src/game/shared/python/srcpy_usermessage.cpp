@@ -319,6 +319,9 @@ ConVar g_debug_pyusermessage("g_debug_pyusermessage", "0", FCVAR_CHEAT|FCVAR_GAM
 //-----------------------------------------------------------------------------
 void PySendUserMessage( IRecipientFilter& filter, const char *messagename, boost::python::list msg, bool bUseSteamP2P )
 {
+	if( !engine )
+		return;
+
 	if( bUseSteamP2P )
 	{
 		WarsNet_WriteMessageData( filter, messagename, msg );

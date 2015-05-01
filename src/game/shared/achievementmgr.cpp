@@ -150,6 +150,7 @@ bool CAchievementMgr::Init()
 	{
 		ACTIVE_SPLITSCREEN_PLAYER_GUARD( hh );
 		usermessages->HookMessage( "AchievementEvent", MsgFunc_AchievementEvent );
+		usermessages->HookMessage( "AchievementWithCountEvent", MsgFunc_AchievementWithCountEvent );
 	}
 #endif // CLIENT_DLL
 
@@ -1440,14 +1441,14 @@ void CAchievementMgr::OnKillEvent( CBaseEntity *pVictim, CBaseEntity *pAttacker,
 	}
 }
 
-void CAchievementMgr::OnAchievementEvent( int iAchievementID, int nUserSlot )
+void CAchievementMgr::OnAchievementEvent( int iAchievementID, int nUserSlot, int nCount )
 {
 	// handle event for specific achievement
 	CBaseAchievement *pAchievement = GetAchievementByID( iAchievementID, nUserSlot );
 	Assert( pAchievement );
 	if ( pAchievement )
 	{
-		if ( !pAchievement->IsAchieved() )
+		for( int i = 0; i < nCount && !pAchievement->IsAchieved(); i++ )
 		{
 			pAchievement->IncrementCount();
 		}
@@ -1748,6 +1749,16 @@ void MsgFunc_AchievementEvent( bf_read &msg )
 	if ( !pAchievementMgr )
 		return;
 	pAchievementMgr->OnAchievementEvent( iAchievementID, STEAM_PLAYER_SLOT );
+}
+
+void MsgFunc_AchievementWithCountEvent( bf_read &msg )
+{
+	int iAchievementID = (int) msg.ReadShort();
+	int nCount = (int) msg.ReadShort();
+	CAchievementMgr *pAchievementMgr = dynamic_cast<CAchievementMgr *>( engine->GetAchievementMgr() );
+	if ( !pAchievementMgr )
+		return;
+	pAchievementMgr->OnAchievementEvent( iAchievementID, STEAM_PLAYER_SLOT, nCount );
 }
 
 //#ifdef _DEBUG

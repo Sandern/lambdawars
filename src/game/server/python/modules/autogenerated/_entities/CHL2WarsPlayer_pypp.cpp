@@ -1111,12 +1111,12 @@ void register_CHL2WarsPlayer_class(){
         }
         { //::CHL2WarsPlayer::AwardAchievement
         
-            typedef void ( ::CHL2WarsPlayer::*AwardAchievement_function_type )( int ) ;
+            typedef void ( ::CHL2WarsPlayer::*AwardAchievement_function_type )( int,int ) ;
             
             CHL2WarsPlayer_exposer.def( 
                 "AwardAchievement"
                 , AwardAchievement_function_type( &::CHL2WarsPlayer::AwardAchievement )
-                , ( bp::arg("iAchievement") ) );
+                , ( bp::arg("iAchievement"), bp::arg("nCount")=(int)(1) ) );
         
         }
         { //::CHL2WarsPlayer::CalculateHeight

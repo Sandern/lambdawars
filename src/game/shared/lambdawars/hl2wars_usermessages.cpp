@@ -45,6 +45,7 @@ void RegisterUserMessages()
 
 	usermessages->Register( "AmmoDenied", 2 );
 	usermessages->Register( "AchievementEvent", -1 );
+	usermessages->Register( "AchievementWithCountEvent", -1 );
 
 	usermessages->Register( "UpdateRadar", -1 );
 

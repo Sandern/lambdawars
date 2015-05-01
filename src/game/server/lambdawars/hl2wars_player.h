@@ -43,7 +43,7 @@ public:
 
 	virtual bool					ClientCommand( const CCommand &args );
 
-	void							AwardAchievement( int iAchievement );
+	void							AwardAchievement( int iAchievement, int nCount = 1 );
 
 	virtual void					PreThink( void );
 
