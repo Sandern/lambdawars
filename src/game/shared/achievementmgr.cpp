@@ -45,7 +45,7 @@
 ConVar	cc_achievement_debug("achievement_debug", "0", FCVAR_CHEAT | FCVAR_REPLICATED, "Turn on achievement debug msgs." );
 const char *COM_GetModDirectory();
 
-// Wars temporary: only allow achievements in dev build
+// Allows achievement convars in dev build.
 static bool AllowAchievement()
 {
 	char betaName[512];
@@ -884,9 +884,6 @@ ConVar	cc_achievement_disable("achievement_disable", "0", FCVAR_CHEAT | FCVAR_RE
 //-----------------------------------------------------------------------------
 bool CAchievementMgr::CheckAchievementsEnabled( )
 {
-	if( !AllowAchievement() )
-		return false;
-
 	// if PC, Steam must be running and user logged in
 	if ( cc_achievement_disable.GetBool() )
 		return false;
@@ -1576,7 +1573,7 @@ void CAchievementMgr::Steam_OnUserStatsReceived( UserStatsReceived_t *pUserStats
 	for ( int i = 0; i < m_vecAchievement[STEAM_PLAYER_SLOT].Count(); ++i )
 	{
 		CBaseAchievement *pAchievement = m_vecAchievement[STEAM_PLAYER_SLOT][i];
-#if defined( INFESTED_DLL ) || defined( HL2WARS_DLL )
+#if !defined( INFESTED_DLL ) && !defined( HL2WARS_DLL )
 		char szFieldName[64];
 #endif
 		int nCount = 0;
