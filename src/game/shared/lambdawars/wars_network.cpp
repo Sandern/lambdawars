@@ -283,6 +283,9 @@ void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool
 //-----------------------------------------------------------------------------
 void WarsNet_WriteMessageData( IRecipientFilter& filter, const char *name, boost::python::object msg )
 {
+	if( !steamgameserverapicontext->SteamGameServerNetworking() || !engine )
+		return;
+
 	CUtlBuffer buf;
 
 	WarsMessage_t msgData;
