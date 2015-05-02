@@ -13,7 +13,7 @@
 
 // CefStreamResourceHandler is part of the libcef_dll_wrapper project.
 #include "include/wrapper/cef_stream_resource_handler.h"
-#include "include/cef_url.h"
+#include "include/cef_parser.h"
 
 #include <jpeglib/jpeglib.h>
 
