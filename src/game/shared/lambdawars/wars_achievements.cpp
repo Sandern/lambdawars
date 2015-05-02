@@ -203,7 +203,7 @@ class CAchievement_Striders : public CWarsAchievement
 	{
 		SetFlags( ACH_SAVE_GLOBAL );
 		SetStoreProgressInSteam( true );
-		SetGoal( 5 );
+		SetGoal( 20 );
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
@@ -238,7 +238,8 @@ class CAchievement_Dog : public CWarsAchievement
 	void Init() 
 	{
 		SetFlags( ACH_SAVE_GLOBAL );
-		SetGoal( 1 );
+		SetStoreProgressInSteam( true );
+		SetGoal( 20 );
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
