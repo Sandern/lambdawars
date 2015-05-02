@@ -1035,6 +1035,9 @@ void register_CBaseGrenade_class(){
                 , ( bp::arg("pActivator"), bp::arg("pCaller"), bp::arg("useType"), bp::arg("value") ) );
         
         }
+        CBaseGrenade_exposer.def_readwrite( "forcefriendlyfire", &CBaseGrenade::m_bForceFriendlyFire );
+        CBaseGrenade_exposer.def_readwrite( "damageattributes", &CBaseGrenade::m_damageAttributes );
+        CBaseGrenade_exposer.def_readwrite( "detonatetime", &CBaseGrenade::m_flDetonateTime );
         { //::CBaseAnimating::Activate
         
             typedef void ( ::CBaseAnimating::*Activate_function_type )(  ) ;

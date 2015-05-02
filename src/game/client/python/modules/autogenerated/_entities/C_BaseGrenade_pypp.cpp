@@ -865,6 +865,9 @@ void register_C_BaseGrenade_class(){
                 , TumbleThink_function_type( &::C_BaseGrenade::TumbleThink ) );
         
         }
+        C_BaseGrenade_exposer.def_readwrite( "forcefriendlyfire", &C_BaseGrenade::m_bForceFriendlyFire );
+        C_BaseGrenade_exposer.def_readwrite( "damageattributes", &C_BaseGrenade::m_damageAttributes );
+        C_BaseGrenade_exposer.def_readwrite( "detonatetime", &C_BaseGrenade::m_flDetonateTime );
         { //::C_BaseEntity::Activate
         
             typedef void ( ::C_BaseEntity::*Activate_function_type )(  ) ;

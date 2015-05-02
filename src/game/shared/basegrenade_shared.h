@@ -138,6 +138,13 @@ public:
 	float				m_flDetonateTime;			// Time at which to detonate.
 	float				m_flWarnAITime;				// Time at which to warn the AI
 
+#ifdef HL2WARS_DLL
+	bool				m_bForceFriendlyFire;
+#ifdef ENABLE_PYTHON
+	boost::python::object m_damageAttributes;
+#endif //ENABLE_PYTHON
+#endif // HL2WARS_DLL
+
 protected:
 
 	CNetworkVar( float, m_flDamage );		// Damage to inflict.

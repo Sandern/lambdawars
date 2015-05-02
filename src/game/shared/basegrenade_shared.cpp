@@ -194,6 +194,12 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	
 	EmitSound( "BaseGrenade.Explode" );
 	CTakeDamageInfo info( this, m_hThrower, GetBlastForce(), GetAbsOrigin(), m_flDamage, bitsDamageType, 0, &vecReported );
+#ifdef HL2WARS_DLL
+	info.SetForceFriendlyFire( m_bForceFriendlyFire );
+#ifdef ENABLE_PYTHON
+	info.SetAttributes( m_damageAttributes );
+#endif // ENABLE_PYTHON
+#endif // HL2WARS_DLL
 
 	RadiusDamage( info, GetAbsOrigin(), m_DmgRadius, CLASS_NONE, NULL );
 

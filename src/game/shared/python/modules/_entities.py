@@ -1070,6 +1070,10 @@ class Entities(SemiSharedModuleGenerator):
         self.SetupProperty(cls, 'damage', 'GetDamage', 'SetDamage')
         self.SetupProperty(cls, 'damageradius', 'GetDamageRadius', 'SetDamageRadius')
         
+        self.IncludeVarAndRename('m_flDetonateTime', 'detonatetime')
+        self.IncludeVarAndRename('m_bForceFriendlyFire', 'forcefriendlyfire')
+        self.IncludeVarAndRename('m_damageAttributes', 'damageattributes')
+        
         # Overrides
         cls.mem_funs('Explode').virtuality = 'virtual'
             
