@@ -144,9 +144,16 @@ UnitBaseWaypoint *UnitBaseAirNavigator::BuildNavAreaPath( UnitBasePath *pPath, c
 	if( pNavMesh )
 	{
 		const Vector &vStart = GetAbsOrigin();
-		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f, pPath->GetTarget() );
+		Vector vStartTestPos( vStart - Vector( 0, 0, m_fCurrentHeight) );
+
+		bool bIsPartial;
+		UnitBaseWaypoint *pFoundPath = pNavMesh->FindPath( vStart, vGoalPos, 500.0f, pPath->GetTarget(), &bIsPartial, &vStartTestPos );
 		if( pFoundPath )
+		{
+			if( bIsPartial )
+				pPath->m_iFlags |= UNITPATH_FLAGS_PARTIAL;
 			return pFoundPath;
+		}
 	}
 
 	return NULL;

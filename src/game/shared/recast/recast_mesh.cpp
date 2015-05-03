@@ -686,7 +686,11 @@ dtStatus CRecastMesh::DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPo
 		{
 			// Make sure end pos is always on a polygon
 			dtVcopy(curFindpathData.adjustedEndPos, epos);
-			m_navQuery->closestPointOnPoly(curFindpathData.polys[curFindpathData.npolys-1], epos, curFindpathData.adjustedEndPos, 0);
+			status = m_navQuery->closestPointOnPoly(curFindpathData.polys[curFindpathData.npolys-1], epos, curFindpathData.adjustedEndPos, 0);
+			if( !dtStatusSucceed( status ) )
+			{
+				return status;
+			}
 
 			if( recast_findpath_debug.GetBool() )
 			{
@@ -697,7 +701,11 @@ dtStatus CRecastMesh::DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPo
 			status = m_navQuery->findStraightPath(spos, curFindpathData.adjustedEndPos, curFindpathData.polys, curFindpathData.npolys,
 											curFindpathData.straightPath, curFindpathData.straightPathFlags,
 											curFindpathData.straightPathPolys, &curFindpathData.nstraightPath, 
-											RECASTMESH_MAX_POLYS, curFindpathData.straightPathOptions);
+										RECASTMESH_MAX_POLYS, curFindpathData.straightPathOptions);
+			if( !dtStatusSucceed( status ) )
+			{
+				return status;
+			}
 
 			float fPathDistance = 0;
 			Vector vPrev = Vector( epos[0], epos[2], epos[1] );
@@ -723,7 +731,7 @@ dtStatus CRecastMesh::DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPo
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit, CBaseEntity *pTarget, bool *bIsPartial )
+UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit, CBaseEntity *pTarget, bool *bIsPartial, const Vector *vStartTestPos )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPath", "RecastNav" );
 
@@ -748,8 +756,20 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	polyPickExt[1] = fBeneathLimit;
 	polyPickExt[2] = 256.0f;
 
-	// Find the start area
-	status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);
+	// Find the start area. Optional use a different test position for finding the best area.
+	if( vStartTestPos )
+	{
+		float spostest[3];
+		spostest[0] = (*vStartTestPos)[0];
+		spostest[1] = (*vStartTestPos)[2];
+		spostest[2] = (*vStartTestPos)[1];
+		status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0, spostest);
+	}
+	else
+	{
+		status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);
+	}
+
 	if( !dtStatusSucceed( status ) )
 	{
 		return NULL;
