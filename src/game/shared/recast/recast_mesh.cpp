@@ -1046,12 +1046,15 @@ bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 	return rayHit.t == FLT_MAX;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Adds a temporary obstacle to the navigation mesh (radius version)
+//-----------------------------------------------------------------------------
 dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
 {
 	if( !IsLoaded() )
 		return 0;
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
-	//Msg("Adding temp obstacle to %f %f %f with radius %f and height %f\n", pos[0], pos[1], pos[2], radius, height);
+
 	dtObstacleRef result;
 	dtStatus status = m_tileCache->addObstacle( pos, radius, height, &result );
 	if( !dtStatusSucceed( status ) )
@@ -1069,6 +1072,9 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, fl
 	return result;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Adds a temporary obstacle to the navigation mesh (convex hull version)
+//-----------------------------------------------------------------------------
 dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height )
 {
 	if( !IsLoaded() )
@@ -1084,7 +1090,6 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *co
 		verts[(i*3)+2] = convexHull[i].y;
 	}
 
-	//Msg("Adding temp obstacle to %f %f %f with height %f and %d verts\n", pos[0], pos[1], pos[2], height, numConvexHull);
 	dtObstacleRef result;
 	dtStatus status = m_tileCache->addObstacle( pos, verts, numConvexHull, height, &result );
 	if( !dtStatusSucceed( status ) )
@@ -1102,6 +1107,9 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *co
 	return result;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Removes a temporary obstacle from the navigation mesh
+//-----------------------------------------------------------------------------
 bool CRecastMesh::RemoveObstacle( const dtObstacleRef ref )
 {
 	if( !IsLoaded() )
