@@ -683,8 +683,12 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 		return status;
 	
 	// Early out if the mesh tile is empty.
-	if (!bc.lmesh->npolys)
+	if (!bc.lmesh->npolys) {
+		// Remove existing tile.
+		navmesh->removeTile(navmesh->getTileRefAt(tile->header->tx,tile->header->ty,tile->header->tlayer),0,0);
+
 		return DT_SUCCESS;
+	}
 	
 	dtNavMeshCreateParams params;
 	memset(&params, 0, sizeof(params));
