@@ -35,8 +35,8 @@ enum ObstacleState
 	DT_OBSTACLE_REMOVING,
 };
 
-//static const int DT_MAX_TOUCHED_TILES = 8;
-static const int DT_MAX_TOUCHED_TILES = 128;
+// Was 8, changed to 16 for Lambda Wars (due some large buildings covering more than 8 tiles)
+static const int DT_MAX_TOUCHED_TILES = 16;
 static const int DT_MAX_CONVEX_HULL_VERTICES = 8;
 struct dtTileCacheObstacle
 {
