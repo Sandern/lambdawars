@@ -21,17 +21,18 @@ class PyOutputEvent;
 class PySaveHelper
 {
 public:
-	PySaveHelper( CSave *save ) : m_pSave( save ) {}
+	PySaveHelper( CSave *save, const char *pFieldName ) : m_pSave( save ), m_pFieldName( pFieldName ) {}
 
-	void WriteString( const char *fieldname, const char *fieldvalue );
-	void WriteFields( const char *fieldname, boost::python::object instance );
+	void WriteString( const char *fieldvalue );
+	void WriteFields( boost::python::object instance );
 
 #ifndef CLIENT_DLL
-	void WriteOutputEvent( const char *fieldname, PyOutputEvent &ev );
+	void WriteOutputEvent( PyOutputEvent &ev );
 #endif // CLIENT_DLL
 
 private:
 	CSave *m_pSave;
+	const char *m_pFieldName;
 };
 
 class PyRestoreHelper

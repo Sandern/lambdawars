@@ -19,25 +19,25 @@
 //-----------------------------------------------------------------------------
 // Helper interface exposed to fields in Python
 //-----------------------------------------------------------------------------
-void PySaveHelper::WriteString( const char *fieldname, const char *fieldvalue )
+void PySaveHelper::WriteString( const char *fieldvalue )
 {
-	m_pSave->WriteString( fieldname, fieldvalue );
+	m_pSave->WriteString( m_pFieldName, fieldvalue );
 }
 
-void PySaveHelper::WriteFields( const char *fieldname, boost::python::object instance )
+void PySaveHelper::WriteFields( boost::python::object instance )
 {
-	m_pSave->StartBlock( fieldname );
+	m_pSave->StartBlock( m_pFieldName );
 	m_pSave->PyWriteAll( instance );
 	m_pSave->EndBlock();
 }
 
 #ifndef CLIENT_DLL
-void PySaveHelper::WriteOutputEvent( const char *fieldname, PyOutputEvent &ev )
+void PySaveHelper::WriteOutputEvent( PyOutputEvent &ev )
 {
 	// Hacky code duplicated from CSave::WriteBasicField
-	typedescription_t typeDesc = { FIELD_CUSTOM, fieldname, -1, 1, FTYPEDESC_OUTPUT | FTYPEDESC_SAVE | FTYPEDESC_KEY, "", eventFuncs };
+	typedescription_t typeDesc = { FIELD_CUSTOM, m_pFieldName, -1, 1, FTYPEDESC_OUTPUT | FTYPEDESC_SAVE | FTYPEDESC_KEY, "", eventFuncs };
 
-	m_pSave->StartBlock( fieldname );
+	m_pSave->StartBlock( m_pFieldName );
 
 	SaveRestoreFieldInfo_t fieldInfo =
 	{

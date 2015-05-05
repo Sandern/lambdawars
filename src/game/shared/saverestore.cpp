@@ -901,7 +901,7 @@ int CSave::PyWriteAll( boost::python::object instance )
 {
 	try
 	{
-		PySaveHelper saveHelper( this );
+		
 
 		const char *pName = boost::python::extract< const char *>( instance.attr("__class__").attr("__name__") );
 
@@ -918,7 +918,10 @@ int CSave::PyWriteAll( boost::python::object instance )
 		for (unsigned long u = 0; u < ulCount; u++)
 		{
 			boost::python::object item = iterator.attr(PY_NEXT_METHODNAME)();
+			const char *pFieldName = boost::python::extract< const char * >( item[0] );
 			boost::python::object field = item[1];
+
+			PySaveHelper saveHelper( this, pFieldName );
 
 			if( field.attr("save") == false )
 			{
