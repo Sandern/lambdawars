@@ -19,9 +19,40 @@
 //-----------------------------------------------------------------------------
 // Helper interface exposed to fields in Python
 //-----------------------------------------------------------------------------
-void PySaveHelper::WriteString( const char *fieldvalue )
+void PySaveHelper::WriteShort( short value )
 {
-	m_pSave->WriteString( m_pFieldName, fieldvalue );
+	m_pSave->WriteShort( m_pFieldName, &value );
+}
+
+void PySaveHelper::WriteInteger( int value )
+{
+	m_pSave->WriteInt( m_pFieldName, &value );
+}
+
+void PySaveHelper::WriteFloat( float value )
+{
+	m_pSave->WriteFloat( m_pFieldName, &value );
+}
+
+void PySaveHelper::WriteBoolean( bool value )
+{
+	m_pSave->WriteBool( m_pFieldName, &value );
+}
+
+void PySaveHelper::WriteString( const char *value )
+{
+	m_pSave->WriteString( m_pFieldName, value );
+}
+
+void PySaveHelper::WriteVector( Vector &value )
+{
+	m_pSave->WriteVector( m_pFieldName, &value );
+}
+
+void PySaveHelper::WriteEHandle( CBaseHandle &h )
+{
+	EHANDLE eh( h );
+	m_pSave->WriteEHandle( &eh );
 }
 
 void PySaveHelper::WriteFields( boost::python::object instance )
@@ -51,11 +82,55 @@ void PySaveHelper::WriteOutputEvent( PyOutputEvent &ev )
 }
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Read functions
+//-----------------------------------------------------------------------------
+boost::python::object PyRestoreHelper::ReadShort()
+{
+	return boost::python::object( m_pRestore->ReadShort() );
+}
+
+boost::python::object PyRestoreHelper::ReadInteger()
+{
+	return boost::python::object( m_pRestore->ReadInt() );
+}
+
+boost::python::object PyRestoreHelper::ReadFloat()
+{
+	float v;
+	m_pRestore->ReadFloat( &v );
+	return boost::python::object( v );
+}
+
+boost::python::object PyRestoreHelper::ReadBoolean()
+{
+	bool v;
+	m_pRestore->ReadBool( &v );
+	return boost::python::object( v );
+}
+
 boost::python::object PyRestoreHelper::ReadString()
 {
 	char buf[2048];
 	m_pRestore->ReadString( buf, sizeof(buf), 0 );
 	return boost::python::object( buf );
+}
+
+boost::python::object PyRestoreHelper::ReadVector()
+{
+	Vector v;
+	m_pRestore->ReadVector( &v, 1, 0 );
+	return boost::python::object( v );
+}
+
+boost::python::object PyRestoreHelper::ReadEHandle()
+{
+	EHANDLE eh;
+	m_pRestore->ReadEHandle( &eh );
+
+	if( eh )
+		return eh->GetPyHandle();
+	return boost::python::object();
 }
 
 void PyRestoreHelper::ReadFields( boost::python::object instance )

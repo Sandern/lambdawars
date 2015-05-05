@@ -2572,6 +2572,24 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         bp::scope PyRestoreHelper_scope( PyRestoreHelper_exposer );
         PyRestoreHelper_exposer.def( bp::init< CRestore * >(( bp::arg("restore") )) );
         bp::implicitly_convertible< CRestore *, PyRestoreHelper >();
+        { //::PyRestoreHelper::ReadBoolean
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadBoolean_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadBoolean"
+                , ReadBoolean_function_type( &::PyRestoreHelper::ReadBoolean ) );
+        
+        }
+        { //::PyRestoreHelper::ReadEHandle
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadEHandle_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadEHandle"
+                , ReadEHandle_function_type( &::PyRestoreHelper::ReadEHandle ) );
+        
+        }
         { //::PyRestoreHelper::ReadFields
         
             typedef void ( ::PyRestoreHelper::*ReadFields_function_type )( ::boost::python::api::object ) ;
@@ -2580,6 +2598,33 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 "ReadFields"
                 , ReadFields_function_type( &::PyRestoreHelper::ReadFields )
                 , ( bp::arg("instance") ) );
+        
+        }
+        { //::PyRestoreHelper::ReadFloat
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadFloat_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadFloat"
+                , ReadFloat_function_type( &::PyRestoreHelper::ReadFloat ) );
+        
+        }
+        { //::PyRestoreHelper::ReadInteger
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadInteger_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadInteger"
+                , ReadInteger_function_type( &::PyRestoreHelper::ReadInteger ) );
+        
+        }
+        { //::PyRestoreHelper::ReadShort
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadShort_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadShort"
+                , ReadShort_function_type( &::PyRestoreHelper::ReadShort ) );
         
         }
         { //::PyRestoreHelper::ReadString
@@ -2591,18 +2636,51 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ReadString_function_type( &::PyRestoreHelper::ReadString ) );
         
         }
+        { //::PyRestoreHelper::ReadVector
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadVector_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadVector"
+                , ReadVector_function_type( &::PyRestoreHelper::ReadVector ) );
+        
+        }
     }
 
     bp::class_< PySaveHelper >( "PySaveHelper", bp::no_init )    
         .def( bp::init< CSave *, char const * >(( bp::arg("save"), bp::arg("pFieldName") )) )    
         .def( 
+            "WriteBoolean"
+            , (void ( ::PySaveHelper::* )( bool ) )( &::PySaveHelper::WriteBoolean )
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteEHandle"
+            , (void ( ::PySaveHelper::* )( ::CBaseHandle & ) )( &::PySaveHelper::WriteEHandle )
+            , ( bp::arg("h") ) )    
+        .def( 
             "WriteFields"
             , (void ( ::PySaveHelper::* )( ::boost::python::api::object ) )( &::PySaveHelper::WriteFields )
             , ( bp::arg("instance") ) )    
         .def( 
+            "WriteFloat"
+            , (void ( ::PySaveHelper::* )( float ) )( &::PySaveHelper::WriteFloat )
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteInteger"
+            , (void ( ::PySaveHelper::* )( int ) )( &::PySaveHelper::WriteInteger )
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteShort"
+            , (void ( ::PySaveHelper::* )( short int ) )( &::PySaveHelper::WriteShort )
+            , ( bp::arg("value") ) )    
+        .def( 
             "WriteString"
             , (void ( ::PySaveHelper::* )( char const * ) )( &::PySaveHelper::WriteString )
-            , ( bp::arg("fieldvalue") ) );
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteVector"
+            , (void ( ::PySaveHelper::* )( ::Vector & ) )( &::PySaveHelper::WriteVector )
+            , ( bp::arg("value") ) );
 
     { //::SpatializationInfo_t
         typedef bp::class_< SpatializationInfo_t > SpatializationInfo_t_exposer_t;
@@ -5871,6 +5949,24 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         bp::scope PyRestoreHelper_scope( PyRestoreHelper_exposer );
         PyRestoreHelper_exposer.def( bp::init< CRestore * >(( bp::arg("restore") )) );
         bp::implicitly_convertible< CRestore *, PyRestoreHelper >();
+        { //::PyRestoreHelper::ReadBoolean
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadBoolean_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadBoolean"
+                , ReadBoolean_function_type( &::PyRestoreHelper::ReadBoolean ) );
+        
+        }
+        { //::PyRestoreHelper::ReadEHandle
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadEHandle_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadEHandle"
+                , ReadEHandle_function_type( &::PyRestoreHelper::ReadEHandle ) );
+        
+        }
         { //::PyRestoreHelper::ReadFields
         
             typedef void ( ::PyRestoreHelper::*ReadFields_function_type )( ::boost::python::api::object ) ;
@@ -5879,6 +5975,24 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 "ReadFields"
                 , ReadFields_function_type( &::PyRestoreHelper::ReadFields )
                 , ( bp::arg("instance") ) );
+        
+        }
+        { //::PyRestoreHelper::ReadFloat
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadFloat_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadFloat"
+                , ReadFloat_function_type( &::PyRestoreHelper::ReadFloat ) );
+        
+        }
+        { //::PyRestoreHelper::ReadInteger
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadInteger_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadInteger"
+                , ReadInteger_function_type( &::PyRestoreHelper::ReadInteger ) );
         
         }
         { //::PyRestoreHelper::ReadOutputEvent
@@ -5891,6 +6005,15 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ( bp::arg("ev") ) );
         
         }
+        { //::PyRestoreHelper::ReadShort
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadShort_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadShort"
+                , ReadShort_function_type( &::PyRestoreHelper::ReadShort ) );
+        
+        }
         { //::PyRestoreHelper::ReadString
         
             typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadString_function_type )(  ) ;
@@ -5900,22 +6023,55 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ReadString_function_type( &::PyRestoreHelper::ReadString ) );
         
         }
+        { //::PyRestoreHelper::ReadVector
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadVector_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadVector"
+                , ReadVector_function_type( &::PyRestoreHelper::ReadVector ) );
+        
+        }
     }
 
     bp::class_< PySaveHelper >( "PySaveHelper", bp::no_init )    
         .def( bp::init< CSave *, char const * >(( bp::arg("save"), bp::arg("pFieldName") )) )    
         .def( 
+            "WriteBoolean"
+            , (void ( ::PySaveHelper::* )( bool ) )( &::PySaveHelper::WriteBoolean )
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteEHandle"
+            , (void ( ::PySaveHelper::* )( ::CBaseHandle & ) )( &::PySaveHelper::WriteEHandle )
+            , ( bp::arg("h") ) )    
+        .def( 
             "WriteFields"
             , (void ( ::PySaveHelper::* )( ::boost::python::api::object ) )( &::PySaveHelper::WriteFields )
             , ( bp::arg("instance") ) )    
+        .def( 
+            "WriteFloat"
+            , (void ( ::PySaveHelper::* )( float ) )( &::PySaveHelper::WriteFloat )
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteInteger"
+            , (void ( ::PySaveHelper::* )( int ) )( &::PySaveHelper::WriteInteger )
+            , ( bp::arg("value") ) )    
         .def( 
             "WriteOutputEvent"
             , (void ( ::PySaveHelper::* )( ::PyOutputEvent & ) )( &::PySaveHelper::WriteOutputEvent )
             , ( bp::arg("ev") ) )    
         .def( 
+            "WriteShort"
+            , (void ( ::PySaveHelper::* )( short int ) )( &::PySaveHelper::WriteShort )
+            , ( bp::arg("value") ) )    
+        .def( 
             "WriteString"
             , (void ( ::PySaveHelper::* )( char const * ) )( &::PySaveHelper::WriteString )
-            , ( bp::arg("fieldvalue") ) );
+            , ( bp::arg("value") ) )    
+        .def( 
+            "WriteVector"
+            , (void ( ::PySaveHelper::* )( ::Vector & ) )( &::PySaveHelper::WriteVector )
+            , ( bp::arg("value") ) );
 
     bp::class_< ServerClass >( "ServerClass", bp::no_init )    
         .def( 
