@@ -2581,6 +2581,15 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ReadBoolean_function_type( &::PyRestoreHelper::ReadBoolean ) );
         
         }
+        { //::PyRestoreHelper::ReadBytes
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadBytes_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadBytes"
+                , ReadBytes_function_type( &::PyRestoreHelper::ReadBytes ) );
+        
+        }
         { //::PyRestoreHelper::ReadEHandle
         
             typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadEHandle_function_type )(  ) ;
@@ -2654,9 +2663,13 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (void ( ::PySaveHelper::* )( bool ) )( &::PySaveHelper::WriteBoolean )
             , ( bp::arg("value") ) )    
         .def( 
+            "WriteBytes"
+            , (void ( ::PySaveHelper::* )( ::boost::python::api::object ) )( &::PySaveHelper::WriteBytes )
+            , ( bp::arg("bytes") ) )    
+        .def( 
             "WriteEHandle"
-            , (void ( ::PySaveHelper::* )( ::CBaseHandle & ) )( &::PySaveHelper::WriteEHandle )
-            , ( bp::arg("h") ) )    
+            , (void ( ::PySaveHelper::* )( ::C_BaseEntity * ) )( &::PySaveHelper::WriteEHandle )
+            , ( bp::arg("value") ) )    
         .def( 
             "WriteFields"
             , (void ( ::PySaveHelper::* )( ::boost::python::api::object ) )( &::PySaveHelper::WriteFields )
@@ -5958,6 +5971,15 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
                 , ReadBoolean_function_type( &::PyRestoreHelper::ReadBoolean ) );
         
         }
+        { //::PyRestoreHelper::ReadBytes
+        
+            typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadBytes_function_type )(  ) ;
+            
+            PyRestoreHelper_exposer.def( 
+                "ReadBytes"
+                , ReadBytes_function_type( &::PyRestoreHelper::ReadBytes ) );
+        
+        }
         { //::PyRestoreHelper::ReadEHandle
         
             typedef ::boost::python::api::object ( ::PyRestoreHelper::*ReadEHandle_function_type )(  ) ;
@@ -6041,9 +6063,13 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             , (void ( ::PySaveHelper::* )( bool ) )( &::PySaveHelper::WriteBoolean )
             , ( bp::arg("value") ) )    
         .def( 
+            "WriteBytes"
+            , (void ( ::PySaveHelper::* )( ::boost::python::api::object ) )( &::PySaveHelper::WriteBytes )
+            , ( bp::arg("bytes") ) )    
+        .def( 
             "WriteEHandle"
-            , (void ( ::PySaveHelper::* )( ::CBaseHandle & ) )( &::PySaveHelper::WriteEHandle )
-            , ( bp::arg("h") ) )    
+            , (void ( ::PySaveHelper::* )( ::CBaseEntity * ) )( &::PySaveHelper::WriteEHandle )
+            , ( bp::arg("value") ) )    
         .def( 
             "WriteFields"
             , (void ( ::PySaveHelper::* )( ::boost::python::api::object ) )( &::PySaveHelper::WriteFields )

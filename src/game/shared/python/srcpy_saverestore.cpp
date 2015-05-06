@@ -49,10 +49,19 @@ void PySaveHelper::WriteVector( Vector &value )
 	m_pSave->WriteVector( m_pFieldName, &value );
 }
 
-void PySaveHelper::WriteEHandle( CBaseHandle &h )
+void PySaveHelper::WriteEHandle( CBaseEntity *value )
 {
-	EHANDLE eh( h );
-	m_pSave->WriteEHandle( &eh );
+	EHANDLE eh( value );
+	m_pSave->WriteEHandle( m_pFieldName, &eh );
+}
+
+void PySaveHelper::WriteBytes( boost::python::object bytes )
+{
+	char *pBytes = PyBytes_AsString( bytes.ptr() );
+	if( pBytes )
+	{
+		m_pSave->WriteString( m_pFieldName, pBytes );
+	}
 }
 
 void PySaveHelper::WriteFields( boost::python::object instance )
@@ -111,9 +120,10 @@ boost::python::object PyRestoreHelper::ReadBoolean()
 
 boost::python::object PyRestoreHelper::ReadString()
 {
-	char buf[2048];
-	m_pRestore->ReadString( buf, sizeof(buf), 0 );
-	return boost::python::object( buf );
+	int bufSize = (m_pActiveHeader->size + 1) * sizeof( char );
+	char *buf = (char *)stackalloc( bufSize );
+	m_pRestore->ReadString( buf, bufSize, 0 );
+	return boost::python::object( (const char *)buf );
 }
 
 boost::python::object PyRestoreHelper::ReadVector()
@@ -130,6 +140,34 @@ boost::python::object PyRestoreHelper::ReadEHandle()
 
 	if( eh )
 		return eh->GetPyHandle();
+	// If it does not exist, create a new handle
+	try 
+	{								
+		return _entities.attr("PyHandle")( eh.GetEntryIndex(), eh.GetSerialNumber() );							
+	} 
+	catch(boost::python::error_already_set &) 
+	{					
+		Warning("ReadEHandle: Failed to create a PyHandle\n");				
+		PyErr_Print();											
+	}	
+	return boost::python::object();
+}
+
+boost::python::object PyRestoreHelper::ReadBytes()
+{
+	int bufSize = (m_pActiveHeader->size + 1) * sizeof( char );
+	char *buf = (char *)stackalloc( bufSize );
+	m_pRestore->ReadString( buf, bufSize, 0 );
+
+	PyObject *pBytes = PyBytes_FromString( buf );
+	if( pBytes )
+	{
+		return boost::python::object(
+			boost::python::handle<>(
+				pBytes
+			)
+		);
+	}
 	return boost::python::object();
 }
 

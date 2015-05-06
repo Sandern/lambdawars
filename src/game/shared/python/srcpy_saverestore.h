@@ -29,7 +29,8 @@ public:
 	void WriteBoolean( bool value );
 	void WriteString( const char *value );
 	void WriteVector( Vector &value );
-	void WriteEHandle( CBaseHandle &h );
+	void WriteEHandle( CBaseEntity *value );
+	void WriteBytes( boost::python::object bytes );
 	void WriteFields( boost::python::object instance );
 
 #ifndef CLIENT_DLL
@@ -55,6 +56,7 @@ public:
 	boost::python::object ReadString();
 	boost::python::object ReadVector();
 	boost::python::object ReadEHandle();
+	boost::python::object ReadBytes();
 	void ReadFields( boost::python::object instance );
 
 #ifndef CLIENT_DLL
