@@ -1901,6 +1901,8 @@ int CRestore::PyReadAll( boost::python::object instance )
 		{
 			ReadHeader( &header );
 			restoreHelper.SetActiveField( &header );
+
+			int curPos = m_pData->GetCurPos();
 		
 			const char *pFieldName = m_pData->StringFromSymbol( header.symbol );
 			boost::python::object field = fields.attr("get")( pFieldName, boost::python::object() );
@@ -1914,12 +1916,16 @@ int CRestore::PyReadAll( boost::python::object instance )
 				{
 					Msg( "Skipping reading field %s due error in restore:\n", m_pData->StringFromSymbol( header.symbol ) );
 					PyErr_Print();
+
+					m_pData->Seek( curPos );
 					BufferSkipBytes( header.size );			// Advance to next field
 				}
 			} 
 			else 
 			{
 				Msg( "Skipping reading field %s\n", m_pData->StringFromSymbol( header.symbol ) );
+
+				m_pData->Seek( curPos );
 				BufferSkipBytes( header.size );			// Advance to next field
 			}
 		}
