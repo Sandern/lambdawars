@@ -17,11 +17,12 @@
 enum EGameServerState
 {
 	k_EGameServer_Error = -1,
-	k_EGameServer_Available = 0,
-	k_EGameServer_InGame,
+	k_EGameServer_Available = 0, // Game server is available for matchmaking
+	k_EGameServer_InGame, // A game started from the gamelobby is in progress
 	k_EGameServer_InGameFreeStyle, // Not created through matchmaking, but players are on the server
 	k_EGameServer_StartingGame, // Delays sending back the "accept game" message until the game server is started
 	k_EGameServer_GameEnded, // Tells game server the current game ended
+	k_EGameServer_GracePeriod // Period after a game ended before becoming available again
 };
 
 typedef struct WarsMessage_t

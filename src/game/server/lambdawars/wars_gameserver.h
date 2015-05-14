@@ -64,6 +64,7 @@ private:
 
 	float m_fGameStateStartTime;
 	float m_fLastPlayedConnectedTime;
+	float m_fGracePeriodEnd;
 
 	bool m_bShutdownScheduled;
 

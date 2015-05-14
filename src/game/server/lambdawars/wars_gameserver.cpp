@@ -16,6 +16,9 @@
 
 static ConVar wars_gamserver_debug("wars_gamserver_debug", "0");
 
+static ConVar wars_gamserver_graceperiod("wars_gamserver_graceperiod", "15", 0, "Period after game ended before game server becomes available again");
+static ConVar wars_gamserver_noplayers_timeout("wars_gamserver_noplayers_timeout", "60", 0, "Time before game server changes back to available when no players are connected.");
+
 extern CServerGameDLL g_ServerGameDLL;
 
 extern const char *COM_GetModDirectory( void );
@@ -248,7 +251,7 @@ void CWarsGameServer::UpdateServer()
 			{
 				m_fLastPlayedConnectedTime = Plat_FloatTime();
 			}
-			else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > 60.0f )
+			else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > wars_gamserver_noplayers_timeout.GetFloat() )
 			{
 				SetState( k_EGameServer_Available );
 				Msg("Changing wars game server back to available due inactivity (no connected players)\n");
@@ -261,8 +264,18 @@ void CWarsGameServer::UpdateServer()
 			// k_EGameServer_InGame uses a time out before doing so.
 			if( m_nConnectedPlayers == 0 )
 			{
+				m_fGracePeriodEnd = Plat_FloatTime() + wars_gamserver_graceperiod.GetFloat();
+				SetState( k_EGameServer_GracePeriod );
+				Msg("Changing wars game server back to grace period because game ended and no players are connected anymore\n");
+			}
+			break;
+		}
+		case k_EGameServer_GracePeriod:
+		{
+			if( m_fGracePeriodEnd <  Plat_FloatTime() )
+			{
 				SetState( k_EGameServer_Available );
-				Msg("Changing wars game server back to available because game ended and no players are connected anymore\n");
+				Msg("Grace period ended. Game server is available again.\n");
 			}
 			break;
 		}
