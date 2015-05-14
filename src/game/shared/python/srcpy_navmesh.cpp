@@ -44,52 +44,17 @@ bool NavMeshTestHasArea( Vector &pos, float beneathLimt )
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// TODO: Remove unused parameters
 //-----------------------------------------------------------------------------
-float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, bool anyz, float maxdist, bool bNoTolerance, CBaseEntity *pUnit )
+float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, float maxdist, CBaseEntity *pUnit, float fBeneathLimit )
 {
 	if( g_pynavmesh_debug.GetInt() > 1 )
-		DevMsg("NavMeshGetPathDistance: anyz: %d, maxdist: %f, bNoTolerance: %d, unit: %d\n", anyz, maxdist, bNoTolerance, pUnit);
+		DevMsg("NavMeshGetPathDistance: maxdist: %f, unit: %d, fBeneathLimit: %f\n", maxdist, pUnit, fBeneathLimit);
 
 	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
 		return 0;
 
-	return pMesh->FindPathDistance( vStart, vGoal );
-
-#if 0
-	CNavArea *startArea, *goalArea;
-	if( bNoTolerance )
-	{
-		startArea = TheNavMesh->GetNavArea(vStart);
-		goalArea = TheNavMesh->GetNavArea(vGoal);
-	}
-	else
-	{
-		startArea = TheNavMesh->GetNearestNavArea(vStart, anyz, maxdist, false, false);
-		goalArea = TheNavMesh->GetNearestNavArea(vGoal, anyz, maxdist, false, false);
-	}
-	if( !startArea || !goalArea )
-	{
-		if( g_pynavmesh_debug.GetBool() )
-			DevMsg("NavMeshGetPathDistance: No start=%d or goal=%d area\n", startArea, goalArea);
-		return -1;
-	}
-
-	if( g_pynavmesh_debug.GetInt() > 1 )
-		DevMsg("NavMeshGetPathDistance: startArea: %d, goalArea: %d\n", startArea->GetID(), goalArea->GetID());
-
-	if( !pUnit )
-	{
-		ShortestPathCost costFunc;
-		return NavAreaTravelDistance<ShortestPathCost>(startArea, goalArea, costFunc, maxdist);
-	}
-	else
-	{
-		UnitShortestPathCost costFunc( pUnit, false );
-		return NavAreaTravelDistance<UnitShortestPathCost>(startArea, goalArea, costFunc, maxdist);
-	}
-#endif // 0
+	return pMesh->FindPathDistance( vStart, vGoal, NULL, fBeneathLimit );
 }
 
 //-----------------------------------------------------------------------------

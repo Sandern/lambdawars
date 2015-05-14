@@ -925,7 +925,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 // Purpose: Finds the path distance between two points
 // Returns: The distance, or -1 if not found.
 //-----------------------------------------------------------------------------
-float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget )
+float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget, float fBeneathLimit )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPathDistance", "RecastNav" );
 
@@ -963,7 +963,7 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
 	polyPickExt[0] = 256.0f;
-	polyPickExt[1] = 600.0f;
+	polyPickExt[1] = fBeneathLimit;
 	polyPickExt[2] = 256.0f;
 
 	status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);

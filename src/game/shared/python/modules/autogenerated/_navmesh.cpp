@@ -138,12 +138,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPathDistance
     
-        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,bool,float,bool,::C_BaseEntity * );
+        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,float,::C_BaseEntity *,float );
         
         bp::def( 
             "NavMeshGetPathDistance"
             , NavMeshGetPathDistance_function_type( &::NavMeshGetPathDistance )
-            , ( bp::arg("start"), bp::arg("goal"), bp::arg("anyz")=(bool)(false), bp::arg("maxdist")=1.0e+4f, bp::arg("notolerance")=(bool)(false), bp::arg("unit")=bp::object() ) );
+            , ( bp::arg("start"), bp::arg("goal"), bp::arg("maxdist")=1.0e+4f, bp::arg("unit")=bp::object(), bp::arg("beneathlimit")=1.2e+2f ) );
     
     }
 
@@ -317,12 +317,12 @@ BOOST_PYTHON_MODULE(_navmesh){
 
     { //::NavMeshGetPathDistance
     
-        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,bool,float,bool,::CBaseEntity * );
+        typedef float ( *NavMeshGetPathDistance_function_type )( ::Vector &,::Vector &,float,::CBaseEntity *,float );
         
         bp::def( 
             "NavMeshGetPathDistance"
             , NavMeshGetPathDistance_function_type( &::NavMeshGetPathDistance )
-            , ( bp::arg("start"), bp::arg("goal"), bp::arg("anyz")=(bool)(false), bp::arg("maxdist")=1.0e+4f, bp::arg("notolerance")=(bool)(false), bp::arg("unit")=bp::object() ) );
+            , ( bp::arg("start"), bp::arg("goal"), bp::arg("maxdist")=1.0e+4f, bp::arg("unit")=bp::object(), bp::arg("beneathlimit")=1.2e+2f ) );
     
     }
 

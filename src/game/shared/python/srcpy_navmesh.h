@@ -21,7 +21,7 @@
 // Generic Nav mesh functions
 bool NavMeshAvailable();
 //bool NavMeshTestHasArea( Vector &pos, float beneathLimt = 120.0f );
-float NavMeshGetPathDistance( Vector &start, Vector &goal, bool anyz = false, float maxdist = 10000.0f, bool notolerance = false, CBaseEntity *unit = NULL );
+float NavMeshGetPathDistance( Vector &start, Vector &goal, float maxdist = 10000.0f, CBaseEntity *unit = NULL, float beneathlimit = 120.0f );
 Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit=120.0f, float maxradius=256.0f, CBaseEntity *unit = NULL );
 
 Vector RandomNavAreaPosition( CBaseEntity *unit = NULL );
