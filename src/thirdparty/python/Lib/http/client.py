@@ -771,8 +771,7 @@ class HTTPConnection:
         if self.sock:
             raise RuntimeError("Can't set up tunnel for established connection")
 
-        self._tunnel_host = host
-        self._tunnel_port = port
+        self._tunnel_host, self._tunnel_port = self._get_hostport(host, port)
         if headers:
             self._tunnel_headers = headers
         else:
@@ -802,9 +801,8 @@ class HTTPConnection:
         self.debuglevel = level
 
     def _tunnel(self):
-        (host, port) = self._get_hostport(self._tunnel_host,
-                                          self._tunnel_port)
-        connect_str = "CONNECT %s:%d HTTP/1.0\r\n" % (host, port)
+        connect_str = "CONNECT %s:%d HTTP/1.0\r\n" % (self._tunnel_host,
+            self._tunnel_port)
         connect_bytes = connect_str.encode("ascii")
         self.send(connect_bytes)
         for header, value in self._tunnel_headers.items():
@@ -1169,18 +1167,22 @@ class HTTPConnection:
         else:
             response = self.response_class(self.sock, method=self._method)
 
-        response.begin()
-        assert response.will_close != _UNKNOWN
-        self.__state = _CS_IDLE
+        try:
+            response.begin()
+            assert response.will_close != _UNKNOWN
+            self.__state = _CS_IDLE
 
-        if response.will_close:
-            # this effectively passes the connection to the response
-            self.close()
-        else:
-            # remember this, so we can tell when it is complete
-            self.__response = response
+            if response.will_close:
+                # this effectively passes the connection to the response
+                self.close()
+            else:
+                # remember this, so we can tell when it is complete
+                self.__response = response
 
-        return response
+            return response
+        except:
+            response.close()
+            raise
 
 try:
     import ssl
@@ -1203,11 +1205,11 @@ else:
             self.key_file = key_file
             self.cert_file = cert_file
             if context is None:
-                context = ssl._create_stdlib_context()
+                context = ssl._create_default_https_context()
             will_verify = context.verify_mode != ssl.CERT_NONE
             if check_hostname is None:
-                check_hostname = will_verify
-            elif check_hostname and not will_verify:
+                check_hostname = context.check_hostname
+            if check_hostname and not will_verify:
                 raise ValueError("check_hostname needs a SSL context with "
                                  "either CERT_OPTIONAL or CERT_REQUIRED")
             if key_file or cert_file:
@@ -1224,10 +1226,9 @@ else:
                 server_hostname = self._tunnel_host
             else:
                 server_hostname = self.host
-            sni_hostname = server_hostname if ssl.HAS_SNI else None
 
             self.sock = self._context.wrap_socket(self.sock,
-                                                  server_hostname=sni_hostname)
+                                                  server_hostname=server_hostname)
             if not self._context.check_hostname and self._check_hostname:
                 try:
                     ssl.match_hostname(self.sock.getpeercert(), server_hostname)

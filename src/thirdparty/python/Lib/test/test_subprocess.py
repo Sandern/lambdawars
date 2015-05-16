@@ -1008,6 +1008,39 @@ class ProcessTestCase(BaseTestCase):
         p = subprocess.Popen([sys.executable, "-c", "pass"], bufsize=None)
         self.assertEqual(p.wait(), 0)
 
+    def _test_bufsize_equal_one(self, line, expected, universal_newlines):
+        # subprocess may deadlock with bufsize=1, see issue #21332
+        with subprocess.Popen([sys.executable, "-c", "import sys;"
+                               "sys.stdout.write(sys.stdin.readline());"
+                               "sys.stdout.flush()"],
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL,
+                              bufsize=1,
+                              universal_newlines=universal_newlines) as p:
+            p.stdin.write(line) # expect that it flushes the line in text mode
+            os.close(p.stdin.fileno()) # close it without flushing the buffer
+            read_line = p.stdout.readline()
+            try:
+                p.stdin.close()
+            except OSError:
+                pass
+            p.stdin = None
+        self.assertEqual(p.returncode, 0)
+        self.assertEqual(read_line, expected)
+
+    def test_bufsize_equal_one_text_mode(self):
+        # line is flushed in text mode with bufsize=1.
+        # we should get the full line in return
+        line = "line\n"
+        self._test_bufsize_equal_one(line, line, universal_newlines=True)
+
+    def test_bufsize_equal_one_binary_mode(self):
+        # line is not flushed in binary mode with bufsize=1.
+        # we should get empty response
+        line = b'line' + os.linesep.encode() # assume ascii-based locale
+        self._test_bufsize_equal_one(line, b'', universal_newlines=False)
+
     def test_leaking_fds_on_error(self):
         # see bug #5179: Popen leaks file descriptors to PIPEs if
         # the child fails to execute; this will eventually exhaust
@@ -2182,6 +2215,39 @@ class POSIXProcessTestCase(BaseTestCase):
         remaining_fds = set(map(int, output.split(b',')))
 
         self.assertNotIn(fd, remaining_fds)
+
+    @support.cpython_only
+    def test_fork_exec(self):
+        # Issue #22290: fork_exec() must not crash on memory allocation failure
+        # or other errors
+        import _posixsubprocess
+        gc_enabled = gc.isenabled()
+        try:
+            # Use a preexec function and enable the garbage collector
+            # to force fork_exec() to re-enable the garbage collector
+            # on error.
+            func = lambda: None
+            gc.enable()
+
+            executable_list = "exec"   # error: must be a sequence
+
+            for args, exe_list, cwd, env_list in (
+                (123,      [b"exe"], None, [b"env"]),
+                ([b"arg"], 123,      None, [b"env"]),
+                ([b"arg"], [b"exe"], 123,  [b"env"]),
+                ([b"arg"], [b"exe"], None, 123),
+            ):
+                with self.assertRaises(TypeError):
+                    _posixsubprocess.fork_exec(
+                        args, exe_list,
+                        True, [], cwd, env_list,
+                        -1, -1, -1, -1,
+                        1, 2, 3, 4,
+                        True, True, func)
+        finally:
+            if not gc_enabled:
+                gc.disable()
+
 
 
 @unittest.skipUnless(mswindows, "Windows specific tests")

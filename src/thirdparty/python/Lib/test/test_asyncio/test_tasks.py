@@ -1,17 +1,22 @@
 """Tests for tasks.py."""
 
+import os
 import re
 import sys
 import types
 import unittest
 import weakref
-from test import support
-from test.script_helper import assert_python_ok
 from unittest import mock
 
 import asyncio
 from asyncio import coroutines
 from asyncio import test_utils
+try:
+    from test import support
+    from test.script_helper import assert_python_ok
+except ImportError:
+    from asyncio import test_support as support
+    from asyncio.test_support import assert_python_ok
 
 
 PY34 = (sys.version_info >= (3, 4))
@@ -203,7 +208,8 @@ class TaskTests(test_utils.TestCase):
         self.assertEqual(notmuch.__name__, 'notmuch')
         if PY35:
             self.assertEqual(notmuch.__qualname__,
-                             'TaskTests.test_task_repr_coro_decorator.<locals>.notmuch')
+                             'TaskTests.test_task_repr_coro_decorator'
+                             '.<locals>.notmuch')
         self.assertEqual(notmuch.__module__, __name__)
 
         # test coroutine object
@@ -213,7 +219,8 @@ class TaskTests(test_utils.TestCase):
             # function, as expected, and have a qualified name (__qualname__
             # attribute).
             coro_name = 'notmuch'
-            coro_qualname = 'TaskTests.test_task_repr_coro_decorator.<locals>.notmuch'
+            coro_qualname = ('TaskTests.test_task_repr_coro_decorator'
+                             '.<locals>.notmuch')
         else:
             # On Python < 3.5, generators inherit the name of the code, not of
             # the function. See: http://bugs.python.org/issue21205
@@ -234,7 +241,8 @@ class TaskTests(test_utils.TestCase):
             else:
                 code = gen.gi_code
                 coro = ('%s() running at %s:%s'
-                        % (coro_qualname, code.co_filename, code.co_firstlineno))
+                        % (coro_qualname, code.co_filename,
+                           code.co_firstlineno))
 
             self.assertEqual(repr(gen), '<CoroWrapper %s>' % coro)
 
@@ -1673,7 +1681,8 @@ class TaskTests(test_utils.TestCase):
         self.assertTrue(m_log.error.called)
         message = m_log.error.call_args[0][0]
         func_filename, func_lineno = test_utils.get_function_source(coro_noop)
-        regex = (r'^<CoroWrapper %s\(\) .* at %s:%s, .*> was never yielded from\n'
+        regex = (r'^<CoroWrapper %s\(\) .* at %s:%s, .*> '
+                    r'was never yielded from\n'
                  r'Coroutine object created at \(most recent call last\):\n'
                  r'.*\n'
                  r'  File "%s", line %s, in test_coroutine_never_yielded\n'
@@ -1695,6 +1704,33 @@ class TaskTests(test_utils.TestCase):
                           lineno,
                           'test_task_source_traceback'))
         self.loop.run_until_complete(task)
+
+    def _test_cancel_wait_for(self, timeout):
+        loop = asyncio.new_event_loop()
+        self.addCleanup(loop.close)
+
+        @asyncio.coroutine
+        def blocking_coroutine():
+            fut = asyncio.Future(loop=loop)
+            # Block: fut result is never set
+            yield from fut
+
+        task = loop.create_task(blocking_coroutine())
+
+        wait = loop.create_task(asyncio.wait_for(task, timeout, loop=loop))
+        loop.call_soon(wait.cancel)
+
+        self.assertRaises(asyncio.CancelledError,
+                          loop.run_until_complete, wait)
+
+        # Python issue #23219: cancelling the wait must also cancel the task
+        self.assertTrue(task.cancelled())
+
+    def test_cancel_blocking_wait_for(self):
+        self._test_cancel_wait_for(None)
+
+    def test_cancel_wait_for(self):
+        self._test_cancel_wait_for(60.0)
 
 
 class GatherTestsBase:
@@ -1768,25 +1804,31 @@ class GatherTestsBase:
         self.assertEqual(fut.result(), [3, 1, exc, exc2])
 
     def test_env_var_debug(self):
+        aio_path = os.path.dirname(os.path.dirname(asyncio.__file__))
+
         code = '\n'.join((
             'import asyncio.coroutines',
             'print(asyncio.coroutines._DEBUG)'))
 
         # Test with -E to not fail if the unit test was run with
         # PYTHONASYNCIODEBUG set to a non-empty string
-        sts, stdout, stderr = assert_python_ok('-E', '-c', code)
+        sts, stdout, stderr = assert_python_ok('-E', '-c', code,
+                                               PYTHONPATH=aio_path)
         self.assertEqual(stdout.rstrip(), b'False')
 
         sts, stdout, stderr = assert_python_ok('-c', code,
-                                               PYTHONASYNCIODEBUG='')
+                                               PYTHONASYNCIODEBUG='',
+                                               PYTHONPATH=aio_path)
         self.assertEqual(stdout.rstrip(), b'False')
 
         sts, stdout, stderr = assert_python_ok('-c', code,
-                                               PYTHONASYNCIODEBUG='1')
+                                               PYTHONASYNCIODEBUG='1',
+                                               PYTHONPATH=aio_path)
         self.assertEqual(stdout.rstrip(), b'True')
 
         sts, stdout, stderr = assert_python_ok('-E', '-c', code,
-                                               PYTHONASYNCIODEBUG='1')
+                                               PYTHONASYNCIODEBUG='1',
+                                               PYTHONPATH=aio_path)
         self.assertEqual(stdout.rstrip(), b'False')
 
 

@@ -672,6 +672,12 @@ class UnicodeTest(string_tests.CommonTest,
         self.assertEqual('x'.center(4, '\U0010FFFF'),
                          '\U0010FFFFx\U0010FFFF\U0010FFFF')
 
+    @unittest.skipUnless(sys.maxsize == 2**31 - 1, "requires 32-bit system")
+    @support.cpython_only
+    def test_case_operation_overflow(self):
+        # Issue #22643
+        self.assertRaises(OverflowError, ("ü"*(2**32//12 + 1)).upper)
+
     def test_contains(self):
         # Testing Unicode contains method
         self.assertIn('a', 'abdb')
@@ -1435,9 +1441,9 @@ class UnicodeTest(string_tests.CommonTest,
     def test_utf8_decode_invalid_sequences(self):
         # continuation bytes in a sequence of 2, 3, or 4 bytes
         continuation_bytes = [bytes([x]) for x in range(0x80, 0xC0)]
-        # start bytes of a 2-byte sequence equivalent to codepoints < 0x7F
+        # start bytes of a 2-byte sequence equivalent to code points < 0x7F
         invalid_2B_seq_start_bytes = [bytes([x]) for x in range(0xC0, 0xC2)]
-        # start bytes of a 4-byte sequence equivalent to codepoints > 0x10FFFF
+        # start bytes of a 4-byte sequence equivalent to code points > 0x10FFFF
         invalid_4B_seq_start_bytes = [bytes([x]) for x in range(0xF5, 0xF8)]
         invalid_start_bytes = (
             continuation_bytes + invalid_2B_seq_start_bytes +

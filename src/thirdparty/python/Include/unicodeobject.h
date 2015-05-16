@@ -605,7 +605,7 @@ PyAPI_FUNC(PyObject*) PyUnicode_New(
     );
 #endif
 
-/* Initializes the canonical string representation from a the deprecated
+/* Initializes the canonical string representation from the deprecated
    wstr/Py_UNICODE representation. This function is used to convert Unicode
    objects which were created using the old API to the new flexible format
    introduced with PEP 393.
@@ -849,7 +849,7 @@ PyAPI_FUNC(int) PyUnicode_Resize(
 
    Coercion is done in the following way:
 
-   1. bytes, bytearray and other char buffer compatible objects are decoded
+   1. bytes, bytearray and other bytes-like objects are decoded
       under the assumptions that they contain data using the UTF-8
       encoding. Decoding is done in "strict" mode.
 

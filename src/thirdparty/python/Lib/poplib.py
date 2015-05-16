@@ -41,7 +41,7 @@ LF = b'\n'
 CRLF = CR+LF
 
 # maximal line length when calling readline(). This is to prevent
-# reading arbitrary lenght lines. RFC 1939 limits POP3 line length to
+# reading arbitrary length lines. RFC 1939 limits POP3 line length to
 # 512 characters, including CRLF. We have selected 2048 just to be on
 # the safe side.
 _MAXLINE = 2048
@@ -387,9 +387,8 @@ class POP3:
         if context is None:
             context = ssl._create_stdlib_context()
         resp = self._shortcmd('STLS')
-        server_hostname = self.host if ssl.HAS_SNI else None
         self.sock = context.wrap_socket(self.sock,
-                                        server_hostname=server_hostname)
+                                        server_hostname=self.host)
         self.file = self.sock.makefile('rb')
         self._tls_established = True
         return resp
@@ -430,9 +429,8 @@ if HAVE_SSL:
 
         def _create_socket(self, timeout):
             sock = POP3._create_socket(self, timeout)
-            server_hostname = self.host if ssl.HAS_SNI else None
             sock = self.context.wrap_socket(sock,
-                                            server_hostname=server_hostname)
+                                            server_hostname=self.host)
             return sock
 
         def stls(self, keyfile=None, certfile=None, context=None):

@@ -623,6 +623,29 @@ fail:
 #endif /* MS_WINDOWS */
 
 
+#ifdef HAVE_LONG_LONG
+#  define _PyLong_FromDev PyLong_FromLongLong
+#else
+#  define _PyLong_FromDev PyLong_FromLong
+#endif
+
+
+#if defined(HAVE_MKNOD) && defined(HAVE_MAKEDEV)
+static int
+_Py_Dev_Converter(PyObject *obj, void *p)
+{
+#ifdef HAVE_LONG_LONG
+    *((dev_t *)p) = PyLong_AsUnsignedLongLong(obj);
+#else
+    *((dev_t *)p) = PyLong_AsUnsignedLong(obj);
+#endif
+    if (PyErr_Occurred())
+        return 0;
+    return 1;
+}
+#endif /* HAVE_MKNOD && HAVE_MAKEDEV */
+
+
 #ifdef AT_FDCWD
 /*
  * Why the (int) cast?  Solaris 10 defines AT_FDCWD as 0xffd19553 (-3041965);
@@ -2218,11 +2241,8 @@ _pystat_fromstructstat(STRUCT_STAT *st)
 #endif
 #ifdef MS_WINDOWS
     PyStructSequence_SET_ITEM(v, 2, PyLong_FromUnsignedLong(st->st_dev));
-#elif defined(HAVE_LONG_LONG)
-    PyStructSequence_SET_ITEM(v, 2,
-                              PyLong_FromLongLong((PY_LONG_LONG)st->st_dev));
 #else
-    PyStructSequence_SET_ITEM(v, 2, PyLong_FromLong((long)st->st_dev));
+    PyStructSequence_SET_ITEM(v, 2, _PyLong_FromDev(st->st_dev));
 #endif
     PyStructSequence_SET_ITEM(v, 3, PyLong_FromLong((long)st->st_nlink));
 #if defined(MS_WINDOWS)
@@ -4684,55 +4704,55 @@ typedef struct {
 } utime_t;
 
 /*
- * these macros assume that "utime" is a pointer to a utime_t
+ * these macros assume that "ut" is a pointer to a utime_t
  * they also intentionally leak the declaration of a pointer named "time"
  */
 #define UTIME_TO_TIMESPEC \
     struct timespec ts[2]; \
     struct timespec *time; \
-    if (utime->now) \
+    if (ut->now) \
         time = NULL; \
     else { \
-        ts[0].tv_sec = utime->atime_s; \
-        ts[0].tv_nsec = utime->atime_ns; \
-        ts[1].tv_sec = utime->mtime_s; \
-        ts[1].tv_nsec = utime->mtime_ns; \
+        ts[0].tv_sec = ut->atime_s; \
+        ts[0].tv_nsec = ut->atime_ns; \
+        ts[1].tv_sec = ut->mtime_s; \
+        ts[1].tv_nsec = ut->mtime_ns; \
         time = ts; \
     } \
 
 #define UTIME_TO_TIMEVAL \
     struct timeval tv[2]; \
     struct timeval *time; \
-    if (utime->now) \
+    if (ut->now) \
         time = NULL; \
     else { \
-        tv[0].tv_sec = utime->atime_s; \
-        tv[0].tv_usec = utime->atime_ns / 1000; \
-        tv[1].tv_sec = utime->mtime_s; \
-        tv[1].tv_usec = utime->mtime_ns / 1000; \
+        tv[0].tv_sec = ut->atime_s; \
+        tv[0].tv_usec = ut->atime_ns / 1000; \
+        tv[1].tv_sec = ut->mtime_s; \
+        tv[1].tv_usec = ut->mtime_ns / 1000; \
         time = tv; \
     } \
 
 #define UTIME_TO_UTIMBUF \
-    struct utimbuf u[2]; \
+    struct utimbuf u; \
     struct utimbuf *time; \
-    if (utime->now) \
+    if (ut->now) \
         time = NULL; \
     else { \
-        u.actime = utime->atime_s; \
-        u.modtime = utime->mtime_s; \
-        time = u; \
+        u.actime = ut->atime_s; \
+        u.modtime = ut->mtime_s; \
+        time = &u; \
     }
 
 #define UTIME_TO_TIME_T \
     time_t timet[2]; \
-    struct timet time; \
-    if (utime->now) \
+    time_t *time; \
+    if (ut->now) \
         time = NULL; \
     else { \
-        timet[0] = utime->atime_s; \
-        timet[1] = utime->mtime_s; \
-        time = &timet; \
+        timet[0] = ut->atime_s; \
+        timet[1] = ut->mtime_s; \
+        time = timet; \
     } \
 
 
@@ -4741,7 +4761,7 @@ typedef struct {
 #if UTIME_HAVE_DIR_FD
 
 static int
-utime_dir_fd(utime_t *utime, int dir_fd, char *path, int follow_symlinks)
+utime_dir_fd(utime_t *ut, int dir_fd, char *path, int follow_symlinks)
 {
 #ifdef HAVE_UTIMENSAT
     int flags = follow_symlinks ? 0 : AT_SYMLINK_NOFOLLOW;
@@ -4766,7 +4786,7 @@ utime_dir_fd(utime_t *utime, int dir_fd, char *path, int follow_symlinks)
 #if UTIME_HAVE_FD
 
 static int
-utime_fd(utime_t *utime, int fd)
+utime_fd(utime_t *ut, int fd)
 {
 #ifdef HAVE_FUTIMENS
     UTIME_TO_TIMESPEC;
@@ -4786,7 +4806,7 @@ utime_fd(utime_t *utime, int fd)
 #if UTIME_HAVE_NOFOLLOW_SYMLINKS
 
 static int
-utime_nofollow_symlinks(utime_t *utime, char *path)
+utime_nofollow_symlinks(utime_t *ut, char *path)
 {
 #ifdef HAVE_UTIMENSAT
     UTIME_TO_TIMESPEC;
@@ -4802,7 +4822,7 @@ utime_nofollow_symlinks(utime_t *utime, char *path)
 #ifndef MS_WINDOWS
 
 static int
-utime_default(utime_t *utime, char *path)
+utime_default(utime_t *ut, char *path)
 {
 #ifdef HAVE_UTIMENSAT
     UTIME_TO_TIMESPEC;
@@ -8633,16 +8653,16 @@ posix_mknod(PyObject *self, PyObject *args, PyObject *kwargs)
 {
     path_t path;
     int mode = 0666;
-    int device = 0;
+    dev_t device = 0;
     int dir_fd = DEFAULT_DIR_FD;
     int result;
     PyObject *return_value = NULL;
     static char *keywords[] = {"path", "mode", "device", "dir_fd", NULL};
 
     memset(&path, 0, sizeof(path));
-    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&|ii$O&:mknod", keywords,
+    if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&|iO&$O&:mknod", keywords,
         path_converter, &path,
-        &mode, &device,
+        &mode, _Py_Dev_Converter, &device,
 #ifdef HAVE_MKNODAT
         dir_fd_converter, &dir_fd
 #else
@@ -8682,8 +8702,8 @@ Extracts a device major number from a raw device number.");
 static PyObject *
 posix_major(PyObject *self, PyObject *args)
 {
-    int device;
-    if (!PyArg_ParseTuple(args, "i:major", &device))
+    dev_t device;
+    if (!PyArg_ParseTuple(args, "O&:major", _Py_Dev_Converter, &device))
         return NULL;
     return PyLong_FromLong((long)major(device));
 }
@@ -8695,8 +8715,8 @@ Extracts a device minor number from a raw device number.");
 static PyObject *
 posix_minor(PyObject *self, PyObject *args)
 {
-    int device;
-    if (!PyArg_ParseTuple(args, "i:minor", &device))
+    dev_t device;
+    if (!PyArg_ParseTuple(args, "O&:minor", _Py_Dev_Converter, &device))
         return NULL;
     return PyLong_FromLong((long)minor(device));
 }
@@ -8711,7 +8731,7 @@ posix_makedev(PyObject *self, PyObject *args)
     int major, minor;
     if (!PyArg_ParseTuple(args, "ii:makedev", &major, &minor))
         return NULL;
-    return PyLong_FromLong((long)makedev(major, minor));
+    return _PyLong_FromDev(makedev(major, minor));
 }
 #endif /* device macros */
 
@@ -8786,7 +8806,15 @@ posix_truncate(PyObject *self, PyObject *args, PyObject *kwargs)
 }
 #endif
 
-#ifdef HAVE_POSIX_FALLOCATE
+/* Issue #22396: On 32-bit AIX platform, the prototypes of os.posix_fadvise()
+   and os.posix_fallocate() in system headers are wrong if _LARGE_FILES is
+   defined, which is the case in Python on AIX. AIX bug report:
+   http://www-01.ibm.com/support/docview.wss?uid=isg1IV56170 */
+#if defined(_AIX) && defined(_LARGE_FILES) && !defined(__64BIT__)
+#  define POSIX_FADVISE_AIX_BUG
+#endif
+
+#if defined(HAVE_POSIX_FALLOCATE) && !defined(POSIX_FADVISE_AIX_BUG)
 PyDoc_STRVAR(posix_posix_fallocate__doc__,
 "posix_fallocate(fd, offset, len)\n\n\
 Ensures that enough disk space is allocated for the file specified by fd\n\
@@ -8813,7 +8841,7 @@ posix_posix_fallocate(PyObject *self, PyObject *args)
 }
 #endif
 
-#ifdef HAVE_POSIX_FADVISE
+#if defined(HAVE_POSIX_FADVISE) && !defined(POSIX_FADVISE_AIX_BUG)
 PyDoc_STRVAR(posix_posix_fadvise__doc__,
 "posix_fadvise(fd, offset, len, advice)\n\n\
 Announces an intention to access data in a specific pattern thus allowing\n\
@@ -10281,7 +10309,7 @@ posix_sysconf(PyObject *self, PyObject *args)
 
 
 /* This code is used to ensure that the tables of configuration value names
- * are in sorted order as required by conv_confname(), and also to build the
+ * are in sorted order as required by conv_confname(), and also to build
  * the exported dictionaries that are used to publish information about the
  * names available on the host platform.
  *
@@ -11485,10 +11513,10 @@ static PyMethodDef posix_methods[] = {
                         METH_VARARGS | METH_KEYWORDS,
                         posix_truncate__doc__},
 #endif
-#ifdef HAVE_POSIX_FALLOCATE
+#if defined(HAVE_POSIX_FALLOCATE) && !defined(POSIX_FADVISE_AIX_BUG)
     {"posix_fallocate", posix_posix_fallocate, METH_VARARGS, posix_posix_fallocate__doc__},
 #endif
-#ifdef HAVE_POSIX_FADVISE
+#if defined(HAVE_POSIX_FADVISE) && !defined(POSIX_FADVISE_AIX_BUG)
     {"posix_fadvise",   posix_posix_fadvise, METH_VARARGS, posix_posix_fadvise__doc__},
 #endif
 #ifdef HAVE_PUTENV

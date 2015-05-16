@@ -1,6 +1,7 @@
 # Copyright (C) 2003 Python Software Foundation
 
 import unittest
+import unittest.mock
 import shutil
 import tempfile
 import sys
@@ -758,6 +759,20 @@ class TestShutil(unittest.TestCase):
         self.assertEqual(os.stat(restrictive_subdir).st_mode,
                           os.stat(restrictive_subdir_dst).st_mode)
 
+    @unittest.mock.patch('os.chmod')
+    def test_copytree_winerror(self, mock_patch):
+        # When copying to VFAT, copystat() raises OSError. On Windows, the
+        # exception object has a meaningful 'winerror' attribute, but not
+        # on other operating systems. Do not assume 'winerror' is set.
+        src_dir = tempfile.mkdtemp()
+        dst_dir = os.path.join(tempfile.mkdtemp(), 'destination')
+        self.addCleanup(shutil.rmtree, src_dir)
+        self.addCleanup(shutil.rmtree, os.path.dirname(dst_dir))
+
+        mock_patch.side_effect = PermissionError('ka-boom')
+        with self.assertRaises(shutil.Error):
+            shutil.copytree(src_dir, dst_dir)
+
     @unittest.skipIf(os.name == 'nt', 'temporarily disabled on Windows')
     @unittest.skipUnless(hasattr(os, 'link'), 'requires os.link')
     def test_dont_copy_file_onto_link_to_itself(self):
@@ -1125,6 +1140,21 @@ class TestShutil(unittest.TestCase):
             self.assertEqual(os.getcwd(), current_dir)
         finally:
             unregister_archive_format('xxx')
+
+    def test_make_tarfile_in_curdir(self):
+        # Issue #21280
+        root_dir = self.mkdtemp()
+        with support.change_cwd(root_dir):
+            self.assertEqual(make_archive('test', 'tar'), 'test.tar')
+            self.assertTrue(os.path.isfile('test.tar'))
+
+    @requires_zlib
+    def test_make_zipfile_in_curdir(self):
+        # Issue #21280
+        root_dir = self.mkdtemp()
+        with support.change_cwd(root_dir):
+            self.assertEqual(make_archive('test', 'zip'), 'test.zip')
+            self.assertTrue(os.path.isfile('test.zip'))
 
     def test_register_archive_format(self):
 
@@ -1760,6 +1790,24 @@ class TermsizeTests(unittest.TestCase):
             actual = shutil.get_terminal_size()
 
         self.assertEqual(expected, actual)
+
+
+class PublicAPITests(unittest.TestCase):
+    """Ensures that the correct values are exposed in the public API."""
+
+    def test_module_all_attribute(self):
+        self.assertTrue(hasattr(shutil, '__all__'))
+        target_api = ['copyfileobj', 'copyfile', 'copymode', 'copystat',
+                      'copy', 'copy2', 'copytree', 'move', 'rmtree', 'Error',
+                      'SpecialFileError', 'ExecError', 'make_archive',
+                      'get_archive_formats', 'register_archive_format',
+                      'unregister_archive_format', 'get_unpack_formats',
+                      'register_unpack_format', 'unregister_unpack_format',
+                      'unpack_archive', 'ignore_patterns', 'chown', 'which',
+                      'get_terminal_size', 'SameFileError']
+        if hasattr(os, 'statvfs') or os.name == 'nt':
+            target_api.append('disk_usage')
+        self.assertEqual(set(shutil.__all__), set(target_api))
 
 
 if __name__ == '__main__':

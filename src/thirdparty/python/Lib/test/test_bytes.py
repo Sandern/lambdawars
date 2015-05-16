@@ -13,9 +13,11 @@ import functools
 import pickle
 import tempfile
 import unittest
+
 import test.support
 import test.string_tests
 import test.buffer_tests
+from test.support import bigaddrspacetest, MAX_Py_ssize_t
 
 
 if sys.flags.bytes_warning:
@@ -98,6 +100,14 @@ class BaseBytesTest:
         self.assertRaises(TypeError, self.type2test, [0.0])
         self.assertRaises(TypeError, self.type2test, [None])
         self.assertRaises(TypeError, self.type2test, [C()])
+        self.assertRaises(TypeError, self.type2test, 0, 'ascii')
+        self.assertRaises(TypeError, self.type2test, b'', 'ascii')
+        self.assertRaises(TypeError, self.type2test, 0, errors='ignore')
+        self.assertRaises(TypeError, self.type2test, b'', errors='ignore')
+        self.assertRaises(TypeError, self.type2test, '')
+        self.assertRaises(TypeError, self.type2test, '', errors='ignore')
+        self.assertRaises(TypeError, self.type2test, '', b'ascii')
+        self.assertRaises(TypeError, self.type2test, '', 'ascii', b'ignore')
 
     def test_constructor_value_errors(self):
         self.assertRaises(ValueError, self.type2test, [-1])
@@ -110,6 +120,17 @@ class BaseBytesTest:
         self.assertRaises(ValueError, self.type2test, [sys.maxsize])
         self.assertRaises(ValueError, self.type2test, [sys.maxsize+1])
         self.assertRaises(ValueError, self.type2test, [10**100])
+
+    @bigaddrspacetest
+    def test_constructor_overflow(self):
+        size = MAX_Py_ssize_t
+        self.assertRaises((OverflowError, MemoryError), self.type2test, size)
+        try:
+            # Should either pass or raise an error (e.g. on debug builds with
+            # additional malloc() overhead), but shouldn't crash.
+            bytearray(size - 4)
+        except (OverflowError, MemoryError):
+            pass
 
     def test_compare(self):
         b1 = self.type2test([1, 2, 3])
@@ -298,6 +319,7 @@ class BaseBytesTest:
         seq = [b"abc"] * 1000
         expected = b"abc" + b".:abc" * 999
         self.assertEqual(dot_join(seq), expected)
+        self.assertRaises(TypeError, self.type2test(b" ").join, None)
         # Error handling and cleanup when some item in the middle of the
         # sequence has the wrong type.
         with self.assertRaises(TypeError):
@@ -533,22 +555,23 @@ class BaseBytesTest:
                 self.assertEqual(b, q)
 
     def test_iterator_pickling(self):
-        for b in b"", b"a", b"abc", b"\xffab\x80", b"\0\0\377\0\0":
-            it = itorg = iter(self.type2test(b))
-            data = list(self.type2test(b))
-            d = pickle.dumps(it)
-            it = pickle.loads(d)
-            self.assertEqual(type(itorg), type(it))
-            self.assertEqual(list(it), data)
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            for b in b"", b"a", b"abc", b"\xffab\x80", b"\0\0\377\0\0":
+                it = itorg = iter(self.type2test(b))
+                data = list(self.type2test(b))
+                d = pickle.dumps(it, proto)
+                it = pickle.loads(d)
+                self.assertEqual(type(itorg), type(it))
+                self.assertEqual(list(it), data)
 
-            it = pickle.loads(d)
-            try:
-                next(it)
-            except StopIteration:
-                continue
-            d = pickle.dumps(it)
-            it = pickle.loads(d)
-            self.assertEqual(list(it), data[1:])
+                it = pickle.loads(d)
+                try:
+                    next(it)
+                except StopIteration:
+                    continue
+                d = pickle.dumps(it, proto)
+                it = pickle.loads(d)
+                self.assertEqual(list(it), data[1:])
 
     def test_strip(self):
         b = self.type2test(b'mississippi')

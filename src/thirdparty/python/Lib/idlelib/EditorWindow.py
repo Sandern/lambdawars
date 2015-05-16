@@ -189,6 +189,8 @@ class EditorWindow(object):
         text.bind("<<python-docs>>", self.python_docs)
         text.bind("<<about-idle>>", self.about_dialog)
         text.bind("<<open-config-dialog>>", self.config_dialog)
+        text.bind("<<open-config-extensions-dialog>>",
+                  self.config_extensions_dialog)
         text.bind("<<open-module>>", self.open_module)
         text.bind("<<do-nothing>>", lambda event: "break")
         text.bind("<<select-all>>", self.select_all)
@@ -437,12 +439,9 @@ class EditorWindow(object):
         ("format", "F_ormat"),
         ("run", "_Run"),
         ("options", "_Options"),
-        ("windows", "_Windows"),
+        ("windows", "_Window"),
         ("help", "_Help"),
     ]
-
-    if sys.platform == "darwin":
-        menu_specs[-2] = ("windows", "_Window")
 
 
     def createmenubar(self):
@@ -543,6 +542,8 @@ class EditorWindow(object):
 
     def config_dialog(self, event=None):
         configDialog.ConfigDialog(self.top,'Settings')
+    def config_extensions_dialog(self, event=None):
+        configDialog.ConfigExtensionsDialog(self.top)
 
     def help_dialog(self, event=None):
         if self.root:
@@ -689,16 +690,15 @@ class EditorWindow(object):
             self.flist.open(file_path)
         else:
             self.io.loadfile(file_path)
+        return file_path
 
     def open_class_browser(self, event=None):
         filename = self.io.filename
-        if not filename:
-            tkMessageBox.showerror(
-                "No filename",
-                "This buffer has no associated filename",
-                master=self.text)
-            self.text.focus_set()
-            return None
+        if not (self.__class__.__name__ == 'PyShellEditorWindow'
+                and filename):
+            filename = self.open_module()
+            if filename is None:
+                return
         head, tail = os.path.split(filename)
         base, ext = os.path.splitext(tail)
         from idlelib import ClassBrowser
@@ -766,7 +766,7 @@ class EditorWindow(object):
         self.color = None
 
     def ResetColorizer(self):
-        "Update the colour theme"
+        "Update the color theme"
         # Called from self.filename_change_hook and from configDialog.py
         self._rmcolorizer()
         self._addcolorizer()
@@ -1712,7 +1712,8 @@ def fixwordbreaks(root):
     tk.call('set', 'tcl_nonwordchars', '[^a-zA-Z0-9_]')
 
 
-def _editor_window(parent):
+def _editor_window(parent):  # htest #
+    # error if close master window first - timer event, after script
     root = parent
     fixwordbreaks(root)
     if sys.argv[1:]:
@@ -1722,7 +1723,8 @@ def _editor_window(parent):
     macosxSupport.setupApp(root, None)
     edit = EditorWindow(root=root, filename=filename)
     edit.text.bind("<<close-all-windows>>", edit.close_event)
-    parent.mainloop()
+    # Does not stop error, neither does following
+    # edit.text.bind("<<close-window>>", edit.close_event)
 
 if __name__ == '__main__':
     from idlelib.idle_test.htest import run

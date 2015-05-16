@@ -27,6 +27,7 @@ import codecs
 import decimal
 import fractions
 import pickle
+import sysconfig
 try:
     import threading
 except ImportError:
@@ -265,10 +266,13 @@ class StatAttributeTests(unittest.TestCase):
 
     def test_stat_result_pickle(self):
         result = os.stat(self.fname)
-        p = pickle.dumps(result)
-        self.assertIn(b'\x03cos\nstat_result\n', p)
-        unpickled = pickle.loads(p)
-        self.assertEqual(result, unpickled)
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            p = pickle.dumps(result, proto)
+            self.assertIn(b'stat_result', p)
+            if proto < 4:
+                self.assertIn(b'cos\nstat_result\n', p)
+            unpickled = pickle.loads(p)
+            self.assertEqual(result, unpickled)
 
     @unittest.skipUnless(hasattr(os, 'statvfs'), 'test needs os.statvfs()')
     def test_statvfs_attributes(self):
@@ -324,10 +328,13 @@ class StatAttributeTests(unittest.TestCase):
             if e.errno == errno.ENOSYS:
                 self.skipTest('os.statvfs() failed with ENOSYS')
 
-        p = pickle.dumps(result)
-        self.assertIn(b'\x03cos\nstatvfs_result\n', p)
-        unpickled = pickle.loads(p)
-        self.assertEqual(result, unpickled)
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            p = pickle.dumps(result, proto)
+            self.assertIn(b'statvfs_result', p)
+            if proto < 4:
+                self.assertIn(b'cos\nstatvfs_result\n', p)
+            unpickled = pickle.loads(p)
+            self.assertEqual(result, unpickled)
 
     def test_utime_dir(self):
         delta = 1000000
@@ -1047,6 +1054,12 @@ class URandomTests(unittest.TestCase):
         data2 = self.get_urandom_subprocess(16)
         self.assertNotEqual(data1, data2)
 
+
+HAVE_GETENTROPY = (sysconfig.get_config_var('HAVE_GETENTROPY') == 1)
+
+@unittest.skipIf(HAVE_GETENTROPY,
+                 "getentropy() does not use a file descriptor")
+class URandomFDTests(unittest.TestCase):
     @unittest.skipUnless(resource, "test requires the resource module")
     def test_urandom_failure(self):
         # Check urandom() failing when it is not able to open /dev/random.

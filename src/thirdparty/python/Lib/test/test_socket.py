@@ -649,6 +649,13 @@ def requireSocket(*args):
 
 class GeneralModuleTests(unittest.TestCase):
 
+    def test_SocketType_is_socketobject(self):
+        import _socket
+        self.assertTrue(socket.SocketType is _socket.socket)
+        s = socket.socket()
+        self.assertIsInstance(s, socket.SocketType)
+        s.close()
+
     def test_repr(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         with s:
@@ -1224,7 +1231,7 @@ class GeneralModuleTests(unittest.TestCase):
             self.assertEqual(family, socket.AF_INET)
             self.assertEqual(str(family), 'AddressFamily.AF_INET')
             self.assertEqual(type, socket.SOCK_STREAM)
-            self.assertEqual(str(type), 'SocketType.SOCK_STREAM')
+            self.assertEqual(str(type), 'SocketKind.SOCK_STREAM')
         infos = socket.getaddrinfo(HOST, None, 0, socket.SOCK_STREAM)
         for _, socktype, _, _, _ in infos:
             self.assertEqual(socktype, socket.SOCK_STREAM)
@@ -1284,9 +1291,10 @@ class GeneralModuleTests(unittest.TestCase):
             if e.errno == socket.EAI_NODATA:
                 self.skipTest('internet access required for this test')
         # these should all be successful
-        socket.gethostbyname('испытание.python.org')
-        socket.gethostbyname_ex('испытание.python.org')
-        socket.getaddrinfo('испытание.python.org',0,socket.AF_UNSPEC,socket.SOCK_STREAM)
+        domain = 'испытание.pythontest.net'
+        socket.gethostbyname(domain)
+        socket.gethostbyname_ex(domain)
+        socket.getaddrinfo(domain,0,socket.AF_UNSPEC,socket.SOCK_STREAM)
         # this may not work if the forward lookup choses the IPv6 address, as that doesn't
         # have a reverse entry yet
         # socket.gethostbyaddr('испытание.python.org')
@@ -1396,7 +1404,7 @@ class GeneralModuleTests(unittest.TestCase):
         # reprs.
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             self.assertEqual(str(s.family), 'AddressFamily.AF_INET')
-            self.assertEqual(str(s.type), 'SocketType.SOCK_STREAM')
+            self.assertEqual(str(s.type), 'SocketKind.SOCK_STREAM')
 
     @unittest.skipIf(os.name == 'nt', 'Will not work on Windows')
     def test_uknown_socket_family_repr(self):
@@ -2208,7 +2216,7 @@ class SendmsgStreamTests(SendmsgTests):
     # Linux supports MSG_DONTWAIT when sending, but in general, it
     # only works when receiving.  Could add other platforms if they
     # support it too.
-    @skipWithClientIf(sys.platform not in {"linux2"},
+    @skipWithClientIf(sys.platform not in {"linux"},
                       "MSG_DONTWAIT not known to work on this platform when "
                       "sending")
     def testSendmsgDontWait(self):

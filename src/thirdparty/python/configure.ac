@@ -2238,6 +2238,9 @@ AC_MSG_RESULT($SHLIBS)
 AC_CHECK_LIB(sendfile, sendfile)
 AC_CHECK_LIB(dl, dlopen)	# Dynamic linking for SunOS/Solaris and SYSV
 AC_CHECK_LIB(dld, shl_load)	# Dynamic linking for HP-UX
+AC_CHECK_LIB(crypto, RAND_egd,
+             AC_DEFINE(HAVE_RAND_EGD, 1,
+             [Define if the libcrypto has RAND_egd]))
 
 # only check for sem_init if thread support is requested
 if test "$with_threads" = "yes" -o -z "$with_threads"; then
@@ -2335,7 +2338,7 @@ LIBS="$withval $LIBS"
 ],
 [AC_MSG_RESULT(no)])
 
-AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
+PKG_PROG_PKG_CONFIG
 
 # Check for use of the system expat library
 AC_MSG_CHECKING(for --with-system-expat)
@@ -2935,7 +2938,7 @@ fi
 AC_CHECK_FUNCS(alarm accept4 setitimer getitimer bind_textdomain_codeset chown \
  clock confstr ctermid dup3 execv faccessat fchmod fchmodat fchown fchownat \
  fexecve fdopendir fork fpathconf fstatat ftime ftruncate futimesat \
- futimens futimes gai_strerror \
+ futimens futimes gai_strerror getentropy \
  getgrouplist getgroups getlogin getloadavg getpeername getpgid getpid \
  getpriority getresuid getresgid getpwent getspnam getspent getsid getwd \
  if_nameindex \

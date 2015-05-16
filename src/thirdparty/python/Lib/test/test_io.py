@@ -701,6 +701,8 @@ class CommonBufferedTests:
         self.assertIs(buf.detach(), raw)
         self.assertRaises(ValueError, buf.detach)
 
+        repr(buf)  # Should still work
+
     def test_fileno(self):
         rawio = self.MockRawIO()
         bufio = self.tp(rawio)
@@ -1567,6 +1569,12 @@ class BufferedRWPairTest(unittest.TestCase):
         pair = self.tp(SelectableIsAtty(True), SelectableIsAtty(True))
         self.assertTrue(pair.isatty())
 
+    def test_weakref_clearing(self):
+        brw = self.tp(self.MockRawIO(), self.MockRawIO())
+        ref = weakref.ref(brw)
+        brw = None
+        ref = None # Shouldn't segfault.
+
 class CBufferedRWPairTest(BufferedRWPairTest):
     tp = io.BufferedRWPair
 
@@ -2020,6 +2028,12 @@ class TextIOWrapperTest(unittest.TestCase):
         self.assertEqual(r.getvalue(), b"howdy")
         self.assertRaises(ValueError, t.detach)
 
+        # Operations independent of the detached stream should still work
+        repr(t)
+        self.assertEqual(t.encoding, "ascii")
+        self.assertEqual(t.errors, "strict")
+        self.assertFalse(t.line_buffering)
+
     def test_repr(self):
         raw = self.BytesIO("hello".encode("utf-8"))
         b = self.BufferedReader(raw)
@@ -2036,6 +2050,9 @@ class TextIOWrapperTest(unittest.TestCase):
         raw.name = b"dummy"
         self.assertEqual(repr(t),
                          "<%s.TextIOWrapper name=b'dummy' mode='r' encoding='utf-8'>" % modname)
+
+        t.buffer.detach()
+        repr(t)  # Should not raise an exception
 
     def test_line_buffering(self):
         r = self.BytesIO()
@@ -2778,6 +2795,21 @@ class TextIOWrapperTest(unittest.TestCase):
         self.assertFalse(err)
         self.assertEqual("ok", out.decode().strip())
 
+    def test_issue22849(self):
+        class F(object):
+            def readable(self): return True
+            def writable(self): return True
+            def seekable(self): return True
+
+        for i in range(10):
+            try:
+                self.TextIOWrapper(F(), encoding='utf-8')
+            except Exception:
+                pass
+
+        F.tell = lambda x: 0
+        t = self.TextIOWrapper(F(), encoding='utf-8')
+
 
 class CTextIOWrapperTest(TextIOWrapperTest):
     io = io
@@ -2791,6 +2823,9 @@ class CTextIOWrapperTest(TextIOWrapperTest):
         self.assertRaises(ValueError, t.read)
         self.assertRaises(ValueError, t.__init__, b, newline='xyzzy')
         self.assertRaises(ValueError, t.read)
+
+        t = self.TextIOWrapper.__new__(self.TextIOWrapper)
+        self.assertRaises(Exception, repr, t)
 
     def test_garbage_collection(self):
         # C TextIOWrapper objects are collected, and collecting them flushes

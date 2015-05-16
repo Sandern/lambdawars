@@ -63,10 +63,17 @@ class TestChainMap(unittest.TestCase):
             for m1, m2 in zip(d.maps[1:], e.maps[1:]):
                 self.assertIs(m1, m2)
 
-        for e in [pickle.loads(pickle.dumps(d)),
-                  copy.deepcopy(d),
+        # check deep copies
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            e = pickle.loads(pickle.dumps(d, proto))
+            self.assertEqual(d, e)
+            self.assertEqual(d.maps, e.maps)
+            self.assertIsNot(d, e)
+            for m1, m2 in zip(d.maps, e.maps):
+                self.assertIsNot(m1, m2, e)
+        for e in [copy.deepcopy(d),
                   eval(repr(d))
-                ]:                                                    # check deep copies
+                ]:
             self.assertEqual(d, e)
             self.assertEqual(d.maps, e.maps)
             self.assertIsNot(d, e)
@@ -1084,32 +1091,47 @@ class TestCounter(unittest.TestCase):
         self.assertEqual(c.setdefault('e', 5), 5)
         self.assertEqual(c['e'], 5)
 
+    def test_init(self):
+        self.assertEqual(list(Counter(self=42).items()), [('self', 42)])
+        self.assertEqual(list(Counter(iterable=42).items()), [('iterable', 42)])
+        self.assertEqual(list(Counter(iterable=None).items()), [('iterable', None)])
+        self.assertRaises(TypeError, Counter, 42)
+        self.assertRaises(TypeError, Counter, (), ())
+        self.assertRaises(TypeError, Counter.__init__)
+
+    def test_update(self):
+        c = Counter()
+        c.update(self=42)
+        self.assertEqual(list(c.items()), [('self', 42)])
+        c = Counter()
+        c.update(iterable=42)
+        self.assertEqual(list(c.items()), [('iterable', 42)])
+        c = Counter()
+        c.update(iterable=None)
+        self.assertEqual(list(c.items()), [('iterable', None)])
+        self.assertRaises(TypeError, Counter().update, 42)
+        self.assertRaises(TypeError, Counter().update, {}, {})
+        self.assertRaises(TypeError, Counter.update)
+
     def test_copying(self):
         # Check that counters are copyable, deepcopyable, picklable, and
         #have a repr/eval round-trip
         words = Counter('which witch had which witches wrist watch'.split())
+        def check(dup):
+            msg = "\ncopy: %s\nwords: %s" % (dup, words)
+            self.assertIsNot(dup, words, msg)
+            self.assertEqual(dup, words)
+        check(words.copy())
+        check(copy.copy(words))
+        check(copy.deepcopy(words))
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(proto=proto):
+                check(pickle.loads(pickle.dumps(words, proto)))
+        check(eval(repr(words)))
         update_test = Counter()
         update_test.update(words)
-        for label, dup in [
-                    ('words.copy()', words.copy()),
-                    ('copy.copy(words)', copy.copy(words)),
-                    ('copy.deepcopy(words)', copy.deepcopy(words)),
-                    ('pickle.loads(pickle.dumps(words, 0))',
-                        pickle.loads(pickle.dumps(words, 0))),
-                    ('pickle.loads(pickle.dumps(words, 1))',
-                        pickle.loads(pickle.dumps(words, 1))),
-                    ('pickle.loads(pickle.dumps(words, 2))',
-                        pickle.loads(pickle.dumps(words, 2))),
-                    ('pickle.loads(pickle.dumps(words, -1))',
-                        pickle.loads(pickle.dumps(words, -1))),
-                    ('eval(repr(words))', eval(repr(words))),
-                    ('update_test', update_test),
-                    ('Counter(words)', Counter(words)),
-                    ]:
-            with self.subTest(label=label):
-                msg = "\ncopy: %s\nwords: %s" % (dup, words)
-                self.assertIsNot(dup, words, msg)
-                self.assertEqual(dup, words)
+        check(update_test)
+        check(Counter(words))
 
     def test_copy_subclass(self):
         class MyCounter(Counter):
@@ -1205,6 +1227,16 @@ class TestCounter(unittest.TestCase):
         c.subtract('aaaabbcce')
         self.assertEqual(c, Counter(a=-1, b=0, c=-1, d=1, e=-1))
 
+        c = Counter()
+        c.subtract(self=42)
+        self.assertEqual(list(c.items()), [('self', -42)])
+        c = Counter()
+        c.subtract(iterable=42)
+        self.assertEqual(list(c.items()), [('iterable', -42)])
+        self.assertRaises(TypeError, Counter().subtract, 42)
+        self.assertRaises(TypeError, Counter().subtract, {}, {})
+        self.assertRaises(TypeError, Counter.subtract)
+
     def test_unary(self):
         c = Counter(a=-5, b=0, c=5, d=10, e=15,g=40)
         self.assertEqual(dict(+c), dict(c=5, d=10, e=15, g=40))
@@ -1255,8 +1287,11 @@ class TestOrderedDict(unittest.TestCase):
                                           c=3, e=5).items()), pairs)                # mixed input
 
         # make sure no positional args conflict with possible kwdargs
-        self.assertEqual(inspect.getargspec(OrderedDict.__dict__['__init__']).args,
-                         ['self'])
+        self.assertEqual(list(OrderedDict(self=42).items()), [('self', 42)])
+        self.assertEqual(list(OrderedDict(other=42).items()), [('other', 42)])
+        self.assertRaises(TypeError, OrderedDict, 42)
+        self.assertRaises(TypeError, OrderedDict, (), ())
+        self.assertRaises(TypeError, OrderedDict.__init__)
 
         # Make sure that direct calls to __init__ do not clear previous contents
         d = OrderedDict([('a', 1), ('b', 2), ('c', 3), ('d', 44), ('e', 55)])
@@ -1300,6 +1335,10 @@ class TestOrderedDict(unittest.TestCase):
         d.update([('e', 5), ('f', 6)], g=7, d=4)
         self.assertEqual(list(d.items()),
             [('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', 5), ('f', 6), ('g', 7)])
+
+        self.assertRaises(TypeError, OrderedDict().update, 42)
+        self.assertRaises(TypeError, OrderedDict().update, (), ())
+        self.assertRaises(TypeError, OrderedDict.update)
 
     def test_abc(self):
         self.assertIsInstance(OrderedDict(), MutableMapping)
@@ -1394,30 +1433,21 @@ class TestOrderedDict(unittest.TestCase):
         # and have a repr/eval round-trip
         pairs = [('c', 1), ('b', 2), ('a', 3), ('d', 4), ('e', 5), ('f', 6)]
         od = OrderedDict(pairs)
+        def check(dup):
+            msg = "\ncopy: %s\nod: %s" % (dup, od)
+            self.assertIsNot(dup, od, msg)
+            self.assertEqual(dup, od)
+        check(od.copy())
+        check(copy.copy(od))
+        check(copy.deepcopy(od))
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(proto=proto):
+                check(pickle.loads(pickle.dumps(od, proto)))
+        check(eval(repr(od)))
         update_test = OrderedDict()
         update_test.update(od)
-        for label, dup in [
-                    ('od.copy()', od.copy()),
-                    ('copy.copy(od)', copy.copy(od)),
-                    ('copy.deepcopy(od)', copy.deepcopy(od)),
-                    ('pickle.loads(pickle.dumps(od, 0))',
-                        pickle.loads(pickle.dumps(od, 0))),
-                    ('pickle.loads(pickle.dumps(od, 1))',
-                        pickle.loads(pickle.dumps(od, 1))),
-                    ('pickle.loads(pickle.dumps(od, 2))',
-                        pickle.loads(pickle.dumps(od, 2))),
-                    ('pickle.loads(pickle.dumps(od, 3))',
-                        pickle.loads(pickle.dumps(od, 3))),
-                    ('pickle.loads(pickle.dumps(od, -1))',
-                        pickle.loads(pickle.dumps(od, -1))),
-                    ('eval(repr(od))', eval(repr(od))),
-                    ('update_test', update_test),
-                    ('OrderedDict(od)', OrderedDict(od)),
-                    ]:
-            with self.subTest(label=label):
-                msg = "\ncopy: %s\nod: %s" % (dup, od)
-                self.assertIsNot(dup, od, msg)
-                self.assertEqual(dup, od)
+        check(update_test)
+        check(OrderedDict(od))
 
     def test_yaml_linkage(self):
         # Verify that __reduce__ is setup in a way that supports PyYAML's dump() feature.

@@ -35,10 +35,12 @@ SocketType -- type object for socket objects
 error -- exception raised for I/O errors
 has_ipv6 -- boolean value indicating if IPv6 is supported
 
-Integer constants:
+IntEnum constants:
 
 AF_INET, AF_UNIX -- socket domains (first argument to socket() call)
 SOCK_STREAM, SOCK_DGRAM, SOCK_RAW -- socket types (second argument)
+
+Integer constants:
 
 Many other constants may be defined; these may be used in calls to
 the setsockopt() and getsockopt() methods.
@@ -58,7 +60,8 @@ EBADF = getattr(errno, 'EBADF', 9)
 EAGAIN = getattr(errno, 'EAGAIN', 11)
 EWOULDBLOCK = getattr(errno, 'EWOULDBLOCK', 11)
 
-__all__ = ["getfqdn", "create_connection"]
+__all__ = ["fromfd", "getfqdn", "create_connection",
+        "AddressFamily", "SocketKind"]
 __all__.extend(os._get_exports_list(_socket))
 
 # Set up the socket.AF_* socket.SOCK_* constants as members of IntEnums for
@@ -71,10 +74,10 @@ AddressFamily = IntEnum('AddressFamily',
                          if name.isupper() and name.startswith('AF_')})
 globals().update(AddressFamily.__members__)
 
-SocketType = IntEnum('SocketType',
+SocketKind = IntEnum('SocketKind',
                      {name: value for name, value in globals().items()
                       if name.isupper() and name.startswith('SOCK_')})
-globals().update(SocketType.__members__)
+globals().update(SocketKind.__members__)
 
 def _intenum_converter(value, enum_klass):
     """Convert a numeric family value to an IntEnum member.
@@ -198,9 +201,8 @@ class socket(_socket.socket):
         except the only mode characters supported are 'r', 'w' and 'b'.
         The semantics are similar too.  (XXX refactor to share code?)
         """
-        for c in mode:
-            if c not in {"r", "w", "b"}:
-                raise ValueError("invalid mode %r (only r, w, b allowed)")
+        if not set(mode) <= {"r", "w", "b"}:
+            raise ValueError("invalid mode %r (only r, w, b allowed)" % (mode,))
         writing = "w" in mode
         reading = "r" in mode or not writing
         assert reading or writing
@@ -269,7 +271,7 @@ class socket(_socket.socket):
     def type(self):
         """Read-only access to the socket type.
         """
-        return _intenum_converter(super().type, SocketType)
+        return _intenum_converter(super().type, SocketKind)
 
     if os.name == 'nt':
         def get_inheritable(self):
@@ -297,10 +299,11 @@ if hasattr(_socket.socket, "share"):
     def fromshare(info):
         """ fromshare(info) -> socket object
 
-        Create a socket object from a the bytes object returned by
+        Create a socket object from the bytes object returned by
         socket.share(pid).
         """
         return socket(0, 0, 0, info)
+    __all__.append("fromshare")
 
 if hasattr(_socket, "socketpair"):
 
@@ -530,6 +533,6 @@ def getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
     for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
         af, socktype, proto, canonname, sa = res
         addrlist.append((_intenum_converter(af, AddressFamily),
-                         _intenum_converter(socktype, SocketType),
+                         _intenum_converter(socktype, SocketKind),
                          proto, canonname, sa))
     return addrlist

@@ -269,6 +269,7 @@ class SimpleHTTPServerTestCase(BaseTestCase):
             self.assertEqual(data, body)
         return body
 
+    @support.requires_mac_ver(10, 5)
     @unittest.skipUnless(support.TESTFN_UNDECODABLE,
                          'need support.TESTFN_UNDECODABLE')
     def test_undecodable_filename(self):
@@ -305,6 +306,12 @@ class SimpleHTTPServerTestCase(BaseTestCase):
         self.check_status_and_reason(response, 200)
         response = self.request(self.tempdir_name)
         self.check_status_and_reason(response, 301)
+        response = self.request(self.tempdir_name + '/?hi=2')
+        self.check_status_and_reason(response, 200)
+        response = self.request(self.tempdir_name + '?hi=1')
+        self.check_status_and_reason(response, 301)
+        self.assertEqual(response.getheader("Location"),
+                         self.tempdir_name + "/?hi=1")
         response = self.request('/ThisDoesNotExist')
         self.check_status_and_reason(response, 404)
         response = self.request('/' + 'ThisDoesNotExist' + '/')
@@ -333,7 +340,7 @@ class SimpleHTTPServerTestCase(BaseTestCase):
         response = self.request('/', method='FOO')
         self.check_status_and_reason(response, 501)
         # requests must be case sensitive,so this should fail too
-        response = self.request('/', method='get')
+        response = self.request('/', method='custom')
         self.check_status_and_reason(response, 501)
         response = self.request('/', method='GETs')
         self.check_status_and_reason(response, 501)

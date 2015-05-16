@@ -91,6 +91,13 @@ class SilentWSGIRequestHandler(WSGIRequestHandler):
 
 class SilentWSGIServer(WSGIServer):
 
+    request_timeout = 2
+
+    def get_request(self):
+        request, client_addr = super().get_request()
+        request.settimeout(self.request_timeout)
+        return request, client_addr
+
     def handle_error(self, request, client_address):
         pass
 
@@ -138,7 +145,8 @@ def _run_test_server(*, address, use_ssl=False, server_cls, server_ssl_cls):
     httpd = server_class(address, SilentWSGIRequestHandler)
     httpd.set_app(app)
     httpd.address = httpd.server_address
-    server_thread = threading.Thread(target=httpd.serve_forever)
+    server_thread = threading.Thread(
+        target=lambda: httpd.serve_forever(poll_interval=0.05))
     server_thread.start()
     try:
         yield httpd
@@ -160,12 +168,15 @@ if hasattr(socket, 'AF_UNIX'):
 
     class UnixWSGIServer(UnixHTTPServer, WSGIServer):
 
+        request_timeout = 2
+
         def server_bind(self):
             UnixHTTPServer.server_bind(self)
             self.setup_environ()
 
         def get_request(self):
             request, client_addr = super().get_request()
+            request.settimeout(self.request_timeout)
             # Code in the stdlib expects that get_request
             # will return a socket and a tuple (host, port).
             # However, this isn't true for UNIX sockets,
@@ -296,6 +307,7 @@ class TestLoop(base_events.BaseEventLoop):
             self._time += advance
 
     def close(self):
+        super().close()
         if self._check_on_close:
             try:
                 self._gen.send(0)
@@ -404,6 +416,10 @@ class TestCase(unittest.TestCase):
     def tearDown(self):
         events.set_event_loop(None)
 
+        # Detect CPython bug #23353: ensure that yield/yield-from is not used
+        # in an except block of a generator
+        self.assertEqual(sys.exc_info(), (None, None, None))
+
 
 @contextlib.contextmanager
 def disable_logger():
@@ -423,3 +439,8 @@ def mock_nonblocking_socket():
     sock = mock.Mock(socket.socket)
     sock.gettimeout.return_value = 0.0
     return sock
+
+
+def force_legacy_ssl_support():
+    return mock.patch('asyncio.sslproto._is_sslproto_available',
+                      return_value=False)

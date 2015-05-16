@@ -22,9 +22,11 @@ import logging
 import os
 import socket
 import subprocess
+import threading
 import time
 import traceback
 import sys
+import warnings
 
 from . import coroutines
 from . import events
@@ -34,12 +36,19 @@ from .coroutines import coroutine
 from .log import logger
 
 
-__all__ = ['BaseEventLoop', 'Server']
+__all__ = ['BaseEventLoop']
 
 
 # Argument for default thread pool executor creation.
 _MAX_WORKERS = 5
 
+# Minimum number of _scheduled timer handles before cleanup of
+# cancelled handles is performed.
+_MIN_SCHEDULED_TIMER_HANDLES = 100
+
+# Minimum fraction of _scheduled timer handles that are cancelled
+# before cleanup of cancelled handles is performed.
+_MIN_CANCELLED_TIMER_HANDLES_FRACTION = 0.5
 
 def _format_handle(handle):
     cb = handle._callback
@@ -66,7 +75,11 @@ class _StopError(BaseException):
 def _check_resolved_address(sock, address):
     # Ensure that the address is already resolved to avoid the trap of hanging
     # the entire event loop when the address requires doing a DNS lookup.
+    #
+    # getaddrinfo() is slow (around 10 us per call): this function should only
+    # be called in debug mode
     family = sock.family
+
     if family == socket.AF_INET:
         host, port = address
     elif family == socket.AF_INET6:
@@ -74,25 +87,47 @@ def _check_resolved_address(sock, address):
     else:
         return
 
-    type_mask = 0
-    if hasattr(socket, 'SOCK_NONBLOCK'):
-        type_mask |= socket.SOCK_NONBLOCK
-    if hasattr(socket, 'SOCK_CLOEXEC'):
-        type_mask |= socket.SOCK_CLOEXEC
-    # Use getaddrinfo(flags=AI_NUMERICHOST) to ensure that the address is
-    # already resolved.
-    try:
-        socket.getaddrinfo(host, port,
-                           family=family,
-                           type=(sock.type & ~type_mask),
-                           proto=sock.proto,
-                           flags=socket.AI_NUMERICHOST)
-    except socket.gaierror as err:
-        raise ValueError("address must be resolved (IP address), got %r: %s"
-                         % (address, err))
+    # On Windows, socket.inet_pton() is only available since Python 3.4
+    if hasattr(socket, 'inet_pton'):
+        # getaddrinfo() is slow and has known issue: prefer inet_pton()
+        # if available
+        try:
+            socket.inet_pton(family, host)
+        except OSError as exc:
+            raise ValueError("address must be resolved (IP address), "
+                             "got host %r: %s"
+                             % (host, exc))
+    else:
+        # Use getaddrinfo(flags=AI_NUMERICHOST) to ensure that the address is
+        # already resolved.
+        type_mask = 0
+        if hasattr(socket, 'SOCK_NONBLOCK'):
+            type_mask |= socket.SOCK_NONBLOCK
+        if hasattr(socket, 'SOCK_CLOEXEC'):
+            type_mask |= socket.SOCK_CLOEXEC
+        try:
+            socket.getaddrinfo(host, port,
+                               family=family,
+                               type=(sock.type & ~type_mask),
+                               proto=sock.proto,
+                               flags=socket.AI_NUMERICHOST)
+        except socket.gaierror as err:
+            raise ValueError("address must be resolved (IP address), "
+                             "got host %r: %s"
+                             % (host, err))
 
 def _raise_stop_error(*args):
     raise _StopError
+
+
+def _run_until_complete_cb(fut):
+    exc = fut._exception
+    if (isinstance(exc, BaseException)
+    and not isinstance(exc, Exception)):
+        # Issue #22429: run_forever() already finished, no need to
+        # stop it.
+        return
+    _raise_stop_error()
 
 
 class Server(events.AbstractServer):
@@ -145,12 +180,15 @@ class Server(events.AbstractServer):
 class BaseEventLoop(events.AbstractEventLoop):
 
     def __init__(self):
+        self._timer_cancelled_count = 0
         self._closed = False
         self._ready = collections.deque()
         self._scheduled = []
         self._default_executor = None
         self._internal_fds = 0
-        self._running = False
+        # Identifier of the thread running the event loop, or None if the
+        # event loop is not running
+        self._thread_id = None
         self._clock_resolution = time.get_clock_info('monotonic').resolution
         self._exception_handler = None
         self._debug = (not sys.flags.ignore_environment
@@ -158,6 +196,7 @@ class BaseEventLoop(events.AbstractEventLoop):
         # In debug mode, if the execution of a callback or a step of a task
         # exceed this duration in seconds, the slow callback/task is logged.
         self.slow_callback_duration = 0.1
+        self._current_handle = None
 
     def __repr__(self):
         return ('<%s running=%s closed=%s debug=%s>'
@@ -169,6 +208,7 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         Return a task object.
         """
+        self._check_closed()
         task = tasks.Task(coro, loop=self)
         if task._source_traceback:
             del task._source_traceback[-1]
@@ -179,8 +219,8 @@ class BaseEventLoop(events.AbstractEventLoop):
         """Create socket transport."""
         raise NotImplementedError
 
-    def _make_ssl_transport(self, rawsock, protocol, sslcontext, waiter, *,
-                            server_side=False, server_hostname=None,
+    def _make_ssl_transport(self, rawsock, protocol, sslcontext, waiter=None,
+                            *, server_side=False, server_hostname=None,
                             extra=None, server=None):
         """Create SSL transport."""
         raise NotImplementedError
@@ -227,9 +267,9 @@ class BaseEventLoop(events.AbstractEventLoop):
     def run_forever(self):
         """Run until stop() is called."""
         self._check_closed()
-        if self._running:
+        if self.is_running():
             raise RuntimeError('Event loop is running.')
-        self._running = True
+        self._thread_id = threading.get_ident()
         try:
             while True:
                 try:
@@ -237,7 +277,7 @@ class BaseEventLoop(events.AbstractEventLoop):
                 except _StopError:
                     break
         finally:
-            self._running = False
+            self._thread_id = None
 
     def run_until_complete(self, future):
         """Run until the Future is done.
@@ -259,9 +299,17 @@ class BaseEventLoop(events.AbstractEventLoop):
             # is no need to log the "destroy pending task" message
             future._log_destroy_pending = False
 
-        future.add_done_callback(_raise_stop_error)
-        self.run_forever()
-        future.remove_done_callback(_raise_stop_error)
+        future.add_done_callback(_run_until_complete_cb)
+        try:
+            self.run_forever()
+        except:
+            if new_task and future.done() and not future.cancelled():
+                # The coroutine raised a BaseException. Consume the exception
+                # to not log a warning, the caller doesn't have access to the
+                # local task.
+                future.exception()
+            raise
+        future.remove_done_callback(_run_until_complete_cb)
         if not future.done():
             raise RuntimeError('Event loop stopped before Future completed.')
 
@@ -284,7 +332,7 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         The event loop must not be running.
         """
-        if self._running:
+        if self.is_running():
             raise RuntimeError("Cannot close a running event loop")
         if self._closed:
             return
@@ -302,9 +350,19 @@ class BaseEventLoop(events.AbstractEventLoop):
         """Returns True if the event loop was closed."""
         return self._closed
 
+    # On Python 3.3 and older, objects with a destructor part of a reference
+    # cycle are never destroyed. It's not more the case on Python 3.4 thanks
+    # to the PEP 442.
+    if sys.version_info >= (3, 4):
+        def __del__(self):
+            if not self.is_closed():
+                warnings.warn("unclosed event loop %r" % self, ResourceWarning)
+                if not self.is_running():
+                    self.close()
+
     def is_running(self):
         """Returns True if the event loop is running."""
-        return self._running
+        return (self._thread_id is not None)
 
     def time(self):
         """Return the time according to the event loop's clock.
@@ -341,14 +399,17 @@ class BaseEventLoop(events.AbstractEventLoop):
 
         Absolute time corresponds to the event loop's time() method.
         """
-        if coroutines.iscoroutinefunction(callback):
+        if (coroutines.iscoroutine(callback)
+        or coroutines.iscoroutinefunction(callback)):
             raise TypeError("coroutines cannot be used with call_at()")
+        self._check_closed()
         if self._debug:
-            self._assert_is_current_event_loop()
+            self._check_thread()
         timer = events.TimerHandle(when, callback, args, self)
         if timer._source_traceback:
             del timer._source_traceback[-1]
         heapq.heappush(self._scheduled, timer)
+        timer._scheduled = True
         return timer
 
     def call_soon(self, callback, *args):
@@ -361,24 +422,26 @@ class BaseEventLoop(events.AbstractEventLoop):
         Any positional arguments after the callback will be passed to
         the callback when it is called.
         """
-        handle = self._call_soon(callback, args, check_loop=True)
+        if self._debug:
+            self._check_thread()
+        handle = self._call_soon(callback, args)
         if handle._source_traceback:
             del handle._source_traceback[-1]
         return handle
 
-    def _call_soon(self, callback, args, check_loop):
-        if coroutines.iscoroutinefunction(callback):
+    def _call_soon(self, callback, args):
+        if (coroutines.iscoroutine(callback)
+        or coroutines.iscoroutinefunction(callback)):
             raise TypeError("coroutines cannot be used with call_soon()")
-        if self._debug and check_loop:
-            self._assert_is_current_event_loop()
+        self._check_closed()
         handle = events.Handle(callback, args, self)
         if handle._source_traceback:
             del handle._source_traceback[-1]
         self._ready.append(handle)
         return handle
 
-    def _assert_is_current_event_loop(self):
-        """Asserts that this event loop is the current event loop.
+    def _check_thread(self):
+        """Check that the current thread is the thread running the event loop.
 
         Non-thread-safe methods of this class make this assumption and will
         likely behave incorrectly when the assumption is violated.
@@ -386,26 +449,27 @@ class BaseEventLoop(events.AbstractEventLoop):
         Should only be called when (self._debug == True).  The caller is
         responsible for checking this condition for performance reasons.
         """
-        try:
-            current = events.get_event_loop()
-        except AssertionError:
+        if self._thread_id is None:
             return
-        if current is not self:
+        thread_id = threading.get_ident()
+        if thread_id != self._thread_id:
             raise RuntimeError(
                 "Non-thread-safe operation invoked on an event loop other "
                 "than the current one")
 
     def call_soon_threadsafe(self, callback, *args):
         """Like call_soon(), but thread-safe."""
-        handle = self._call_soon(callback, args, check_loop=False)
+        handle = self._call_soon(callback, args)
         if handle._source_traceback:
             del handle._source_traceback[-1]
         self._write_to_self()
         return handle
 
     def run_in_executor(self, executor, callback, *args):
-        if coroutines.iscoroutinefunction(callback):
-            raise TypeError("Coroutines cannot be used with run_in_executor()")
+        if (coroutines.iscoroutine(callback)
+        or coroutines.iscoroutinefunction(callback)):
+            raise TypeError("coroutines cannot be used with run_in_executor()")
+        self._check_closed()
         if isinstance(callback, events.Handle):
             assert not args
             assert not isinstance(callback, events.TimerHandle)
@@ -598,7 +662,12 @@ class BaseEventLoop(events.AbstractEventLoop):
         else:
             transport = self._make_socket_transport(sock, protocol, waiter)
 
-        yield from waiter
+        try:
+            yield from waiter
+        except:
+            transport.close()
+            raise
+
         return transport, protocol
 
     @coroutine
@@ -682,7 +751,13 @@ class BaseEventLoop(events.AbstractEventLoop):
                 logger.debug("Datagram endpoint remote_addr=%r created: "
                              "(%r, %r)",
                              remote_addr, transport, protocol)
-        yield from waiter
+
+        try:
+            yield from waiter
+        except:
+            transport.close()
+            raise
+
         return transport, protocol
 
     @coroutine
@@ -774,7 +849,13 @@ class BaseEventLoop(events.AbstractEventLoop):
         protocol = protocol_factory()
         waiter = futures.Future(loop=self)
         transport = self._make_read_pipe_transport(pipe, protocol, waiter)
-        yield from waiter
+
+        try:
+            yield from waiter
+        except:
+            transport.close()
+            raise
+
         if self._debug:
             logger.debug('Read pipe %r connected: (%r, %r)',
                          pipe.fileno(), transport, protocol)
@@ -785,7 +866,13 @@ class BaseEventLoop(events.AbstractEventLoop):
         protocol = protocol_factory()
         waiter = futures.Future(loop=self)
         transport = self._make_write_pipe_transport(pipe, protocol, waiter)
-        yield from waiter
+
+        try:
+            yield from waiter
+        except:
+            transport.close()
+            raise
+
         if self._debug:
             logger.debug('Write pipe %r connected: (%r, %r)',
                          pipe.fileno(), transport, protocol)
@@ -896,6 +983,11 @@ class BaseEventLoop(events.AbstractEventLoop):
         else:
             exc_info = False
 
+        if ('source_traceback' not in context
+        and self._current_handle is not None
+        and self._current_handle._source_traceback):
+            context['handle_traceback'] = self._current_handle._source_traceback
+
         log_lines = [message]
         for key in sorted(context):
             if key in {'message', 'exception'}:
@@ -904,6 +996,10 @@ class BaseEventLoop(events.AbstractEventLoop):
             if key == 'source_traceback':
                 tb = ''.join(traceback.format_list(value))
                 value = 'Object created at (most recent call last):\n'
+                value += tb.rstrip()
+            elif key == 'handle_traceback':
+                tb = ''.join(traceback.format_list(value))
+                value = 'Handle created at (most recent call last):\n'
                 value += tb.rstrip()
             else:
                 value = repr(value)
@@ -964,15 +1060,18 @@ class BaseEventLoop(events.AbstractEventLoop):
         assert isinstance(handle, events.Handle), 'A Handle is required here'
         if handle._cancelled:
             return
-        if isinstance(handle, events.TimerHandle):
-            heapq.heappush(self._scheduled, handle)
-        else:
-            self._ready.append(handle)
+        assert not isinstance(handle, events.TimerHandle)
+        self._ready.append(handle)
 
     def _add_callback_signalsafe(self, handle):
         """Like _add_callback() but called from a signal handler."""
         self._add_callback(handle)
         self._write_to_self()
+
+    def _timer_handle_cancelled(self, handle):
+        """Notification that a TimerHandle has been cancelled."""
+        if handle._scheduled:
+            self._timer_cancelled_count += 1
 
     def _run_once(self):
         """Run one full iteration of the event loop.
@@ -981,9 +1080,29 @@ class BaseEventLoop(events.AbstractEventLoop):
         schedules the resulting callbacks, and finally schedules
         'call_later' callbacks.
         """
-        # Remove delayed calls that were cancelled from head of queue.
-        while self._scheduled and self._scheduled[0]._cancelled:
-            heapq.heappop(self._scheduled)
+
+        sched_count = len(self._scheduled)
+        if (sched_count > _MIN_SCHEDULED_TIMER_HANDLES and
+            self._timer_cancelled_count / sched_count >
+                _MIN_CANCELLED_TIMER_HANDLES_FRACTION):
+            # Remove delayed calls that were cancelled if their number
+            # is too high
+            new_scheduled = []
+            for handle in self._scheduled:
+                if handle._cancelled:
+                    handle._scheduled = False
+                else:
+                    new_scheduled.append(handle)
+
+            heapq.heapify(new_scheduled)
+            self._scheduled = new_scheduled
+            self._timer_cancelled_count = 0
+        else:
+            # Remove delayed calls that were cancelled from head of queue.
+            while self._scheduled and self._scheduled[0]._cancelled:
+                self._timer_cancelled_count -= 1
+                handle = heapq.heappop(self._scheduled)
+                handle._scheduled = False
 
         timeout = None
         if self._ready:
@@ -1024,6 +1143,7 @@ class BaseEventLoop(events.AbstractEventLoop):
             if handle._when >= end_time:
                 break
             handle = heapq.heappop(self._scheduled)
+            handle._scheduled = False
             self._ready.append(handle)
 
         # This is the only place where callbacks are actually *called*.
@@ -1038,12 +1158,16 @@ class BaseEventLoop(events.AbstractEventLoop):
             if handle._cancelled:
                 continue
             if self._debug:
-                t0 = self.time()
-                handle._run()
-                dt = self.time() - t0
-                if dt >= self.slow_callback_duration:
-                    logger.warning('Executing %s took %.3f seconds',
-                                   _format_handle(handle), dt)
+                try:
+                    self._current_handle = handle
+                    t0 = self.time()
+                    handle._run()
+                    dt = self.time() - t0
+                    if dt >= self.slow_callback_duration:
+                        logger.warning('Executing %s took %.3f seconds',
+                                       _format_handle(handle), dt)
+                finally:
+                    self._current_handle = None
             else:
                 handle._run()
         handle = None  # Needed to break cycles when an exception occurs.

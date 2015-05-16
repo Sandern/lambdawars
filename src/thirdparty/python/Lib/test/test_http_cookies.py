@@ -3,7 +3,7 @@
 from test.support import run_unittest, run_doctest, check_warnings
 import unittest
 from http import cookies
-
+import pickle
 import warnings
 
 class CookieTests(unittest.TestCase):
@@ -114,7 +114,7 @@ class CookieTests(unittest.TestCase):
         C['Customer']['secure'] = True
         C['Customer']['httponly'] = True
         self.assertEqual(C.output(),
-            'Set-Cookie: Customer="WILE_E_COYOTE"; httponly; secure')
+            'Set-Cookie: Customer="WILE_E_COYOTE"; HttpOnly; Secure')
 
     def test_secure_httponly_false_if_not_present(self):
         C = cookies.SimpleCookie()
@@ -152,7 +152,7 @@ class CookieTests(unittest.TestCase):
         C = cookies.SimpleCookie()
         C.load('eggs  =  scrambled  ;  secure  ;  path  =  bar   ; foo=foo   ')
         self.assertEqual(C.output(),
-            'Set-Cookie: eggs=scrambled; Path=bar; secure\r\nSet-Cookie: foo=foo')
+            'Set-Cookie: eggs=scrambled; Path=bar; Secure\r\nSet-Cookie: foo=foo')
 
     def test_quoted_meta(self):
         # Try cookie with quoted meta-data
@@ -186,6 +186,19 @@ class CookieTests(unittest.TestCase):
             C.load(s)
             self.assertEqual(dict(C), {})
             self.assertEqual(C.output(), '')
+
+    def test_pickle(self):
+        rawdata = 'Customer="WILE_E_COYOTE"; Path=/acme; Version=1'
+        expected_output = 'Set-Cookie: %s' % rawdata
+
+        C = cookies.SimpleCookie()
+        C.load(rawdata)
+        self.assertEqual(C.output(), expected_output)
+
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.subTest(proto=proto):
+                C1 = pickle.loads(pickle.dumps(C, protocol=proto))
+                self.assertEqual(C1.output(), expected_output)
 
 
 class MorselTests(unittest.TestCase):

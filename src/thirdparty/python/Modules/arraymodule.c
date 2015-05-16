@@ -1441,14 +1441,14 @@ frombytes(arrayobject *self, Py_buffer *buffer)
     Py_ssize_t n;
     if (buffer->itemsize != 1) {
         PyBuffer_Release(buffer);
-        PyErr_SetString(PyExc_TypeError, "string/buffer of bytes required.");
+        PyErr_SetString(PyExc_TypeError, "a bytes-like object is required");
         return NULL;
     }
     n = buffer->len;
     if (n % itemsize != 0) {
         PyBuffer_Release(buffer);
         PyErr_SetString(PyExc_ValueError,
-                   "string length not a multiple of item size");
+                   "bytes length not a multiple of item size");
         return NULL;
     }
     n = n / itemsize;
@@ -2628,7 +2628,7 @@ array_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
                     self->allocated = Py_SIZE(self);
                 }
             }
-            else if (initial != NULL && array_Check(initial)) {
+            else if (initial != NULL && array_Check(initial) && len > 0) {
                 arrayobject *self = (arrayobject *)a;
                 arrayobject *other = (arrayobject *)initial;
                 memcpy(self->ob_item, other->ob_item, len * other->ob_descr->itemsize);

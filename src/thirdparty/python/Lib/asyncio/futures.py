@@ -20,7 +20,6 @@ _FINISHED = 'FINISHED'
 
 _PY34 = sys.version_info >= (3, 4)
 
-# TODO: Do we really want to depend on concurrent.futures internals?
 Error = concurrent.futures._base.Error
 CancelledError = concurrent.futures.CancelledError
 TimeoutError = concurrent.futures.TimeoutError
@@ -30,7 +29,6 @@ STACK_DEBUG = logging.DEBUG - 1  # heavy-duty debugging
 
 class InvalidStateError(Error):
     """The operation is not allowed in this state."""
-    # TODO: Show the future, its state, the method, and the required state.
 
 
 class _TracebackLogger:
@@ -61,7 +59,7 @@ class _TracebackLogger:
     the Future is collected, and the helper is present, the helper
     object is also collected, and its __del__() method will log the
     traceback.  When the Future's result() or exception() method is
-    called (and a helper object is present), it removes the the helper
+    called (and a helper object is present), it removes the helper
     object, after calling its clear() method to prevent it from
     logging.
 
@@ -104,10 +102,11 @@ class _TracebackLogger:
 
     def __del__(self):
         if self.tb:
-            msg = 'Future/Task exception was never retrieved'
+            msg = 'Future/Task exception was never retrieved\n'
             if self.source_traceback:
-                msg += '\nFuture/Task created at (most recent call last):\n'
-                msg += ''.join(traceback.format_list(self.source_traceback))
+                src = ''.join(traceback.format_list(self.source_traceback))
+                msg += 'Future/Task created at (most recent call last):\n'
+                msg += '%s\n' % src.rstrip()
             msg += ''.join(self.tb).rstrip()
             self.loop.call_exception_handler({'message': msg})
 
@@ -134,6 +133,7 @@ class Future:
     _result = None
     _exception = None
     _loop = None
+    _source_traceback = None
 
     _blocking = False  # proper use of future (yield vs yield from)
 
@@ -154,8 +154,6 @@ class Future:
         self._callbacks = []
         if self._loop.get_debug():
             self._source_traceback = traceback.extract_stack(sys._getframe(1))
-        else:
-            self._source_traceback = None
 
     def _format_callbacks(self):
         cb = self._callbacks
@@ -197,9 +195,9 @@ class Future:
         info = self._repr_info()
         return '<%s %s>' % (self.__class__.__name__, ' '.join(info))
 
-    # On Python 3.3 or older, objects with a destructor part of a reference
-    # cycle are never destroyed. It's not more the case on Python 3.4 thanks to
-    # the PEP 442.
+    # On Python 3.3 and older, objects with a destructor part of a reference
+    # cycle are never destroyed. It's not more the case on Python 3.4 thanks
+    # to the PEP 442.
     if _PY34:
         def __del__(self):
             if not self._log_traceback:
@@ -407,5 +405,5 @@ def wrap_future(fut, *, loop=None):
     new_future.add_done_callback(_check_cancel_other)
     fut.add_done_callback(
         lambda future: loop.call_soon_threadsafe(
-            new_future._copy_state, fut))
+            new_future._copy_state, future))
     return new_future

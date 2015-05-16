@@ -15,8 +15,8 @@ here = os.path.dirname(__file__)
 CERT_localhost = os.path.join(here, 'keycert.pem')
 # Self-signed cert file for 'fakehostname'
 CERT_fakehostname = os.path.join(here, 'keycert2.pem')
-# Root cert file (CA) for svn.python.org's cert
-CACERT_svn_python_org = os.path.join(here, 'https_svn_python_org_root.pem')
+# Self-signed cert file for self-signed.pythontest.net
+CERT_selfsigned_pythontestdotnet = os.path.join(here, 'selfsigned_pythontestdotnet.pem')
 
 HOST = support.HOST
 
@@ -28,6 +28,7 @@ class FakeSocket:
         self.fileclass = fileclass
         self.data = b''
         self.sendall_calls = 0
+        self.file_closed = False
         self.host = host
         self.port = port
 
@@ -38,7 +39,13 @@ class FakeSocket:
     def makefile(self, mode, bufsize=None):
         if mode != 'r' and mode != 'rb':
             raise client.UnimplementedFileMode()
-        return self.fileclass(self.text)
+        # keep the file around so we can check how much was read from it
+        self.file = self.fileclass(self.text)
+        self.file.close = self.file_close #nerf close ()
+        return self.file
+
+    def file_close(self):
+        self.file_closed = True
 
     def close(self):
         pass
@@ -159,6 +166,16 @@ class HeaderTests(TestCase):
         conn.sock = sock
         conn.request('GET', '/foo')
         self.assertTrue(sock.data.startswith(expected))
+
+    def test_malformed_headers_coped_with(self):
+        # Issue 19996
+        body = "HTTP/1.1 200 OK\r\nFirst: val\r\n: nval\r\nSecond: val\r\n\r\n"
+        sock = FakeSocket(body)
+        resp = client.HTTPResponse(sock)
+        resp.begin()
+
+        self.assertEqual(resp.getheader('First'), 'val')
+        self.assertEqual(resp.getheader('Second'), 'val')
 
 
 class BasicTest(TestCase):
@@ -675,6 +692,22 @@ class BasicTest(TestCase):
         conn.request('POST', '/', body)
         self.assertGreater(sock.sendall_calls, 1)
 
+    def test_error_leak(self):
+        # Test that the socket is not leaked if getresponse() fails
+        conn = client.HTTPConnection('example.com')
+        response = None
+        class Response(client.HTTPResponse):
+            def __init__(self, *pos, **kw):
+                nonlocal response
+                response = self  # Avoid garbage collector closing the socket
+                client.HTTPResponse.__init__(self, *pos, **kw)
+        conn.response_class = Response
+        conn.sock = FakeSocket('')  # Emulate server dropping connection
+        conn.request('GET', '/')
+        self.assertRaises(client.BadStatusLine, conn.getresponse)
+        self.assertTrue(response.closed)
+        self.assertTrue(conn.sock.file_closed)
+
 class OfflineTest(TestCase):
     def test_responses(self):
         self.assertEqual(client.responses[client.NOT_FOUND], "Not Found")
@@ -772,44 +805,74 @@ class HTTPSTest(TestCase):
         h = client.HTTPSConnection(HOST, TimeoutTest.PORT, timeout=30)
         self.assertEqual(h.timeout, 30)
 
-    def _check_svn_python_org(self, resp):
-        # Just a simple check that everything went fine
-        server_string = resp.getheader('server')
-        self.assertIn('Apache', server_string)
-
     def test_networked(self):
-        # Default settings: no cert verification is done
-        support.requires('network')
-        with support.transient_internet('svn.python.org'):
-            h = client.HTTPSConnection('svn.python.org', 443)
-            h.request('GET', '/')
-            resp = h.getresponse()
-            self._check_svn_python_org(resp)
-
-    def test_networked_good_cert(self):
-        # We feed a CA cert that validates the server's cert
+        # Default settings: requires a valid cert from a trusted CA
         import ssl
         support.requires('network')
-        with support.transient_internet('svn.python.org'):
-            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-            context.verify_mode = ssl.CERT_REQUIRED
-            context.load_verify_locations(CACERT_svn_python_org)
-            h = client.HTTPSConnection('svn.python.org', 443, context=context)
+        with support.transient_internet('self-signed.pythontest.net'):
+            h = client.HTTPSConnection('self-signed.pythontest.net', 443)
+            with self.assertRaises(ssl.SSLError) as exc_info:
+                h.request('GET', '/')
+            self.assertEqual(exc_info.exception.reason, 'CERTIFICATE_VERIFY_FAILED')
+
+    def test_networked_noverification(self):
+        # Switch off cert verification
+        import ssl
+        support.requires('network')
+        with support.transient_internet('self-signed.pythontest.net'):
+            context = ssl._create_unverified_context()
+            h = client.HTTPSConnection('self-signed.pythontest.net', 443,
+                                       context=context)
             h.request('GET', '/')
             resp = h.getresponse()
-            self._check_svn_python_org(resp)
+            self.assertIn('nginx', resp.getheader('server'))
+
+    @support.system_must_validate_cert
+    def test_networked_trusted_by_default_cert(self):
+        # Default settings: requires a valid cert from a trusted CA
+        support.requires('network')
+        with support.transient_internet('www.python.org'):
+            h = client.HTTPSConnection('www.python.org', 443)
+            h.request('GET', '/')
+            resp = h.getresponse()
+            content_type = resp.getheader('content-type')
+            self.assertIn('text/html', content_type)
+
+    def test_networked_good_cert(self):
+        # We feed the server's cert as a validating cert
+        import ssl
+        support.requires('network')
+        with support.transient_internet('self-signed.pythontest.net'):
+            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+            context.verify_mode = ssl.CERT_REQUIRED
+            context.load_verify_locations(CERT_selfsigned_pythontestdotnet)
+            h = client.HTTPSConnection('self-signed.pythontest.net', 443, context=context)
+            h.request('GET', '/')
+            resp = h.getresponse()
+            server_string = resp.getheader('server')
+            self.assertIn('nginx', server_string)
 
     def test_networked_bad_cert(self):
         # We feed a "CA" cert that is unrelated to the server's cert
         import ssl
         support.requires('network')
-        with support.transient_internet('svn.python.org'):
+        with support.transient_internet('self-signed.pythontest.net'):
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
             context.verify_mode = ssl.CERT_REQUIRED
             context.load_verify_locations(CERT_localhost)
-            h = client.HTTPSConnection('svn.python.org', 443, context=context)
-            with self.assertRaises(ssl.SSLError):
+            h = client.HTTPSConnection('self-signed.pythontest.net', 443, context=context)
+            with self.assertRaises(ssl.SSLError) as exc_info:
                 h.request('GET', '/')
+            self.assertEqual(exc_info.exception.reason, 'CERTIFICATE_VERIFY_FAILED')
+
+    def test_local_unknown_cert(self):
+        # The custom cert isn't known to the default trust bundle
+        import ssl
+        server = self.make_server(CERT_localhost)
+        h = client.HTTPSConnection('localhost', server.port)
+        with self.assertRaises(ssl.SSLError) as exc_info:
+            h.request('GET', '/')
+        self.assertEqual(exc_info.exception.reason, 'CERTIFICATE_VERIFY_FAILED')
 
     def test_local_good_hostname(self):
         # The (valid) cert validates the HTTP hostname
@@ -822,7 +885,6 @@ class HTTPSTest(TestCase):
         h.request('GET', '/nonexistent')
         resp = h.getresponse()
         self.assertEqual(resp.status, 404)
-        del server
 
     def test_local_bad_hostname(self):
         # The (valid) cert doesn't validate the HTTP hostname
@@ -830,6 +892,7 @@ class HTTPSTest(TestCase):
         server = self.make_server(CERT_fakehostname)
         context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
         context.verify_mode = ssl.CERT_REQUIRED
+        context.check_hostname = True
         context.load_verify_locations(CERT_fakehostname)
         h = client.HTTPSConnection('localhost', server.port, context=context)
         with self.assertRaises(ssl.CertificateError):
@@ -840,12 +903,24 @@ class HTTPSTest(TestCase):
         with self.assertRaises(ssl.CertificateError):
             h.request('GET', '/')
         # With check_hostname=False, the mismatching is ignored
+        context.check_hostname = False
         h = client.HTTPSConnection('localhost', server.port, context=context,
                                    check_hostname=False)
         h.request('GET', '/nonexistent')
         resp = h.getresponse()
         self.assertEqual(resp.status, 404)
-        del server
+        # The context's check_hostname setting is used if one isn't passed to
+        # HTTPSConnection.
+        context.check_hostname = False
+        h = client.HTTPSConnection('localhost', server.port, context=context)
+        h.request('GET', '/nonexistent')
+        self.assertEqual(h.getresponse().status, 404)
+        # Passing check_hostname to HTTPSConnection should override the
+        # context's setting.
+        h = client.HTTPSConnection('localhost', server.port, context=context,
+                                   check_hostname=True)
+        with self.assertRaises(ssl.CertificateError):
+            h.request('GET', '/')
 
     @unittest.skipIf(not hasattr(client, 'HTTPSConnection'),
                      'http.client.HTTPSConnection not available')
@@ -976,8 +1051,7 @@ class HTTPResponseTest(TestCase):
         self.assertEqual(header, 42)
 
 class TunnelTests(TestCase):
-
-    def test_connect(self):
+    def setUp(self):
         response_text = (
             'HTTP/1.0 200 OK\r\n\r\n' # Reply to CONNECT
             'HTTP/1.1 200 OK\r\n' # Reply to HEAD
@@ -985,37 +1059,58 @@ class TunnelTests(TestCase):
         )
 
         def create_connection(address, timeout=None, source_address=None):
-            return FakeSocket(response_text, host=address[0],
-                              port=address[1])
+            return FakeSocket(response_text, host=address[0], port=address[1])
 
-        conn = client.HTTPConnection('proxy.com')
-        conn._create_connection = create_connection
+        self.host = 'proxy.com'
+        self.conn = client.HTTPConnection(self.host)
+        self.conn._create_connection = create_connection
 
+    def tearDown(self):
+        self.conn.close()
+
+    def test_set_tunnel_host_port_headers(self):
+        tunnel_host = 'destination.com'
+        tunnel_port = 8888
+        tunnel_headers = {'User-Agent': 'Mozilla/5.0 (compatible, MSIE 11)'}
+        self.conn.set_tunnel(tunnel_host, port=tunnel_port,
+                             headers=tunnel_headers)
+        self.conn.request('HEAD', '/', '')
+        self.assertEqual(self.conn.sock.host, self.host)
+        self.assertEqual(self.conn.sock.port, client.HTTP_PORT)
+        self.assertEqual(self.conn._tunnel_host, tunnel_host)
+        self.assertEqual(self.conn._tunnel_port, tunnel_port)
+        self.assertEqual(self.conn._tunnel_headers, tunnel_headers)
+
+    def test_disallow_set_tunnel_after_connect(self):
         # Once connected, we shouldn't be able to tunnel anymore
-        conn.connect()
-        self.assertRaises(RuntimeError, conn.set_tunnel,
+        self.conn.connect()
+        self.assertRaises(RuntimeError, self.conn.set_tunnel,
                           'destination.com')
 
-        # But if we close the connection, we're good
-        conn.close()
-        conn.set_tunnel('destination.com')
-        conn.request('HEAD', '/', '')
-
-        self.assertEqual(conn.sock.host, 'proxy.com')
-        self.assertEqual(conn.sock.port, 80)
-        self.assertTrue(b'CONNECT destination.com' in conn.sock.data)
-        self.assertTrue(b'Host: destination.com' in conn.sock.data)
+    def test_connect_with_tunnel(self):
+        self.conn.set_tunnel('destination.com')
+        self.conn.request('HEAD', '/', '')
+        self.assertEqual(self.conn.sock.host, self.host)
+        self.assertEqual(self.conn.sock.port, client.HTTP_PORT)
+        self.assertIn(b'CONNECT destination.com', self.conn.sock.data)
+        # issue22095
+        self.assertNotIn(b'Host: destination.com:None', self.conn.sock.data)
+        self.assertIn(b'Host: destination.com', self.conn.sock.data)
 
         # This test should be removed when CONNECT gets the HTTP/1.1 blessing
-        self.assertTrue(b'Host: proxy.com' not in conn.sock.data)
+        self.assertNotIn(b'Host: proxy.com', self.conn.sock.data)
 
-        conn.close()
-        conn.request('PUT', '/', '')
-        self.assertEqual(conn.sock.host, 'proxy.com')
-        self.assertEqual(conn.sock.port, 80)
-        self.assertTrue(b'CONNECT destination.com' in conn.sock.data)
-        self.assertTrue(b'Host: destination.com' in conn.sock.data)
+    def test_connect_put_request(self):
+        self.conn.set_tunnel('destination.com')
+        self.conn.request('PUT', '/', '')
+        self.assertEqual(self.conn.sock.host, self.host)
+        self.assertEqual(self.conn.sock.port, client.HTTP_PORT)
+        self.assertIn(b'CONNECT destination.com', self.conn.sock.data)
+        self.assertIn(b'Host: destination.com', self.conn.sock.data)
 
+
+
+@support.reap_threads
 def test_main(verbose=None):
     support.run_unittest(HeaderTests, OfflineTest, BasicTest, TimeoutTest,
                          HTTPSTest, RequestBodyTest, SourceAddressTest,

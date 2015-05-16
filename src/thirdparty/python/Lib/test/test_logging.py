@@ -41,7 +41,7 @@ import sys
 import tempfile
 from test.script_helper import assert_python_ok
 from test.support import (captured_stdout, run_with_locale, run_unittest,
-                          patch, requires_zlib, TestHandler, Matcher)
+                          patch, requires_zlib, TestHandler, Matcher, HOST)
 import textwrap
 import time
 import unittest
@@ -930,10 +930,10 @@ class SMTPHandlerTest(BaseTest):
     TIMEOUT = 8.0
     def test_basic(self):
         sockmap = {}
-        server = TestSMTPServer(('localhost', 0), self.process_message, 0.001,
+        server = TestSMTPServer((HOST, 0), self.process_message, 0.001,
                                 sockmap)
         server.start()
-        addr = ('localhost', server.port)
+        addr = (HOST, server.port)
         h = logging.handlers.SMTPHandler(addr, 'me', 'you', 'Log',
                                          timeout=self.TIMEOUT)
         self.assertEqual(h.toaddrs, ['you'])
@@ -1631,36 +1631,6 @@ class UnixSysLogHandlerTest(SysLogHandlerTest):
 class HTTPHandlerTest(BaseTest):
     """Test for HTTPHandler."""
 
-    PEMFILE = """-----BEGIN RSA PRIVATE KEY-----
-MIICXQIBAAKBgQDGT4xS5r91rbLJQK2nUDenBhBG6qFk+bVOjuAGC/LSHlAoBnvG
-zQG3agOG+e7c5z2XT8m2ktORLqG3E4mYmbxgyhDrzP6ei2Anc+pszmnxPoK3Puh5
-aXV+XKt0bU0C1m2+ACmGGJ0t3P408art82nOxBw8ZHgIg9Dtp6xIUCyOqwIDAQAB
-AoGBAJFTnFboaKh5eUrIzjmNrKsG44jEyy+vWvHN/FgSC4l103HxhmWiuL5Lv3f7
-0tMp1tX7D6xvHwIG9VWvyKb/Cq9rJsDibmDVIOslnOWeQhG+XwJyitR0pq/KlJIB
-5LjORcBw795oKWOAi6RcOb1ON59tysEFYhAGQO9k6VL621gRAkEA/Gb+YXULLpbs
-piXN3q4zcHzeaVANo69tUZ6TjaQqMeTxE4tOYM0G0ZoSeHEdaP59AOZGKXXNGSQy
-2z/MddcYGQJBAMkjLSYIpOLJY11ja8OwwswFG2hEzHe0cS9bzo++R/jc1bHA5R0Y
-i6vA5iPi+wopPFvpytdBol7UuEBe5xZrxWMCQQCWxELRHiP2yWpEeLJ3gGDzoXMN
-PydWjhRju7Bx3AzkTtf+D6lawz1+eGTuEss5i0JKBkMEwvwnN2s1ce+EuF4JAkBb
-E96h1lAzkVW5OAfYOPY8RCPA90ZO/hoyg7PpSxR0ECuDrgERR8gXIeYUYfejBkEa
-rab4CfRoVJKKM28Yq/xZAkBvuq670JRCwOgfUTdww7WpdOQBYPkzQccsKNCslQW8
-/DyW6y06oQusSENUvynT6dr3LJxt/NgZPhZX2+k1eYDV
------END RSA PRIVATE KEY-----
------BEGIN CERTIFICATE-----
-MIICGzCCAYSgAwIBAgIJAIq84a2Q/OvlMA0GCSqGSIb3DQEBBQUAMBQxEjAQBgNV
-BAMTCWxvY2FsaG9zdDAeFw0xMTA1MjExMDIzMzNaFw03NTAzMjEwMzU1MTdaMBQx
-EjAQBgNVBAMTCWxvY2FsaG9zdDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA
-xk+MUua/da2yyUCtp1A3pwYQRuqhZPm1To7gBgvy0h5QKAZ7xs0Bt2oDhvnu3Oc9
-l0/JtpLTkS6htxOJmJm8YMoQ68z+notgJ3PqbM5p8T6Ctz7oeWl1flyrdG1NAtZt
-vgAphhidLdz+NPGq7fNpzsQcPGR4CIPQ7aesSFAsjqsCAwEAAaN1MHMwHQYDVR0O
-BBYEFLWaUPO6N7efGiuoS9i3DVYcUwn0MEQGA1UdIwQ9MDuAFLWaUPO6N7efGiuo
-S9i3DVYcUwn0oRikFjAUMRIwEAYDVQQDEwlsb2NhbGhvc3SCCQCKvOGtkPzr5TAM
-BgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4GBAMK5whPjLNQK1Ivvk88oqJqq
-4f889OwikGP0eUhOBhbFlsZs+jq5YZC2UzHz+evzKBlgAP1u4lP/cB85CnjvWqM+
-1c/lywFHQ6HOdDeQ1L72tSYMrNOG4XNmLn0h7rx6GoTU7dcFRfseahBCq8mv0IDt
-IRbTpvlHWPjsSvHz0ZOH
------END CERTIFICATE-----"""
-
     def setUp(self):
         """Set up an HTTP server to receive log messages, and a HTTPHandler
         pointing to that server's address and port."""
@@ -1690,17 +1660,18 @@ IRbTpvlHWPjsSvHz0ZOH
             if secure:
                 try:
                     import ssl
-                    fd, fn = tempfile.mkstemp()
-                    os.close(fd)
-                    with open(fn, 'w') as f:
-                        f.write(self.PEMFILE)
-                    sslctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-                    sslctx.load_cert_chain(fn)
-                    os.unlink(fn)
                 except ImportError:
                     sslctx = None
+                else:
+                    here = os.path.dirname(__file__)
+                    localhost_cert = os.path.join(here, "keycert.pem")
+                    sslctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+                    sslctx.load_cert_chain(localhost_cert)
+
+                    context = ssl.create_default_context(cafile=localhost_cert)
             else:
                 sslctx = None
+                context = None
             self.server = server = TestHTTPServer(addr, self.handle_request,
                                                     0.01, sslctx=sslctx)
             server.start()
@@ -1708,7 +1679,8 @@ IRbTpvlHWPjsSvHz0ZOH
             host = 'localhost:%d' % server.server_port
             secure_client = secure and sslctx
             self.h_hdlr = logging.handlers.HTTPHandler(host, '/frob',
-                                                       secure=secure_client)
+                                                       secure=secure_client,
+                                                       context=context)
             self.log_data = None
             root_logger.addHandler(self.h_hdlr)
 

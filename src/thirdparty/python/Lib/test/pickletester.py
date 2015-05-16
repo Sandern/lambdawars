@@ -1284,7 +1284,7 @@ class AbstractPickleTests(unittest.TestCase):
         loaded = self.loads(DATA5)
         self.assertEqual(type(loaded), SimpleCookie)
         self.assertEqual(list(loaded.keys()), ["key"])
-        self.assertEqual(loaded["key"].value, "Set-Cookie: key=value")
+        self.assertEqual(loaded["key"].value, "value")
 
         for (exc, data) in DATA7.items():
             loaded = self.loads(data)
@@ -1537,6 +1537,14 @@ class AbstractPickleTests(unittest.TestCase):
             self.assertLess(count_opcode(pickle.FRAME, some_frames_pickle),
                             count_opcode(pickle.FRAME, pickled))
             self.assertEqual(obj, self.loads(some_frames_pickle))
+
+    def test_frame_readline(self):
+        pickled = b'\x80\x04\x95\x05\x00\x00\x00\x00\x00\x00\x00I42\n.'
+        #    0: \x80 PROTO      4
+        #    2: \x95 FRAME      5
+        #   11: I    INT        42
+        #   15: .    STOP
+        self.assertEqual(self.loads(pickled), 42)
 
     def test_nested_names(self):
         global Nested

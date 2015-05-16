@@ -25,6 +25,7 @@ import sysconfig
 import tempfile
 import time
 import unittest
+import urllib.error
 import warnings
 
 try:
@@ -460,12 +461,11 @@ def _is_gui_available():
                 reason = "cannot run without OS X gui process"
 
     # check on every platform whether tkinter can actually do anything
-    # but skip the test on OS X because it can cause segfaults in Cocoa Tk
-    # when running regrtest with the -j option (multiple threads/subprocesses)
-    if (not reason) and (sys.platform != 'darwin'):
+    if not reason:
         try:
             from tkinter import Tk
             root = Tk()
+            root.update()
             root.destroy()
         except Exception as e:
             err_string = str(e)
@@ -691,6 +691,18 @@ def _is_ipv6_enabled():
 
 IPV6_ENABLED = _is_ipv6_enabled()
 
+def system_must_validate_cert(f):
+    """Skip the test on TLS certificate validation failures."""
+    @functools.wraps(f)
+    def dec(*args, **kwargs):
+        try:
+            f(*args, **kwargs)
+        except IOError as e:
+            if "CERTIFICATE_VERIFY_FAILED" in str(e):
+                raise unittest.SkipTest("system does not contain "
+                                        "necessary certificates")
+            raise
+    return dec
 
 # A constant likely larger than the underlying OS pipe buffer size, to
 # make writes blocking.
@@ -1029,7 +1041,12 @@ def open_urlresource(url, *args, **kw):
     requires('urlfetch')
 
     print('\tfetching %s ...' % url, file=get_original_stdout())
-    f = urllib.request.urlopen(url, timeout=15)
+    opener = urllib.request.build_opener()
+    if gzip:
+        opener.addheaders.append(('Accept-Encoding', 'gzip'))
+    f = opener.open(url, timeout=15)
+    if gzip and f.headers.get('Content-Encoding') == 'gzip':
+        f = gzip.GzipFile(fileobj=f)
     try:
         with open(fn, "wb") as out:
             s = f.read()
@@ -1307,6 +1324,8 @@ def transient_internet(resource_name, *, timeout=30.0, errnos=()):
         n = getattr(err, 'errno', None)
         if (isinstance(err, socket.timeout) or
             (isinstance(err, socket.gaierror) and n in gai_errnos) or
+            (isinstance(err, urllib.error.URLError) and
+             "ConnectionRefusedError" in err.reason) or
             n in captured_errnos):
             if not verbose:
                 sys.stderr.write(denied.args[0] + "\n")

@@ -175,6 +175,8 @@ class BaseSelector(metaclass=ABCMeta):
         """
         mapping = self.get_map()
         try:
+            if mapping is None:
+                raise KeyError
             return mapping[fileobj]
         except KeyError:
             raise KeyError("{!r} is not registered".format(fileobj)) from None
@@ -256,6 +258,7 @@ class _BaseSelectorImpl(BaseSelector):
 
     def close(self):
         self._fd_to_key.clear()
+        self._map = None
 
     def get_map(self):
         return self._map
@@ -418,7 +421,12 @@ if hasattr(select, 'epoll'):
                 # epoll_wait() has a resolution of 1 millisecond, round away
                 # from zero to wait *at least* timeout seconds.
                 timeout = math.ceil(timeout * 1e3) * 1e-3
-            max_ev = len(self._fd_to_key)
+
+            # epoll_wait() expects `maxevents` to be greater than zero;
+            # we want to make sure that `select()` can be called when no
+            # FD is registered.
+            max_ev = max(len(self._fd_to_key), 1)
+
             ready = []
             try:
                 fd_event_list = self._epoll.poll(timeout, max_ev)

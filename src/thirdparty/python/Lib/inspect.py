@@ -49,7 +49,7 @@ from collections import namedtuple, OrderedDict
 
 # Create constants for the compiler flags in Include/code.h
 # We try to get them from dis to avoid duplication, but fall
-# back to hardcoding so the dependency is optional
+# back to hard-coding so the dependency is optional
 try:
     from dis import COMPILER_FLAG_NAMES as _flag_names
 except ImportError:
@@ -652,11 +652,17 @@ def findsource(object):
     in the file and the line number indexes a line in that list.  An OSError
     is raised if the source code cannot be retrieved."""
 
-    file = getfile(object)
-    sourcefile = getsourcefile(object)
-    if not sourcefile and file[:1] + file[-1:] != '<>':
-        raise OSError('source code not available')
-    file = sourcefile if sourcefile else file
+    file = getsourcefile(object)
+    if file:
+        # Invalidate cache if needed.
+        linecache.checkcache(file)
+    else:
+        file = getfile(object)
+        # Allow filenames in form of "<something>" to pass through.
+        # `doctest` monkeypatches `linecache` module to enable
+        # inspection, so let `linecache.getlines` to be called.
+        if not (file.startswith('<') and file.endswith('>')):
+            raise OSError('source code not available')
 
     module = getmodule(object, file)
     if module:

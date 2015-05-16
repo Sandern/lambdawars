@@ -879,21 +879,21 @@ class SysLogHandler(logging.Handler):
         The record is formatted, and then sent to the syslog server. If
         exception information is present, it is NOT sent to the server.
         """
-        msg = self.format(record)
-        if self.ident:
-            msg = self.ident + msg
-        if self.append_nul:
-            msg += '\000'
-
-        # We need to convert record level to lowercase, maybe this will
-        # change in the future.
-        prio = '<%d>' % self.encodePriority(self.facility,
-                                            self.mapPriority(record.levelname))
-        prio = prio.encode('utf-8')
-        # Message is a string. Convert to bytes as required by RFC 5424
-        msg = msg.encode('utf-8')
-        msg = prio + msg
         try:
+            msg = self.format(record)
+            if self.ident:
+                msg = self.ident + msg
+            if self.append_nul:
+                msg += '\000'
+
+            # We need to convert record level to lowercase, maybe this will
+            # change in the future.
+            prio = '<%d>' % self.encodePriority(self.facility,
+                                                self.mapPriority(record.levelname))
+            prio = prio.encode('utf-8')
+            # Message is a string. Convert to bytes as required by RFC 5424
+            msg = msg.encode('utf-8')
+            msg = prio + msg
             if self.unixsocket:
                 try:
                     self.socket.send(msg)
@@ -931,11 +931,11 @@ class SMTPHandler(logging.Handler):
         default is one second).
         """
         logging.Handler.__init__(self)
-        if isinstance(mailhost, tuple):
+        if isinstance(mailhost, (list, tuple)):
             self.mailhost, self.mailport = mailhost
         else:
             self.mailhost, self.mailport = mailhost, None
-        if isinstance(credentials, tuple):
+        if isinstance(credentials, (list, tuple)):
             self.username, self.password = credentials
         else:
             self.username = None
@@ -1089,7 +1089,8 @@ class HTTPHandler(logging.Handler):
     A class which sends records to a Web server, using either GET or
     POST semantics.
     """
-    def __init__(self, host, url, method="GET", secure=False, credentials=None):
+    def __init__(self, host, url, method="GET", secure=False, credentials=None,
+                 context=None):
         """
         Initialize the instance with the host, the request URL, and the method
         ("GET" or "POST")
@@ -1098,11 +1099,15 @@ class HTTPHandler(logging.Handler):
         method = method.upper()
         if method not in ["GET", "POST"]:
             raise ValueError("method must be GET or POST")
+        if not secure and context is not None:
+            raise ValueError("context parameter only makes sense "
+                             "with secure=True")
         self.host = host
         self.url = url
         self.method = method
         self.secure = secure
         self.credentials = credentials
+        self.context = context
 
     def mapLogRecord(self, record):
         """
@@ -1122,7 +1127,7 @@ class HTTPHandler(logging.Handler):
             import http.client, urllib.parse
             host = self.host
             if self.secure:
-                h = http.client.HTTPSConnection(host)
+                h = http.client.HTTPSConnection(host, context=self.context)
             else:
                 h = http.client.HTTPConnection(host)
             url = self.url

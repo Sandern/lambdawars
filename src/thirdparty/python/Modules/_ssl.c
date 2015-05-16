@@ -2016,8 +2016,10 @@ context_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     else if (proto_version == PY_SSL_VERSION_TLS1_2)
         ctx = SSL_CTX_new(TLSv1_2_method());
 #endif
+#ifndef OPENSSL_NO_SSL3
     else if (proto_version == PY_SSL_VERSION_SSL3)
         ctx = SSL_CTX_new(SSLv3_method());
+#endif
 #ifndef OPENSSL_NO_SSL2
     else if (proto_version == PY_SSL_VERSION_SSL2)
         ctx = SSL_CTX_new(SSLv2_method());
@@ -2806,12 +2808,6 @@ context_wrap_socket(PySSLContext *self, PyObject *args, PyObject *kwds)
             &sock, &server_side,
             "idna", &hostname))
             return NULL;
-#if !HAVE_SNI
-        PyMem_Free(hostname);
-        PyErr_SetString(PyExc_ValueError, "server_hostname is not supported "
-                        "by your OpenSSL library");
-        return NULL;
-#endif
     }
 
     res = (PyObject *) newPySSLSocket(self, sock, server_side,
@@ -3339,6 +3335,7 @@ Returns 1 if the OpenSSL PRNG has been seeded with enough data and 0 if not.\n\
 It is necessary to seed the PRNG with RAND_add() on some platforms before\n\
 using the ssl() function.");
 
+#ifdef HAVE_RAND_EGD
 static PyObject *
 PySSL_RAND_egd(PyObject *self, PyObject *args)
 {
@@ -3366,6 +3363,7 @@ PyDoc_STRVAR(PySSL_RAND_egd_doc,
 Queries the entropy gather daemon (EGD) on the socket named by 'path'.\n\
 Returns number of bytes read.  Raises SSLError if connection to EGD\n\
 fails or if it does not provide enough data to seed PRNG.");
+#endif /* HAVE_RAND_EGD */
 
 #endif /* HAVE_OPENSSL_RAND */
 
@@ -3761,8 +3759,10 @@ static PyMethodDef PySSL_methods[] = {
      PySSL_RAND_bytes_doc},
     {"RAND_pseudo_bytes",   PySSL_RAND_pseudo_bytes, METH_VARARGS,
      PySSL_RAND_pseudo_bytes_doc},
+#ifdef HAVE_RAND_EGD
     {"RAND_egd",            PySSL_RAND_egd, METH_VARARGS,
      PySSL_RAND_egd_doc},
+#endif
     {"RAND_status",         (PyCFunction)PySSL_RAND_status, METH_NOARGS,
      PySSL_RAND_status_doc},
 #endif
@@ -4071,8 +4071,10 @@ PyInit__ssl(void)
     PyModule_AddIntConstant(m, "PROTOCOL_SSLv2",
                             PY_SSL_VERSION_SSL2);
 #endif
+#ifndef OPENSSL_NO_SSL3
     PyModule_AddIntConstant(m, "PROTOCOL_SSLv3",
                             PY_SSL_VERSION_SSL3);
+#endif
     PyModule_AddIntConstant(m, "PROTOCOL_SSLv23",
                             PY_SSL_VERSION_SSL23);
     PyModule_AddIntConstant(m, "PROTOCOL_TLSv1",
