@@ -247,6 +247,9 @@ public:
 	bool					ShutdownInterpreter( void );
 	void					PostInterpreterInit( void );
 
+	// Initialize function for stand alone interpreter (from a separate executable, for dev'ing)
+	virtual bool			InitStandAloneInterpreter();
+
 	bool					IsPythonRunning();
 	bool					IsPythonFinalizing(); // Special case
 	bool					IsPathProtected(); // For file writing

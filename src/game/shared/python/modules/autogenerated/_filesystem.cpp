@@ -101,7 +101,7 @@ BOOST_PYTHON_MODULE(_filesystem){
         bp::def( 
             "ReadFile"
             , ReadFile_function_type( &::PyFS_ReadFile )
-            , ( bp::arg("filepath"), bp::arg("pathid"), bp::arg("optimalalloc")=(bool)(false), bp::arg("maxtyes")=(int)(0), bp::arg("startingbyte")=(int)(0), bp::arg("textmode")=(bool)(false) ) );
+            , ( bp::arg("filepath"), bp::arg("pathid"), bp::arg("optimalalloc")=(bool)(false), bp::arg("maxbytes")=(int)(0), bp::arg("startingbyte")=(int)(0), bp::arg("textmode")=(bool)(false) ) );
     
     }
 

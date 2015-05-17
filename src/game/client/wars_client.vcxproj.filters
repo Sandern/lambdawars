@@ -106,6 +106,9 @@
     <Filter Include="Source Files\Recast\fastlz">
       <UniqueIdentifier>{1b825196-5c8e-44f0-b754-f3d0b114d30a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Python\Helper">
+      <UniqueIdentifier>{0d29e3cd-2413-4794-8e16-e0c70b5238cb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="vscript_client.nut">
@@ -2467,6 +2470,12 @@
     </ClCompile>
     <ClCompile Include="lambdawars\c_wars_steamstats.cpp">
       <Filter>Source Files\wars</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shared\python\srcpy_standalone.cpp">
+      <Filter>Source Files\Python</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\public\filesystem_init.cpp">
+      <Filter>Source Files\Python\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -4998,6 +5007,12 @@
     </ClInclude>
     <ClInclude Include="lambdawars\c_wars_steamstats.h">
       <Filter>Source Files\wars</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\python\srcpy_standalone.h">
+      <Filter>Source Files\Python</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\public\filesystem_init.h">
+      <Filter>Source Files\Python\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

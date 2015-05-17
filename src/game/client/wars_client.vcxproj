@@ -234,6 +234,9 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <None Include="vscript_client.nut" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\public\filesystem_init.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\shared\baseprojectile.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLight.cpp" />
     <ClCompile Include="..\shared\deferred\CDefLightContainer.cpp" />
@@ -282,6 +285,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\python\srcpy_filesystem.cpp" />
     <ClCompile Include="..\shared\python\srcpy_saverestore.cpp" />
     <ClCompile Include="..\shared\python\srcpy_scclasses.cpp" />
+    <ClCompile Include="..\shared\python\srcpy_standalone.cpp" />
     <ClCompile Include="..\shared\python\srcpy_steam.cpp" />
     <ClCompile Include="..\shared\python\srcpy_usermessage.cpp" />
     <ClCompile Include="..\shared\python\srcpy_gamerules.cpp" />
@@ -1484,6 +1488,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="toolframework_client.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\public\filesystem_init.h" />
     <ClInclude Include="..\shared\baseprojectile.h" />
     <ClInclude Include="..\shared\deferred\CDefLight.h" />
     <ClInclude Include="..\shared\deferred\CDefLightContainer.h" />
@@ -1508,6 +1513,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="..\shared\python\srcpy_materials.h" />
     <ClInclude Include="..\shared\python\srcpy_saverestore.h" />
     <ClInclude Include="..\shared\python\srcpy_srcbuiltins_converters.h" />
+    <ClInclude Include="..\shared\python\srcpy_standalone.h" />
     <ClInclude Include="..\shared\python\srcpy_steam.h" />
     <ClInclude Include="..\shared\recast\fastlz\fastlz.h" />
     <ClInclude Include="..\shared\recast\recast_file.h" />

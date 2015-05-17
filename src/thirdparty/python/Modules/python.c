@@ -8,10 +8,38 @@
 #endif
 
 #ifdef MS_WINDOWS
+
+#include <Windows.h>
+
+typedef int (*SrcPyMain_t)( int argc, wchar_t **argv );
+
 int
 wmain(int argc, wchar_t **argv)
 {
-    return Py_Main(argc, argv);
+	TCHAR fullPath[MAX_PATH];
+	TCHAR driveLetter[3];
+	TCHAR directory[MAX_PATH];
+	TCHAR FinalPath[MAX_PATH];
+	GetModuleFileName(NULL, fullPath, MAX_PATH);
+	_splitpath(fullPath, driveLetter, directory, NULL, NULL);
+
+	// Must add 'bin' to the path....
+	char* pPath = getenv("PATH");
+
+	char szBuffer[MAX_PATH];
+	char szFullPath[MAX_PATH];
+	char szFullPath2[MAX_PATH];
+	_fullpath( szFullPath, "..\\..\\bin\\", sizeof( szFullPath ) );
+	_fullpath( szFullPath2, "..\\..\\", sizeof( szFullPath2 ) );
+
+	_snprintf( szBuffer, sizeof( szBuffer ), "PATH=%s%s\\..\\..;%s%s\\..\\..\\bin;%s", driveLetter, directory, driveLetter, directory, pPath );
+	szBuffer[sizeof( szBuffer ) - 1] = '\0';
+	assert( len < sizeof( szBuffer ) );
+	_putenv( szBuffer );
+
+	HINSTANCE server = LoadLibraryEx( "server.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+	SrcPyMain_t main = (SrcPyMain_t)GetProcAddress( server, "SrcPy_Main" );
+	return main(argc, argv);
 }
 #else
 

@@ -43,6 +43,9 @@ void PyAsyncFinishAllWrites( void )
 //-----------------------------------------------------------------------------
 bool PyShutdownConVar( const char *pName )
 {
+	if( !cvar )
+		return false;
+
 	PyConVar *pConVar = dynamic_cast<PyConVar *>( cvar->FindVar( pName ) );
 	if( pConVar != NULL )
 	{
@@ -58,6 +61,9 @@ bool PyShutdownConVar( const char *pName )
 //-----------------------------------------------------------------------------
 bool PyShutdownConCommand( const char *pName )
 {
+	if( !cvar )
+		return false;
+
 	PyConCommand *pConCommand = dynamic_cast<PyConCommand *>( cvar->FindCommand( pName ) );
 	if( pConCommand != NULL )
 	{
