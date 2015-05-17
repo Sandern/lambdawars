@@ -383,6 +383,11 @@ void CWarsGameServer::SetState( EGameServerState state )
 			m_bShutdownScheduled = false;
 		}
 	}
+	else if( state == k_EGameServer_InGame )
+	{
+		// Avoid changing back immediately
+		m_fLastPlayedConnectedTime = Plat_FloatTime();
+	}
 }
 
 //-----------------------------------------------------------------------------
