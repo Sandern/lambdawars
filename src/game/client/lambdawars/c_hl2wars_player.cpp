@@ -463,19 +463,37 @@ void C_HL2WarsPlayer::CamFollowRelease( bool bForced )
 //-----------------------------------------------------------------------------
 Vector C_HL2WarsPlayer::CamCalculateGroupOrigin()
 {
-	Vector vOrigin = vec3_origin;
-
-	for( int i = m_CamFollowEntities.Count()-1; i >= 0; i-- )
+	// Cleanup group
+	for( int i = m_CamFollowEntities.Count() - 1; i >= 0; i-- )
 	{
 		if( m_CamFollowEntities[i] == NULL )
 		{
 			m_CamFollowEntities.Remove( i );
 			continue;
 		}
-
-		vOrigin += m_CamFollowEntities[i]->GetAbsOrigin();
 	}
-	vOrigin /= m_CamFollowEntities.Count();
+
+	// Calculate group origin. Use first unit as filter point.
+	// Throw away units that are too far away from the first unit
+	Vector vOrigin = vec3_origin;
+	if( m_CamFollowEntities.Count() > 1 )
+	{
+		const Vector &vBaseOrigin = m_CamFollowEntities[0]->GetAbsOrigin();
+		vOrigin += vBaseOrigin;
+		int count = 1;
+
+		for( int i = m_CamFollowEntities.Count() - 1; i >= 1; i-- )
+		{
+			const Vector &vUnitOrigin = m_CamFollowEntities[i]->GetAbsOrigin();
+			if( (vUnitOrigin - vBaseOrigin).Length2D() > 512.0 )
+			{
+				continue;
+			}
+			vOrigin += vUnitOrigin;
+			count += 1;
+		}
+		vOrigin /= count;
+	}
 	return vOrigin;
 }
 
