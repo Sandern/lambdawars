@@ -3,6 +3,13 @@
 // Purpose: Main entry for running interpreter against server dll.
 //			This is useful for using an IDE and accessing the builtin modules.
 //
+// Caveats:
+//  - Even though we initialize the filesystem here, most modules will not use 
+//    Source filesystem (or a lot of stuff needs to be rewritten). Only the import
+//	  system and select number of modules has been modified for this.
+//	  For this reason, the standalone interpreter changes Python/Lib to Python/LibDev
+//	  and expects the extracted Lib folder in there.
+//
 // TODO:
 //	- In thirdparty/python/Python/pythonrun.c, stdout/stderr should be initialized,
 //	  but only for when running as a Python interpreter (otherwise causes issues on
@@ -32,8 +39,15 @@
 #define VarArgs UTIL_VarArgs
 #endif // CLIENT_DLL
 
+static int s_iStandAloneInterpreter = 0;
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CSrcPython::InitStandAloneInterpreter()
 {
+	s_iStandAloneInterpreter = 1;
+	m_bPythonRunning = true;
 	m_bPathProtected = false;
 
 	//char originalPath[MAX_PATH];
@@ -106,13 +120,13 @@ bool CSrcPython::InitStandAloneInterpreter()
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 
 	V_strcat( pythonpath, moddir, sizeof(pythonpath) );
-	V_strcat( pythonpath, "/python/Lib/site-packages", sizeof(pythonpath) );
+	V_strcat( pythonpath, "/python/LibDev/site-packages", sizeof(pythonpath) );
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 
 	// Workaround for adding these paths
-	if( filesystem->FileExists( "python/Lib", "MOD" ) == false )
+	if( filesystem->FileExists( "python/LibDev", "MOD" ) == false )
 	{
-		filesystem->CreateDirHierarchy( "python/Lib", "MOD" );
+		filesystem->CreateDirHierarchy( "python/LibDev", "MOD" );
 	}
 	if( filesystem->FileExists( "python/srclib", "MOD" ) == false )
 	{
@@ -120,17 +134,11 @@ bool CSrcPython::InitStandAloneInterpreter()
 	}
 
 	V_strcat( pythonpath, moddir, sizeof(pythonpath) );
-	V_strcat( pythonpath, "/python/Lib", sizeof(pythonpath) );
+	V_strcat( pythonpath, "/python/LibDev", sizeof(pythonpath) );
 	
 #ifdef OSX
-	//V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	//filesystem->RelativePathToFullPath("python/plat-darwin", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python/plat-darwin", sizeof(pythonpath) );
 	
-	//V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python", sizeof(pythonpath) );
 #endif // OSX
 
@@ -151,58 +159,53 @@ static int SrcPy_Main_Impl( int argc, wchar_t **argv )
 {
 	SrcPySystem()->InitStandAloneInterpreter();
 
-	return Py_Main(argc, argv);
+	int ret = Py_Main(argc, argv);
+
+	SrcPySystem()->PostShutdownInterpreter( true );
+
+	return ret;
 }
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if 0
 //-----------------------------------------------------------------------------
-// Purpose: Compiler strips out Py_Main. Force for export to interpreter versions.
-// TODO: Maybe
+// Purpose: Used by thirdparty/Python/Python/pythonrun.c to determine if stdio
+//			should be initialized. Skipped for Game, because it will be
+//			redirected. Also seems to give problems on machines of some users.
 //-----------------------------------------------------------------------------
-PyAPI_FUNC(int) SrcPy_PostInitalize()
+PyAPI_FUNC(int) SrcPy_IsStandAloneInterpreter()
 {
-#if PY_VERSION_HEX < 0x03000000
-	builtins = SrcPySystem()->Import("__builtin__");
-#else
-	builtins = SrcPySystem()->Import("builtins");
-#endif 
+	return s_iStandAloneInterpreter;
+}
 
-	srcbuiltins = SrcPySystem()->Import("srcbuiltins");
-
-	SrcPySystem()->SysAppendPath("python\\srclib");
-
-	// Bind common things to the builtins module, so they are available everywhere
-	try 
-	{
-		// isclient and isserver can be used to execute specific code on client or server
-		// Kind of the equivalent of CLIENT_DLL and GAME_DLL
-#ifdef CLIENT_DLL
-		builtins.attr("isclient") = true;
-		builtins.attr("isserver") = false;
-#else
-		builtins.attr("isclient") = false;
-		builtins.attr("isserver") = true;
-#endif // CLIENT_DLL
-
-		builtins.attr("gpGlobals") = boost::ref( gpGlobals );
-		
-		builtins.attr("Msg") = srcbuiltins.attr("Msg");
-		builtins.attr("DevMsg") = srcbuiltins.attr("DevMsg");
-		builtins.attr("PrintWarning") = srcbuiltins.attr("PrintWarning"); // Not "Warning" because Warning is already a builtin
-	} 
-	catch( boost::python::error_already_set & ) 
-	{
-		PyErr_Print();
-	}
-
+//-----------------------------------------------------------------------------
+// Purpose: To be called from thirdparty/Python/Modules/main.c, 
+// after Py_Initialize
+//-----------------------------------------------------------------------------
+PyAPI_FUNC(int) SrcPy_Main_PostInitalize()
+{
+	if( !SrcPySystem()->PostInitInterpreter( true ) )
+		return 0;
 	return 1;
 }
-#endif // 0
 
+//-----------------------------------------------------------------------------
+// Purpose: To be called from thirdparty/Python/Modules/main.c, 
+// before Py_Finalize
+//-----------------------------------------------------------------------------
+PyAPI_FUNC(int) SrcPy_Main_PreFinalize()
+{
+	if( !SrcPySystem()->PreShutdownInterpreter( true ) )
+		return 0;
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: To be called from thirdparty/Python/Modules/python.c, 
+// Initializes the embedded interpreter.
+//-----------------------------------------------------------------------------
 PyAPI_FUNC(int) SrcPy_Main( int argc, wchar_t **argv )
 {
 	return SrcPy_Main_Impl( argc, argv );

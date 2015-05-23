@@ -321,6 +321,8 @@ run_file(FILE *fp, const wchar_t *filename, PyCompilerFlags *p_cf)
     return run != 0;
 }
 
+PyAPI_FUNC(int) SrcPy_Main_PostInitalize();
+PyAPI_FUNC(int) SrcPy_Main_PreFinalize();
 
 /* Main program */
 
@@ -359,7 +361,7 @@ Py_Main(int argc, wchar_t **argv)
             break;
         }
         if (c == 'E') {
-            Py_IgnoreEnvironmentFlag++;
+            //Py_IgnoreEnvironmentFlag++;
             break;
         }
     }
@@ -413,7 +415,7 @@ Py_Main(int argc, wchar_t **argv)
         case 'I':
             Py_IsolatedFlag++;
             Py_NoUserSiteDirectory++;
-            Py_IgnoreEnvironmentFlag++;
+            //Py_IgnoreEnvironmentFlag++;
             break;
 
         /* case 'J': reserved for Jython */
@@ -653,6 +655,9 @@ Py_Main(int argc, wchar_t **argv)
 #endif
     Py_Initialize();
 
+	// Lambda Wars modification
+	SrcPy_Main_PostInitalize();
+
     if (!Py_QuietFlag && (Py_VerboseFlag ||
                         (command == NULL && filename == NULL &&
                          module == NULL && stdin_is_interactive))) {
@@ -767,6 +772,9 @@ Py_Main(int argc, wchar_t **argv)
         /* XXX */
         sts = PyRun_AnyFileFlags(stdin, "<stdin>", &cf) != 0;
     }
+
+	// Lambda Wars modification
+	SrcPy_Main_PreFinalize();
 
     Py_Finalize();
 

@@ -19,7 +19,6 @@ wmain(int argc, wchar_t **argv)
 	TCHAR fullPath[MAX_PATH];
 	TCHAR driveLetter[3];
 	TCHAR directory[MAX_PATH];
-	TCHAR FinalPath[MAX_PATH];
 	GetModuleFileName(NULL, fullPath, MAX_PATH);
 	_splitpath(fullPath, driveLetter, directory, NULL, NULL);
 
@@ -36,6 +35,23 @@ wmain(int argc, wchar_t **argv)
 	szBuffer[sizeof( szBuffer ) - 1] = '\0';
 	assert( len < sizeof( szBuffer ) );
 	_putenv( szBuffer );
+
+	// For debugging purposes:
+#if 1
+	char logPath[MAX_PATH];
+	snprintf( logPath, sizeof( logPath ), "%s%spython.log", driveLetter, directory );
+	FILE *file = fopen( logPath, "a+" );
+	if( file )
+	{
+		for( int i = 0; i < argc; i++ )
+		{
+			fputws (argv[i],file);
+			fputs (" ",file);
+		}
+		fputs ("\n",file);
+		fclose (file);
+	}
+#endif // 0
 
 	HINSTANCE server = LoadLibraryEx( "server.dll", NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
 	SrcPyMain_t main = (SrcPyMain_t)GetProcAddress( server, "SrcPy_Main" );

@@ -244,8 +244,11 @@ public:
 	virtual void			LevelShutdownPostEntity();
 
 	bool					InitInterpreter( void );
+	bool					PostInitInterpreter( bool bStandAloneInterpreter = false );
+	bool					PreShutdownInterpreter( bool bStandAloneInterpreter = false );
+	bool					PostShutdownInterpreter( bool bStandAloneInterpreter = false );
 	bool					ShutdownInterpreter( void );
-	void					PostInterpreterInit( void );
+	void					PostInitInterpreterActions( void );
 
 	// Initialize function for stand alone interpreter (from a separate executable, for dev'ing)
 	virtual bool			InitStandAloneInterpreter();
@@ -256,7 +259,6 @@ public:
 
 #ifdef WIN32
 	// Visual Studio Python Tools support
-	bool					CheckVSPTInterpreter();
 	bool					CheckVSPTDebugger();
 #endif // WIN32
 

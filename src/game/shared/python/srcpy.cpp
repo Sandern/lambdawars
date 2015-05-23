@@ -261,20 +261,17 @@ bool CSrcPython::InitInterpreter( void )
 	const bool bEnabled = CommandLine() && CommandLine()->FindParm("-disablepython") == 0;
 	//const bool bToolsMode = CommandLine() && CommandLine()->FindParm("-tools") != 0;
 
-	/*const char *pGameDir = COM_GetModDirectory();
-	const char *pDevModDir = "hl2wars_asw_dev";
-	if( V_strncmp( pGameDir, pDevModDir, V_strlen( pDevModDir ) ) != 0 )*/
 	m_bPathProtected = CommandLine() ? CommandLine()->FindParm("-nopathprotection") == 0 : true;
 
 	bool bNoChangeWorkingDirectory = CommandLine() ? CommandLine()->FindParm("-testnochangeworkingdir") != 0 : false;
 
 	if( !bEnabled )
 	{
-	#ifdef CLIENT_DLL
+#ifdef CLIENT_DLL
 		ConColorMsg( g_PythonColor, "CLIENT: " );
-	#else
+#else
 		ConColorMsg( g_PythonColor, "SERVER: " );
-	#endif // CLIENT_DLL
+#endif // CLIENT_DLL
 		ConColorMsg( g_PythonColor, "Python is disabled.\n" );
 		return true;
 	}
@@ -318,26 +315,18 @@ bool CSrcPython::InitInterpreter( void )
 #endif // WIN32
 
 	// Set PYTHONHOME
-	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonhome, "python", sizeof(pythonhome) );
 	
 	// Set PYTHONPATH
 #ifdef WIN32
 #ifdef CLIENT_DLL
-	//filesystem->RelativePathToFullPath("python/ClientDLLs", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python/ClientDLLs", sizeof(pythonpath) );
 #else
-	//filesystem->RelativePathToFullPath("python/DLLs", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python/DLLs", sizeof(pythonpath) );
 #endif // CLIENT_DLL
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 #endif // WIN32
 
-	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python", sizeof(pythonpath) );
 	V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
 
@@ -351,19 +340,10 @@ bool CSrcPython::InitInterpreter( void )
 		filesystem->CreateDirHierarchy( "python/srclib", "MOD" );
 	}
 
-	//filesystem->RelativePathToFullPath("python/Lib", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python/Lib", sizeof(pythonpath) );
 	
 #ifdef OSX
-	//V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	//filesystem->RelativePathToFullPath("python/plat-darwin", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python/plat-darwin", sizeof(pythonpath) );
-	
-	//V_strcat( pythonpath, PYPATH_SEP, sizeof(pythonpath) );
-	//filesystem->RelativePathToFullPath("python", "MOD", buf, sizeof(buf));
-	//V_FixupPathName(buf, sizeof(buf), buf);
 	V_strcat( pythonpath, "python", sizeof(pythonpath) );
 #endif // OSX
 	
@@ -407,6 +387,38 @@ bool CSrcPython::InitInterpreter( void )
 	}
 	fStartTime = Plat_FloatTime();
 
+	// Shared initialization by standalone interpreter against game dll
+	if( !PostInitInterpreter() )
+	{
+		return false;
+	}
+
+	//  initialize the module that manages the python side
+	Run( Get("_Init", "srcmgr", true) );
+	
+	// For spy/cpy commands
+	consolespace = Import("consolespace");
+
+#ifdef CLIENT_DLL
+	DevMsg( "CLIENT: " );
+#else
+	DevMsg( "SERVER: " );
+#endif // CLIENT_DLL
+	DevMsg( "Initialized Python default modules... (%f seconds)\n", Plat_FloatTime() - fStartTime );
+
+#ifdef WIN32
+	if( !CheckVSPTDebugger() )
+		return false;
+#endif // WIN32
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CSrcPython::PostInitInterpreter( bool bStandAloneInterpreter )
+{
 	// Save our thread ID
 #ifdef _WIN32
 	g_hPythonThreadID = GetCurrentThreadId();
@@ -431,10 +443,13 @@ bool CSrcPython::InitInterpreter( void )
 	// Redirect stdout/stderr to source print functions
 	// Also set these to the "original" values, which are none.
 	srcbuiltins = Import("srcbuiltins");
-	sys.attr("stdout") = srcbuiltins.attr("SrcPyStdOut")();
-	sys.attr("stderr") = srcbuiltins.attr("SrcPyStdErr")();
-	sys.attr("__stdout__") = sys.attr("stdout");
-	sys.attr("__stderr__") = sys.attr("stderr");
+	if( !bStandAloneInterpreter )
+	{
+		sys.attr("stdout") = srcbuiltins.attr("SrcPyStdOut")();
+		sys.attr("stderr") = srcbuiltins.attr("SrcPyStdErr")();
+		sys.attr("__stdout__") = sys.attr("stdout");
+		sys.attr("__stderr__") = sys.attr("stderr");
+	}
 
 	weakref = Import("weakref");
 	
@@ -471,101 +486,82 @@ bool CSrcPython::InitInterpreter( void )
 	fntype = builtins.attr("type");
 	fnisinstance = builtins.attr("isinstance");
 
-	// Add the maps directory to the modules path
-	SysAppendPath("python\\srclib");
-
 	// Default imports
 	Import( "vmath" );
 
-	srcmgr = Import("srcmgr");
+	// Most of these modules are not needed for the standalone interpreter, so 
+	// skip them since they can have side effects.
+	if( !bStandAloneInterpreter )
+	{
+		srcmgr = Import("srcmgr");
 
-	types = Import("types");
-	collections = Import("collections");
-	steam = Import("steam");
-	Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
-	Run( "import _entitiesmisc" );
-	_entitiesmisc = Import("_entitiesmisc");
-	Run( "import _entities" );
-	_entities = Import("_entities");
-	unit_helper = Import("unit_helper");
-	_particles = Import("_particles");
-	_physics = Import("_physics");
+		types = Import("types");
+		collections = Import("collections");
+		steam = Import("steam");
+		Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
+		Run( "import _entitiesmisc" );
+		_entitiesmisc = Import("_entitiesmisc");
+		Run( "import _entities" );
+		_entities = Import("_entities");
+		unit_helper = Import("unit_helper");
+		_particles = Import("_particles");
+		_physics = Import("_physics");
 #ifdef CLIENT_DLL
-	Run( "import input" );		// Registers buttons
-	_vguicontrols = Import("_vguicontrols");
-	_cef = Import("_cef");
+		Run( "import input" );		// Registers buttons
+		_vguicontrols = Import("_vguicontrols");
+		_cef = Import("_cef");
 #endif	// CLIENT_DLL
-
-	//  initialize the module that manages the python side
-	Run( Get("_Init", "srcmgr", true) );
-	
-	// For spy/cpy commands
-	consolespace = Import("consolespace");
-
-#ifdef CLIENT_DLL
-	DevMsg( "CLIENT: " );
-#else
-	DevMsg( "SERVER: " );
-#endif // CLIENT_DLL
-	DevMsg( "Initialized Python default modules... (%f seconds)\n", Plat_FloatTime() - fStartTime );
-
-#ifdef WIN32
-	if( !CheckVSPTInterpreter() )
-		return false;
-
-	if( !CheckVSPTDebugger() )
-		return false;
-#endif // WIN32
+	}
 
 	return true;
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: Shared shutdown code between standalone and game interpreter
 //-----------------------------------------------------------------------------
-bool CSrcPython::ShutdownInterpreter( void )
+bool CSrcPython::PreShutdownInterpreter( bool bIsStandAlone )
 {
-	if( !m_bPythonRunning )
-		return false;
-
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
 
-#ifdef CLIENT_DLL
-	// Clear python panels
-	DestroyPyPanels();
-#endif // CLIENT_DLL
-
-	// Clear Python gamerules
-	if( PyGameRules().ptr() != Py_None )
+	if( !bIsStandAlone )
 	{
-		// Ingame: install default c++ gamerules
 #ifdef CLIENT_DLL
-		if( GetClientWorldEntity() )
+		// Clear python panels
+		DestroyPyPanels();
+#endif // CLIENT_DLL
+
+		// Clear Python gamerules
+		if( PyGameRules().ptr() != Py_None )
+		{
+			// Ingame: install default c++ gamerules
+#ifdef CLIENT_DLL
+			if( GetClientWorldEntity() )
 #else
-		if( GetWorldEntity() )
+			if( GetWorldEntity() )
 #endif // CLIENT_DLL
-		{
-			PyInstallGameRules( boost::python::object() );
+			{
+				PyInstallGameRules( boost::python::object() );
+			}
+			else
+			{
+				ClearPyGameRules();
+			}
 		}
-		else
-		{
-			ClearPyGameRules();
-		}
-	}
 
-	// Make sure these lists don't hold references
-	m_deleteList.Purge();
-	m_methodTickList.Purge();
-	m_methodPerFrameList.Purge();
+		// Make sure these lists don't hold references
+		m_deleteList.Purge();
+		m_methodTickList.Purge();
+		m_methodPerFrameList.Purge();
 
 #ifdef CLIENT_DLL
-	py_delayed_data_update_list.Purge();
+		py_delayed_data_update_list.Purge();
 #endif // CLIENT_DLL
 
-	// Disconnect redirecting stdout/stderr
-	sys.attr("stdout") = bp::object();
-	sys.attr("stderr") = bp::object();
+		// Disconnect redirecting stdout/stderr
+		sys.attr("stdout") = bp::object();
+		sys.attr("stderr") = bp::object();
+	}
 
 	// Clear modules
 	mainmodule = bp::object();
@@ -598,13 +594,40 @@ bool CSrcPython::ShutdownInterpreter( void )
 	m_bPythonIsFinalizing = true;
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
-	Py_Finalize();
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Shared shutdown code between standalone and game interpreter
+//-----------------------------------------------------------------------------
+bool CSrcPython::PostShutdownInterpreter( bool bIsStandAlone )
+{
 #ifdef WIN32
 	PyImport_FreeDynLibraries(); // IMPORTANT, otherwise it will crash if c extension modules are used.
 #endif // WIN32
 
 	m_bPythonIsFinalizing = false;
 	m_bPythonRunning = false;
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CSrcPython::ShutdownInterpreter( void )
+{
+	if( !m_bPythonRunning )
+		return false;
+
+	if( !PreShutdownInterpreter() )
+		return false;
+
+	Py_Finalize();
+
+	if( !PostShutdownInterpreter() )
+		return false;
 
 	if( developer.GetInt() > 0 )
 	{
@@ -637,13 +660,13 @@ void CSrcPython::PostInit()
 	HookPyNetworkVar();
 #endif // CLIENT_DLL
 
-	PostInterpreterInit();
+	PostInitInterpreterActions();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CSrcPython::PostInterpreterInit( void )
+void CSrcPython::PostInitInterpreterActions( void )
 {
 	// Gamemgr manages all game packages
 	Run( "import gamemgr" );
@@ -654,157 +677,6 @@ void CSrcPython::PostInterpreterInit( void )
 }
 
 #ifdef WIN32
-//-----------------------------------------------------------------------------
-// Purpose: Support for Visual Studio Python Tools Interpreter
-//-----------------------------------------------------------------------------
-bool CSrcPython::CheckVSPTInterpreter()
-{
-#ifdef CLIENT_DLL
-	return true; // TODO
-#endif // CLIENT_DL
-
-	const bool bRunInterpreter = CommandLine() && CommandLine()->FindParm("-interpreter") != 0;
-	if( !bRunInterpreter )
-		return true;
-
-	bool bSuccess = false;
-
-#ifndef CLIENT_DLL
-	tm today;
-	Plat_GetLocalTime( &today );
-
-	// Note: appends to the same log on the same day
-	char logfilename[MAX_PATH];
-	V_snprintf( logfilename, sizeof( logfilename ), "vspt_%02i-%02i-%04i.txt",
-		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year );
-
-	engine->ServerCommand( CFmtStr("con_logfile %s\n", logfilename) );
-	engine->ServerExecute();
-#endif // CLIENT_DLL
-
-	Msg("\n\n=======================================\n");
-	Msg("Running in PySource Interpreter mode...\n");
-	Msg("=======================================\n");
-
-	Msg( "Pre-modified Command: %s\n", CommandLine()->GetCmdLine() );
-
-	// "-insecure" is added at the back. Remove it, so we can just take the remainder
-	// after "-interpreter" argument.
-	VSPTParmRemove("-insecure");
-
-	std::string command("<null>");
-	std::string cmdline = CommandLine()->GetCmdLine();
-	std::string needle( "-interpreter " );
-	std::size_t found = cmdline.find( needle );
-
-	if( found == std::string::npos )
-	{
-		Warning("CheckVSPTInterpreter: -interpreter argument not found!\n");
-		return true;
-	}
-
-	command = cmdline.substr( found + needle.length() );
-	Msg( "Command: %s\n", command.c_str() );
-
-	try
-	{
-		// Parse arguments for Python
-		bp::str args( command.c_str() );
-
-		bp::exec( "import shlex", mainnamespace, mainnamespace );
-		bp::object shlex = Import("shlex");
-
-		bp::str newCmd( args );
-		newCmd = newCmd.replace( "\\\"", "\\\\\"" );
-
-		builtins.attr("print")( newCmd );
-
-		bp::list argv( shlex.attr("split")( newCmd ) );
-		bp::setattr( sys, bp::object("argv"), argv );
-
-		const char *pFilePath = bp::extract< const char * >( argv[0] );
-
-		// Add path
-		char vtptpath[MAX_PATH];
-		V_strncpy( vtptpath, pFilePath, MAX_PATH );
-		V_StripFilename( vtptpath );
-		this->SysAppendPath( vtptpath );
-
-		// Support 3 modes:
-		// 1. Run a command with "-c"
-		// 2. Run a module with "-m"
-		// 3. Execute a file
-		std::string firstchars = command.substr(0, 3);
-		if( firstchars == "-c " )
-		{
-			command = command.substr( 3 );
-			Msg("Running interpreter command: %s\n", command.c_str() );
-
-			bp::exec( command.c_str() );
-			bSuccess = true;
-			Msg("Successfully runned interpreter command\n");
-		}
-		else if( firstchars == "-m " )
-		{
-			if( V_strncmp( command.c_str(), "-m pip list", command.length() ) == 0 )
-			{
-				Msg("Ignoring pip list call\n");
-				bSuccess = true;
-			}
-			else
-			{
-				command = command.substr( 3 );
-				Msg("Running interpreter module: %s\n", command.c_str() );
-
-				bp::str newCmd( command.c_str() );
-				newCmd = newCmd.replace( "\\\"", "\\\\\"" );
-
-				builtins.attr("print")( newCmd );
-
-				bp::list argv( shlex.attr("split")( newCmd ) );
-				bp::setattr( sys, bp::object("argv"), argv );
-
-				bp::object runpy = bp::import( "runpy" );
-				boost::python::dict kwargs;
-				kwargs["run_name"] = bp::object("__main__");
-				kwargs["alter_sys"] = (bool)(true);
-				runpy.attr("run_module")( *bp::make_tuple(argv[0]), **kwargs );
-				bSuccess = true;
-			}
-		}
-		else
-		{
-			// Change working directory	
-			V_SetCurrentDirectory( vtptpath );
-
-			Msg("Running interpreter file: %s\n", pFilePath );
-			Run("import encodings.idna");
-			bSuccess = this->ExecuteFile( pFilePath );
-			Msg("Successfully runned interpreter file\n");
-		}
-	}
-	catch( bp::error_already_set & ) 
-	{
-		PyErr_Print();
-	}
-
-	if( !bSuccess )
-	{
-#ifdef CLIENT_DLL
-		Warning( "PySource: Failed to execute interpreter file (%s). Please check log\n", command.c_str() );
-#else
-		Error( "PySource: Failed to execute interpreter file (%s). Please check log: %s", command.c_str(), logfilename );
-#endif // CLIENT_DLL
-	}
-	// Make sure logs are saved
-#ifndef CLIENT_DLL
-	engine->ServerExecute();
-#endif // CLIENT_DLL
-	filesystem->AsyncFinishAllWrites();
-	::TerminateProcess( ::GetCurrentProcess(), 0 );
-	return true;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1727,7 +1599,7 @@ CON_COMMAND_F( cl_py_restart, "Restarts the Python interpreter on the Client", F
 #endif // CLIENT_DLL
 	g_SrcPythonSystem.ShutdownInterpreter();
 	g_SrcPythonSystem.InitInterpreter();
-	g_SrcPythonSystem.PostInterpreterInit();
+	g_SrcPythonSystem.PostInitInterpreterActions();
 }
 
 //-----------------------------------------------------------------------------
@@ -1804,8 +1676,6 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 			V_snprintf( initpath, MAX_PATH, "%s\\__init__.py", fullpath );
 			if( filesystem->FileExists( initpath, "MOD" ) )
 			{
-				
-				
 				V_snprintf( newmodulepath, MAX_PATH, "%s%s", basemodulepath, filename );
 				if( V_strncmp( pRest, newmodulepath, V_strlen(pRest) ) == 0 )
 					V_snprintf( commands[ numMatches++ ], COMMAND_COMPLETION_ITEM_LENGTH, "%s %s", pCommand, newmodulepath );

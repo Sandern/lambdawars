@@ -1115,6 +1115,8 @@ is_valid_fd(int fd)
     return 1;
 }
 
+PyAPI_FUNC(int) SrcPy_IsStandAloneInterpreter();
+
 /* Initialize sys.stdin, stdout, stderr and builtins.open */
 static int
 initstdio(void)
@@ -1182,105 +1184,140 @@ initstdio(void)
         }
     }
 
-    /* Set sys.stdin */
-    fd = fileno(stdin);
-    /* Under some conditions stdin, stdout and stderr may not be connected
-     * and fileno() may point to an invalid file descriptor. For example
-     * GUI apps don't have valid standard streams by default.
-     */
-	// Workaround http://bugs.python.org/issue17797
-	// Work-around does not work on some system, so have another work-around by always disabling this
-	// code, since we don't use stdio streams in Lambda Wars (it's always going to be redirected to Source Engine
-	// Msg/Warning functions).
-#if 0
-#ifdef MS_WINDOWS
-	if (!is_valid_fd(fd) || GetStdHandle(STD_INPUT_HANDLE) == NULL) {
-#else
-    if (!is_valid_fd(fd)) {
-#endif
-#endif // 0
+	if (!SrcPy_IsStandAloneInterpreter()) {
+		// stdin
         std = Py_None;
         Py_INCREF(std);
-#if 0
-    }
-    else {
-        std = create_stdio(iomod, fd, 0, "<stdin>", encoding, errors);
-        if (std == NULL)
-            goto error;
-    } /* if (fd < 0) */
-#endif // 0
-    PySys_SetObject("__stdin__", std);
-    _PySys_SetObjectId(&PyId_stdin, std);
-    Py_DECREF(std);
 
-#if 0
-    /* Set sys.stdout */
-    fd = fileno(stdout);
-#ifdef MS_WINDOWS
-	if (!is_valid_fd(fd) || GetStdHandle(STD_OUTPUT_HANDLE) == NULL) {
-#else
-    if (!is_valid_fd(fd)) {
-#endif
-#endif // 0
+		PySys_SetObject("__stdin__", std);
+		_PySys_SetObjectId(&PyId_stdin, std);
+		Py_DECREF(std);
+
+		// stdout
         std = Py_None;
         Py_INCREF(std);
-#if 0
-    }
-    else {
-        std = create_stdio(iomod, fd, 1, "<stdout>", encoding, errors);
-        if (std == NULL)
-            goto error;
-    } /* if (fd < 0) */
-#endif // 0
-    PySys_SetObject("__stdout__", std);
-    _PySys_SetObjectId(&PyId_stdout, std);
-    Py_DECREF(std);
+
+		PySys_SetObject("__stdout__", std);
+		_PySys_SetObjectId(&PyId_stdout, std);
+		Py_DECREF(std);
+
+		// stderr
+        std = Py_None;
+        Py_INCREF(std);
+
+		/* Same as hack above, pre-import stderr's codec to avoid recursion
+		   when import.c tries to write to stderr in verbose mode. */
+		encoding_attr = PyObject_GetAttrString(std, "encoding");
+		if (encoding_attr != NULL) {
+			const char * std_encoding;
+			std_encoding = _PyUnicode_AsString(encoding_attr);
+			if (std_encoding != NULL) {
+				PyObject *codec_info = _PyCodec_Lookup(std_encoding);
+				Py_XDECREF(codec_info);
+			}
+			Py_DECREF(encoding_attr);
+		}
+		PyErr_Clear();  /* Not a fatal error if codec isn't available */
+
+		if (PySys_SetObject("__stderr__", std) < 0) {
+			Py_DECREF(std);
+			goto error;
+		}
+		if (_PySys_SetObjectId(&PyId_stderr, std) < 0) {
+			Py_DECREF(std);
+			goto error;
+		}
+		Py_DECREF(std);
+
+	} else {
+		/* Set sys.stdin */
+		fd = fileno(stdin);
+		/* Under some conditions stdin, stdout and stderr may not be connected
+		 * and fileno() may point to an invalid file descriptor. For example
+		 * GUI apps don't have valid standard streams by default.
+		 */
+		// Workaround http://bugs.python.org/issue17797
+		// Work-around does not work on some system, so have another work-around by always disabling this
+		// code, since we don't use stdio streams in Lambda Wars (it's always going to be redirected to Source Engine
+		// Msg/Warning functions).
+#ifdef MS_WINDOWS
+		if (!is_valid_fd(fd) || GetStdHandle(STD_INPUT_HANDLE) == NULL) {
+#else
+		if (!is_valid_fd(fd)) {
+#endif
+			std = Py_None;
+			Py_INCREF(std);
+		}
+		else {
+			std = create_stdio(iomod, fd, 0, "<stdin>", encoding, errors);
+			if (std == NULL)
+				goto error;
+		} /* if (fd < 0) */
+		PySys_SetObject("__stdin__", std);
+		_PySys_SetObjectId(&PyId_stdin, std);
+		Py_DECREF(std);
+
+		/* Set sys.stdout */
+		fd = fileno(stdout);
+#ifdef MS_WINDOWS
+		if (!is_valid_fd(fd) || GetStdHandle(STD_OUTPUT_HANDLE) == NULL) {
+#else
+		if (!is_valid_fd(fd)) {
+#endif
+			std = Py_None;
+			Py_INCREF(std);
+		}
+		else {
+			std = create_stdio(iomod, fd, 1, "<stdout>", encoding, errors);
+			if (std == NULL)
+				goto error;
+		} /* if (fd < 0) */
+		PySys_SetObject("__stdout__", std);
+		_PySys_SetObjectId(&PyId_stdout, std);
+		Py_DECREF(std);
 
 #if 1 /* Disable this if you have trouble debugging bootstrap stuff */
-    /* Set sys.stderr, replaces the preliminary stderr */
-#if 0
-    fd = fileno(stderr);
+		/* Set sys.stderr, replaces the preliminary stderr */
+		fd = fileno(stderr);
 #ifdef MS_WINDOWS
-	if (!is_valid_fd(fd) || GetStdHandle(STD_ERROR_HANDLE) == NULL) {
+		if (!is_valid_fd(fd) || GetStdHandle(STD_ERROR_HANDLE) == NULL) {
 #else
-    if (!is_valid_fd(fd)) {
+		if (!is_valid_fd(fd)) {
 #endif
-#endif // 0
-        std = Py_None;
-        Py_INCREF(std);
-#if 0
-    }
-    else {
-        std = create_stdio(iomod, fd, 1, "<stderr>", encoding, "backslashreplace");
-        if (std == NULL)
-            goto error;
-    } /* if (fd < 0) */
-#endif // 0
+			std = Py_None;
+			Py_INCREF(std);
+		}
+		else {
+			std = create_stdio(iomod, fd, 1, "<stderr>", encoding, "backslashreplace");
+			if (std == NULL)
+				goto error;
+		} /* if (fd < 0) */
 
-    /* Same as hack above, pre-import stderr's codec to avoid recursion
-       when import.c tries to write to stderr in verbose mode. */
-    encoding_attr = PyObject_GetAttrString(std, "encoding");
-    if (encoding_attr != NULL) {
-        const char * std_encoding;
-        std_encoding = _PyUnicode_AsString(encoding_attr);
-        if (std_encoding != NULL) {
-            PyObject *codec_info = _PyCodec_Lookup(std_encoding);
-            Py_XDECREF(codec_info);
-        }
-        Py_DECREF(encoding_attr);
-    }
-    PyErr_Clear();  /* Not a fatal error if codec isn't available */
+		/* Same as hack above, pre-import stderr's codec to avoid recursion
+		   when import.c tries to write to stderr in verbose mode. */
+		encoding_attr = PyObject_GetAttrString(std, "encoding");
+		if (encoding_attr != NULL) {
+			const char * std_encoding;
+			std_encoding = _PyUnicode_AsString(encoding_attr);
+			if (std_encoding != NULL) {
+				PyObject *codec_info = _PyCodec_Lookup(std_encoding);
+				Py_XDECREF(codec_info);
+			}
+			Py_DECREF(encoding_attr);
+		}
+		PyErr_Clear();  /* Not a fatal error if codec isn't available */
 
-    if (PySys_SetObject("__stderr__", std) < 0) {
-        Py_DECREF(std);
-        goto error;
-    }
-    if (_PySys_SetObjectId(&PyId_stderr, std) < 0) {
-        Py_DECREF(std);
-        goto error;
-    }
-    Py_DECREF(std);
+		if (PySys_SetObject("__stderr__", std) < 0) {
+			Py_DECREF(std);
+			goto error;
+		}
+		if (_PySys_SetObjectId(&PyId_stderr, std) < 0) {
+			Py_DECREF(std);
+			goto error;
+		}
+		Py_DECREF(std);
 #endif
+	}
 
     if (0) {
   error:
