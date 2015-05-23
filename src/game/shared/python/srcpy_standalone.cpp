@@ -194,10 +194,23 @@ PyAPI_FUNC(int) SrcPy_Main_PostInitalize()
 //-----------------------------------------------------------------------------
 // Purpose: To be called from thirdparty/Python/Modules/main.c, 
 // before Py_Finalize
+// To be called from thirdparty/Python/Modules/pythonrun.c, 
+// before Py_Exit
 //-----------------------------------------------------------------------------
 PyAPI_FUNC(int) SrcPy_Main_PreFinalize()
 {
 	if( !SrcPySystem()->PreShutdownInterpreter( true ) )
+		return 0;
+	return 1;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: To be called from thirdparty/Python/Modules/pythonrun.c, 
+// after Py_Exit
+//-----------------------------------------------------------------------------
+PyAPI_FUNC(int) SrcPy_Main_PostFinalize()
+{
+	if( !SrcPySystem()->PostShutdownInterpreter( true ) )
 		return 0;
 	return 1;
 }

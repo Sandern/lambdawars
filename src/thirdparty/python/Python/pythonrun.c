@@ -2772,10 +2772,18 @@ call_ll_exitfuncs(void)
     fflush(stderr);
 }
 
+// Lambda Wars Modification
+PyAPI_FUNC(int) SrcPy_Main_PreFinalize();
+PyAPI_FUNC(int) SrcPy_Main_PostFinalize();
+
 void
 Py_Exit(int sts)
 {
+	SrcPy_Main_PreFinalize();
+
     Py_Finalize();
+
+	SrcPy_Main_PostFinalize();
 
     exit(sts);
 }
