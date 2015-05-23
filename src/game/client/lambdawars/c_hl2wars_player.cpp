@@ -476,7 +476,7 @@ Vector C_HL2WarsPlayer::CamCalculateGroupOrigin()
 	// Calculate group origin. Use first unit as filter point.
 	// Throw away units that are too far away from the first unit
 	Vector vOrigin = vec3_origin;
-	if( m_CamFollowEntities.Count() > 1 )
+	if( m_CamFollowEntities.Count() > 0 )
 	{
 		const Vector &vBaseOrigin = m_CamFollowEntities[0]->GetAbsOrigin();
 		vOrigin += vBaseOrigin;
