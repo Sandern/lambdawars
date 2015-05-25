@@ -50,8 +50,9 @@ bool CSrcPython::InitStandAloneInterpreter()
 	m_bPythonRunning = true;
 	m_bPathProtected = false;
 
-	//char originalPath[MAX_PATH];
-	//V_GetCurrentDirectory( originalPath, sizeof( originalPath ) );
+	// Temporary change working directory for initalizing the filesystem
+	char originalPath[MAX_PATH];
+	V_GetCurrentDirectory( originalPath, sizeof( originalPath ) );
 
 	// Hook up the filesystem
 	TCHAR fullPath[MAX_PATH];
@@ -150,7 +151,8 @@ bool CSrcPython::InitStandAloneInterpreter()
     ::setenv( "PYTHONPATH", pythonpath, 1 );
 #endif // WIN32
 
-	//V_SetCurrentDirectory( originalPath );
+	// Change back working directory
+	V_SetCurrentDirectory( originalPath );
 
 	return true;
 }

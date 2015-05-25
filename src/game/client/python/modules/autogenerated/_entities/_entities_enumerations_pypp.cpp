@@ -58,6 +58,16 @@ void _entities_register_enumerations(){
         .export_values()
         ;
 
+    bp::enum_< MoveCollide_t>("MoveCollide_t")
+        .value("MOVECOLLIDE_DEFAULT", MOVECOLLIDE_DEFAULT)
+        .value("MOVECOLLIDE_FLY_BOUNCE", MOVECOLLIDE_FLY_BOUNCE)
+        .value("MOVECOLLIDE_FLY_CUSTOM", MOVECOLLIDE_FLY_CUSTOM)
+        .value("MOVECOLLIDE_FLY_SLIDE", MOVECOLLIDE_FLY_SLIDE)
+        .value("MOVECOLLIDE_COUNT", MOVECOLLIDE_COUNT)
+        .value("MOVECOLLIDE_MAX_BITS", MOVECOLLIDE_MAX_BITS)
+        .export_values()
+        ;
+
     bp::enum_< WeaponSound_t>("WeaponSound")
         .value("EMPTY", EMPTY)
         .value("SINGLE", SINGLE)

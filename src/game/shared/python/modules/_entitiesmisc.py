@@ -417,7 +417,6 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         
         # Enums
         mb.enums('MoveType_t').include()
-        mb.enums('MoveCollide_t').include()
         mb.enums('SolidType_t').include()
         mb.enums('SolidFlags_t').include()
         mb.enums('Collision_Group_t').include()

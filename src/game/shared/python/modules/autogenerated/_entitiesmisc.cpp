@@ -1537,16 +1537,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .export_values()
         ;
 
-    bp::enum_< MoveCollide_t>("MoveCollide_t")
-        .value("MOVECOLLIDE_DEFAULT", MOVECOLLIDE_DEFAULT)
-        .value("MOVECOLLIDE_FLY_BOUNCE", MOVECOLLIDE_FLY_BOUNCE)
-        .value("MOVECOLLIDE_FLY_CUSTOM", MOVECOLLIDE_FLY_CUSTOM)
-        .value("MOVECOLLIDE_FLY_SLIDE", MOVECOLLIDE_FLY_SLIDE)
-        .value("MOVECOLLIDE_COUNT", MOVECOLLIDE_COUNT)
-        .value("MOVECOLLIDE_MAX_BITS", MOVECOLLIDE_MAX_BITS)
-        .export_values()
-        ;
-
     bp::enum_< MoveType_t>("MoveType_t")
         .value("MOVETYPE_NONE", MOVETYPE_NONE)
         .value("MOVETYPE_ISOMETRIC", MOVETYPE_ISOMETRIC)
@@ -4699,16 +4689,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
         .value("FIRE_BULLETS_NO_PIERCING_SPARK", FIRE_BULLETS_NO_PIERCING_SPARK)
         .value("FIRE_BULLETS_HULL", FIRE_BULLETS_HULL)
         .value("FIRE_BULLETS_ANGULAR_SPREAD", FIRE_BULLETS_ANGULAR_SPREAD)
-        .export_values()
-        ;
-
-    bp::enum_< MoveCollide_t>("MoveCollide_t")
-        .value("MOVECOLLIDE_DEFAULT", MOVECOLLIDE_DEFAULT)
-        .value("MOVECOLLIDE_FLY_BOUNCE", MOVECOLLIDE_FLY_BOUNCE)
-        .value("MOVECOLLIDE_FLY_CUSTOM", MOVECOLLIDE_FLY_CUSTOM)
-        .value("MOVECOLLIDE_FLY_SLIDE", MOVECOLLIDE_FLY_SLIDE)
-        .value("MOVECOLLIDE_COUNT", MOVECOLLIDE_COUNT)
-        .value("MOVECOLLIDE_MAX_BITS", MOVECOLLIDE_MAX_BITS)
         .export_values()
         ;
 

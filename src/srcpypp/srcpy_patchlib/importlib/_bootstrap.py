@@ -2157,8 +2157,8 @@ class VPKFileFinder(FileFinder):
     def __init__(self, *args, **kwargs):
         super(VPKFileFinder, self).__init__(*args, **kwargs)
         
-        if _filesystem.IsAbsolutePath(self.path):
-            self.path = _filesystem.FullPathToRelativePath(self.path + '\\', defaultvalue=self.path)
+        #if _filesystem.IsAbsolutePath(self.path):
+        #    self.path = _filesystem.FullPathToRelativePath(self.path + '\\', defaultvalue=self.path)
         if self.path:
             self.path = self.path.rstrip('/\\') 
         

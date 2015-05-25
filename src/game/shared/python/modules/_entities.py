@@ -848,6 +848,8 @@ class Entities(SemiSharedModuleGenerator):
             
             # Do not want the firebullets function with multiple arguments. Only the one with the struct.
             mb.mem_funs(name='FireBullets', function=calldef_withtypes('int')).exclude()
+            
+        mb.enum('MoveCollide_t').include()
 
     def ParseBaseAnimating(self, mb):
         cls = mb.class_('C_BaseAnimating' if self.isclient else 'CBaseAnimating')
