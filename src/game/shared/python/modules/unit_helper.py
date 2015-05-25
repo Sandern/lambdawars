@@ -8,6 +8,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         'cbase.h',
         
         'unit_base_shared.h',
+        'hl2wars_util_shared.h',
         'unit_component.h',
         'unit_locomotion.h',
         'unit_airlocomotion.h',
@@ -345,10 +346,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         cls.include()
         
     def AddMisc(self, mb):
-        if self.isserver:
-            mb.free_function('VecCheckThrowTolerance').include()
-            #if self.isclient:
-            #    mb.free_function('DrawHealthBar').include()
+        mb.free_function('VecCheckThrowTolerance').include()
         
         '''cls = mb.class_('GroupMoveOrder')
         cls.include()

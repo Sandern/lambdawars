@@ -15,8 +15,6 @@
 
 class CUnitBase;
 
-Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flTolerance, int iCollisionGroup );
-
 // Anim Event handlers
 class BaseAnimEventHandler
 {

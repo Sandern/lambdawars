@@ -6,6 +6,8 @@
 
 #include "unit_base_shared.h"
 
+#include "hl2wars_util_shared.h"
+
 #include "unit_component.h"
 
 #include "unit_locomotion.h"
@@ -2552,11 +2554,24 @@ BOOST_PYTHON_MODULE(unit_helper){
             , ( bp::arg("yawSpeedPerSec"), bp::arg("current"), bp::arg("target"), bp::arg("time") ) );
     
     }
+
+    { //::VecCheckThrowTolerance
+    
+        typedef ::Vector ( *VecCheckThrowTolerance_function_type )( ::C_BaseEntity *,::Vector const &,::Vector,float,float,int );
+        
+        bp::def( 
+            "VecCheckThrowTolerance"
+            , VecCheckThrowTolerance_function_type( &::VecCheckThrowTolerance )
+            , ( bp::arg("pEdict"), bp::arg("vecSpot1"), bp::arg("vecSpot2"), bp::arg("flSpeed"), bp::arg("flTolerance"), bp::arg("iCollisionGroup") ) );
+    
+    }
 }
 #else
 #include "cbase.h"
 
 #include "unit_base_shared.h"
+
+#include "hl2wars_util_shared.h"
 
 #include "unit_component.h"
 
@@ -5718,6 +5733,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("pPath") ) );
         
         }
+        { //::UnitBasePath::IsPartialPath
+        
+            typedef bool ( ::UnitBasePath::*IsPartialPath_function_type )(  ) ;
+            
+            UnitBasePath_exposer.def( 
+                "IsPartialPath"
+                , IsPartialPath_function_type( &::UnitBasePath::IsPartialPath ) );
+        
+        }
         UnitBasePath_exposer.def_readwrite( "avoidenemies", &UnitBasePath::m_bAvoidEnemies );
         UnitBasePath_exposer.def_readwrite( "m_bIsDirectPath", &UnitBasePath::m_bIsDirectPath );
         UnitBasePath_exposer.def_readwrite( "success", &UnitBasePath::m_bSuccess );
@@ -5727,6 +5751,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBasePath_exposer.def_readwrite( "maxrange", &UnitBasePath::m_fMaxRange );
         UnitBasePath_exposer.def_readwrite( "minrange", &UnitBasePath::m_fMinRange );
         UnitBasePath_exposer.def_readwrite( "fncustomloscheck", &UnitBasePath::m_fnCustomLOSCheck );
+        UnitBasePath_exposer.def_readwrite( "m_iFlags", &UnitBasePath::m_iFlags );
         UnitBasePath_exposer.def_readwrite( "goalflags", &UnitBasePath::m_iGoalFlags );
         UnitBasePath_exposer.def_readwrite( "goaltype", &UnitBasePath::m_iGoalType );
         UnitBasePath_exposer.def_readwrite( "pathcontext", &UnitBasePath::m_pathContext );

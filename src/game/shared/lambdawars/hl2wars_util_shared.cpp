@@ -29,6 +29,90 @@
 LINK_ENTITY_TO_CLASS( env_sprite_clientside, CSprite );
 #endif
 
+static ConVar g_debug_checkthrowtolerance( "g_debug_checkthrowtolerance", "0", FCVAR_REPLICATED );
+extern ConVar sv_gravity;
+
+//-----------------------------------------------------------------------------
+// Purpose: Toss helper
+//-----------------------------------------------------------------------------
+Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flTolerance, int iCollisionGroup )
+{
+	flSpeed = Max( 1.0f, flSpeed );
+
+	float ent_gravity = pEdict && pEdict->GetGravity() ? pEdict->GetGravity() : 1.0f;
+
+	float flGravity = sv_gravity.GetFloat() * ent_gravity;
+
+	Vector vecGrenadeVel = (vecSpot2 - vecSpot1);
+
+	// throw at a constant time
+	float time = vecGrenadeVel.Length( ) / flSpeed;
+	vecGrenadeVel = vecGrenadeVel * (1.0 / time);
+
+	// adjust upward toss to compensate for gravity loss
+	vecGrenadeVel.z += flGravity * time * 0.5;
+
+	Vector vecApex = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5;
+	vecApex.z += 0.5 * flGravity * (time * 0.5) * (time * 0.5);
+
+
+	trace_t tr;
+	UTIL_TraceLine( vecSpot1, vecApex, MASK_SOLID, pEdict, iCollisionGroup, &tr );
+	if (tr.fraction != 1.0)
+	{
+		// fail!
+		if ( g_debug_checkthrowtolerance.GetBool() )
+		{
+			NDebugOverlay::Line( vecSpot1, vecApex, 255, 0, 0, true, 5.0 );
+		}
+
+		return vec3_origin;
+	}
+
+	if ( g_debug_checkthrowtolerance.GetBool() )
+	{
+		NDebugOverlay::Line( vecSpot1, vecApex, 0, 255, 0, true, 5.0 );
+	}
+
+	UTIL_TraceLine( vecApex, vecSpot2, MASK_SOLID_BRUSHONLY, pEdict, iCollisionGroup, &tr );
+	if ( tr.fraction != 1.0 )
+	{
+		bool bFail = true;
+
+		// Didn't make it all the way there, but check if we're within our tolerance range
+		if ( flTolerance > 0.0f )
+		{
+			float flNearness = ( tr.endpos - vecSpot2 ).LengthSqr();
+			if ( flNearness < Square( flTolerance ) )
+			{
+				if ( g_debug_checkthrowtolerance.GetBool() )
+				{
+					NDebugOverlay::Sphere( tr.endpos, vec3_angle, flTolerance, 0, 255, 0, 0, true, 5.0 );
+				}
+
+				bFail = false;
+			}
+		}
+		
+		if ( bFail )
+		{
+			if ( g_debug_checkthrowtolerance.GetBool() )
+			{
+				NDebugOverlay::Line( vecApex, vecSpot2, 255, 0, 0, true, 5.0 );
+				NDebugOverlay::Sphere( tr.endpos, vec3_angle, flTolerance, 255, 0, 0, 0, true, 5.0 );
+			}
+			return vec3_origin;
+		}
+	}
+
+	if ( g_debug_checkthrowtolerance.GetBool() )
+	{
+		NDebugOverlay::Line( vecApex, vecSpot2, 0, 255, 0, true, 5.0 );
+	}
+
+	return vecGrenadeVel;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

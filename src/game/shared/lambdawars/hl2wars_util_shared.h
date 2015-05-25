@@ -12,6 +12,8 @@
 
 #include "unit_base_shared.h"
 
+Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vector vecSpot2, float flSpeed, float flTolerance, int iCollisionGroup );
+
 void UTIL_ListPlayersForOwnerNumber( int ownernumber, CUtlVector< CHL2WarsPlayer * > &players );
 
 QAngle UTIL_CalculateDirection( const Vector &point1, const Vector &point2 );
