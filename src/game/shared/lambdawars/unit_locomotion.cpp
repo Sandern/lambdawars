@@ -1673,6 +1673,8 @@ void UnitBaseLocomotion::DoUnstuck()
 		return;
 	m_fNextAllowUnstuckTime = gpGlobals->curtime + 2.0f;
 
+	//NDebugOverlay::Box( mv->origin, -Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 1.0f );
+
 	// Prefer finding a position in radius
 	bool bFoundPosition = false;
 	if( RecastMgr().HasMeshes() )
@@ -1680,7 +1682,7 @@ void UnitBaseLocomotion::DoUnstuck()
 		CRecastMesh *pMesh = RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) );
 		if( pMesh )
 		{
-			Vector vClosestPoint = pMesh->ClosestPointOnMesh( mv->origin, 10000.0f, 2048.0f );
+			Vector vClosestPoint = pMesh->ClosestPointOnMesh( mv->origin, 256.0f, 128.0f );
 
 			if( vClosestPoint != vec3_origin )
 			{

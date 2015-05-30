@@ -175,7 +175,7 @@ void UTIL_FindPositionInRadius( positioninradius_t &info, CBaseEntity *navMeshEn
 		{
 
 			vEndPos = NavMeshGetPositionNearestNavArea( vecTest, info.m_fBeneathLimit, 128.0f, navMeshEnt );
-            if( vEndPos == vec3_origin )
+            if( vEndPos == vec3_origin || NavMeshGetPathDistance( vecTest, vEndPos, 10000.0f, navMeshEnt ) < 0 )
                 continue;
 		}
 		else
@@ -233,7 +233,7 @@ void UTIL_FindPosition( positioninfo_t &info, CBaseEntity *navMeshEnt )
 		{
 #ifdef ENABLE_PYTHON
 			vEndPos = NavMeshGetPositionNearestNavArea( info.m_vPosition, info.m_fBeneathLimit, info.m_fMaxRadius, navMeshEnt );
-			if( vEndPos == vec3_origin )
+			if( vEndPos == vec3_origin && NavMeshGetPathDistance( info.m_vPosition, vEndPos, 10000.0f, navMeshEnt ) >= 0 )
 				vEndPos = info.m_vPosition;
 		}
 #endif // ENABLE_PYTHON
