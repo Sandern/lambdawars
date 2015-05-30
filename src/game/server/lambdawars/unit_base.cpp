@@ -126,7 +126,16 @@ CBaseEntity *TossGrenadeAnimEventHandler::TossGrenade( CUnitBase *pUnit, Vector 
 //-----------------------------------------------------------------------------
 EmitSoundAnimEventHandler::EmitSoundAnimEventHandler( const char *soundscript )
 {
-	Q_strncpy(m_SoundScript, soundscript, 256);
+	if( !soundscript )
+	{
+#ifdef ENABLE_PYTHON
+		PyErr_SetString(PyExc_Exception, "Must pass a valid string" );
+		throw boost::python::error_already_set(); 
+#endif // ENABLE_PYTHON
+		m_SoundScript[0] = 0;
+		return;
+	}
+	V_strncpy( m_SoundScript, soundscript, sizeof( m_SoundScript ) );
 }
 
 void EmitSoundAnimEventHandler::HandleEvent(CUnitBase *pUnit, animevent_t *event)
