@@ -136,7 +136,7 @@ void PyFS_WriteFile( const char *filepath, const char *pathid, const char *conte
 	if( !content )
 	{
 		PyErr_SetString(PyExc_IOError, "Content cannot be empty" );
-		throw boost::python::error_already_set();  
+		throw boost::python::error_already_set();
 	}
 
 	if( !SrcPyPathIsInGameFolder( filepath ) )
@@ -155,7 +155,7 @@ void PyFS_WriteFile( const char *filepath, const char *pathid, const char *conte
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose:
 //-----------------------------------------------------------------------------
 boost::python::object PyFS_FullPathToRelativePath( const char *path, const char *pathid, boost::python::object defaultvalue )
 {

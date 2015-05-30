@@ -335,10 +335,6 @@ bool CSrcPython::InitInterpreter( void )
 	{
 		filesystem->CreateDirHierarchy( "python/Lib", "MOD" );
 	}
-	if( filesystem->FileExists( "python/srclib", "MOD" ) == false )
-	{
-		filesystem->CreateDirHierarchy( "python/srclib", "MOD" );
-	}
 
 	V_strcat( pythonpath, "python/Lib", sizeof(pythonpath) );
 	
@@ -1192,13 +1188,6 @@ void CSrcPython::SysAppendPath( const char* path, bool inclsubdirs )
 	// First retrieve the append method
 	bp::object append = Get("append", Get("path", "sys", true), true);
 
-	// Fixup path
-	//char char_output_full_filename[MAX_PATH];
-	//char p_out[MAX_PATH];
-	//filesystem->RelativePathToFullPath( path, NULL, char_output_full_filename, sizeof( char_output_full_filename ) );
-	//V_FixupPathName( char_output_full_filename, sizeof( char_output_full_filename ), char_output_full_filename );
-	//V_StrSubst( char_output_full_filename, "\\", "/", p_out, sizeof( p_out ) ); 
-	
 	// Append
 	Run<const char *>( append, path, true );
 
