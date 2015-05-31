@@ -263,7 +263,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 				free( m_pTextureBuffer );
 				m_pTextureBuffer = NULL;
 			}
-			DevMsg("Texture buffer size changed from %dh %dw to %dw %dh\n", m_iWidth, m_iHeight, width, height );
+			CefDbgMsg( 1, "Texture buffer size changed from %dh %dw to %dw %dh\n", m_iWidth, m_iHeight, width, height );
 			m_iWidth = width;
 			m_iHeight = height;
 			m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
