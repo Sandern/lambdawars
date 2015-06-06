@@ -21,6 +21,7 @@
 	#include "videocfg/videocfg.h"
 #else
 	#include "hl2wars_player.h"
+	#include "hl2wars_gamerules.h"
 #endif
 
 #include <string.h>
@@ -2378,11 +2379,23 @@ void CFogOfWarMgr::DebugPrintEntities()
 	}
 }
 
+#ifndef CLIENT_DLL
+CON_COMMAND_F( fow_toggle, "Toggles fog of of war", 0)
+{
+	if( (!HL2WarsGameRules() || !HL2WarsGameRules()->AllowSandboxCheats()) && !sv_cheats->GetBool() )
+	{
+		Msg( "Can't use cheat command fow_toggle in multiplayer, unless the server has sv_cheats set to 1 or playing a sandbox mode.\n" );
+		return;
+	}
+	sv_fogofwar.SetValue( !sv_fogofwar.GetBool() );
+}
+#endif // CLIENT_DLL
+
 #ifdef CLIENT_DLL
 CON_COMMAND_F( fow_print_cliententities, "", FCVAR_CHEAT)
 #else
 CON_COMMAND_F( fow_print_serverentities, "", FCVAR_CHEAT)
 #endif // CLIENT_DLL
 {
-	FogOfWarMgr()->DebugPrintEntities();	
+	FogOfWarMgr()->DebugPrintEntities();
 }

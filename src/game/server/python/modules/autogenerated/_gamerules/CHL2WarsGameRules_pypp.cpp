@@ -27,6 +27,25 @@ struct CHL2WarsGameRules_wrapper : CHL2WarsGameRules, bp::wrapper< CHL2WarsGameR
     
     }
 
+    virtual bool AllowSandboxCheats(  ) {
+        PY_OVERRIDE_CHECK( CHL2WarsGameRules, AllowSandboxCheats )
+        PY_OVERRIDE_LOG( _gamerules, CHL2WarsGameRules, AllowSandboxCheats )
+        bp::override func_AllowSandboxCheats = this->get_override( "AllowSandboxCheats" );
+        if( func_AllowSandboxCheats.ptr() != Py_None )
+            try {
+                return func_AllowSandboxCheats(  );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CHL2WarsGameRules::AllowSandboxCheats(  );
+            }
+        else
+            return this->CHL2WarsGameRules::AllowSandboxCheats(  );
+    }
+    
+    bool default_AllowSandboxCheats(  ) {
+        return CHL2WarsGameRules::AllowSandboxCheats( );
+    }
+
     virtual void ClientActive( ::CBasePlayer * client ) {
         PY_OVERRIDE_CHECK( CHL2WarsGameRules, ClientActive )
         PY_OVERRIDE_LOG( _gamerules, CHL2WarsGameRules, ClientActive )
@@ -2527,6 +2546,17 @@ void register_CHL2WarsGameRules_class(){
         CHL2WarsGameRules_exposer_t CHL2WarsGameRules_exposer = CHL2WarsGameRules_exposer_t( "CHL2WarsGameRules", bp::no_init );
         bp::scope CHL2WarsGameRules_scope( CHL2WarsGameRules_exposer );
         CHL2WarsGameRules_exposer.def( bp::init< >() );
+        { //::CHL2WarsGameRules::AllowSandboxCheats
+        
+            typedef bool ( ::CHL2WarsGameRules::*AllowSandboxCheats_function_type )(  ) ;
+            typedef bool ( CHL2WarsGameRules_wrapper::*default_AllowSandboxCheats_function_type )(  ) ;
+            
+            CHL2WarsGameRules_exposer.def( 
+                "AllowSandboxCheats"
+                , AllowSandboxCheats_function_type(&::CHL2WarsGameRules::AllowSandboxCheats)
+                , default_AllowSandboxCheats_function_type(&CHL2WarsGameRules_wrapper::default_AllowSandboxCheats) );
+        
+        }
         { //::CHL2WarsGameRules::ClientActive
         
             typedef void ( ::CHL2WarsGameRules::*ClientActive_function_type )( ::CBasePlayer * ) ;

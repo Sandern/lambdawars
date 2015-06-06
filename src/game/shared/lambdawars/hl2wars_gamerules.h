@@ -173,6 +173,8 @@ public:
 	bool GetGameOver() { return g_fGameOver; }
 	void SetGameOver( bool gameover ) { g_fGameOver = gameover; }
 
+	virtual bool AllowSandboxCheats() { return false; }
+
 private:
 	void DestroyTeams();
 
