@@ -959,6 +959,7 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 		epos[1] = vEnd[2];
 		epos[2] = vEnd[1];
 	}
+	dtVcopy(m_pathfindData.adjustedEndPos, epos);
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
