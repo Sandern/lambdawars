@@ -82,14 +82,14 @@ public:
 	virtual bool Save( CUtlBuffer &fileBuffer );
 
 	virtual bool RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const Vector &vMaxs );
+
+	bool IsPolyReachable( const CUtlVector< Vector > &sampleOrigins, const Vector &vPolyCenter );
+	bool RemoveUnreachablePoly( CMapMesh *pMapMesh );
 #endif // CLIENT_DLL
 
 #ifdef CLIENT_DLL
 	virtual void DebugRender();
 #endif // CLIENT_DLL
-
-	// Dynamic tile building
-	//virtual bool RebuildTilesAt( const Vector &vMins, const Vector &vMaxs );
 
 	// Mesh Querying
 	int GetPolyRef( const Vector &vPoint, float fBeneathLimit = 120.0f );

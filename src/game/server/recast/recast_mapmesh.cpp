@@ -68,6 +68,7 @@ void CMapMesh::Clear( bool bDynamicOnly )
 		m_Triangles.Purge();
 	}
 	m_Normals.Purge();
+	m_sampleOrigins.Purge();
 
 	if( m_chunkyMesh )
 	{
@@ -796,6 +797,14 @@ bool CMapMesh::Load( bool bDynamicOnly )
 		Warning("buildTiledNavigation: Failed to build chunky mesh.\n");
 		//ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Failed to build chunky mesh.");
 		return false;
+	}
+
+	// Origins for testing reachability of polygons
+	CBaseEntity *pSampleEnt = gEntList.FindEntityByClassname( NULL, "info_start_wars" );
+	while( pSampleEnt )
+	{
+		m_sampleOrigins.AddToTail( pSampleEnt->GetAbsOrigin() );
+		pSampleEnt = gEntList.FindEntityByClassname( pSampleEnt, "info_start_wars" );
 	}	
 
 	return true;

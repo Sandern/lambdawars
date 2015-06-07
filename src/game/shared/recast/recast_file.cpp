@@ -72,7 +72,7 @@ static char *RecastGetBspFilename( const char *navFilename )
 	V_snprintf( bspFilename, sizeof( bspFilename ), FORMAT_BSPFILE, STRING( gpGlobals->mapname ) );
 #endif // CLIENT_DLL
 
-	int len = strlen( bspFilename );
+	int len = V_strlen( bspFilename );
 	if (len < 3)
 		return NULL;
 

@@ -26,6 +26,8 @@
 #include "detour/DetourCommon.h"
 #include "detour/DetourNode.h"
 
+#include "recast/recast_mesh.h"
+
 #include "view.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -147,6 +149,8 @@ static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMesh
 		const dtPoly* p = &tile->polys[i];
 		if (p->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)	// Skip off-mesh links.
 			continue;
+		if (p->flags & SAMPLE_POLYFLAGS_DISABLED)
+			continue;
 			
 		const dtPolyDetail* pd = &tile->detailMeshes[i];
 
@@ -197,7 +201,9 @@ static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMesh
 			const dtPoly* p = &tile->polys[i];
 			if (p->getType() != DT_POLYTYPE_OFFMESH_CONNECTION)	// Skip regular polys.
 				continue;
-			
+			if (p->flags & SAMPLE_POLYFLAGS_DISABLED)
+				continue;
+
 			unsigned int col, col2;
 			if (query && query->isInClosedList(base | (dtPolyRef)i))
 				col = duRGBA(255,196,0,220);

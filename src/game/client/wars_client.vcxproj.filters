@@ -100,9 +100,6 @@
     <Filter Include="Source Files\Recast">
       <UniqueIdentifier>{f816e912-f7fc-4399-badb-0f59e8cf6460}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Recast\DispBuild">
-      <UniqueIdentifier>{3036161f-9f78-4084-81a1-c23afb72b4cc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Recast\fastlz">
       <UniqueIdentifier>{1b825196-5c8e-44f0-b754-f3d0b114d30a}</UniqueIdentifier>
     </Filter>

@@ -31,6 +31,7 @@
 static ConVar recast_build_single( "recast_build_single", "", 0, "Limit building to a single mesh named in this convar" );
 static ConVar recast_build_threaded( "recast_build_threaded", "1", FCVAR_ARCHIVE );
 static ConVar recast_build_numthreads( "recast_build_numthreads", "8", FCVAR_ARCHIVE );
+static ConVar recast_build_remove_unreachable_polys( "recast_build_remove_unreachable_polys", "0", 0 );
 
 static ConVar recast_build_partial_debug( "recast_build_partial_debug", "0", 0, "debug partial mesh rebuilding" );
 
@@ -290,6 +291,84 @@ static int rasterizeTileLayers(BuildContext* ctx, CMapMesh* geom,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+bool CRecastMesh::IsPolyReachable( const CUtlVector< Vector > &sampleOrigins, const Vector &vPolyCenter )
+{
+	for( int i = 0; i < sampleOrigins.Count(); i++ )
+	{
+		if( FindPathDistance( sampleOrigins[i] + Vector(0, 0, 8), vPolyCenter + Vector(0, 0, 8) ) > 0 )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+static Vector CalcPolyCenter( const dtMeshTile* tile, const dtPoly *p )
+{
+	Vector center( 0, 0, 0 );
+	for( int i = 0; i < p->vertCount; i++ )
+	{
+		float* v = &tile->verts[p->verts[i]*3];
+		center += Vector( v[0], v[2], v[1] );
+	}
+	center /= p->vertCount;
+	return center;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// TODO: Marks the nav mesh polies as disabled, but this information needs to be
+// written back to the compressed tile data!
+//-----------------------------------------------------------------------------
+bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
+{
+	const dtNavMesh * navMesh = m_navMesh;
+
+	int nDisabledPolys = 0;
+#if 1
+	// Go through all tiles
+	for (int i = 0; i < m_navMesh->getMaxTiles(); ++i)
+	{
+		const dtMeshTile* tile = navMesh->getTile(i);
+		if (!tile->header) 
+			continue;
+
+		// Go through each poly in the tile
+		for (int i = 0; i < tile->header->polyCount; ++i)
+		{
+			const dtPoly* p = &tile->polys[i];
+			if (p->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)	// Skip off-mesh links.
+				continue;
+			if (p->flags & SAMPLE_POLYFLAGS_DISABLED) // Skip when already marked disabled
+				continue;
+
+			dtPolyRef polyRef = (dtPolyRef)i;
+			if( !IsPolyReachable( pMapMesh->GetSampleOrigins(), CalcPolyCenter( tile, p ) ) )
+			{
+				// For now, just mark them as disabled. Would be nicer to completely remove them, but may be hard due 
+				// the links between polygons and likely introduces many bugs.
+				((dtPoly*)p)->flags |= SAMPLE_POLYFLAGS_DISABLED;
+				nDisabledPolys += 1;
+			}
+		}
+	}
+#else
+	for (int i = 0; i < m_tileCache->getTileCount(); ++i)
+	{
+		const dtCompressedTile* tile = m_tileCache->getTile(i);
+		if (!tile || !tile->header || !tile->dataSize) continue;
+
+
+	}
+#endif // 0
+
+	DevMsg( "Disabled %d polys\n", nDisabledPolys );
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CRecastMesh::Build( CMapMesh *pMapMesh )
 {
 	double fStartTime = Plat_FloatTime();
@@ -442,10 +521,15 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 		for (int x = 0; x < tw; ++x)
 			m_tileCache->buildNavMeshTilesAt(x,y, m_navMesh);
 	ctx.stopTimer(RC_TIMER_TOTAL);
+
+	// Disable unreachable polys
+	if( recast_build_remove_unreachable_polys.GetBool() )
+	{
+		RemoveUnreachablePoly( pMapMesh );
+	}
 	
 	m_cacheBuildTimeMs = ctx.getAccumulatedTime(RC_TIMER_TOTAL)/1000.0f;
 	m_cacheBuildMemUsage = ((LinearAllocator *)m_talloc)->high;
-	
 
 	const dtNavMesh* nav = m_navMesh;
 	int navmeshMemUsage = 0;

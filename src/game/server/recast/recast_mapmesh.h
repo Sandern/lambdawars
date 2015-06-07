@@ -37,6 +37,8 @@ public:
 	void AddEntity( CBaseEntity *pEnt );
 	void AddEntityBBox( CBaseEntity *pEnt, const Vector &vMins, const Vector &vMaxs );
 
+	const CUtlVector< Vector > &GetSampleOrigins();
+
 private:
 	bool IsTriangleInValidArea( const Vector *vTriangle, bool bCheckNoArea = true );
 	void AddCollisionModelToMesh( const matrix3x4_t &transform, CPhysCollide const *pCollisionModel, 
@@ -61,6 +63,8 @@ private:
 
 	Vector m_vMeshMins;
 	Vector m_vMeshMaxs;
+
+	CUtlVector< Vector > m_sampleOrigins;
 };
 
 inline void CMapMesh::SetBounds( const Vector &vMins, const Vector &vMaxs )
@@ -105,6 +109,11 @@ inline const float *CMapMesh::GetNorms()
 inline const rcChunkyTriMesh *CMapMesh::GetChunkyMesh()
 {
 	return m_chunkyMesh;
+}
+
+inline const CUtlVector< Vector > &CMapMesh::GetSampleOrigins()
+{
+	return m_sampleOrigins;
 }
 
 #endif // RECAST_MAPMESH_H
