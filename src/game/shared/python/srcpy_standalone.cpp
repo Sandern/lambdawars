@@ -129,10 +129,6 @@ bool CSrcPython::InitStandAloneInterpreter()
 	{
 		filesystem->CreateDirHierarchy( "python/LibDev", "MOD" );
 	}
-	if( filesystem->FileExists( "python/srclib", "MOD" ) == false )
-	{
-		filesystem->CreateDirHierarchy( "python/srclib", "MOD" );
-	}
 
 	V_strcat( pythonpath, moddir, sizeof(pythonpath) );
 	V_strcat( pythonpath, "/python/LibDev", sizeof(pythonpath) );
