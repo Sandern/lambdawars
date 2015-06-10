@@ -28,13 +28,11 @@ class MatchMaking(SemiSharedModuleGenerator):
         cls = mb.class_('PyMatchSession')
         cls.include()
         cls.rename('matchsession')
-        cls.mem_funs().virtuality = 'not virtual' 
-        cls.mem_fun('GetSessionSystemData').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
-        cls.mem_fun('GetSessionSettings').call_policies = call_policies.return_value_policy( call_policies.return_by_value )  
+        cls.mem_funs().virtuality = 'not virtual'
+        cls.mem_fun('GetSessionSystemData').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_fun('GetSessionSettings').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         
         # Wars
-        mb.free_function('WarsRequestGameServer').include()
-        
         if self.isserver:
             mb.enum('EGameServerState').include()
         
@@ -44,6 +42,7 @@ class MatchMaking(SemiSharedModuleGenerator):
             mb.free_function('SetWarsGameServerState').include()
             mb.free_function('GetActiveGameLobbySteamID').include()
         else:
+            mb.free_function('WarsRequestGameServer').include()
             mb.free_function('WarsSendPingMessage').include()
             mb.free_function('WarsSendPongMessage').include()
             

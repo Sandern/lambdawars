@@ -734,6 +734,7 @@ void ProcessWarsMessages()
 		while( messageData )
 		{
 			EMessageClient eMsg = (EMessageClient)( *(uint32*)messageData->buf.Base() );
+			const CSteamID &steamIDRemote = messageData->steamIDRemote;
 
 #ifdef ENABLE_PYTHON
 			boost::python::dict kwargs;
@@ -742,20 +743,26 @@ void ProcessWarsMessages()
 			uint32 publicIP = 0;
 			uint32 gamePort = 0;
 			CSteamID serverSteamID;
+			WarsAcceptGameMessage_t *acceptMessageData;
 
 			switch( eMsg )
 			{
 				case k_EMsgClientRequestGameAccepted:
-
-					if( messageData->buf.TellMaxPut() >= sizeof(WarsAcceptGameMessage_t) )
+					if( messageData->buf.TellMaxPut() < sizeof(WarsAcceptGameMessage_t) )
 					{
-						WarsAcceptGameMessage_t *acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
-
-						publicIP = acceptMessageData->publicIP;
-						gamePort = acceptMessageData->gamePort;
-						serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
+						break;
+					}
+					if( WarsGetActiveRequestGameServerSteamID() != steamIDRemote )
+					{
+						break;
 					}
 					
+					acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
+
+					publicIP = acceptMessageData->publicIP;
+					gamePort = acceptMessageData->gamePort;
+					serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
+
 #ifdef ENABLE_PYTHON
 					kwargs["sender"] = boost::python::object();
 					kwargs["publicip"] = publicIP;
@@ -766,6 +773,10 @@ void ProcessWarsMessages()
 #endif // ENABLE_PYTHON
 					break;
 				case k_EMsgClientRequestGameDenied:
+					if( WarsGetActiveRequestGameServerSteamID() != steamIDRemote )
+					{
+						break;
+					}
 #ifdef ENABLE_PYTHON
 					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
 #endif // ENABLE_PYTHON

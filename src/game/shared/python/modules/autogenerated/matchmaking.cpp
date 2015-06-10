@@ -139,6 +139,7 @@ BOOST_PYTHON_MODULE(matchmaking){
         .value("k_EGameServer_InGameFreeStyle", k_EGameServer_InGameFreeStyle)
         .value("k_EGameServer_StartingGame", k_EGameServer_StartingGame)
         .value("k_EGameServer_GameEnded", k_EGameServer_GameEnded)
+        .value("k_EGameServer_GracePeriod", k_EGameServer_GracePeriod)
         .export_values()
         ;
 
@@ -244,17 +245,6 @@ BOOST_PYTHON_MODULE(matchmaking){
         bp::def( 
             "WarsInitGameServer"
             , WarsInitGameServer_function_type( &::WarsInitGameServer ) );
-    
-    }
-
-    { //::WarsRequestGameServer
-    
-        typedef void ( *WarsRequestGameServer_function_type )( ::CSteamID,::CSteamID,::KeyValues * );
-        
-        bp::def( 
-            "WarsRequestGameServer"
-            , WarsRequestGameServer_function_type( &::WarsRequestGameServer )
-            , ( bp::arg("serverSteamId"), bp::arg("lobbySteamId"), bp::arg("pGameData") ) );
     
     }
 

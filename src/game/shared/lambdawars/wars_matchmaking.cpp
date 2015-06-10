@@ -14,9 +14,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#ifdef CLIENT_DLL
+// To prevent handling multiple messages from game servers
+static CSteamID s_activeGameServerRequestID;
+
 void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyValues *pGameData )
 {
-#ifdef CLIENT_DLL
 	if( !steamapicontext )
 		return;
 
@@ -38,11 +41,11 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 	int dataSize = sizeof(data) + keyvaluesData.TellPut();
 	char* pszData = (char*)stackalloc( dataSize );
 	V_memcpy( pszData, &data, sizeof(data) );
-	V_memcpy( pszData + sizeof(data), keyvaluesData.Base(), keyvaluesData.TellPut());
+	V_memcpy( pszData + sizeof(data), keyvaluesData.Base(), keyvaluesData.TellPut() );
 
 	//Msg("Wrote game data. Total message size: %d, game data size: %d\n", dataSize, keyvaluesData.TellPut() );
 	//KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
-
+	
 	if( bIsRequestingLocalGameServer )
 	{
 		// Sends the data correctly
@@ -51,18 +54,23 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 		pMessageData->steamIDRemote = steamapicontext->SteamUser()->GetSteamID();
 
 		// Creates the session
+		s_activeGameServerRequestID = serverSteamId;
 		g_pMatchFramework->CreateSession( pGameData );
 	}
 	else
 	{
 		if( !steamapicontext->SteamNetworking() )
 			return;
+		s_activeGameServerRequestID = serverSteamId;
 		steamapicontext->SteamNetworking()->SendP2PPacket( serverSteamId, pszData, dataSize, k_EP2PSendReliable, WARSNET_SERVER_CHANNEL );
 	}
-#endif // CLIENT_DLL
 }
 
-#ifdef CLIENT_DLL
+CSteamID WarsGetActiveRequestGameServerSteamID()
+{
+	return s_activeGameServerRequestID;
+}
+
 void WarsFireMMErrorSignal( KeyValues *pEvent )
 {
 #ifdef ENABLE_PYTHON
