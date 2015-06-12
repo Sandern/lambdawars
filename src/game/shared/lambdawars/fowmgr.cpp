@@ -47,6 +47,7 @@ static CFogOfWarMgr s_FogOfWarMgr; // singleton
 CFogOfWarMgr* FogOfWarMgr() { return &s_FogOfWarMgr; }
 
 ConVar sv_fogofwar( "sv_fogofwar", "1", FCVAR_CHEAT | FCVAR_REPLICATED | FCVAR_NOTIFY, "Disables/enables the fog of war." );
+ConVar sv_fogofwar_sandbox( "sv_fogofwar_sandbox", "1", FCVAR_CHEAT | FCVAR_REPLICATED | FCVAR_HIDDEN, "Toggle for sandbox fog of war" );
 ConVar sv_fogofwar_shadowcast( "sv_fogofwar_shadowcast", "1", FCVAR_CHEAT | FCVAR_REPLICATED, "Use shadow casting when computing the fog of war (i.e. height differences block the line of sight." );
 ConVar g_debug_fogofwar( "g_debug_fogofwar", "0", FCVAR_CHEAT | FCVAR_REPLICATED );
 
@@ -266,6 +267,11 @@ void CFogOfWarMgr::LevelInitPostEntity()
 	m_bActive = true;
 	m_fNeedsUpdate = 0.0f;
 	m_fNextConvergeUpdate = 0.0f;
+
+#ifndef CLIENT_DLL
+	// Reset sandbox fog of war
+	sv_fogofwar_sandbox.SetValue( 1 );
+#endif // CLIENT_DLL
 
 	LoadHeightMap();
 	if( !m_bHeightMapLoaded )
@@ -1618,7 +1624,9 @@ void CFogOfWarMgr::UpdateShared()
 #endif
 
 	// look if fog of war is disabled, and if we need to clear the fog then
-	if( !sv_fogofwar.GetBool() 
+	// Note: sv_fogofwar_sandbox convar is purely used by the fow_toggle command. It's reset to 1 between map changes, and can only
+	// be set through fow_toggle in Sandbox or when cheats are on.
+	if( !sv_fogofwar.GetBool() || !sv_fogofwar_sandbox.GetBool()
 #ifdef CLIENT_DLL
 		|| pPlayer->IsObserver() || (pPlayer->GetTeamNumber() == TEAM_SPECTATOR && pPlayer->GetOwnerNumber() == 0) 
 #endif // CLIENT_DLL
@@ -2387,7 +2395,7 @@ CON_COMMAND_F( fow_toggle, "Toggles fog of of war", 0)
 		Msg( "Can't use cheat command fow_toggle in multiplayer, unless the server has sv_cheats set to 1 or playing a sandbox mode.\n" );
 		return;
 	}
-	sv_fogofwar.SetValue( !sv_fogofwar.GetBool() );
+	sv_fogofwar_sandbox.SetValue( !sv_fogofwar_sandbox.GetBool() );
 }
 #endif // CLIENT_DLL
 
