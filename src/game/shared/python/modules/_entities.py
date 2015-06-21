@@ -1232,6 +1232,12 @@ class Entities(SemiSharedModuleGenerator):
             # CGib
             mb.free_functions('CreateRagGib').include()
             mb.enum('GibType_e').include()
+            
+            cls = mb.class_('CGib')
+            self.IncludeVarAndRename('m_cBloodDecals', 'blooddecals')
+            self.IncludeVarAndRename('m_material', 'material')
+            self.IncludeVarAndRename('m_lifeTime', 'lifetime')
+            self.IncludeVarAndRename('m_bForceRemove', 'forceremove')
         else:
             # C_PlayerResource
             cls = mb.class_('C_PlayerResource')

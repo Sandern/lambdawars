@@ -912,6 +912,10 @@ void register_CGib_class(){
         .def( 
             "WaitTillLand"
             , (void ( ::CGib::* )(  ) )( &::CGib::WaitTillLand ) )    
+        .def_readwrite( "forceremove", &CGib::m_bForceRemove )    
+        .def_readwrite( "blooddecals", &CGib::m_cBloodDecals )    
+        .def_readwrite( "lifetime", &CGib::m_lifeTime )    
+        .def_readwrite( "material", &CGib::m_material )    
         .def( 
             "Activate"
             , (void ( ::CBaseAnimating::* )(  ) )(&::CBaseAnimating::Activate)
