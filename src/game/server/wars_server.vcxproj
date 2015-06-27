@@ -828,6 +828,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="recast\recast_build.cpp" />
     <ClCompile Include="recast\recast_mapmesh.cpp" />
     <ClCompile Include="recast\recast_offmesh_connection.cpp" />
+    <ClCompile Include="recast\recast_prunetool.cpp" />
     <ClCompile Include="recipientfilter.cpp" />
     <ClCompile Include="..\..\public\registry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
