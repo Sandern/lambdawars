@@ -2474,6 +2474,9 @@
     <ClCompile Include="..\..\public\filesystem_init.cpp">
       <Filter>Source Files\Python\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\recast\recast_prunetool.cpp">
+      <Filter>Source Files\Recast</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">

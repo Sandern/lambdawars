@@ -303,6 +303,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr_ent.cpp" />
+    <ClCompile Include="..\shared\recast\recast_prunetool.cpp" />
     <ClCompile Include="..\shared\recast\recast_tilecache_helpers.cpp" />
     <ClCompile Include="deferred\cdeferred_manager_server.cpp" />
     <ClCompile Include="lambdawars\unit_vehiclenavigator.cpp" />
@@ -828,7 +829,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="recast\recast_build.cpp" />
     <ClCompile Include="recast\recast_mapmesh.cpp" />
     <ClCompile Include="recast\recast_offmesh_connection.cpp" />
-    <ClCompile Include="recast\recast_prunetool.cpp" />
     <ClCompile Include="recipientfilter.cpp" />
     <ClCompile Include="..\..\public\registry.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

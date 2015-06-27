@@ -31,7 +31,7 @@
 static ConVar recast_build_single( "recast_build_single", "", 0, "Limit building to a single mesh named in this convar" );
 static ConVar recast_build_threaded( "recast_build_threaded", "1", FCVAR_ARCHIVE );
 static ConVar recast_build_numthreads( "recast_build_numthreads", "8", FCVAR_ARCHIVE );
-static ConVar recast_build_remove_unreachable_polys( "recast_build_remove_unreachable_polys", "0", 0 );
+static ConVar recast_build_remove_unreachable_polys( "recast_build_remove_unreachable_polys", "1", 0 );
 
 static ConVar recast_build_partial_debug( "recast_build_partial_debug", "0", 0, "debug partial mesh rebuilding" );
 
@@ -316,6 +316,122 @@ static Vector CalcPolyCenter( const dtMeshTile* tile, const dtPoly *p )
 	return center;
 }
 #endif // 0
+
+//-----------------------------------------------------------------------------
+// Purpose: Marks polygons as disabled based on a number of sample points and
+//			writes back the data, removing any empty tiles.
+//-----------------------------------------------------------------------------
+bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
+{
+	dtStatus status;
+
+	DisableUnreachablePolygons( pMapMesh->GetSampleOrigins() );
+
+	int removedTiles = 0, updatedTiles = 0;
+
+	// Go through all tiles
+	const dtNavMesh * navMesh = m_navMesh;
+
+	for( int i = 0; i < m_navMesh->getMaxTiles(); ++i )
+	{
+		m_talloc->reset();
+
+		const dtMeshTile* tile = navMesh->getTile(i);
+		if( !tile->header ) 
+			continue;
+
+		// Find compressed tile
+		dtCompressedTile *compTile = NULL;
+		for (int j = 0; j < m_tileCache->getTileCount(); ++j)
+		{
+			const dtCompressedTile* compressedTile = m_tileCache->getTile(j);
+			if (!compressedTile || !compressedTile->header || !compressedTile->dataSize) continue;
+
+			if( compressedTile->header->tx == tile->header->x && 
+				compressedTile->header->ty == tile->header->y &&
+				compressedTile->header->tlayer == tile->header->layer ) {
+				compTile = (dtCompressedTile *)compressedTile;
+				break;
+			}
+		}
+
+		if( !compTile ) {
+			Warning("Did not find matching compressed tile!\n");
+			continue;
+		}
+
+		dtTileCacheLayer *pLayer = NULL;
+		status = dtDecompressTileCacheLayer( m_talloc, m_tcomp, compTile->data, compTile->dataSize, &pLayer );
+		if (dtStatusFailed(status)) {
+			Warning("Could not decompress tile! =>\n" );
+			if( status & DT_FAILURE )
+				Msg("\tFailure status\n");
+			if( status & DT_OUT_OF_MEMORY )
+				Msg("\t out of memory status\n");
+			if( status & DT_WRONG_MAGIC )
+				Msg("\tWrong magic status\n");
+			if( status & DT_WRONG_VERSION )
+				Msg("\tWrong version status\n");
+			if( status & DT_INVALID_PARAM )
+				Msg("\tInvalid param status\n");
+			continue;
+		}
+	
+		// Go through each poly in the tile
+		bool bAllPolygonsDisabled = true, bHasPolygonsDisabled = false;
+		for( int i = 0; i < tile->header->polyCount; ++i )
+		{
+			const dtPoly* p = &tile->polys[i];
+			if( p->flags & SAMPLE_POLYFLAGS_DISABLED ) {
+
+				// TODO: Maybe optimize by creating a custom version of dtMarkPolyArea, but probably fast enough
+				CUtlVector< float > verts;
+				for( int k = 0; k < p->vertCount; k++ ) 
+				{
+					verts.AddToTail( tile->verts[ p->verts[k] * 3 ] );
+					verts.AddToTail( tile->verts[ p->verts[k]*3+1 ] );
+					verts.AddToTail( tile->verts[ p->verts[k]*3+2 ] );
+				}
+
+				dtMarkPolyArea( *pLayer, tile->header->bmin, m_tileCache->getParams()->cs, m_tileCache->getParams()->ch, 
+					verts.Base(), p->vertCount, DT_TILECACHE_NULL_AREA );
+
+				bHasPolygonsDisabled = true;
+			} else {
+				bAllPolygonsDisabled = false;
+			}
+		}
+
+		if( bAllPolygonsDisabled ) {
+			m_tileCache->removeTile( m_tileCache->getTileRef( compTile ), &compTile->data, &compTile->dataSize );
+			removedTiles++;
+		} else if( bHasPolygonsDisabled ) {
+			// Write back tile
+			status = dtBuildTileCacheLayer( m_tcomp, pLayer->header, pLayer->heights, pLayer->areas, pLayer->cons, &compTile->data, &compTile->dataSize );
+			if (dtStatusFailed(status)) {
+				Warning("Could not rebuild compressed tile cache layer! =>\n" );
+				if( status & DT_FAILURE )
+					Msg("\tFailure status\n");
+				if( status & DT_OUT_OF_MEMORY )
+					Msg("\t out of memory status\n");
+				if( status & DT_WRONG_MAGIC )
+					Msg("\tWrong magic status\n");
+				if( status & DT_WRONG_VERSION )
+					Msg("\tWrong version status\n");
+				if( status & DT_INVALID_PARAM )
+					Msg("\tInvalid param status\n");
+			}
+
+			updatedTiles++;
+		}
+
+		dtFreeTileCacheLayer( m_talloc, pLayer );
+	}
+
+	Msg( "Removed %d tiles, Updated tiles: %d, total tiles: %d\n", removedTiles, updatedTiles, m_navMesh->getMaxTiles() );
+
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

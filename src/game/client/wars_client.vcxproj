@@ -300,6 +300,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="..\shared\recast\recast_mesh.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr.cpp" />
     <ClCompile Include="..\shared\recast\recast_mgr_ent.cpp" />
+    <ClCompile Include="..\shared\recast\recast_prunetool.cpp" />
     <ClCompile Include="..\shared\recast\recast_tilecache_helpers.cpp" />
     <ClCompile Include="cef\src_cef_avatar_handler.cpp" />
     <ClCompile Include="cef\src_cef_local_handler.cpp" />

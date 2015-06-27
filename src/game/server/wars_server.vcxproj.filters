@@ -2005,7 +2005,7 @@
     <ClCompile Include="..\shared\python\srcpy_standalone.cpp">
       <Filter>Source Files\Python</Filter>
     </ClCompile>
-    <ClCompile Include="recast\recast_prunetool.cpp">
+    <ClCompile Include="..\shared\recast\recast_prunetool.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
   </ItemGroup>

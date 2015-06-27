@@ -77,6 +77,8 @@ public:
 	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
 	virtual bool Reset();
 
+	bool DisableUnreachablePolygons( const CUtlVector< Vector > &samplePositions );
+
 #ifndef CLIENT_DLL
 	virtual bool Build( CMapMesh *pMapMesh );
 	virtual bool Save( CUtlBuffer &fileBuffer );

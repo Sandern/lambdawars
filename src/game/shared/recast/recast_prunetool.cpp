@@ -20,7 +20,6 @@
 #include "cbase.h"
 
 #include "recast/recast_mesh.h"
-#include "recast/recast_mapmesh.h"
 
 #include "detour/DetourNavMesh.h"
 #include "detour/DetourCommon.h"
@@ -211,25 +210,20 @@ static void disableUnvisitedPolys(dtNavMesh* nav, NavmeshFlags* flags)
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-// TODO: Marks the nav mesh polies as disabled, but this information needs to be
-// written back to the compressed tile data!
+// Purpose: Marks unreachable polygons for samplePositions with 
+//			SAMPLE_POLYFLAGS_DISABLED flag.
 //-----------------------------------------------------------------------------
-bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
+bool CRecastMesh::DisableUnreachablePolygons( const CUtlVector< Vector > &samplePositions )
 {
-	double fStartTime = Plat_FloatTime();
-
 	NavmeshFlags *flags = new NavmeshFlags;
 	flags->init( m_navMesh );
 
-	for( int i = 0; i < pMapMesh->GetSampleOrigins().Count(); i++ )
+	for( int i = 0; i < samplePositions.Count(); i++ )
 	{
-		floodNavmesh( m_navMesh, flags, GetPolyRef( pMapMesh->GetSampleOrigins()[i] ), 1 );
+		floodNavmesh( m_navMesh, flags, GetPolyRef( samplePositions[i] ), 1 );
 	}
 
 	disableUnvisitedPolys( m_navMesh, flags );
-
-	Msg("Disabled unreachable polys in %f time\n", Plat_FloatTime() - fStartTime );
 
 	return true;
 }
