@@ -353,8 +353,6 @@ void CCefSystem::Shutdown()
 	CefShutdown();
 
 #ifdef WIN32
-	// Restore window process to prevent unwanted callbacks
-
 #ifndef USE_MULTITHREADED_MESSAGELOOP
 	// Workaround crash on exit: minimize window...
 	// If the window is still shown, an unwanted unhandled user callback occurs
@@ -643,7 +641,6 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 		{
 			wchar_t unicode[2];
 			int ret = ToUnicodeEx(virtualKey, scancode, (BYTE*)kbrdState, unicode, 2, 0, currentKb);
-			//Msg("wParam: %d, Unicode: %d, ret: %d\n", wParam, unicode[0], ret );
 
 			// Only change wParam if there is a translation for our active keyboard
 			if( ret == 1 )
@@ -651,10 +648,6 @@ void CCefSystem::ProcessKeyInput( UINT message, WPARAM wParam, LPARAM lParam )
 				wParam = unicode[0];
 			}
 		}
-		/*else
-		{
-			Warning("Could not get keyboard state\n");
-		}*/
 	}
 
 	keyevent.character = (wchar_t)wParam;

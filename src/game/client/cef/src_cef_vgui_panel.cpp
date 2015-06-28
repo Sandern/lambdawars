@@ -150,7 +150,7 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	// IMPORTANT: Use TEXTUREFLAGS_POINTSAMPLE. Otherwise mat_filtertextures will make it really blurred and ugly.
 	// IMPORTANT 2: Use TEXTUREFLAGS_SINGLECOPY in case you want to be able to regenerate only a part of the texture (i.e. specify
 	//				a sub rect when calling ->Download()).
-	m_iTexImageFormat = IMAGE_FORMAT_BGRA8888; // IMAGE_FORMAT_RGBA8888;
+	m_iTexImageFormat = IMAGE_FORMAT_BGRA8888;
 	m_iTexFlags = TEXTUREFLAGS_PROCEDURAL|TEXTUREFLAGS_NOLOD|TEXTUREFLAGS_NOMIP|TEXTUREFLAGS_POINTSAMPLE|TEXTUREFLAGS_SINGLECOPY|
 		TEXTUREFLAGS_PRE_SRGB|TEXTUREFLAGS_NODEPTHBUFFER;
 

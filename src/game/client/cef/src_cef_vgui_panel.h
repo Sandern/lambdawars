@@ -14,7 +14,6 @@
 #include "materialsystem/MaterialSystemUtil.h"
 
 class SrcCefBrowser;
-//class CCefTextureGenerator;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
