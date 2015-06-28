@@ -102,12 +102,14 @@ boost::python::object PyFS_ReadFile( const char *filepath, const char *pathid, b
 		throw boost::python::error_already_set(); 
 	}
 
-	int iExpectedSize = filesystem->Size( filepath, pathid );
+	int iExpectedSize = maxbytes == 0 ? filesystem->Size( filepath, pathid ) : maxbytes - 1;
 	void *buffer = NULL;
 	int len = filesystem->ReadFileEx( filepath, pathid, &buffer, true, optimalalloc, maxbytes, startingbyte );
 	if( len != iExpectedSize )
 	{
-		PyErr_SetString(PyExc_IOError, "Failed to read file" );
+		char buf[256];
+		V_snprintf( buf, sizeof( buf ), "Failed to read file. Expected file size %d, got %d instead", iExpectedSize, len );
+		PyErr_SetString( PyExc_IOError, buf );
 		throw boost::python::error_already_set(); 
 	}
 
