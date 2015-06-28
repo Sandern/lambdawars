@@ -195,8 +195,8 @@ void ClientApp::OnContextInitialized()
 	CefRegisterSchemeHandlerFactory( "avatar", "small", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeSmall ) );
 	CefRegisterSchemeHandlerFactory( "avatar", "medium", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeMedium ) );
 	CefRegisterSchemeHandlerFactory( "avatar", "large", new AvatarSchemeHandlerFactory( AvatarSchemeHandlerFactory::k_AvatarTypeLarge ) );
-	CefRegisterSchemeHandlerFactory("vtf", "", new VTFSchemeHandlerFactory());
-	CefRegisterSchemeHandlerFactory("local", "", new LocalSchemeHandlerFactory());
+	CefRegisterSchemeHandlerFactory( "vtf", "", new VTFSchemeHandlerFactory() );
+	CefRegisterSchemeHandlerFactory( "local", "", new LocalSchemeHandlerFactory() );
 }
 
 //-----------------------------------------------------------------------------
@@ -206,6 +206,7 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 {
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
+	command_line->AppendSwitch( CefString( "enable-begin-frame-scheduling" ) );
 
 	if( !m_bEnableGPU )
 	{
@@ -223,9 +224,9 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 //-----------------------------------------------------------------------------
 void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar)
 {
-	registrar->AddCustomScheme("avatar", true, false, false);
-	registrar->AddCustomScheme("vtf", false /* Not a standard url */, false, false);
-	registrar->AddCustomScheme("local", true, false, false);
+	registrar->AddCustomScheme( "avatar", true, false, false );
+	registrar->AddCustomScheme( "vtf", false /* Not a standard url */, false, false );
+	registrar->AddCustomScheme( "local", true, false, false );
 }
 
 //-----------------------------------------------------------------------------
