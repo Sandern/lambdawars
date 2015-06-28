@@ -180,11 +180,14 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	DevMsg( "GameInterface reservation payload:\n" );
 	KeyValuesDumpAsDevMsg( pKV );
 
-	// Vitaliy: Disable cheats as part of reservation in case they were enabled (unless we are on Steam Beta)
-	if ( sv_force_transmit_ents.IsFlagSet( FCVAR_DEVELOPMENTONLY ) &&	// any convar with FCVAR_DEVELOPMENTONLY flag will be sufficient here
-		sv_cheats && sv_cheats->GetBool() )
+	if( !g_bOfflineGame )
 	{
-		sv_cheats->SetValue( 0 );
+		// Vitaliy: Disable cheats as part of reservation in case they were enabled (unless we are on Steam Beta)
+		if ( sv_force_transmit_ents.IsFlagSet( FCVAR_DEVELOPMENTONLY ) &&	// any convar with FCVAR_DEVELOPMENTONLY flag will be sufficient here
+			sv_cheats && sv_cheats->GetBool() )
+		{
+			sv_cheats->SetValue( 0 );
+		}
 	}
 
 	// Between here and the last part: apply settings...
