@@ -225,9 +225,13 @@ class GameInterface(SemiSharedModuleGenerator):
         mb.free_function('PyGetMapHeader').include()
         mb.free_function('PyGetMapHeader').rename('GetMapHeader')
         if self.settings.branch == 'swarm':
-            mb.class_('BSPHeader_t').include()
+            cls = mb.class_('BSPHeader_t')
         else:
-            mb.class_('dheader_t').include()
+            cls = mb.class_('dheader_t')
+        cls.include()
+        cls.var('m_nVersion').rename('version')
+        cls.var('mapRevision').rename('maprevision')
+        
         mb.class_('lump_t').include()
         mb.mem_funs('GetBaseMap').exclude()
         mb.vars('m_DataMap').exclude()

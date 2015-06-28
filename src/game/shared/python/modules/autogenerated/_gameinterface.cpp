@@ -1197,8 +1197,8 @@ BOOST_PYTHON_MODULE(_gameinterface){
                 , bp::make_function( array_wrapper_creator(&BSPHeader_t_wrapper::pyplusplus_lumps_wrapper)
                                     , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }
-        BSPHeader_t_exposer.def_readwrite( "m_nVersion", &BSPHeader_t::m_nVersion );
-        BSPHeader_t_exposer.def_readwrite( "mapRevision", &BSPHeader_t::mapRevision );
+        BSPHeader_t_exposer.def_readwrite( "version", &BSPHeader_t::m_nVersion );
+        BSPHeader_t_exposer.def_readwrite( "maprevision", &BSPHeader_t::mapRevision );
     }
 
     bp::class_< IGameSystem, boost::noncopyable >( "IGameSystem", bp::no_init )    
@@ -4113,8 +4113,8 @@ BOOST_PYTHON_MODULE(_gameinterface){
                 , bp::make_function( array_wrapper_creator(&BSPHeader_t_wrapper::pyplusplus_lumps_wrapper)
                                     , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
         }
-        BSPHeader_t_exposer.def_readwrite( "m_nVersion", &BSPHeader_t::m_nVersion );
-        BSPHeader_t_exposer.def_readwrite( "mapRevision", &BSPHeader_t::mapRevision );
+        BSPHeader_t_exposer.def_readwrite( "version", &BSPHeader_t::m_nVersion );
+        BSPHeader_t_exposer.def_readwrite( "maprevision", &BSPHeader_t::mapRevision );
     }
 
     bp::class_< IGameSystem, boost::noncopyable >( "IGameSystem", bp::no_init )    
