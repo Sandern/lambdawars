@@ -402,8 +402,6 @@ void SrcCefOSRRenderer::OnCursorChange(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::SetCursor( vgui::CursorCode cursor )
 {
-	//CefDbgMsg( 2, "#%dCef: OnCursorChange -> %d\n", m_pBrowser->GetBrowser()->GetIdentifier(), cursor );
-	//m_pBrowser->GetPanel()->SetCursor( cursor );
 	CefDbgMsg( 2, "Cef: OnCursorChange -> %d\n", cursor );
 	m_Cursor = cursor;
 }
@@ -430,6 +428,9 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 	return alpha;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 bool SrcCefOSRRenderer::StartDragging(CefRefPtr<CefBrowser> browser,
 							CefRefPtr<CefDragData> drag_data,
 							DragOperationsMask allowed_ops,
@@ -439,6 +440,9 @@ bool SrcCefOSRRenderer::StartDragging(CefRefPtr<CefBrowser> browser,
 	return false;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void SrcCefOSRRenderer::UpdateDragCursor(CefRefPtr<CefBrowser> browser,
 							DragOperation operation)
 {
@@ -460,7 +464,7 @@ void SrcCefOSRRenderer::UpdateRootScreenRect( int x, int y, int wide, int tall )
 {
 	if (!CefCurrentlyOn(TID_UI)) {
 		CefPostTask(TID_UI, 
-			base::Bind(&SrcCefOSRRenderer::UpdateViewRect, this,
+			base::Bind(&SrcCefOSRRenderer::UpdateRootScreenRect, this,
 			x, y, wide, tall));
 		return;
 	}
