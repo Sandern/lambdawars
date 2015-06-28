@@ -323,6 +323,12 @@ static Vector CalcPolyCenter( const dtMeshTile* tile, const dtPoly *p )
 //-----------------------------------------------------------------------------
 bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
 {
+	if( !pMapMesh->GetSampleOrigins().Count() )
+	{
+		Warning( "CRecastMesh: No sample points on the map, skipping removable of unreachable polygons\n" );
+		return true;
+	}
+
 	dtStatus status;
 
 	DisableUnreachablePolygons( pMapMesh->GetSampleOrigins() );
@@ -360,20 +366,21 @@ bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
 			continue;
 		}
 
+		// Build the layer data, so we can access the areas of the tile
 		dtTileCacheLayer *pLayer = NULL;
 		status = dtDecompressTileCacheLayer( m_talloc, m_tcomp, compTile->data, compTile->dataSize, &pLayer );
 		if (dtStatusFailed(status)) {
 			Warning("Could not decompress tile! =>\n" );
 			if( status & DT_FAILURE )
-				Msg("\tFailure status\n");
+				Warning("\tFailure status\n");
 			if( status & DT_OUT_OF_MEMORY )
-				Msg("\t out of memory status\n");
+				Warning("\tOut of memory status\n");
 			if( status & DT_WRONG_MAGIC )
-				Msg("\tWrong magic status\n");
+				Warning("\tWrong magic status\n");
 			if( status & DT_WRONG_VERSION )
-				Msg("\tWrong version status\n");
+				Warning("\tWrong version status\n");
 			if( status & DT_INVALID_PARAM )
-				Msg("\tInvalid param status\n");
+				Warning("\tInvalid param status\n");
 			continue;
 		}
 	
@@ -393,6 +400,7 @@ bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
 					verts.AddToTail( tile->verts[ p->verts[k]*3+2 ] );
 				}
 
+				// Mark areas for this polygon as null
 				dtMarkPolyArea( *pLayer, tile->header->bmin, m_tileCache->getParams()->cs, m_tileCache->getParams()->ch, 
 					verts.Base(), p->vertCount, DT_TILECACHE_NULL_AREA );
 
@@ -403,23 +411,18 @@ bool CRecastMesh::RemoveUnreachablePoly( CMapMesh *pMapMesh )
 		}
 
 		if( bAllPolygonsDisabled ) {
+			// If all polygons are disabled, simply remove the tile. This can greatly reduce the file size.
 			m_tileCache->removeTile( m_tileCache->getTileRef( compTile ), &compTile->data, &compTile->dataSize );
 			removedTiles++;
 		} else if( bHasPolygonsDisabled ) {
-			// Write back tile
+			// Write back the updated tile with disabled areas
 			status = dtBuildTileCacheLayer( m_tcomp, pLayer->header, pLayer->heights, pLayer->areas, pLayer->cons, &compTile->data, &compTile->dataSize );
 			if (dtStatusFailed(status)) {
 				Warning("Could not rebuild compressed tile cache layer! =>\n" );
 				if( status & DT_FAILURE )
-					Msg("\tFailure status\n");
+					Warning("\tFailure status\n");
 				if( status & DT_OUT_OF_MEMORY )
-					Msg("\t out of memory status\n");
-				if( status & DT_WRONG_MAGIC )
-					Msg("\tWrong magic status\n");
-				if( status & DT_WRONG_VERSION )
-					Msg("\tWrong version status\n");
-				if( status & DT_INVALID_PARAM )
-					Msg("\tInvalid param status\n");
+					Warning("\tOut of memory status\n");
 			}
 
 			updatedTiles++;

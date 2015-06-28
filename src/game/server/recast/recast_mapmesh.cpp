@@ -17,8 +17,12 @@
 #include "ChunkyTriMesh.h"
 
 #ifdef ENABLE_PYTHON
-	#include "srcpy.h"
+#include "srcpy.h"
 #endif // ENABLE_PYTHON
+
+#ifdef HL2WARS_DLL
+#include "unit_base_shared.h"
+#endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -670,6 +674,19 @@ bool CMapMesh::GenerateBrushData( void *fileContent, CUtlVector<float> &verts, C
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+static void AddSampleOrigins( CUtlVector< Vector > &sampleOrigins, const char *pClassName )
+{
+	CBaseEntity *pSampleEnt = gEntList.FindEntityByClassname( NULL, pClassName );
+	while( pSampleEnt )
+	{
+		sampleOrigins.AddToTail( pSampleEnt->GetAbsOrigin() );
+		pSampleEnt = gEntList.FindEntityByClassname( pSampleEnt, pClassName );
+	}	
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 bool CMapMesh::Load( bool bDynamicOnly )
 {
 	Clear( bDynamicOnly );
@@ -799,13 +816,24 @@ bool CMapMesh::Load( bool bDynamicOnly )
 		return false;
 	}
 
+#ifdef HL2WARS_DLL
 	// Origins for testing reachability of polygons
-	CBaseEntity *pSampleEnt = gEntList.FindEntityByClassname( NULL, "info_start_wars" );
-	while( pSampleEnt )
+	AddSampleOrigins( m_sampleOrigins, "info_start_wars" );
+	AddSampleOrigins( m_sampleOrigins, "overrun_wave_spawnpoint" );
+
+	if( !m_sampleOrigins.Count() )
 	{
-		m_sampleOrigins.AddToTail( pSampleEnt->GetAbsOrigin() );
-		pSampleEnt = gEntList.FindEntityByClassname( pSampleEnt, "info_start_wars" );
-	}	
+		// Probably single player map, so add all units as sample points
+		// This includes buildings, so should include good points.
+		// Number of sample points won't hurt build time, since already
+		// visited polygons are skipped.
+		CUnitBase **ppUnits = g_Unit_Manager.AccessUnits();
+		for ( int i = 0; i < g_Unit_Manager.NumUnits(); i++ )
+		{
+			m_sampleOrigins.AddToTail( ppUnits[i]->GetAbsOrigin() );
+		}
+	}
+#endif // HL2WARS_DLL
 
 	return true;
 }
