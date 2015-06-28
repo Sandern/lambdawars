@@ -205,6 +205,7 @@ boost::python::dict PyKeyValuesToDict( const KeyValues *pKV );
 boost::python::object PyKeyValuesToDictFromFile( const char *pFileName );
 KeyValues *PyDictToKeyValues( boost::python::object d, const char *name = NULL );
 bool PyWriteKeyValuesToFile( KeyValues *pKV, const char *filename, const char *pathid = NULL );
+boost::python::object PyReadKeyValuesFromFile( const char *filename, const char *pathid = NULL );
 
 class PyKeyValues
 {

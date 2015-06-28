@@ -256,6 +256,17 @@ bool PyWriteKeyValuesToFile( KeyValues *pKV, const char *filename, const char *p
 	return pKV->SaveToFile( filesystem, filename, pathid );
 }
 
+boost::python::object PyReadKeyValuesFromFile( const char *filename, const char *pathid )
+{
+	KeyValues *pData = new KeyValues("data");
+	KeyValues::AutoDelete autodelete( pData );
+	if( pData->LoadFromFile( filesystem, filename, pathid ) )
+	{
+		return srcbuiltins.attr("KeyValues")( boost::python::ptr( pData ) );
+	}
+	return boost::python::object();
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Safe KeyValues version for Python
 //-----------------------------------------------------------------------------

@@ -880,6 +880,17 @@ BOOST_PYTHON_MODULE(srcbuiltins){
     
     }
 
+    { //::PyReadKeyValuesFromFile
+    
+        typedef ::boost::python::api::object ( *ReadKeyValuesFromFile_function_type )( char const *,char const * );
+        
+        bp::def( 
+            "ReadKeyValuesFromFile"
+            , ReadKeyValuesFromFile_function_type( &::PyReadKeyValuesFromFile )
+            , ( bp::arg("filename"), bp::arg("pathid")=bp::object() ) );
+    
+    }
+
     { //::PyWriteKeyValuesToFile
     
         typedef bool ( *WriteKeyValuesToFile_function_type )( ::KeyValues *,char const *,char const * );
