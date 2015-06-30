@@ -164,14 +164,19 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBas
 	// The "findRandomPointAroundCircle" is not too random, so pick a random start position, which is used as starting point for the random
 	// point on a poly on the navigation mesh. This function is not really used on the client, so not implemented right now for client.
 #ifndef CLIENT_DLL
-	CUtlVector< CBaseEntity *> startPoints;
+	CUtlVector< Vector > startPoints;
 	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "info_start_wars" );
 	while( pEnt )
 	{
-		startPoints.AddToTail( pEnt );
+		const Vector &vOrigin = pEnt->GetAbsOrigin();
+		if( IsPointInBox( vOrigin, mins, maxs ) )
+		{
+			startPoints.AddToTail( pEnt->GetAbsOrigin() );
+		}
+		
 		pEnt = gEntList.FindEntityByClassname( pEnt, "info_start_wars" );
 	}
-	const Vector *vStartPoint = startPoints.Count() > 0 ? &startPoints[random->RandomInt(0, startPoints.Count()-1)]->GetAbsOrigin() : NULL;
+	Vector *vStartPoint = startPoints.Count() > 0 ? &startPoints[random->RandomInt(0, startPoints.Count()-1)] : NULL;
 #else
 	// TODO/Maybe. Not really needed.
 	const Vector *vStartPoint = NULL;
