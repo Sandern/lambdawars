@@ -285,7 +285,6 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		for (; i != dirtyRects.end(); ++i) 
 		{
 			const CefRect& rect = *i;
-			//DevMsg("Painting dirty rect: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
 
 			for( int y = rect.y; y < rect.y + rect.height; y++ )
 			{

@@ -13,6 +13,10 @@
 #include "include/cef_render_handler.h"
 #include "vgui/Cursor.h"
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+static CThreadFastMutex s_BufferMutex;
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 // Forward declarations
 class SrcCefBrowser;
 
@@ -76,9 +80,9 @@ public:
 	int GetPopupHeight() { return m_iPopupHeight; }
 
 #ifdef USE_MULTITHREADED_MESSAGELOOP
-	void LockTextureBuffer() { s_BufferMutex.Lock(); }
-	void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
-	CThreadFastMutex &GetTextureBufferMutex() { return s_BufferMutex; }
+	//static void LockTextureBuffer() { s_BufferMutex.Lock(); }
+	//static void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
+	static CThreadFastMutex &GetTextureBufferMutex() { return s_BufferMutex; }
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 	int GetAlphaAt( int x, int y );
@@ -109,9 +113,6 @@ private:
 
 private:
 	bool m_bActive;
-#ifdef USE_MULTITHREADED_MESSAGELOOP
-	CThreadFastMutex s_BufferMutex;
-#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	// ===== Game thread data
 	SrcCefBrowser *m_pBrowser;

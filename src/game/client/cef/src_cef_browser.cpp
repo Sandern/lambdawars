@@ -518,6 +518,10 @@ void SrcCefBrowser::Destroy( void )
 	// Delete panel
 	if( m_pPanel )
 	{
+		// OSR thread could be receiving a new paint buffer, during which it marks
+		// the vgui panel as dirty.
+		AUTO_LOCK( SrcCefOSRRenderer::GetTextureBufferMutex() );
+
 		delete m_pPanel;
 		m_pPanel = NULL;
 	}
