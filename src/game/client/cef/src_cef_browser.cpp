@@ -62,6 +62,12 @@ CefClientHandler::CefClientHandler( SrcCefBrowser *pSrcBrowser, SrcCefNavigation
 void CefClientHandler::Destroy()
 {
 	Assert( !CefCurrentlyOn(TID_UI) );
+
+	if( GetOSRHandler() )
+	{
+		GetOSRHandler()->Destroy();
+	}
+
 	if( GetBrowser() && GetBrowser()->GetHost() )
 	{
 		GetBrowser()->GetHost()->CloseBrowser( true );
@@ -83,11 +89,6 @@ bool CefClientHandler::DoClose(CefRefPtr<CefBrowser> browser)
 void CefClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
 	Assert( CefCurrentlyOn(TID_UI) );
-	if( GetOSRHandler() )
-	{
-		GetOSRHandler()->Destroy();
-	}
-
 	m_Browser = NULL;
 }
 
@@ -515,12 +516,13 @@ void SrcCefBrowser::Destroy( void )
 {
 	CloseDevTools();
 
+	// OSR thread could be receiving a new paint buffer, during which it marks
+	// the vgui panel as dirty.
+	AUTO_LOCK( SrcCefOSRRenderer::GetTextureBufferMutex() );
+
 	// Delete panel
 	if( m_pPanel )
 	{
-		// OSR thread could be receiving a new paint buffer, during which it marks
-		// the vgui panel as dirty.
-		AUTO_LOCK( SrcCefOSRRenderer::GetTextureBufferMutex() );
 
 		delete m_pPanel;
 		m_pPanel = NULL;

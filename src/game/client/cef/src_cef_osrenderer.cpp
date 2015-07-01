@@ -66,7 +66,7 @@ SrcCefOSRRenderer::~SrcCefOSRRenderer()
 void SrcCefOSRRenderer::Destroy()
 {
 #ifdef USE_MULTITHREADED_MESSAGELOOP
-	AUTO_LOCK( s_BufferMutex );
+	AUTO_LOCK( GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 	m_bActive = false;
@@ -156,6 +156,10 @@ void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 {
 	Assert( !CefCurrentlyOn(TID_UI) );
 	if (!show) {
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	AUTO_LOCK( GetTextureBufferMutex() );
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 		// Clear the popup rectangle.
 		ClearPopupRects();
 
@@ -227,12 +231,12 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 {
 #ifdef USE_MULTITHREADED_MESSAGELOOP
 	Assert( CefCurrentlyOn(TID_UI) );
-	AUTO_LOCK( s_BufferMutex );
+	AUTO_LOCK( GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 	if( !m_bActive || !m_pBrowser || !m_pBrowser->GetPanel() )
 	{
-		Warning("SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet\n");
+		DevMsg("SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet, or browser is being destroyed.\n");
 		return;
 	}
 
@@ -414,7 +418,7 @@ int SrcCefOSRRenderer::GetAlphaAt( int x, int y )
 		return 0;
 
 #ifdef USE_MULTITHREADED_MESSAGELOOP
-	AUTO_LOCK( s_BufferMutex );
+	AUTO_LOCK( GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 	if( x < 0 || y < 0 || x >= m_iWidth || y >= m_iHeight )

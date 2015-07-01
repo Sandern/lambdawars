@@ -80,8 +80,6 @@ public:
 	int GetPopupHeight() { return m_iPopupHeight; }
 
 #ifdef USE_MULTITHREADED_MESSAGELOOP
-	//static void LockTextureBuffer() { s_BufferMutex.Lock(); }
-	//static void UnlockTextureBuffer() { s_BufferMutex.Unlock(); }
 	static CThreadFastMutex &GetTextureBufferMutex() { return s_BufferMutex; }
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
