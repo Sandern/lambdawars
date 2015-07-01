@@ -25,6 +25,8 @@
 	class CFOWTextureRegen;
 #endif // CLIENT_DLL
 
+// #define FOW_USE_PROCTEX
+
 // A simple list of all entities updating the fog of war.
 // For each player/owner a list is created.
 struct FOWListInfo
@@ -80,6 +82,8 @@ public: // CBaseGameSystem overrides
 	virtual void LevelInitPreEntity();
 	virtual void LevelInitPostEntity();
 	virtual void LevelShutdownPostEntity();
+
+	bool				IsFogOfWarOn();
 
 	// Grid/tile size
 	int					GetGridSize() { return m_nGridSize; }
@@ -240,8 +244,10 @@ private:
 	CTextureReference m_RenderBufferIM;
 	CTextureReference m_RenderBufferExplored;
 
+#ifdef FOW_USE_PROCTEX
 	CFOWTextureRegen *m_pTextureRegen;
 	CUtlVector< FOWSIZE_TYPE > m_FogOfWarTextureData;
+#endif // FOW_USE_PROCTEX
 
 	Frustum m_Frustum;
 	bool m_bRenderingFOW;
@@ -249,6 +255,14 @@ private:
 };
 
 extern CFogOfWarMgr* FogOfWarMgr();
+
+//-----------------------------------------------------------------------------
+// Purpose:  
+//-----------------------------------------------------------------------------
+inline bool CFogOfWarMgr::IsFogOfWarOn()
+{
+	return m_bWasFogofwarOn;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose:  

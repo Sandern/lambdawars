@@ -17,7 +17,9 @@
 	#include "materialsystem/ITexture.h"
 	#include "materialsystem/imaterialvar.h"
 	#include "renderparm.h"
+#ifdef FOW_USE_PROCTEX
 	#include "tex_fogofwar.h"
+#endif // FOW_USE_PROCTEX
 	#include "videocfg/videocfg.h"
 #else
 	#include "hl2wars_player.h"
@@ -39,8 +41,6 @@
 	#undef VPROF_BUDGETGROUP_FOGOFWAR
 	#define VPROF_BUDGETGROUP_FOGOFWAR					_T("Client:Fog of War")
 #endif // CLIENT_DLL
-
-// #define FOW_USE_PROCTEX
 
 static CFogOfWarMgr s_FogOfWarMgr; // singleton
 
@@ -171,7 +171,7 @@ CFogOfWarMgr::CFogOfWarMgr()
 	m_nTileSize = -1;
 	m_bHeightMapLoaded = false;
 
-#ifdef CLIENT_DLL
+#if defined( CLIENT_DLL ) && defined( FOW_USE_PROCTEX )
 	m_pTextureRegen = new CFOWTextureRegen();
 	m_bRenderingFOW = false;
 #endif // CLIENT_DLL
@@ -182,7 +182,7 @@ CFogOfWarMgr::CFogOfWarMgr()
 //-----------------------------------------------------------------------------
 CFogOfWarMgr::~CFogOfWarMgr()
 {
-#ifdef CLIENT_DLL
+#if defined( CLIENT_DLL ) && defined( FOW_USE_PROCTEX )
 	delete m_pTextureRegen;
 #endif // CLIENT_DLL
 }

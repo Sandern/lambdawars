@@ -1244,7 +1244,7 @@ void C_BaseEntity::Clear( void )
 	// don't need it.
 	//AddEFlags( EFL_USE_PARTITION_WHEN_NOT_SOLID );
 
-	m_bInFOW = sv_fogofwar.GetBool();
+	m_bInFOW = FogOfWarMgr()->IsFogOfWarOn();
     m_LastShouldTransmitState = SHOULDTRANSMIT_END;
     
 	UpdateVisibility();

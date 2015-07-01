@@ -1541,9 +1541,6 @@
     <ClCompile Include="lambdawars\teamcolor_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
-    <ClCompile Include="lambdawars\tex_fogofwar.cpp">
-      <Filter>Source Files\wars</Filter>
-    </ClCompile>
     <ClCompile Include="lambdawars\tf2_proxy.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
@@ -4349,9 +4346,6 @@
       <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="lambdawars\teamcolor_proxy.h">
-      <Filter>Source Files\wars</Filter>
-    </ClInclude>
-    <ClInclude Include="lambdawars\tex_fogofwar.h">
       <Filter>Source Files\wars</Filter>
     </ClInclude>
     <ClInclude Include="lambdawars\vgui\nb_button.h">

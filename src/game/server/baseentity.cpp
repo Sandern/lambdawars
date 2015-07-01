@@ -793,7 +793,7 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 	m_pEvent = NULL;
 
 #ifdef HL2WARS_DLL
-	V_memset( &m_bInFOW, sv_fogofwar.GetBool() ? 1 : 0, sizeof(bool)*FOWMAXPLAYERS );
+	V_memset( &m_bInFOW, FogOfWarMgr()->IsFogOfWarOn() ? 1 : 0, sizeof(bool)*FOWMAXPLAYERS );
 
 	DensityMap()->Init( this );
 
@@ -8942,7 +8942,7 @@ bool CBaseEntity::FOWShouldShow( int owner )
 //------------------------------------------------------------------------------
 bool CBaseEntity::FOWShouldTransmit( CBasePlayer *pPlayer )
 {
-	if( sv_fogofwar.GetBool() == false )
+	if( !FogOfWarMgr()->IsFogOfWarOn() )
 		return true;
 
 	if( pPlayer->IsObserver() || ( pPlayer->GetOwnerNumber() == 0 && pPlayer->GetTeamNumber() == TEAM_SPECTATOR ) )

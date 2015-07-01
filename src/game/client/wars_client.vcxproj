@@ -935,7 +935,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClCompile Include="lambdawars\hl2wars_in_main.cpp" />
     <ClCompile Include="lambdawars\hl2wars_prediction.cpp" />
     <ClCompile Include="lambdawars\teamcolor_proxy.cpp" />
-    <ClCompile Include="lambdawars\tex_fogofwar.cpp" />
     <ClCompile Include="lambdawars\tf2_proxy.cpp" />
     <ClCompile Include="lambdawars\vgui\hl2warsviewport.cpp" />
     <ClCompile Include="lambdawars\vgui\nb_button.cpp" />
@@ -1748,7 +1747,6 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <ClInclude Include="lambdawars\hl2wars_hud_chat.h" />
     <ClInclude Include="lambdawars\playerandunitenumerator.h" />
     <ClInclude Include="lambdawars\teamcolor_proxy.h" />
-    <ClInclude Include="lambdawars\tex_fogofwar.h" />
     <ClInclude Include="lambdawars\vgui\hl2warsviewport.h" />
     <ClInclude Include="lambdawars\vgui\nb_button.h" />
     <ClInclude Include="lambdawars\vgui\nb_header_footer.h" />
