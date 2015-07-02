@@ -287,7 +287,6 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 #endif // 0
 		}
 
-#ifdef RENDER_DIRTY_AREAS
 		const unsigned char *imagebuffer = (const unsigned char *)buffer;
 
 		// Update dirty rects
@@ -304,17 +303,14 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 				);
 			}
 
+#ifdef RENDER_DIRTY_AREAS
 			// Update max dirty area
 			dirtyx = Min( rect.x, dirtyx );
 			dirtyy = Min( rect.y, dirtyy );
 			dirtyxend = Max( rect.x + rect.width, dirtyxend );
 			dirtyyend = Max( rect.y + rect.height, dirtyyend );
-		}
-#else
-		// Full frame copy
-		const unsigned char *imagebuffer = (const unsigned char *)buffer;
-		V_memcpy( m_pTextureBuffer, imagebuffer, m_iWidth * m_iHeight * channels );
 #endif // RENDER_DIRTY_AREAS
+		}
 
 #ifdef RENDER_DIRTY_AREAS
 		m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
