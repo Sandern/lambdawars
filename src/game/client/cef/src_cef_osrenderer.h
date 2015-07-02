@@ -13,10 +13,6 @@
 #include "include/cef_render_handler.h"
 #include "vgui/Cursor.h"
 
-#ifdef USE_MULTITHREADED_MESSAGELOOP
-static CThreadFastMutex s_BufferMutex;
-#endif // USE_MULTITHREADED_MESSAGELOOP
-
 // Forward declarations
 class SrcCefBrowser;
 
@@ -120,6 +116,10 @@ private:
 	int m_iWidth, m_iHeight;
 	vgui::CursorCode m_Cursor;
 	unsigned char *m_pTextureBuffer;
+
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+	static CThreadFastMutex s_BufferMutex;
+#endif // USE_MULTITHREADED_MESSAGELOOP
 
 	int m_iPopupOffsetX, m_iPopupOffsetY;
 	int m_iPopupWidth, m_iPopupHeight;

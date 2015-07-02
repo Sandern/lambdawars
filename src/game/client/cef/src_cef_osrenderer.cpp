@@ -22,6 +22,10 @@ extern ConVar g_debug_cef;
 ConVar cef_alpha_force_zero("cef_alpha_force_zero", "0");
 ConVar cef_debug_nopaint("cef_debug_nopaint", "0");
 
+#ifdef USE_MULTITHREADED_MESSAGELOOP
+CThreadFastMutex SrcCefOSRRenderer::s_BufferMutex;
+#endif // USE_MULTITHREADED_MESSAGELOOP
+
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
