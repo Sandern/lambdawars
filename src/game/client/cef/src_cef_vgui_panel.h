@@ -27,9 +27,12 @@ public:
 	~SrcCefVGUIPanel();
 
 	virtual bool ResizeTexture( int width, int height );
+#ifdef RENDER_DIRTY_AREAS
+	void MarkTextureDirty( int iDirtyX, int iDirtyY, int iDirtyXEnd, int iDirtyYEnd );
+	void MarkTextureFullDirty();
+#else
 	void MarkTextureDirty();
-	//void MarkTextureDirty( int iDirtyX, int iDirtyY, int iDirtyXEnd, int iDirtyYEnd );
-	//void MarkTextureFullDirty();
+#endif // RENDER_DIRTY_AREAS
 	void MarkPopupDirty();
 
 	virtual void ApplySchemeSettings(vgui::IScheme *pScheme);
@@ -101,7 +104,9 @@ private:
 	Color m_Color;
 	float m_fTexS1, m_fTexT1;
 
+#ifdef RENDER_DIRTY_AREAS
 	//int m_iDirtyX, m_iDirtyY, m_iDirtyXEnd, m_iDirtyYEnd;
+#endif // RENDER_DIRTY_AREAS
 	bool m_bTextureGeneratedOnce;
 	bool m_bTextureDirty;
 	bool m_bPopupTextureDirty;
@@ -147,7 +152,7 @@ inline bool SrcCefVGUIPanel::GetDoNotDraw( void )
 	return m_bDontDraw;
 }
 
-#if 0
+#ifdef RENDER_DIRTY_AREAS
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -183,7 +188,7 @@ inline void SrcCefVGUIPanel::MarkTextureDirty()
 	// Popup always becomes dirty because it is drawn on top of the base texture
 	MarkPopupDirty();
 }
-#endif // 0
+#endif // RENDER_DIRTY_AREAS
 
 inline void SrcCefVGUIPanel::MarkPopupDirty()
 {

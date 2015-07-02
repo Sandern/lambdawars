@@ -206,7 +206,9 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 {
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
-	command_line->AppendSwitch( CefString( "enable-begin-frame-scheduling" ) );
+	// TODO: This breaks dev tools (because it depends on osr rendering), but enabling this should be faster for rendering
+	// Make sure to also enable it in lambdawars_browser client_app.cpp
+	//command_line->AppendSwitch( CefString( "enable-begin-frame-scheduling" ) );
 
 	if( !m_bEnableGPU )
 	{

@@ -16,6 +16,8 @@
 // Forward declarations
 class SrcCefBrowser;
 
+//#define RENDER_DIRTY_AREAS 1
+
 class SrcCefOSRRenderer : public CefRenderHandler 
 {
 public:

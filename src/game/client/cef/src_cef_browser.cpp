@@ -446,6 +446,15 @@ void CefClientHandler::ProcessMessages()
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 //-----------------------------------------------------------------------------
+// Purpose: DevTools don't use off screen rendering, so separate client handler.
+//-----------------------------------------------------------------------------
+class CefClientDevToolsHandler : public CefClient
+{
+private:
+	IMPLEMENT_REFCOUNTING( CefClientDevToolsHandler );
+};
+
+//-----------------------------------------------------------------------------
 // Purpose: Cef browser
 //-----------------------------------------------------------------------------
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall, SrcCefNavigationType navigationbehavior ) : 
@@ -1380,10 +1389,12 @@ void SrcCefBrowser::ShowDevTools()
 	CefBrowserSettings settings;
 
 #if defined(WIN32)
-	windowInfo.SetAsPopup( GetBrowser()->GetHost()->GetWindowHandle(), "Lambda Wars Chromium DevTools" );
+	windowInfo.SetAsPopup( GetBrowser()->GetHost()->GetWindowHandle(), "CEF Chromium DevTools" );
 #endif
 
-	GetBrowser()->GetHost()->ShowDevTools(windowInfo, m_CefClientHandler, settings, CefPoint());
+	CefRefPtr<CefClientDevToolsHandler> cefClientDevToolsHandler = new CefClientDevToolsHandler();
+
+	GetBrowser()->GetHost()->ShowDevTools(windowInfo, cefClientDevToolsHandler, settings, CefPoint());
 }
 
 //-----------------------------------------------------------------------------

@@ -161,7 +161,7 @@ void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 	Assert( !CefCurrentlyOn(TID_UI) );
 	if (!show) {
 #ifdef USE_MULTITHREADED_MESSAGELOOP
-	AUTO_LOCK( GetTextureBufferMutex() );
+		AUTO_LOCK( GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 		// Clear the popup rectangle.
@@ -172,6 +172,8 @@ void SrcCefOSRRenderer::OnPopupShow(CefRefPtr<CefBrowser> browser,
 			free( m_pPopupBuffer );
 			m_pPopupBuffer = NULL;
 		}
+
+		browser->GetHost()->Invalidate(PET_VIEW);
 
 		m_pBrowser->GetPanel()->MarkTextureDirty();
 	}
@@ -240,7 +242,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 
 	if( !m_bActive || !m_pBrowser || !m_pBrowser->GetPanel() )
 	{
-		DevMsg("SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet, or browser is being destroyed.\n");
+		CefDbgMsg( 1, "SrcCefOSRRenderer::OnPaint: No browser or vgui panel yet, or browser is being destroyed.\n" );
 		return;
 	}
 
@@ -249,13 +251,13 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 		return;
 	}
 
-	int channels = 4;
+	const int channels = 4;
 
 	Assert( dirtyRects.size() > 0 );
 
 	if( type == PET_VIEW )
 	{
-#if 0
+#ifdef RENDER_DIRTY_AREAS
 		int dirtyx, dirtyy, dirtyxend, dirtyyend;
 		dirtyx = width;
 		dirtyy = height;
@@ -276,7 +278,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 			m_iHeight = height;
 			m_pTextureBuffer = (unsigned char*) malloc( m_iWidth * m_iHeight * channels );
 
-#if 0
+#ifdef RENDER_DIRTY_AREAS
 			// Full dirty
 			dirtyx = 0;
 			dirtyy = 0;
@@ -285,7 +287,7 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 #endif // 0
 		}
 
-#if 1
+#ifdef RENDER_DIRTY_AREAS
 		const unsigned char *imagebuffer = (const unsigned char *)buffer;
 
 		// Update dirty rects
@@ -302,17 +304,19 @@ void SrcCefOSRRenderer::OnPaint(CefRefPtr<CefBrowser> browser,
 				);
 			}
 
-#if 0
 			// Update max dirty area
 			dirtyx = Min( rect.x, dirtyx );
 			dirtyy = Min( rect.y, dirtyy );
 			dirtyxend = Max( rect.x + rect.width, dirtyxend );
 			dirtyyend = Max( rect.y + rect.height, dirtyyend );
-#endif // 0
 		}
-#endif // 0
+#else
+		// Full frame copy
+		const unsigned char *imagebuffer = (const unsigned char *)buffer;
+		V_memcpy( m_pTextureBuffer, imagebuffer, m_iWidth * m_iHeight * channels );
+#endif // RENDER_DIRTY_AREAS
 
-#if 0
+#ifdef RENDER_DIRTY_AREAS
 		m_pBrowser->GetPanel()->MarkTextureDirty( dirtyx, dirtyy, dirtyxend, dirtyyend );
 #else
 		m_pBrowser->GetPanel()->MarkTextureDirty();

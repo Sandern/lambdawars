@@ -329,28 +329,31 @@ void SrcCefVGUIPanel::Paint()
 				{
 					lock = materials->Lock();
 
+#ifndef RENDER_DIRTY_AREAS
 					// Full Copy
 					g_pShaderAPI->ModifyTexture( textureHandle );
 					g_pShaderAPI->TexImage2D( iMip, iFace, m_iTexImageFormat, z, renderer->GetWidth(), renderer->GetHeight(), m_iTexImageFormat, false, renderer->GetTextureBuffer() );
+#else
 					// Partial copy, would work if we had a partial buffer:
 					//g_pShaderAPI->TexSubImage2D( 0 /* level */, 0 /* cubeFaceID */, m_iDirtyX, m_iDirtyY, 0 /* zoffset */, 
 					//	(m_iDirtyXEnd - m_iDirtyX), (m_iDirtyYEnd - m_iDirtyY), m_iTexImageFormat, 0, false,  pSubBuffer );
 					// Copy by line, but call too expensive to do per line:
-					/*int subWidth = m_iDirtyXEnd - m_iDirtyX;
+					int subWidth = m_iDirtyXEnd - m_iDirtyX;
 					for( int y = m_iDirtyY; y < m_iDirtyYEnd; y++ )
 					{
 						g_pShaderAPI->TexSubImage2D( 0, 0, m_iDirtyX, y, z, 
 							subWidth, 1, m_iTexImageFormat, 0, false, 
 							renderer->GetTextureBuffer() + (y * 4 * renderer->GetWidth()) + (m_iDirtyX * 4) );
-					}*/
+					}
+#endif // RENDER_DIRTY_AREAS
 
 					m_bTextureDirty = false;
 					m_bTextureGeneratedOnce = true;
-	#if 0
+#ifdef RENDER_DIRTY_AREAS
 					m_iDirtyX = renderer->GetWidth();
 					m_iDirtyY = renderer->GetHeight();
 					m_iDirtyXEnd = m_iDirtyYEnd = 0;
-	#endif // 0
+#endif // RENDER_DIRTY_AREAS
 				}
 
 				if( renderer->GetPopupBuffer() && m_bPopupTextureDirty )
