@@ -30,6 +30,9 @@ public:
 	virtual float	GetStopDistance();
 	virtual void	VPhysicsMove();
 	virtual void	VPhysicsMoveStep();
+
+	// No facing needed for roller mine
+	virtual void	MoveFacing() {}
 };
 
 #endif // UNIT_VPHYSICSLOCOMOTION_H

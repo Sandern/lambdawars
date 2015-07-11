@@ -37,9 +37,9 @@ void UnitVPhysicsLocomotion::SetupMove( UnitBaseMoveCommand &mv )
 
 #ifdef CLIENT_DLL
 	mv.origin = m_pOuter->GetNetworkOrigin();
-	mv.viewangles = m_pOuter->GetAbsAngles();
+	mv.viewangles = mv.idealviewangles; // m_pOuter->GetAbsAngles();
 #else
-	mv.viewangles = m_pOuter->GetAbsAngles();
+	mv.viewangles = mv.idealviewangles; //m_pOuter->GetAbsAngles();
 	mv.origin = m_pOuter->GetAbsOrigin();
 #endif // CLIENT_DLL
 
@@ -58,7 +58,7 @@ void UnitVPhysicsLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 {
 	m_pOuter->PhysicsTouchTriggers();
 
-	m_pOuter->SetAbsVelocity( mv.velocity );
+	//m_pOuter->SetAbsVelocity( mv.velocity );
 
 #ifdef ENABLE_PYTHON
 	// For Python: keep list of blockers
@@ -226,6 +226,18 @@ void UnitVPhysicsLocomotion::VPhysicsMove( void )
 	//VectorSubtract( mv->velocity, m_pOuter->GetBaseVelocity(), mv->velocity );
 }
 
+#ifdef CLIENT_DLL
+static AngularImpulse WorldToLocalRotation( const VMatrix &localToWorld, const Vector &worldAxis, float rotation )
+{
+	// fix axes of rotation to match axes of vector
+	Vector rot = worldAxis * rotation;
+	// since the matrix maps local to world, do a transpose rotation to get world to local
+	AngularImpulse ang = localToWorld.VMul3x3Transpose( rot );
+
+	return ang;
+}
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -266,10 +278,12 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 		DoUnstuck();
 	}
 
-	//pPhysObj->AddVelocity( NULL, &vAddVel );
-	//Vector vAngVel( 0, 0, 0 );
-	Vector newVelocity = mv->velocity + Vector(0, 0, 48.0f);
-	pPhysObj->SetVelocity(  &newVelocity, NULL );
+	Vector vecRight;
+	AngleVectors( mv->viewangles, NULL, &vecRight, NULL );
+
+	AngularImpulse impulse = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -mv->velocity.Length() );
+
+	pPhysObj->SetVelocity( NULL, &impulse );
 
 #if 0
 	Vector curVel, curAngVel;
