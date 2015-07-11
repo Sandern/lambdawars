@@ -161,7 +161,7 @@ void CWarsGameServer::ProcessMessages()
 					}
 					else
 					{
-						SetState( k_EGameServer_InGame );
+						SetState( k_EGameServer_StartingGame );
 						m_ActiveGameLobbySteamID = requestMsg->lobbySteamId;
 
 						pGameData->SetName( COM_GetModDirectory() );
@@ -240,7 +240,7 @@ void CWarsGameServer::UpdateServer()
 					m_pLocalPlayerGameData->deleteThis();
 					m_pLocalPlayerGameData = NULL;
 				}
-				SetState( k_EGameServer_InGame );
+				SetState( k_EGameServer_StartingGame );
 			}
 			break;
 		}
