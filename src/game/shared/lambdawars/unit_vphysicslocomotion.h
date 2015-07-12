@@ -33,6 +33,9 @@ public:
 
 	// No facing needed for roller mine
 	virtual void	MoveFacing() {}
+
+private:
+	AngularImpulse m_vecAngular;
 };
 
 #endif // UNIT_VPHYSICSLOCOMOTION_H

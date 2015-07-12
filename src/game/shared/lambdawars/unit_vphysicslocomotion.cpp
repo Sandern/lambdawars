@@ -1,6 +1,7 @@
 //====== Copyright © Sandern Corporation, All rights reserved. ===========//
 //
-// Purpose: 
+// Purpose: Locomotion for vphysics based rollermine. Makes the unit roll in the
+//			path direction.
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -17,7 +18,7 @@
 #ifdef ENABLE_PYTHON
 UnitVPhysicsLocomotion::UnitVPhysicsLocomotion( boost::python::object outer ) : UnitBaseLocomotion(outer)
 {
-
+	m_vecAngular.Init();
 }
 #endif // ENABLE_PYTHON
 
@@ -37,9 +38,9 @@ void UnitVPhysicsLocomotion::SetupMove( UnitBaseMoveCommand &mv )
 
 #ifdef CLIENT_DLL
 	mv.origin = m_pOuter->GetNetworkOrigin();
-	mv.viewangles = mv.idealviewangles; // m_pOuter->GetAbsAngles();
+	mv.viewangles = mv.idealviewangles;
 #else
-	mv.viewangles = mv.idealviewangles; //m_pOuter->GetAbsAngles();
+	mv.viewangles = mv.idealviewangles;
 	mv.origin = m_pOuter->GetAbsOrigin();
 #endif // CLIENT_DLL
 
@@ -283,7 +284,9 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 
 	AngularImpulse impulse = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -mv->velocity.Length() );
 
-	pPhysObj->SetVelocity( NULL, &impulse );
+	m_vecAngular = m_vecAngular + (impulse - m_vecAngular) * mv->interval;
+
+	pPhysObj->SetVelocity( NULL, &m_vecAngular );
 
 #if 0
 	Vector curVel, curAngVel;
