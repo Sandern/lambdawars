@@ -273,14 +273,6 @@ void WarsUpdateGameServer()
 	}
 
 	/*if( !steamgameserverapicontext->SteamGameServerNetworking() )
-	{
-		steamgameserverapicontext->Init();
-
-		// set our debug handler
-		g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
-	}
-
-	if( !steamgameserverapicontext->SteamGameServerNetworking() )
 		return;*/
 
 	if( !WarsGameServer() )
