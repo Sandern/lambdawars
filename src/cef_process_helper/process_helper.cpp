@@ -16,11 +16,13 @@
 // Process entry point.
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow )
 {
-	//CefMainArgs main_args(argc, argv);
+	// Parse command-line arguments.
+	//CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
+	//command_line->InitFromString(::GetCommandLineW());
 
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	CefMainArgs main_args( hinst );
-  
+
 	CefRefPtr<CefApp> app(new ClientApp);
 
 	// Execute the secondary process.

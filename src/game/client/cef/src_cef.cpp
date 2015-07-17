@@ -55,23 +55,6 @@ static WNDPROC s_pChainedWndProc;
 
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Helper for finding the main window
-//-----------------------------------------------------------------------------
-BOOL CALLBACK FindMainWindow(HWND hwnd, LPARAM lParam)
-{
-	// Filter zero size windows. Don't care about those!
-	RECT windowRect;
-	GetWindowRect(hwnd, &windowRect);
-	if( windowRect.left == 0 && windowRect.top == 0 && windowRect.right == 0 && windowRect.bottom == 0 )
-		return true;
-
-	CEFSystem().SetMainWindow( hwnd );
-	return true;
-}
-#endif // 0
-
 LRESULT CALLBACK CefWndProcHook(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	if( CEFSystem().IsRunning() )
@@ -158,7 +141,7 @@ class ClientApp : public CefApp,
 					public CefBrowserProcessHandler
 {
 public:
-	ClientApp( bool bCefEnableGPU );
+	ClientApp( bool bCefEnableGPU, bool bDisableBeginFrameScheduling );
 
 protected:
 	// CefBrowserProcessHandler
@@ -176,6 +159,7 @@ private:
 	IMPLEMENT_REFCOUNTING( ClientApp );
 
 	bool m_bEnableGPU;
+	bool m_bDisableBeginFrameScheduling;
 };
 
 CefRefPtr<ClientApp> g_pClientApp;
@@ -183,7 +167,8 @@ CefRefPtr<ClientApp> g_pClientApp;
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-ClientApp::ClientApp( bool bCefEnableGPU ) : m_bEnableGPU( bCefEnableGPU )
+ClientApp::ClientApp( bool bCefEnableGPU, bool bDisableBeginFrameScheduling ) : 
+	m_bEnableGPU( bCefEnableGPU ), m_bDisableBeginFrameScheduling( bDisableBeginFrameScheduling )
 {
 }
 
@@ -206,9 +191,14 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 {
 	command_line->AppendSwitch( CefString( "no-proxy-server" ) );
 	command_line->AppendSwitch( CefString( "disable-sync" ) );
-	// TODO: This breaks dev tools (because it depends on osr rendering), but enabling this should be faster for rendering
-	// Make sure to also enable it in lambdawars_browser client_app.cpp
-	//command_line->AppendSwitch( CefString( "enable-begin-frame-scheduling" ) );
+	
+	// Can be disabled through command line (-cef_disable_begin_frame_scheduling) for launching dev tools ingame
+	// This option does not work because we use window rendering for the dev tools, or we need to write a off screen rendered for it.
+	// Alternatively you can specify -cef_remote_dbg_port on the command line, and visit localhost:port for inspectable pages.
+	if( !m_bDisableBeginFrameScheduling )
+	{
+		command_line->AppendSwitch( CefString( "enable-begin-frame-scheduling" ) );
+	}
 
 	if( !m_bEnableGPU )
 	{
@@ -254,7 +244,15 @@ bool CCefSystem::Init()
 	if( bDebugCef )
 		g_debug_cef.SetValue( CommandLine()->ParmValue( "-debugcef", 1 ) );
 
-	const bool bCefEnableGPU = CommandLine() && CommandLine()->FindParm("-cefenablegpu") != 0;
+	const bool bCefEnableGPU = CommandLine() && CommandLine()->FindParm("-cef_enable_gpu") != 0;
+	const bool bDisableBeginFrameScheduling = CommandLine() && CommandLine()->FindParm("-cef_disable_begin_frame_scheduling") != 0;
+
+	const int iRemoteDebuggingPort = (CommandLine() && CommandLine()->FindParm("-cef_remote_dbg_port") != 0) ? CommandLine()->ParmValue("-cef_remote_dbg_port", 0) : 0;
+
+	if( iRemoteDebuggingPort != 0 )
+	{
+		Msg( "Chromium Embedded remote debugging is enabled. Visit http://localhost:%d for inspectable pages.\n", iRemoteDebuggingPort );
+	}
 
 	// Get path to subprocess browser
 	// Note: use relative path, because otherwise the path may be invalid.
@@ -271,22 +269,16 @@ bool CCefSystem::Init()
 	}*/
 
 #ifdef WIN32 
-	// Find and set the main window
-	//EnumThreadWindows( GetCurrentThreadId(), FindMainWindow, (LPARAM) this );
-
 	HWND inputWindow = (HWND)inputsystem->GetAttachedWindow();
-	//inputsystem->DetachFromWindow();
 	SetMainWindow( inputWindow );
 
 	s_pChainedWndProc = reinterpret_cast<WNDPROC>( SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( CefWndProcHook ) ) );
-
-	//inputsystem->AttachToWindow( inputWindow );
 #endif // WIN32
 
 	// Arguments
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	CefMainArgs main_args( hinst );
-	g_pClientApp = new ClientApp( bCefEnableGPU );
+	g_pClientApp = new ClientApp( bCefEnableGPU, bDisableBeginFrameScheduling );
 
 	// Settings
 	CefSettings settings;
@@ -298,7 +290,7 @@ bool CCefSystem::Init()
 #endif // USE_MULTITHREADED_MESSAGELOOP
 	settings.log_severity = developer.GetBool() ? LOGSEVERITY_VERBOSE : LOGSEVERITY_DEFAULT;
 	settings.command_line_args_disabled = true; // Specify args through OnBeforeCommandLineProcessing
-	//settings.remote_debugging_port = 8088;
+	settings.remote_debugging_port = iRemoteDebuggingPort;
 	settings.windowless_rendering_enabled = true;
 #if !CEF_ENABLE_SANDBOX
 	settings.no_sandbox = true;

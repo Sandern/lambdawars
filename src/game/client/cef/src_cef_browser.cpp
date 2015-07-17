@@ -448,10 +448,21 @@ void CefClientHandler::ProcessMessages()
 //-----------------------------------------------------------------------------
 // Purpose: DevTools don't use off screen rendering, so separate client handler.
 //-----------------------------------------------------------------------------
-class CefClientDevToolsHandler : public CefClient
+class CefClientDevToolsHandler : public CefClient, CefDisplayHandler
 {
+public:
+	virtual bool OnConsoleMessage(CefRefPtr<CefBrowser> browser,
+								const CefString& message,
+								const CefString& source,
+								int line)
+	{
+		Warning("%d %ls: %ls\n", line, source.c_str(), message.c_str() );
+		return false;
+	}
+
 private:
 	IMPLEMENT_REFCOUNTING( CefClientDevToolsHandler );
+
 };
 
 //-----------------------------------------------------------------------------
