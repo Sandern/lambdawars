@@ -2304,6 +2304,24 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
         bp::implicitly_convertible< bp::api::object, UnitVPhysicsLocomotion >();
+        { //::UnitVPhysicsLocomotion::CreateMotionController
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*CreateMotionController_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "CreateMotionController"
+                , CreateMotionController_function_type( &::UnitVPhysicsLocomotion::CreateMotionController ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::DestroyMotionController
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*DestroyMotionController_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "DestroyMotionController"
+                , DestroyMotionController_function_type( &::UnitVPhysicsLocomotion::DestroyMotionController ) );
+        
+        }
         { //::UnitVPhysicsLocomotion::FinishMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -2332,6 +2350,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetStopDistance_function_type( &::UnitVPhysicsLocomotion::GetStopDistance ) );
         
         }
+        { //::UnitVPhysicsLocomotion::MoveFacing
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*MoveFacing_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "MoveFacing"
+                , MoveFacing_function_type( &::UnitVPhysicsLocomotion::MoveFacing ) );
+        
+        }
         { //::UnitVPhysicsLocomotion::SetupMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*SetupMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -2340,6 +2367,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "SetupMove"
                 , SetupMove_function_type( &::UnitVPhysicsLocomotion::SetupMove )
                 , ( bp::arg("mv") ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::Simulate
+        
+            typedef ::IMotionEvent::simresult_e ( ::UnitVPhysicsLocomotion::*Simulate_function_type )( ::IPhysicsMotionController *,::IPhysicsObject *,float,::Vector &,::AngularImpulse & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "Simulate"
+                , Simulate_function_type( &::UnitVPhysicsLocomotion::Simulate )
+                , ( bp::arg("pController"), bp::arg("pObject"), bp::arg("deltaTime"), bp::arg("linear"), bp::arg("angular") ) );
         
         }
         { //::UnitVPhysicsLocomotion::VPhysicsMove
@@ -6436,6 +6473,24 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVPhysicsLocomotion_exposer_t UnitVPhysicsLocomotion_exposer = UnitVPhysicsLocomotion_exposer_t( "UnitVPhysicsLocomotion", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVPhysicsLocomotion_scope( UnitVPhysicsLocomotion_exposer );
         bp::implicitly_convertible< bp::api::object, UnitVPhysicsLocomotion >();
+        { //::UnitVPhysicsLocomotion::CreateMotionController
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*CreateMotionController_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "CreateMotionController"
+                , CreateMotionController_function_type( &::UnitVPhysicsLocomotion::CreateMotionController ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::DestroyMotionController
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*DestroyMotionController_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "DestroyMotionController"
+                , DestroyMotionController_function_type( &::UnitVPhysicsLocomotion::DestroyMotionController ) );
+        
+        }
         { //::UnitVPhysicsLocomotion::FinishMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*FinishMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -6464,6 +6519,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetStopDistance_function_type( &::UnitVPhysicsLocomotion::GetStopDistance ) );
         
         }
+        { //::UnitVPhysicsLocomotion::MoveFacing
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*MoveFacing_function_type )(  ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "MoveFacing"
+                , MoveFacing_function_type( &::UnitVPhysicsLocomotion::MoveFacing ) );
+        
+        }
         { //::UnitVPhysicsLocomotion::SetupMove
         
             typedef void ( ::UnitVPhysicsLocomotion::*SetupMove_function_type )( ::UnitBaseMoveCommand & ) ;
@@ -6472,6 +6536,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "SetupMove"
                 , SetupMove_function_type( &::UnitVPhysicsLocomotion::SetupMove )
                 , ( bp::arg("mv") ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::Simulate
+        
+            typedef ::IMotionEvent::simresult_e ( ::UnitVPhysicsLocomotion::*Simulate_function_type )( ::IPhysicsMotionController *,::IPhysicsObject *,float,::Vector &,::AngularImpulse & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "Simulate"
+                , Simulate_function_type( &::UnitVPhysicsLocomotion::Simulate )
+                , ( bp::arg("pController"), bp::arg("pObject"), bp::arg("deltaTime"), bp::arg("linear"), bp::arg("angular") ) );
         
         }
         { //::UnitVPhysicsLocomotion::VPhysicsMove

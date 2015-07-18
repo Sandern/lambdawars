@@ -16,12 +16,13 @@
 //-----------------------------------------------------------------------------
 // Unit Base Locomotion class. Deals with movement.
 //-----------------------------------------------------------------------------
-class UnitVPhysicsLocomotion : public UnitBaseLocomotion
+class UnitVPhysicsLocomotion : public UnitBaseLocomotion, public IMotionEvent
 {
 public:
 #ifdef ENABLE_PYTHON
 	UnitVPhysicsLocomotion( boost::python::object outer );
 #endif // ENABLE_PYTHON
+	~UnitVPhysicsLocomotion();
 
 	virtual void SetupMove( UnitBaseMoveCommand &mv );
 	virtual void FinishMove( UnitBaseMoveCommand &mv );
@@ -34,8 +35,17 @@ public:
 	// No facing needed for roller mine
 	virtual void	MoveFacing() {}
 
+	// Does the simulation
+	void CreateMotionController();
+	void DestroyMotionController();
+
+	virtual simresult_e	Simulate( IPhysicsMotionController *pController, IPhysicsObject *pObject, float deltaTime, Vector &linear, AngularImpulse &angular );
+
 private:
+	Vector m_vecLinear;
 	AngularImpulse m_vecAngular;
+
+	IPhysicsMotionController *m_pMotionController;
 };
 
 #endif // UNIT_VPHYSICSLOCOMOTION_H

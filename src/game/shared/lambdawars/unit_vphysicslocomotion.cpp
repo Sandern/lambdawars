@@ -16,11 +16,15 @@
 // Movement class
 //-----------------------------------------------------------------------------
 #ifdef ENABLE_PYTHON
-UnitVPhysicsLocomotion::UnitVPhysicsLocomotion( boost::python::object outer ) : UnitBaseLocomotion(outer)
+UnitVPhysicsLocomotion::UnitVPhysicsLocomotion( boost::python::object outer ) : UnitBaseLocomotion(outer), m_pMotionController(NULL)
 {
 	m_vecAngular.Init();
 }
 #endif // ENABLE_PYTHON
+
+UnitVPhysicsLocomotion::~UnitVPhysicsLocomotion()
+{
+}
 
 //-----------------------------------------------------------------------------
 // 
@@ -158,7 +162,7 @@ float UnitVPhysicsLocomotion::GetStopDistance()
 			break;
 	}
 
-	return distance;
+	return distance * 4;
 }
 
 
@@ -269,8 +273,6 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 			break;
 		ignoredEntities.AddToTail( trace.m_pEnt );
 		trace.m_pEnt->SetNavIgnore();
-		//m_pTraceListData->m_aEntityList.FindAndRemove( trace.m_pEnt );
-		//m_pTraceListData->m_nEntityCount--;	
 	}
 
 	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
@@ -279,14 +281,17 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 		DoUnstuck();
 	}
 
-	Vector vecRight;
-	AngleVectors( mv->viewangles, NULL, &vecRight, NULL );
+	if( !m_pMotionController )
+	{
+		Vector vecRight;
+		AngleVectors( mv->viewangles, NULL, &vecRight, NULL );
 
-	AngularImpulse impulse = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -mv->velocity.Length() );
+		AngularImpulse impulse = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -mv->velocity.Length() );
 
-	m_vecAngular = m_vecAngular + (impulse - m_vecAngular) * mv->interval;
+		m_vecAngular = m_vecAngular + (impulse - m_vecAngular) * mv->interval;
 
-	pPhysObj->SetVelocity( NULL, &m_vecAngular );
+		pPhysObj->SetVelocity( NULL, &m_vecAngular );
+	}
 
 #if 0
 	Vector curVel, curAngVel;
@@ -302,3 +307,56 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 		ignoredEntities[i]->ClearNavIgnore();
 	}
 }
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+void UnitVPhysicsLocomotion::CreateMotionController()
+{
+	DestroyMotionController();
+
+	IPhysicsObject *pPhysObj = m_pOuter->VPhysicsGetObject();
+	if( !pPhysObj )
+	{
+		return;
+	}
+
+	m_pMotionController = physenv->CreateMotionController( this );
+	m_pMotionController->AttachObject( pPhysObj, true );
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+void UnitVPhysicsLocomotion::DestroyMotionController()
+{
+	if ( m_pMotionController != NULL )
+	{
+		physenv->DestroyMotionController( m_pMotionController );
+		m_pMotionController = NULL;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// 
+//-----------------------------------------------------------------------------
+IMotionEvent::simresult_e UnitVPhysicsLocomotion::Simulate( IPhysicsMotionController *pController, IPhysicsObject *pObject, float deltaTime, Vector &linear, AngularImpulse &angular )
+{
+	m_vecLinear.Init(0, 0, 0);
+
+	if( mv )
+	{
+		Vector vecRight;
+		AngleVectors( mv->viewangles, NULL, &vecRight, NULL );
+
+		AngularImpulse impulse = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -mv->velocity.Length() );
+
+		m_vecAngular = m_vecAngular + (impulse - m_vecAngular) * deltaTime;
+	}
+
+	linear = m_vecLinear;
+	angular = m_vecAngular;
+
+	return SIM_LOCAL_ACCELERATION;
+}
+
