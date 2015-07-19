@@ -190,8 +190,10 @@ PS_OUTPUT main( PS_INPUT i )
 
 	float3 vResult = ( color1.rgb * blendfactor1 ) + ( color2.rgb * blendfactor2 ) + ( color3.rgb * blendfactor3 ) + ( color4.rgb * blendfactor4 );
 
+	// Only do this on deferred, as to support some lower end devices on regular lighting mode (e.g. Geforce 7 cards)
+	// Seems those cards don't support all texture coordinate inputs?
+#if DEFERRED == 1
 #if ( ( defined( SHADER_MODEL_PS_2_B ) || defined( SHADER_MODEL_PS_3_0 ) ) )
-
 	float3 fSpecular = i.vAlphaBlend.w * cSpecularColor.rgb * cSpecularColor.a;
 	float3 fSpecFinal = float3( 0.0, 0.0, 0.0 );
 	if ( blendfactor1 > 0.0 )
@@ -212,7 +214,7 @@ PS_OUTPUT main( PS_INPUT i )
 	}
 	
 	vResult.rgb += fSpecFinal * fSpecular;
-
+#endif
 #endif
 
 	float3 worldSpaceNormal = float3( 0, 0, 1 );
