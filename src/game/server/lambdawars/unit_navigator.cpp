@@ -341,8 +341,6 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	vDir = m_vLastWishVelocity;
 	fSpeed = VectorNormalize(vDir);
 
-	UpdateIdealAngles( MoveCommand, (GoalStatus == CHS_HASGOAL) ? &vPathDir : NULL );
-
 	QAngle vAngles;
 	VectorAngles( vDir, vAngles );
 	CalcMove( MoveCommand, vAngles, fSpeed );
@@ -353,6 +351,12 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		Warning("#%d UnitNavigator: Unit gives up on goal due being blocked!\n", GetOuter()->entindex());
 		GoalStatus = CHS_FAILED;
 	}
+
+	// Update the ideal angles after calculating the movement
+	// UpdateIdealAngles may dispatch an event and the ai may clear the movement in this.
+	// TODO: Consider splitting the event dispatch code into UpdateGoalStatus, keeping all
+	// event dispatching together.
+	UpdateIdealAngles( MoveCommand, (GoalStatus == CHS_HASGOAL) ? &vPathDir : NULL );
 
 	UpdateGoalStatus( MoveCommand, GoalStatus );
 
