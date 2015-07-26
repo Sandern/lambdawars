@@ -162,7 +162,7 @@ float UnitVPhysicsLocomotion::GetStopDistance()
 			break;
 	}
 
-	return distance * 4;
+	return distance;
 }
 
 
