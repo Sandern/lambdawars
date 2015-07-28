@@ -1153,10 +1153,19 @@ bool CSrcPython::ExecuteFile( const char* pScript )
 //-----------------------------------------------------------------------------
 void CSrcPython::Reload( const char *pModule )
 {
-	DevMsg("Reloading module %s\n", pModule);
+	DevMsg( "Reloading module %s\n", pModule );
 
 	try
 	{
+		
+#if PY_VERSION_HEX >= 0x03000000
+		// Must have the module
+		boost::python::object m = Import( pModule );
+
+		// Reload the module
+		boost::python::object imp = Import( "imp" );
+		imp.attr("reload")( m );
+#else
 		// import into the main space
 		char command[MAX_PATH];
 		V_snprintf( command, sizeof( command ), "import %s", pModule );
@@ -1165,6 +1174,7 @@ void CSrcPython::Reload( const char *pModule )
 		// Reload
 		V_snprintf( command, sizeof( command ), "reload(%s)", pModule );
 		exec(command, mainnamespace, mainnamespace );
+#endif // PY_VERSION_HEX >= 0x03000000
 	}
 	catch( bp::error_already_set & )
 	{
