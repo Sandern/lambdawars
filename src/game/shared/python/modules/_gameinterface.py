@@ -71,6 +71,7 @@ class GameInterface(SemiSharedModuleGenerator):
         
         # Precache functions
         mb.free_function('PrecacheMaterial').include()
+        mb.free_function('PrecacheEffect').include()
         
         # ConVar wrapper
         cls = mb.class_('PyConVar')

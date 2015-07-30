@@ -2727,6 +2727,17 @@ BOOST_PYTHON_MODULE(_gameinterface){
     
     }
 
+    { //::PrecacheEffect
+    
+        typedef void ( *PrecacheEffect_function_type )( char const * );
+        
+        bp::def( 
+            "PrecacheEffect"
+            , PrecacheEffect_function_type( &::PrecacheEffect )
+            , ( bp::arg("pEffectName") ) );
+    
+    }
+
     { //::PrecacheMaterial
     
         typedef void ( *PrecacheMaterial_function_type )( char const * );
@@ -5720,6 +5731,17 @@ BOOST_PYTHON_MODULE(_gameinterface){
         bp::def( 
             "Plat_MSTime"
             , Plat_MSTime_function_type( &::Plat_MSTime ) );
+    
+    }
+
+    { //::PrecacheEffect
+    
+        typedef void ( *PrecacheEffect_function_type )( char const * );
+        
+        bp::def( 
+            "PrecacheEffect"
+            , PrecacheEffect_function_type( &::PrecacheEffect )
+            , ( bp::arg("pParticleSystemName") ) );
     
     }
 
