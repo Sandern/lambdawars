@@ -211,7 +211,7 @@ void CUnitBase::UpdateOnRemove( void )
 	RemoveFromUnitList();
 
 	int i;
-	for( i=0; i < m_SelectedByPlayers.Count(); i++ )
+	for( i = 0; i < m_SelectedByPlayers.Count(); i++ )
 	{
 		if( m_SelectedByPlayers[i] )
 			m_SelectedByPlayers[i]->RemoveUnit( this );

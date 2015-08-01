@@ -94,7 +94,7 @@ public:
 #endif // CLIENT_DLL
 
 	// Mesh Querying
-	int GetPolyRef( const Vector &vPoint, float fBeneathLimit = 120.0f );
+	int GetPolyRef( const Vector &vPoint, float fBeneathLimit = 120.0f, float fExtent2D = 256.0f );
 	bool IsValidPolyRef( int polyRef );
 	Vector ClosestPointOnMesh( const Vector &vPoint, float fBeneathLimit = 120.0f, float fRadius = 256.0f );
 	Vector RandomPointWithRadius( const Vector &vCenter, float fRadius, const Vector *pStartPoint = NULL );

@@ -384,9 +384,23 @@ boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUn
 		coverSpots.Sort( CoverCompare );
 	}
 
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+
 	// Python return result
 	for( int i = 0; i < coverSpots.Count(); i++ )
+	{
+		// Should be on the navigation mesh! Search in a small radius, cover spots are always for soldiers.
+		if( pMesh )
+		{
+			Vector vPoint = pMesh->ClosestPointOnMesh( coverSpots[i].pSpot->position, 64.0f, 8.0f );
+			if( (vPoint - coverSpots[i].pSpot->position).Length2DSqr() > (4.0f * 4.0f) )
+			{
+				continue;
+			}
+		}
+
 		l.append( boost::python::make_tuple( coverSpots[i].pSpot->id, coverSpots[i].pSpot->position ) );
+	}
 
 	return l;
 }

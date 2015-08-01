@@ -401,7 +401,7 @@ void CRecastMesh::DebugRender()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
+int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit, float fExtent2D )
 {
 	if( !IsLoaded() )
 		return 0;
@@ -413,9 +413,9 @@ int CRecastMesh::GetPolyRef( const Vector &vPoint, float fBeneathLimit )
 
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
-	polyPickExt[0] = 256.0f;
+	polyPickExt[0] = fExtent2D;
 	polyPickExt[1] = fBeneathLimit;
-	polyPickExt[2] = 256.0f;
+	polyPickExt[2] = fExtent2D;
 
 	dtPolyRef ref;
 	dtStatus status = m_navQuery->findNearestPoly(pos, polyPickExt, &m_defaultFilter, &ref, 0);
