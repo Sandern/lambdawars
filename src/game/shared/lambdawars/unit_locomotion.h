@@ -187,6 +187,8 @@ public:
 
 	// Facing
 	virtual void	MoveFacing();
+	virtual void	LockFacing( float fBase, float fTolerance = 0 );
+	virtual void	ReleaseFacingLock();
 
 	// Main move function
 	virtual void	Move( float interval, UnitBaseMoveCommand &mv );
@@ -273,6 +275,9 @@ private:
 
 	float m_fIgnoreFrictionEndTime;
 	float m_fNextAllowUnstuckTime;
+
+	bool m_bFacingLocked;
+	float m_fFacingLockBase, m_fFacingLockTolerance;
 };
 
 //-----------------------------------------------------------------------------

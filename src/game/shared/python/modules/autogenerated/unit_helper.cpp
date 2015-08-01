@@ -2045,6 +2045,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("duration") ) );
         
         }
+        { //::UnitBaseLocomotion::LockFacing
+        
+            typedef void ( ::UnitBaseLocomotion::*LockFacing_function_type )( float,float ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "LockFacing"
+                , LockFacing_function_type( &::UnitBaseLocomotion::LockFacing )
+                , ( bp::arg("fBase"), bp::arg("fTolerance")=0 ) );
+        
+        }
         { //::UnitBaseLocomotion::Move
         
             typedef void ( ::UnitBaseLocomotion::*Move_function_type )( float,::UnitBaseMoveCommand & ) ;
@@ -2082,6 +2092,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "PerformMovementFacingOnly"
                 , PerformMovementFacingOnly_function_type( &::UnitBaseLocomotion::PerformMovementFacingOnly )
                 , ( bp::arg("mv") ) );
+        
+        }
+        { //::UnitBaseLocomotion::ReleaseFacingLock
+        
+            typedef void ( ::UnitBaseLocomotion::*ReleaseFacingLock_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "ReleaseFacingLock"
+                , ReleaseFacingLock_function_type( &::UnitBaseLocomotion::ReleaseFacingLock ) );
         
         }
         { //::UnitBaseLocomotion::SetupMove
@@ -5465,6 +5484,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("duration") ) );
         
         }
+        { //::UnitBaseLocomotion::LockFacing
+        
+            typedef void ( ::UnitBaseLocomotion::*LockFacing_function_type )( float,float ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "LockFacing"
+                , LockFacing_function_type( &::UnitBaseLocomotion::LockFacing )
+                , ( bp::arg("fBase"), bp::arg("fTolerance")=0 ) );
+        
+        }
         { //::UnitBaseLocomotion::Move
         
             typedef void ( ::UnitBaseLocomotion::*Move_function_type )( float,::UnitBaseMoveCommand & ) ;
@@ -5502,6 +5531,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 "PerformMovementFacingOnly"
                 , PerformMovementFacingOnly_function_type( &::UnitBaseLocomotion::PerformMovementFacingOnly )
                 , ( bp::arg("mv") ) );
+        
+        }
+        { //::UnitBaseLocomotion::ReleaseFacingLock
+        
+            typedef void ( ::UnitBaseLocomotion::*ReleaseFacingLock_function_type )(  ) ;
+            
+            UnitBaseLocomotion_exposer.def( 
+                "ReleaseFacingLock"
+                , ReleaseFacingLock_function_type( &::UnitBaseLocomotion::ReleaseFacingLock ) );
         
         }
         { //::UnitBaseLocomotion::SetupMove

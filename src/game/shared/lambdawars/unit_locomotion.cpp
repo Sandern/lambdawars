@@ -106,6 +106,8 @@ UnitBaseLocomotion::UnitBaseLocomotion( boost::python::object outer ) : UnitComp
 	m_fIgnoreFrictionEndTime = 0;
 	m_fNextAllowUnstuckTime = 0;
 
+	m_bFacingLocked = false;
+
 	mv = NULL;
 
 	m_pTraceListData = NULL;
@@ -688,7 +690,18 @@ void UnitBaseLocomotion::MoveFacing( void )
 	float newYaw = Unit_ClampYaw( mv->yawspeed * 10.0, current, ideal, mv->interval );
 
 	if( newYaw != current )
+	{
+		if( m_bFacingLocked )
+		{
+			// Clamp to lock
+			if( newYaw < m_fFacingLockBase - m_fFacingLockTolerance )
+				newYaw = m_fFacingLockBase - m_fFacingLockTolerance;
+			else if( newYaw > m_fFacingLockBase + m_fFacingLockTolerance )
+				newYaw = m_fFacingLockBase + m_fFacingLockTolerance;
+		}
+
 		mv->viewangles.y = newYaw;
+	}
 
 	// Don't store pitch in result view angles for now. This pitch is used for aiming weapons, but does not change
 	// the body angles. Storing the pitch in the body angles will change attached entities and particles.
@@ -708,6 +721,18 @@ void UnitBaseLocomotion::MoveFacing( void )
 	{
 		GetOuter()->m_fEyePitch = 0;
 	}
+}
+
+void UnitBaseLocomotion::LockFacing( float fBase, float fTolerance )
+{
+	m_bFacingLocked = true;
+	m_fFacingLockBase = fBase;
+	m_fFacingLockTolerance = fTolerance;
+}
+
+void UnitBaseLocomotion::ReleaseFacingLock()
+{
+	m_bFacingLocked = false;
 }
 
 //-----------------------------------------------------------------------------
