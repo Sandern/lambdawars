@@ -228,6 +228,7 @@ bool NavIsAreaFlat( const Vector &mins, const Vector &maxs, float fFlatTol, CUni
 #else
 	ConVar disable_hidingspots( "sv_disable_coverspots", "0", FCVAR_CHEAT );
 #endif // CLIENT_DLL
+ConVar coverspot_required_nav_radius( "coverspot_required_nav_radius", "2", FCVAR_CHEAT|FCVAR_REPLICATED );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -387,13 +388,16 @@ boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUn
 	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
 
 	// Python return result
+	float fRequiredNavRadius = coverspot_required_nav_radius.GetFloat();
 	for( int i = 0; i < coverSpots.Count(); i++ )
 	{
 		// Should be on the navigation mesh! Search in a small radius, cover spots are always for soldiers.
-		if( pMesh )
+		if( pMesh && fRequiredNavRadius )
 		{
-			Vector vPoint = pMesh->ClosestPointOnMesh( coverSpots[i].pSpot->position, 64.0f, 8.0f );
-			if( (vPoint - coverSpots[i].pSpot->position).Length2DSqr() > (4.0f * 4.0f) )
+			Vector pos = coverSpots[i].pSpot->position;
+			pos.z += 2.0f;
+			if( !pMesh->TestRoute( pos - Vector(fRequiredNavRadius, 0, 0), pos + Vector(fRequiredNavRadius, 0, 0) ) ||
+				!pMesh->TestRoute( pos - Vector(0, fRequiredNavRadius, 0), pos + Vector(0, fRequiredNavRadius, 0) ) )
 			{
 				continue;
 			}
