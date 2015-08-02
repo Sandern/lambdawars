@@ -246,7 +246,7 @@ void LoadingProgress::PaintBackground()
 {
 	int screenWide, screenTall;
 	surface()->GetScreenSize( screenWide, screenTall );
-
+	
 	if ( m_bDrawBackground && m_pBGImage )
 	{
 		int x, y, wide, tall;
@@ -279,7 +279,7 @@ void LoadingProgress::PaintBackground()
 		}		
 	}
 
-	if ( m_bDrawPoster && m_pFooter )
+	if ( /*m_bDrawPoster &&*/ m_pFooter )
 	{
 		int screenWidth, screenHeight;
 		CBaseModPanel::GetSingleton().GetSize( screenWidth, screenHeight );
@@ -401,8 +401,8 @@ void LoadingProgress::SetupControlStates()
 		// spinner needs to be drawn as child of the window that is shown while loading
 		break;
 	case LT_POSTER:
-		m_bDrawBackground = false;
-		m_bDrawPoster = true;
+		m_bDrawBackground = true;
+		m_bDrawPoster = false;
 		m_bDrawProgress = true;
 		m_bDrawSpinner = true;
 		break;
@@ -419,6 +419,20 @@ void LoadingProgress::SetupControlStates()
 		if ( m_LoadingType == LT_POSTER )
 		{
 			//m_pBGImage->SetImage( "../vgui/LoadingScreen_background" );
+
+			// Change loading background
+			static char pics[5][64] = {
+				"posters/poster1",
+				"posters/poster2",
+				"posters/poster3",
+				"posters/poster4",
+				"posters/poster5"
+			};
+
+			int iChosen = RandomInt(0, ARRAYSIZE(pics)-1);
+			char filename[MAX_PATH];
+			V_snprintf( filename, sizeof( filename ), pics[iChosen] ); 
+			m_pBGImage->SetImage( CFmtStr( "../%s", filename ) );
 		}
 		else
 		{
@@ -537,6 +551,7 @@ void LoadingProgress::RearrangeNames( const char *pszCharacterOrder, const char 
 //=============================================================================
 bool LoadingProgress::ShouldShowPosterForLevel( KeyValues *pMissionInfo, KeyValues *pChapterInfo )
 {
+#if 0
 	// Do not show loading poster for credits
 	if ( pMissionInfo && !Q_stricmp( pMissionInfo->GetString( "name" ), "credits" ) )
 		return false;
@@ -551,6 +566,9 @@ bool LoadingProgress::ShouldShowPosterForLevel( KeyValues *pMissionInfo, KeyValu
 
 	// All other campaigns can fall back to a default poster
 	return ( m_pDefaultPosterDataKV != NULL );
+#else
+	return false;
+#endif // 0
 }
 
 //=============================================================================
