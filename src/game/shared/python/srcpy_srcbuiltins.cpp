@@ -148,7 +148,7 @@ boost::python::object PyKeyValuesToDictFromFile( const char *pFileName )
 	return boost::python::object();
 }
 
-static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::object value, KeyValues *pKV )
+static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::object value, KeyValues *pKV, bool keys_sorted = false )
 {
 	try
 	{
@@ -193,7 +193,7 @@ static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::
 					for( int i = 0; i < n; i++ ) 
 					{
 						// Assume lists for one key only contain dictionaries
-						pKV->AddSubKey( PyDictToKeyValues( value[i], pKeyName ) );
+						pKV->AddSubKey( PyDictToKeyValues( value[i], pKeyName, keys_sorted ) );
 					}
 				}
 				else
@@ -205,7 +205,7 @@ static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::
 					{
 						char buf[5];
 						itoa( i, buf, 10 );
-						PyDictToKeyValuesConvertValue( buf, value[i], pListSubKey );
+						PyDictToKeyValuesConvertValue( buf, value[i], pListSubKey, keys_sorted );
 					}
 				}
 			}
@@ -217,7 +217,7 @@ static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::
 		}
 		else if( valuetype == builtins.attr("dict") || valuetype == collections.attr("defaultdict") )
 		{
-			pKV->AddSubKey( PyDictToKeyValues( value, pKeyName ) );
+			pKV->AddSubKey( PyDictToKeyValues( value, pKeyName, keys_sorted ) );
 		}
 		else
 		{
@@ -231,21 +231,25 @@ static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::
 	}
 }
 
-KeyValues *PyDictToKeyValues( boost::python::object d, const char *name )
+KeyValues *PyDictToKeyValues( boost::python::object d, const char *name, bool keys_sorted )
 {
 	KeyValues *pKV = new KeyValues( name ? name : "Data" );
 
-	boost::python::object items = d.attr("items")();
-	boost::python::object iterator = items.attr("__iter__")();
-	unsigned long length = boost::python::len(items); 
+	boost::python::object keys = d.attr( "keys" )();
+	if( keys_sorted ) 
+	{
+		keys = builtins.attr( "sorted" )( keys );
+	}
+	boost::python::object iterator = keys.attr( "__iter__" )();
+	unsigned long length = boost::python::len( keys ); 
 
 	for( unsigned long u = 0; u < length; u++ )
 	{
-		boost::python::object item = iterator.attr( PY_NEXT_METHODNAME )();
-		const char *pKeyName = boost::python::extract< const char * >( item[0] );
-		boost::python::object value = item[1];
+		boost::python::object key = iterator.attr( PY_NEXT_METHODNAME )();
+		const char *pKeyName = boost::python::extract< const char * >( key );
+		boost::python::object value = d[key];
 
-		PyDictToKeyValuesConvertValue( pKeyName, value, pKV );
+		PyDictToKeyValuesConvertValue( pKeyName, value, pKV, keys_sorted );
 	}
 
 	return pKV;

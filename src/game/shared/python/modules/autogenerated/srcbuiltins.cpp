@@ -848,12 +848,12 @@ BOOST_PYTHON_MODULE(srcbuiltins){
 
     { //::PyDictToKeyValues
     
-        typedef ::KeyValues * ( *DictToKeyValues_function_type )( ::boost::python::api::object,char const * );
+        typedef ::KeyValues * ( *DictToKeyValues_function_type )( ::boost::python::api::object,char const *,bool );
         
         bp::def( 
             "DictToKeyValues"
             , DictToKeyValues_function_type( &::PyDictToKeyValues )
-            , ( bp::arg("d"), bp::arg("name")=bp::object() )
+            , ( bp::arg("d"), bp::arg("name")=bp::object(), bp::arg("keys_sorted")=(bool)(false) )
             , bp::return_value_policy< bp::return_by_value >() );
     
     }
