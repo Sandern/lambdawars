@@ -873,7 +873,7 @@ Vector CUnitBase::BodyTarget( const Vector &posSrc, bool bNoisy )
 		{
 			const CPhysCollide *pCollide = pPhysObject->GetCollide();
 			Vector mins, maxs;
-			physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, vec3_angle );
+			physcollision->CollideGetAABB( &mins, &maxs, pCollide, vec3_origin, GetAbsAngles() );
 			high = vOrigin + maxs * 0.8f;
 		}
 		else 
