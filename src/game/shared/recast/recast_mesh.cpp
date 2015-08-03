@@ -775,13 +775,15 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 		return NULL;
 	}
 
+	bool bHasTargetAndIsObstacle = pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX;
+
 	// Determine end point and area
 	// TODO: Special case for targets which act as obstacle on the nav mesh. For this we need to query
 	// the surrounding polygons and test for each found poly and pick the best route.
 	// Problem: hard to query the right polygons around the obstacle (since you will pick the wrong ones as well).
 	// For now: pick single polygon in direction of agent
 	float epos[3];
-	if( pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX )
+	if( bHasTargetAndIsObstacle )
 	{
 #if 0
 		epos[0] = vEnd[0];
@@ -865,18 +867,32 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 		}
 	}
 
+#if 0
 	if( endRefs.Count() > 1 )
 	{
 		status = DoFindPathToObstacle(startRef, endRefs, spos, epos, m_pathfindData );
 	}
 	else
+#endif // 0
 	{
-		// Make sure end pos is always on a polygon
-		dtVcopy(m_pathfindData.adjustedEndPos, epos);
-		status = m_navQuery->closestPointOnPoly(endRefs[0], epos, m_pathfindData.adjustedEndPos, 0);
-		if( !dtStatusSucceed( status ) )
+		// Make sure end pos is always on a polygon, unless target is an obstacle
+		// In this case we expect to move to an area with no polygon
+		// Melee units need to get close for example.
+		// Navigator code will take care of not running into the unit needlessly.
+		if( bHasTargetAndIsObstacle )
 		{
-			return NULL;
+			m_pathfindData.adjustedEndPos[0] = vEnd[0];
+			m_pathfindData.adjustedEndPos[1] = vEnd[2];
+			m_pathfindData.adjustedEndPos[2] = vEnd[1];
+		}
+		else
+		{
+			dtVcopy(m_pathfindData.adjustedEndPos, epos);
+			status = m_navQuery->closestPointOnPoly(endRefs[0], epos, m_pathfindData.adjustedEndPos, 0);
+			if( !dtStatusSucceed( status ) )
+			{
+				return NULL;
+			}
 		}
 
 		if( recast_findpath_debug.GetBool() )
