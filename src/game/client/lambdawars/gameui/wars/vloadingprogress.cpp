@@ -421,12 +421,13 @@ void LoadingProgress::SetupControlStates()
 			//m_pBGImage->SetImage( "../vgui/LoadingScreen_background" );
 
 			// Change loading background
-			static char pics[5][64] = {
+			static char pics[6][64] = {
 				"posters/poster1",
 				"posters/poster2",
 				"posters/poster3",
 				"posters/poster4",
-				"posters/poster5"
+				"posters/poster5",
+				"posters/poster6"
 			};
 
 			int iChosen = RandomInt(0, ARRAYSIZE(pics)-1);
