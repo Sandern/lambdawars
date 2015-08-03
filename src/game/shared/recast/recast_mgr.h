@@ -36,6 +36,8 @@ typedef struct NavObstacleArray_t
 	CUtlVector< NavObstacle_t > obs;
 } NavObstacleArray_t;
 
+#define NAV_OBSTACLE_INVALID_INDEX -1
+
 class CRecastMgr : public IRecastMgr
 {
 public:

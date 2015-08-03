@@ -781,7 +781,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	// Problem: hard to query the right polygons around the obstacle (since you will pick the wrong ones as well).
 	// For now: pick single polygon in direction of agent
 	float epos[3];
-	if( pTarget && pTarget->GetNavObstacleRef() != -1 )
+	if( pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX )
 	{
 #if 0
 		epos[0] = vEnd[0];

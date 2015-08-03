@@ -384,7 +384,7 @@ bool CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 		}
 
 		m_Obstacles.RemoveAt( idx );
-		pEntity->SetNavObstacleRef( m_Obstacles.InvalidIndex() );
+		pEntity->SetNavObstacleRef( NAV_OBSTACLE_INVALID_INDEX );
 	}
 	return true;
 }

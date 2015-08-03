@@ -1217,7 +1217,7 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 		// Note that after a path recomputation, we won't try to recompute the path for a while anymore (performance)
 		// Don't do this for nav obstacles, since they probably don't move
 
-		if( GetPath()->m_hTarget->GetNavObstacleRef() == -1 )
+		if( GetPath()->m_hTarget->GetNavObstacleRef() == NAV_OBSTACLE_INVALID_INDEX )
 		{
 			//const Vector &vTargetOrigin = GetPath()->m_hTarget->EyePosition(); // Eye position may be too high for some targets
 			const Vector &vTargetOrigin = GetPath()->m_hTarget->WorldSpaceCenter();

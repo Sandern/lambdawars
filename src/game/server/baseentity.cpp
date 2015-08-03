@@ -88,6 +88,7 @@
 
 #ifdef HL2WARS_DLL
 #include "fowmgr.h"
+#include "recast/recast_mgr.h"
 #endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -797,7 +798,7 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 
 	DensityMap()->Init( this );
 
-	m_NavObstacleRef = -1;
+	m_NavObstacleRef = NAV_OBSTACLE_INVALID_INDEX;
 #endif // HL2WARS_DLL
 
 #ifdef ENABLE_PYTHON

@@ -56,6 +56,7 @@
 
 #ifdef HL2WARS_DLL
 #include "fowmgr.h"
+#include "recast/recast_mgr.h"
 #endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -1130,7 +1131,7 @@ C_BaseEntity::C_BaseEntity() :
 	m_bIsClientCreated = false;
 
 #ifdef HL2WARS_DLL
-	m_NavObstacleRef = -1;
+	m_NavObstacleRef = NAV_OBSTACLE_INVALID_INDEX;
 #endif // HL2WARS_DLL
 }
 
