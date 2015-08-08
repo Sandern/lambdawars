@@ -3906,6 +3906,9 @@
     <ClInclude Include="..\shared\python\srcpy_standalone.h">
       <Filter>Source Files\Python</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_common.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bonesetup.lib">

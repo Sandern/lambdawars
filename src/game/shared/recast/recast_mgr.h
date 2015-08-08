@@ -31,9 +31,11 @@ typedef struct NavObstacleArray_t
 	NavObstacleArray_t( const NavObstacleArray_t &ref )
 	{
 		obs =  ref.obs;
+		areaId = ref.areaId;
 	}
 
 	CUtlVector< NavObstacle_t > obs;
+	unsigned char areaId;
 } NavObstacleArray_t;
 
 #define NAV_OBSTACLE_INVALID_INDEX -1
@@ -109,6 +111,7 @@ protected:
 #endif // CLIENT_DLL
 
 	NavObstacleArray_t &FindOrCreateObstacle( CBaseEntity *pEntity );
+	unsigned char DetermineAreaID( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs );
 
 private:
 	bool m_bLoaded;

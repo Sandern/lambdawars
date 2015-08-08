@@ -50,6 +50,8 @@ struct dtTileCacheObstacle
 	float verts[DT_MAX_CONVEX_HULL_VERTICES*3];
 	// Use nverts == 0 to differentiate between poly or cylinder obstacle
 	int nverts;
+	// optional alternative area id
+	unsigned char areaId;
 	dtTileCacheObstacle* next;
 };
 
@@ -110,8 +112,8 @@ public:
 	
 	dtStatus removeTile(dtCompressedTileRef ref, unsigned char** data, int* dataSize);
 	
-	dtStatus addObstacle(const float* pos, const float radius, const float height, dtObstacleRef* result);
-	dtStatus addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, dtObstacleRef* result);
+	dtStatus addObstacle(const float* pos, const float radius, const float height, unsigned char areaId, dtObstacleRef* result);
+	dtStatus addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned char areaId, dtObstacleRef* result);
 	dtStatus removeObstacle(const dtObstacleRef ref);
 	
 	dtStatus queryTiles(const float* bmin, const float* bmax,

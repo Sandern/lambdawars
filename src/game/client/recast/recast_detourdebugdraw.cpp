@@ -34,6 +34,7 @@
 #include "tier0/memdbgon.h"
 
 extern ConVar recast_debug_culldist;
+ConVar recast_debug_show_disabled("recast_debug_show_disabled", "0");
 
 static float distancePtLine2d(const float* pt, const float* p, const float* q)
 {
@@ -149,7 +150,7 @@ static void drawMeshTile(duDebugDraw* dd, const dtNavMesh& mesh, const dtNavMesh
 		const dtPoly* p = &tile->polys[i];
 		if (p->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)	// Skip off-mesh links.
 			continue;
-		if (p->flags & SAMPLE_POLYFLAGS_DISABLED)
+		if (!recast_debug_show_disabled.GetBool() && p->flags & SAMPLE_POLYFLAGS_DISABLED)
 			continue;
 			
 		const dtPolyDetail* pd = &tile->detailMeshes[i];

@@ -86,6 +86,7 @@ void LinearAllocator::free(void* /*ptr*/)
 MeshProcess::MeshProcess( const char *meshName )
 {
 	meshFlags = 0;
+
 #ifndef CLIENT_DLL
 	if( V_strncmp( meshName, "human", V_strlen( meshName ) ) == 0 )
 	{
@@ -108,6 +109,9 @@ MeshProcess::MeshProcess( const char *meshName )
 		meshFlags |= SF_OFFMESHCONN_AIR;
 	}
 #endif // CLIENT_DLL
+
+	// One time parse all
+	parseAll();
 }
 
 static void TestAgentRadius( const char *meshName, float &fAgentRadius )
@@ -120,6 +124,100 @@ static void TestAgentRadius( const char *meshName, float &fAgentRadius )
 	}
 }
 
+void MeshProcess::parseAll()
+{
+	offMeshConnVerts.Purge();
+	offMeshConnRad.Purge();
+	offMeshConnDir.Purge();
+	offMeshConnArea.Purge();
+	offMeshConnFlags.Purge();
+	offMeshConnId.Purge();
+
+#ifndef CLIENT_DLL
+	// Pass in off-mesh connections.
+	// TODO: Currently this is always server side, but we don't really need them client side atm.
+
+	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "recast_offmesh_connection" );
+	while( pEnt )
+	{
+		COffMeshConnection *pOffMeshConn = dynamic_cast< COffMeshConnection * >( pEnt );
+		if( pOffMeshConn )
+		{
+			parseConnection( pOffMeshConn );
+		}
+
+		// Find next off mesh connection
+		pEnt = gEntList.FindEntityByClassname( pEnt, "recast_offmesh_connection" );
+	}
+	//DevMsg("Parsed %d offmesh connections\n", offMeshConnId.Count());
+#endif // CLIENT_DLL
+}
+
+#ifndef CLIENT_DLL
+void MeshProcess::parseConnection( COffMeshConnection *pOffMeshConn )
+{
+	// Only parse connections for which we have the flag set
+	int spawnFlags = pOffMeshConn->GetSpawnFlags();
+	if( (spawnFlags & meshFlags) != 0 ) 
+	{
+		CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, pOffMeshConn->m_target );
+		if( pTarget )
+		{
+			int vertOffset = offMeshConnVerts.Count();
+			offMeshConnVerts.AddMultipleToTail( 6 );
+
+			const Vector &vStart = pOffMeshConn->GetAbsOrigin();
+			const Vector &vEnd = pTarget->GetAbsOrigin();
+
+			offMeshConnVerts[vertOffset] = vStart.x;
+			offMeshConnVerts[vertOffset+1] = vStart.z;
+			offMeshConnVerts[vertOffset+2] = vStart.y;
+			offMeshConnVerts[vertOffset+3] = vEnd.x;
+			offMeshConnVerts[vertOffset+4] = vEnd.z;
+			offMeshConnVerts[vertOffset+5] = vEnd.y;
+
+			float rad = 0.0f;
+			if( spawnFlags & SF_OFFMESHCONN_HUMAN )
+				TestAgentRadius( "human", rad );
+			if( spawnFlags & SF_OFFMESHCONN_MEDIUM )
+				TestAgentRadius( "medium", rad );
+			if( spawnFlags & SF_OFFMESHCONN_LARGE )
+				TestAgentRadius( "large", rad );
+			if( spawnFlags & SF_OFFMESHCONN_VERYLARGE )
+				TestAgentRadius( "verylarge", rad );
+			if( spawnFlags & SF_OFFMESHCONN_AIR )
+				TestAgentRadius( "air", rad );
+
+			offMeshConnRad.AddToTail( rad );
+
+			offMeshConnId.AddToTail( 10000 + offMeshConnId.Count() );
+
+			if( spawnFlags & SF_OFFMESHCONN_JUMPEDGE )
+			{
+				offMeshConnArea.AddToTail( SAMPLE_POLYAREA_JUMP );
+				offMeshConnFlags.AddToTail( SAMPLE_POLYFLAGS_JUMP );
+				offMeshConnDir.AddToTail( 0 ); // one direction
+			}
+			else
+			{
+				offMeshConnArea.AddToTail( SAMPLE_POLYAREA_GROUND );
+				offMeshConnFlags.AddToTail( SAMPLE_POLYFLAGS_WALK );
+				offMeshConnDir.AddToTail( 1 ); // bi direction
+			}
+
+			//Msg("Parsed offmesh connection with rad %f, start %f %f %f, end %f %f %f\n", rad,
+			//	vStart.x, vStart.y, vStart.z, vEnd.x, vEnd.y, vEnd.z);
+		}
+		else
+		{
+			Warning("Offmesh connection at (%f %f %f) has no valid target (%s)\n", 
+				pOffMeshConn->GetAbsOrigin().x, pOffMeshConn->GetAbsOrigin().y, pOffMeshConn->GetAbsOrigin().z,
+				pOffMeshConn->m_target != NULL_STRING ? STRING( pOffMeshConn->m_target ) : "<null>");
+		}
+	}
+}
+#endif // CLIENT_DLL
+
 void MeshProcess::process(struct dtNavMeshCreateParams* params,
 						unsigned char* polyAreas, unsigned short* polyFlags)
 {
@@ -129,102 +227,15 @@ void MeshProcess::process(struct dtNavMeshCreateParams* params,
 		if (polyAreas[i] == DT_TILECACHE_WALKABLE_AREA)
 			polyAreas[i] = SAMPLE_POLYAREA_GROUND;
 
-		if (polyAreas[i] == SAMPLE_POLYAREA_GROUND ||
-			polyAreas[i] == SAMPLE_POLYAREA_GRASS ||
-			polyAreas[i] == SAMPLE_POLYAREA_ROAD)
+		if (polyAreas[i] == SAMPLE_POLYAREA_GROUND)
 		{
 			polyFlags[i] = SAMPLE_POLYFLAGS_WALK;
 		}
-		else if (polyAreas[i] == SAMPLE_POLYAREA_WATER)
+
+		if (polyAreas[i] >= SAMPLE_POLYAREA_OBSTACLE_START && polyAreas[i] <= SAMPLE_POLYAREA_OBSTACLE_END )
 		{
-			polyFlags[i] = SAMPLE_POLYFLAGS_SWIM;
+			polyFlags[i] = SAMPLE_POLYFLAGS_OBSTACLE_START << (polyAreas[i] - SAMPLE_POLYAREA_OBSTACLE_START);
 		}
-		else if (polyAreas[i] == SAMPLE_POLYAREA_DOOR)
-		{
-			polyFlags[i] = SAMPLE_POLYFLAGS_WALK | SAMPLE_POLYFLAGS_DOOR;
-		}
-	}
-
-#ifndef CLIENT_DLL
-	// Pass in off-mesh connections.
-	// TODO: Currently this is always server side, but we don't really need them client side atm.
-	offMeshConnVerts.Purge();
-	offMeshConnRad.Purge();
-	offMeshConnDir.Purge();
-	offMeshConnArea.Purge();
-	offMeshConnFlags.Purge();
-	offMeshConnId.Purge();
-
-	CBaseEntity *pEnt = gEntList.FindEntityByClassname( NULL, "recast_offmesh_connection" );
-	while( pEnt )
-	{
-		COffMeshConnection *pOffMeshConn = dynamic_cast< COffMeshConnection * >( pEnt );
-		if( pOffMeshConn )
-		{
-			// Only parse connections for which we have the flag set
-			int spawnFlags = pOffMeshConn->GetSpawnFlags();
-			if( (spawnFlags & meshFlags) != 0 ) 
-			{
-				CBaseEntity *pTarget = gEntList.FindEntityByName( NULL, pOffMeshConn->m_target );
-				if( pTarget )
-				{
-					// Horrifying
-					int vertOffset = offMeshConnVerts.Count();
-					offMeshConnVerts.AddMultipleToTail( 6 );
-
-					const Vector &vStart = pOffMeshConn->GetAbsOrigin();
-					const Vector &vEnd = pTarget->GetAbsOrigin();
-
-					offMeshConnVerts[vertOffset] = vStart.x;
-					offMeshConnVerts[vertOffset+1] = vStart.z;
-					offMeshConnVerts[vertOffset+2] = vStart.y;
-					offMeshConnVerts[vertOffset+3] = vEnd.x;
-					offMeshConnVerts[vertOffset+4] = vEnd.z;
-					offMeshConnVerts[vertOffset+5] = vEnd.y;
-
-					float rad = 0.0f;
-					if( spawnFlags & SF_OFFMESHCONN_HUMAN )
-						TestAgentRadius( "human", rad );
-					if( spawnFlags & SF_OFFMESHCONN_MEDIUM )
-						TestAgentRadius( "medium", rad );
-					if( spawnFlags & SF_OFFMESHCONN_LARGE )
-						TestAgentRadius( "large", rad );
-					if( spawnFlags & SF_OFFMESHCONN_VERYLARGE )
-						TestAgentRadius( "verylarge", rad );
-					if( spawnFlags & SF_OFFMESHCONN_AIR )
-						TestAgentRadius( "air", rad );
-
-					offMeshConnRad.AddToTail( rad );
-
-					offMeshConnId.AddToTail( 10000 + offMeshConnId.Count() );
-
-					if( spawnFlags & SF_OFFMESHCONN_JUMPEDGE )
-					{
-						offMeshConnArea.AddToTail( SAMPLE_POLYAREA_JUMP );
-						offMeshConnFlags.AddToTail( SAMPLE_POLYFLAGS_JUMP );
-						offMeshConnDir.AddToTail( 0 ); // one direction
-					}
-					else
-					{
-						offMeshConnArea.AddToTail( SAMPLE_POLYAREA_GROUND );
-						offMeshConnFlags.AddToTail( SAMPLE_POLYFLAGS_WALK );
-						offMeshConnDir.AddToTail( 1 ); // bi direction
-					}
-
-					//Msg("Parsed offmesh connection with rad %f, start %f %f %f, end %f %f %f\n", rad,
-					//	vStart.x, vStart.y, vStart.z, vEnd.x, vEnd.y, vEnd.z);
-				}
-				else
-				{
-					Warning("Offmesh connection at (%f %f %f) has no valid target (%s)\n", 
-						pOffMeshConn->GetAbsOrigin().x, pOffMeshConn->GetAbsOrigin().y, pOffMeshConn->GetAbsOrigin().z,
-						pOffMeshConn->m_target != NULL_STRING ? STRING( pOffMeshConn->m_target ) : "<null>");
-				}
-			}
-		}
-
-		// Find next off mesh connection
-		pEnt = gEntList.FindEntityByClassname( pEnt, "recast_offmesh_connection" );
 	}
 
 	params->offMeshConVerts = offMeshConnVerts.Base();
@@ -234,7 +245,4 @@ void MeshProcess::process(struct dtNavMeshCreateParams* params,
 	params->offMeshConFlags = offMeshConnFlags.Base();
 	params->offMeshConUserID = offMeshConnId.Base();
 	params->offMeshConCount = offMeshConnId.Count();
-
-	//DevMsg("Parsed %d offmesh connections\n", offMeshConnId.Count());
-#endif // CLIENT_DLL
 }

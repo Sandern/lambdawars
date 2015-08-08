@@ -350,7 +350,7 @@ dtStatus dtTileCache::removeTile(dtCompressedTileRef ref, unsigned char** data, 
 }
 
 
-dtObstacleRef dtTileCache::addObstacle(const float* pos, const float radius, const float height, dtObstacleRef* result)
+dtObstacleRef dtTileCache::addObstacle(const float* pos, const float radius, const float height, unsigned char areaId, dtObstacleRef* result)
 {
 	if (m_nreqs >= MAX_REQUESTS)
 		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
@@ -372,6 +372,7 @@ dtObstacleRef dtTileCache::addObstacle(const float* pos, const float radius, con
 	dtVcopy(ob->pos, pos);
 	ob->radius = radius;
 	ob->height = height;
+	ob->areaId = areaId;
 	
 	ObstacleRequest* req = &m_reqs[m_nreqs++];
 	memset(req, 0, sizeof(ObstacleRequest));
@@ -385,7 +386,7 @@ dtObstacleRef dtTileCache::addObstacle(const float* pos, const float radius, con
 }
 
 // Add polygon obstacle
-dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, dtObstacleRef* result)
+dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned char areaId, dtObstacleRef* result)
 {
 	if (m_nreqs >= MAX_REQUESTS)
 		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
@@ -412,6 +413,7 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVerti
 	{
 		dtVcopy(&ob->verts[i*3], &convexHullVertices[i*3]);
 	}
+	ob->areaId = areaId;
     
 	ObstacleRequest* req = &m_reqs[m_nreqs++];
 	memset(req, 0, sizeof(ObstacleRequest));
@@ -651,12 +653,12 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 			if (ob->radius != 0)
 			{
 				dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-								ob->pos, ob->radius, ob->height, 0);
+								ob->pos, ob->radius, ob->height, ob->areaId);
 			}
 			else
 			{
 				dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-								ob->verts, ob->nverts, 0);
+								ob->verts, ob->nverts, ob->areaId);
 			}
 #endif
 		}

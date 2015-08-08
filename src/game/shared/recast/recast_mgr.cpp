@@ -295,6 +295,7 @@ bool CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 		return false;
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
+	obstacle.areaId = DetermineAreaID( pEntity, -Vector( radius, radius, radius ), Vector( radius, radius, radius ) );
 
 	bool bSuccess = true;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
@@ -306,7 +307,7 @@ bool CRecastMgr::AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float
 
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
-		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), radius + 1.0f, height );
+		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), radius + 1.0f, height, obstacle.areaId );
 		if( obstacle.obs.Tail().ref == 0 )
 			bSuccess = false;
 	}
@@ -324,11 +325,11 @@ bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 
 	matrix3x4_t transform; // model to world transformation
 	AngleMatrix( QAngle(0, pEntity->GetAbsAngles()[YAW], 0), pEntity->GetAbsOrigin(), transform );
-	//AngleMatrix( pEntity->GetAbsAngles(), pEntity->GetAbsOrigin(), transform );
 
 	Vector convexHull[4];
 
 	NavObstacleArray_t &obstacle = FindOrCreateObstacle( pEntity );
+	obstacle.areaId = DetermineAreaID( pEntity, mins, maxs );
 
 	bool bSuccess = true;
 	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
@@ -353,7 +354,7 @@ bool CRecastMgr::AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, co
 
 		obstacle.obs.AddToTail();
 		obstacle.obs.Tail().meshIndex = i;
-		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), convexHull, 4, height );
+		obstacle.obs.Tail().ref = pMesh->AddTempObstacle( pEntity->GetAbsOrigin(), convexHull, 4, height, obstacle.areaId );
 
 		if( obstacle.obs.Tail().ref == 0 )
 			bSuccess = false;
@@ -387,6 +388,46 @@ bool CRecastMgr::RemoveEntObstacles( CBaseEntity *pEntity )
 		pEntity->SetNavObstacleRef( NAV_OBSTACLE_INVALID_INDEX );
 	}
 	return true;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Determines the area id in such a way potential touching obstacles
+//			don't have the same area id. There are about 16 available area ids.
+//-----------------------------------------------------------------------------
+unsigned char CRecastMgr::DetermineAreaID( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs )
+{
+	unsigned char areaId = SAMPLE_POLYAREA_OBSTACLE_START;
+
+	// Determine areaId
+	bool usedPolyAreas[20];
+	V_memset( usedPolyAreas, 0, sizeof(usedPolyAreas) );
+	CBaseEntity *pEnts[256];
+	int n = UTIL_EntitiesInBox( pEnts, 256, pEntity->GetAbsOrigin() + mins - Vector(64.0f, 64.0f, 64.0f), pEntity->GetAbsOrigin() + maxs + Vector(64.0f, 64.0f, 64.0f), 0 );
+	for( int i = 0; i < n; i++ )
+	{
+		CBaseEntity *pEnt = pEnts[i];
+		if( !pEnt || pEnt == pEntity || pEnt->GetNavObstacleRef() == NAV_OBSTACLE_INVALID_INDEX )
+		{
+			continue;
+		}
+
+		unsigned char otherAreaId = m_Obstacles.Element( pEnt->GetNavObstacleRef() ).areaId;
+
+		// Sanity check, would indicate an uninitialized obstacle if this happens.
+		if( otherAreaId < SAMPLE_POLYAREA_OBSTACLE_START || otherAreaId > SAMPLE_POLYAREA_OBSTACLE_END )
+		{
+			Warning( "Obstacle has valid ref, but invalid area id? %d\n", otherAreaId );
+			continue;
+		}
+		usedPolyAreas[otherAreaId] = true;
+	}
+
+	while( areaId != SAMPLE_POLYAREA_OBSTACLE_END && usedPolyAreas[areaId] )
+	{
+		areaId++;
+	}
+
+	return areaId;
 }
 
 //-----------------------------------------------------------------------------
@@ -536,6 +577,7 @@ CON_COMMAND_F( recast_readd_phys_props, "", FCVAR_CHEAT )
 }
 #endif // CLIENT_DLL
 
+#if 0
 #ifndef CLIENT_DLL
 CON_COMMAND_F( recast_addobstacle, "", FCVAR_CHEAT )
 #else
@@ -621,3 +663,4 @@ CON_COMMAND_F( cl_recast_addobstacle_poly, "", FCVAR_CHEAT )
 	engine->ClientCommand( pPlayer->edict(), "cl_recast_addobstacle_poly %s %s\n", args[1], args[2] );
 #endif // CLIENT_DLL
 }
+#endif // 0

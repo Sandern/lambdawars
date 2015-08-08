@@ -7,7 +7,6 @@
 // TODO: 
 // - Merge common code FindPath and FindPathDistance
 // - Fix case with finding the shortest path to neutral obstacle (might try to go from other side)
-// - Move m_polys and various into class?
 // - Cache paths computed for unit type in same frame?
 //
 // $NoKeywords: $
@@ -28,6 +27,7 @@
 #endif // CLIENT_DLL
 
 #include "recast/recast_tilecache_helpers.h"
+#include "recast/recast_common.h"
 
 #include "detour/DetourNavMesh.h"
 #include "detour/DetourNavMeshBuilder.h"
@@ -55,8 +55,7 @@ static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRecastMesh::CRecastMesh() : 
-	m_keepInterResults(true),
+CRecastMesh::CRecastMesh() :
 	m_triareas(0),
 	m_solid(0),
 	m_chf(0),
@@ -90,8 +89,19 @@ CRecastMesh::CRecastMesh() :
 	m_maxPolysPerTile = 0;
 	m_tileSize = 48;
 
-	m_defaultFilter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED);
+	m_allObstacleFlags = 0;
+	unsigned short curFlag = SAMPLE_POLYFLAGS_OBSTACLE_START;
+	while( curFlag != SAMPLE_POLYFLAGS_OBSTACLE_END )
+	{
+		m_allObstacleFlags |= curFlag;
+		curFlag = curFlag << 1;
+	}
+
+	m_defaultFilter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ (SAMPLE_POLYFLAGS_DISABLED|m_allObstacleFlags));
 	m_defaultFilter.setExcludeFlags(0);
+
+	m_obstacleFilter.setIncludeFlags(m_allObstacleFlags);
+	m_obstacleFilter.setExcludeFlags(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -655,76 +665,68 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 	return DT_FAILURE;
 }
 
+typedef struct originalPolyFlags_t {
+	dtPolyRef ref;
+	unsigned short flags;
+} originalPolyFlags_t;
+
 //-----------------------------------------------------------------------------
 // Purpose: 
-// TODO: Unfinished, maybe not use it at all.
 //-----------------------------------------------------------------------------
-dtStatus CRecastMesh::DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPolyRef > &endRefs, float spos[3], float epos[3], pathfind_resultdata_t &findpathData )
+static void markObstaclePolygonsWalkableNavmesh(dtNavMesh* nav, NavmeshFlags* flags, dtPolyRef start, unsigned short obstacleFlag, CUtlVector< originalPolyFlags_t > &enabledPolys)
 {
-	VPROF_BUDGET( "CRecastMesh::DoFindPath", "RecastNav" );
-
 	dtStatus status;
 
-	if( recast_findpath_debug.GetBool() )
-	{
-		NDebugOverlay::Box( Vector(spos[0], spos[2], spos[1]), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 255, 0, 255, 5.0f);
-		NDebugOverlay::Box( Vector(epos[0], epos[2], epos[1]), -Vector(8, 8, 8), Vector(8, 8, 8), 0, 0, 255, 255, 5.0f);
-	}
+	// If already visited, skip.
+	if (flags->getFlags(start))
+		return;
+		
+	PolyRefArray openList;
+	openList.push(start);
 
-	pathfind_resultdata_t curFindpathData;
-	float fBestDistance = MAX_COORD_FLOAT;
-
-	for( int i = 0; i < endRefs.Count(); i++ )
+	while (openList.size())
 	{
-		status = m_navQuery->findPath( startRef, endRefs[i], spos, epos, &m_defaultFilter, curFindpathData.polys, &curFindpathData.npolys, RECASTMESH_MAX_POLYS );
+		const dtPolyRef ref = openList.pop();
+
+		unsigned short polyFlags = 0;
+		status = nav->getPolyFlags( ref, &polyFlags );
 		if( !dtStatusSucceed( status ) )
 		{
-			return status;
+			continue;
 		}
 
-		if( curFindpathData.npolys )
+		// Only mark the polygons of the obstacle
+		if( (polyFlags & obstacleFlag) == 0 )
 		{
-			// Make sure end pos is always on a polygon
-			dtVcopy(curFindpathData.adjustedEndPos, epos);
-			status = m_navQuery->closestPointOnPoly(curFindpathData.polys[curFindpathData.npolys-1], epos, curFindpathData.adjustedEndPos, 0);
-			if( !dtStatusSucceed( status ) )
-			{
-				return status;
-			}
+			continue;
+		}
 
-			if( recast_findpath_debug.GetBool() )
-			{
-				NDebugOverlay::Box( Vector(curFindpathData.adjustedEndPos[0], curFindpathData.adjustedEndPos[2], curFindpathData.adjustedEndPos[1] + 16.0f), 
-					-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
-			}
-				
-			status = m_navQuery->findStraightPath(spos, curFindpathData.adjustedEndPos, curFindpathData.polys, curFindpathData.npolys,
-											curFindpathData.straightPath, curFindpathData.straightPathFlags,
-											curFindpathData.straightPathPolys, &curFindpathData.nstraightPath, 
-										RECASTMESH_MAX_POLYS, curFindpathData.straightPathOptions);
-			if( !dtStatusSucceed( status ) )
-			{
-				return status;
-			}
+		// Mark walkable and remember
+		enabledPolys.AddToTail();
+		enabledPolys.Tail().ref = ref;
+		enabledPolys.Tail().flags = polyFlags;
 
-			float fPathDistance = 0;
-			Vector vPrev = Vector( epos[0], epos[2], epos[1] );
-			for (int i = curFindpathData.nstraightPath - 1; i >= 0; i--)
-			{
-				Vector pos( curFindpathData.straightPath[i*3], curFindpathData.straightPath[i*3+2], curFindpathData.straightPath[i*3+1] );
-				fPathDistance += pos.DistTo(vPrev);
-				vPrev = pos;
-			}
+		nav->setPolyFlags( ref, (polyFlags | SAMPLE_POLYFLAGS_WALK) );
 
-			if( fPathDistance < fBestDistance )
-			{
-				V_memcpy( &findpathData, &curFindpathData, sizeof( pathfind_resultdata_t ) );
-				fBestDistance = fPathDistance;
-			}
+		// Get current poly and tile.
+		// The API input has been cheked already, skip checking internal data.
+		const dtMeshTile* tile = 0;
+		const dtPoly* poly = 0;
+		nav->getTileAndPolyByRefUnsafe(ref, &tile, &poly);
+
+		// Visit linked polygons.
+		for (unsigned int i = poly->firstLink; i != DT_NULL_LINK; i = tile->links[i].next)
+		{
+			const dtPolyRef neiRef = tile->links[i].ref;
+			// Skip invalid and already visited.
+			if (!neiRef || flags->getFlags(neiRef))
+				continue;
+			// Mark as visited
+			flags->setFlags(neiRef, 1);
+			// Visit neighbours
+			openList.push(neiRef);
 		}
 	}
-
-	return fBestDistance != MAX_COORD_FLOAT ? DT_SUCCESS : DT_FAILURE;
 }
 
 #ifndef CLIENT_DLL
@@ -743,7 +745,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	dtStatus status;
 
 	dtPolyRef startRef;
-	CUtlVector< dtPolyRef > endRefs;
+	dtPolyRef endRef;
 
 	float spos[3];
 	spos[0] = vStart[0];
@@ -775,134 +777,53 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 		return NULL;
 	}
 
+	CUtlVector< originalPolyFlags_t > enabledPolys;
 	bool bHasTargetAndIsObstacle = pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX;
 
 	// Determine end point and area
-	// TODO: Special case for targets which act as obstacle on the nav mesh. For this we need to query
-	// the surrounding polygons and test for each found poly and pick the best route.
-	// Problem: hard to query the right polygons around the obstacle (since you will pick the wrong ones as well).
-	// For now: pick single polygon in direction of agent
+	// TODO: Special case for targets which act as obstacle on the nav mesh. These have a special flag to identify their polygon. We temporary mark
+	// these polygons of the obstacle as walkable. Obstacles next to this obstacle have different flags, so they all have their own polygons.
 	float epos[3];
+	epos[0] = vEnd[0];
+	epos[1] = vEnd[2];
+	epos[2] = vEnd[1];
+
+	// Find the end area
+	status = m_navQuery->findNearestPoly(epos, polyPickExt, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
+
+	dtVcopy(m_pathfindData.adjustedEndPos, epos);
+	status = m_navQuery->closestPointOnPoly(endRef, epos, m_pathfindData.adjustedEndPos, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
+
+	if( recast_findpath_debug.GetBool() )
+	{
+		NDebugOverlay::Box( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1] + 16.0f), 
+			-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
+	}
+
 	if( bHasTargetAndIsObstacle )
 	{
-#if 0
-		epos[0] = vEnd[0];
-		epos[1] = vEnd[2];
-		epos[2] = vEnd[1];
-
-		dtPolyRef polys[RECASTMESH_MAX_POLYS];
-		int npolys = 0;
-
-		float bloat = recast_target_querytiles_bloat.GetFloat() + GetAgentRadius();
-
-#if 0
-		dtObstacleRef ref = RecastMgr().GetObstacleRefForMesh( pTarget, RecastMgr().FindMeshIndex( GetName() ) );
-
-		float mins[3];
-		float maxs[3];
-		m_tileCache->getObstacleBounds( m_tileCache->getObstacleByRef( ref ), mins, maxs );
-#endif // 0
-
-		float center[3];
-		center[0] = pTarget->WorldSpaceCenter().x;
-		center[2] = pTarget->WorldSpaceCenter().y;
-		center[1] = pTarget->WorldSpaceCenter().z;
-
-		float extents[3];
-		extents[0] = pTarget->CollisionProp()->BoundingRadius2D() + bloat;
-		extents[1] = pTarget->CollisionProp()->OBBSize().z / 2.0f;
-		extents[2] = pTarget->CollisionProp()->BoundingRadius2D() + bloat;
-
-		NDebugOverlay::Box( pTarget->WorldSpaceCenter(), 
-			-Vector(extents[0], extents[2], extents[1]),
-			Vector(extents[0], extents[2], extents[1]),
-			0, 255, 0, 150, 5.0f );
-
-		status = m_navQuery->queryPolygons( center, extents, &m_defaultFilter, polys, &npolys, RECASTMESH_MAX_POLYS );
+		unsigned short obstacleFlag = 0;
+		status = m_navMesh->getPolyFlags( endRef, &obstacleFlag );
 		if( dtStatusSucceed( status ) )
 		{
-#if 0
-			float point[3];
-			for( int i = 0; i < npolys; i++ )
-			{
-				status = m_navQuery->closestPointOnPoly( polys[i], epos, point,  NULL/*, &posOverPoly*/ );
-				if( dtStatusSucceed( status ) )
-				{
-					
-				}
-			}
-#endif // 0
-
-			endRefs.EnsureCapacity( npolys );
-			endRefs.CopyArray( polys, npolys );
-			Msg("Found %d polys surrounding target\n", npolys);
-		}
-		else
-#endif // 0
-		{
-			Vector vDir = vStart - vEnd;
-			VectorNormalize( vDir );
-			Vector vModifiedEnd = vEnd + vDir * pTarget->CollisionProp()->BoundingRadius2D();
-
-			epos[0] = vModifiedEnd[0];
-			epos[1] = vModifiedEnd[2];
-			epos[2] = vModifiedEnd[1];
-		}
-	}
-	else
-	{
-		epos[0] = vEnd[0];
-		epos[1] = vEnd[2];
-		epos[2] = vEnd[1];
-	}
-
-	if( endRefs.Count() == 0 )
-	{
-		endRefs.EnsureCapacity( 1 );
-		// Find the end area
-		status = m_navQuery->findNearestPoly(epos, polyPickExt, &m_defaultFilter, endRefs.Base(), 0);
-		if( !dtStatusSucceed( status ) )
-		{
-			return NULL;
+			// Find the obstacle flag
+			obstacleFlag &= m_allObstacleFlags;
+			// Make this ref and all linked refs with this flag walkable
+			NavmeshFlags *flags = new NavmeshFlags;
+			flags->init( m_navMesh );
+			markObstaclePolygonsWalkableNavmesh( m_navMesh, flags, endRef, obstacleFlag, enabledPolys );
 		}
 	}
 
-#if 0
-	if( endRefs.Count() > 1 )
-	{
-		status = DoFindPathToObstacle(startRef, endRefs, spos, epos, m_pathfindData );
-	}
-	else
-#endif // 0
-	{
-		// Make sure end pos is always on a polygon, unless target is an obstacle
-		// In this case we expect to move to an area with no polygon
-		// Melee units need to get close for example.
-		// Navigator code will take care of not running into the unit needlessly.
-		if( bHasTargetAndIsObstacle )
-		{
-			m_pathfindData.adjustedEndPos[0] = vEnd[0];
-			m_pathfindData.adjustedEndPos[1] = vEnd[2];
-			m_pathfindData.adjustedEndPos[2] = vEnd[1];
-		}
-		else
-		{
-			dtVcopy(m_pathfindData.adjustedEndPos, epos);
-			status = m_navQuery->closestPointOnPoly(endRefs[0], epos, m_pathfindData.adjustedEndPos, 0);
-			if( !dtStatusSucceed( status ) )
-			{
-				return NULL;
-			}
-		}
-
-		if( recast_findpath_debug.GetBool() )
-		{
-			NDebugOverlay::Box( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1] + 16.0f), 
-				-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
-		}
-
-		status = DoFindPath(startRef, endRefs[0], spos, m_pathfindData.adjustedEndPos, m_pathfindData );
-	}
+	status = DoFindPath(startRef, endRef, spos, m_pathfindData.adjustedEndPos, m_pathfindData );
 
 	if( dtStatusSucceed( status ) )
 	{
@@ -931,6 +852,11 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 			}
 			pResultPath = pNewPath;
 		}
+	}
+
+	for( int i = 0; i < enabledPolys.Count(); i++ )
+	{
+		m_navMesh->setPolyFlags( enabledPolys[i].ref, enabledPolys[i].flags );
 	}
 
 	return pResultPath;
@@ -1066,14 +992,14 @@ bool CRecastMesh::TestRoute( const Vector &vStart, const Vector &vEnd )
 //-----------------------------------------------------------------------------
 // Purpose: Adds a temporary obstacle to the navigation mesh (radius version)
 //-----------------------------------------------------------------------------
-dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height )
+dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, float height, unsigned char areaId )
 {
 	if( !IsLoaded() )
 		return 0;
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
 
 	dtObstacleRef result;
-	dtStatus status = m_tileCache->addObstacle( pos, radius, height, &result );
+	dtStatus status = m_tileCache->addObstacle( pos, radius, height, areaId, &result );
 	if( !dtStatusSucceed( status ) )
 	{
 		if( status & DT_BUFFER_TOO_SMALL )
@@ -1092,11 +1018,12 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, float radius, fl
 //-----------------------------------------------------------------------------
 // Purpose: Adds a temporary obstacle to the navigation mesh (convex hull version)
 //-----------------------------------------------------------------------------
-dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height )
+dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height, unsigned char areaId )
 {
 	if( !IsLoaded() )
 		return 0;
 
+	dtStatus status;
 	float pos[3] = {vPos.x, vPos.z, vPos.y};
 
 	float *verts = (float *)stackalloc( numConvexHull * 3 * sizeof( float ) );
@@ -1108,7 +1035,7 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *co
 	}
 
 	dtObstacleRef result;
-	dtStatus status = m_tileCache->addObstacle( pos, verts, numConvexHull, height, &result );
+	status = m_tileCache->addObstacle( pos, verts, numConvexHull, height, areaId, &result );
 	if( !dtStatusSucceed( status ) )
 	{
 		if( status & DT_BUFFER_TOO_SMALL )

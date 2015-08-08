@@ -5008,6 +5008,9 @@
     <ClInclude Include="..\..\public\filesystem_init.h">
       <Filter>Source Files\Python\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="..\shared\recast\recast_common.h">
+      <Filter>Source Files\Recast</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\lib\public\bitmap.lib">

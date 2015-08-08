@@ -47,6 +47,7 @@ struct LinearAllocator : public dtTileCacheAlloc
 	virtual void free(void* /*ptr*/);
 };
 
+class COffMeshConnection;
 
 struct MeshProcess : public dtTileCacheMeshProcess
 {
@@ -54,6 +55,13 @@ struct MeshProcess : public dtTileCacheMeshProcess
 
 	virtual void process(struct dtNavMeshCreateParams* params,
 						 unsigned char* polyAreas, unsigned short* polyFlags);
+
+private:
+	void parseAll();
+
+#ifndef CLIENT_DLL
+	void parseConnection( COffMeshConnection *pOffMeshConn );
+#endif // CLIENT_DLL
 
 private:
 	int meshFlags;

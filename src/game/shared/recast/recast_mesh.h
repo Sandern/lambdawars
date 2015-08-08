@@ -37,20 +37,26 @@ enum SamplePartitionType
 enum SamplePolyAreas
 {
 	SAMPLE_POLYAREA_GROUND,
-	SAMPLE_POLYAREA_WATER,
-	SAMPLE_POLYAREA_ROAD,
-	SAMPLE_POLYAREA_DOOR,
-	SAMPLE_POLYAREA_GRASS,
+	//SAMPLE_POLYAREA_WATER,
+	//SAMPLE_POLYAREA_ROAD,
+	//SAMPLE_POLYAREA_DOOR,
+	//SAMPLE_POLYAREA_GRASS,
 	SAMPLE_POLYAREA_JUMP,
+	// Remainder are obstacle areas, up to the last valid area id 63
+	// We use multiple ids so no neighboring obstacle gets the same id.
+	SAMPLE_POLYAREA_OBSTACLE_START,
+	SAMPLE_POLYAREA_OBSTACLE_END = SAMPLE_POLYAREA_OBSTACLE_START + 14
 };
 
 enum SamplePolyFlags
 {
 	SAMPLE_POLYFLAGS_WALK		= 0x01,		// Ability to walk (ground, grass, road)
-	SAMPLE_POLYFLAGS_SWIM		= 0x02,		// Ability to swim (water).
-	SAMPLE_POLYFLAGS_DOOR		= 0x04,		// Ability to move through doors.
-	SAMPLE_POLYFLAGS_JUMP		= 0x08,		// Ability to jump.
-	SAMPLE_POLYFLAGS_DISABLED	= 0x10,		// Disabled polygon
+	//SAMPLE_POLYFLAGS_SWIM		= 0x02,		// Ability to swim (water).
+	//SAMPLE_POLYFLAGS_DOOR		= 0x04,		// Ability to move through doors.
+	SAMPLE_POLYFLAGS_JUMP		= 0x02,		// Ability to jump.
+	SAMPLE_POLYFLAGS_DISABLED	= 0x04,		// Disabled polygon
+	SAMPLE_POLYFLAGS_OBSTACLE_START = 0x10,
+	SAMPLE_POLYFLAGS_OBSTACLE_END = 0x8000,
 	SAMPLE_POLYFLAGS_ALL		= 0xffff	// All abilities.
 };
 
@@ -108,8 +114,8 @@ public:
 	float FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget = NULL, float fBeneathLimit = 120.0f );
 
 	// Obstacle management
-	dtObstacleRef AddTempObstacle( const Vector &vPos, float radius, float height );
-	dtObstacleRef AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height );
+	dtObstacleRef AddTempObstacle( const Vector &vPos, float radius, float height, unsigned char areaId );
+	dtObstacleRef AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height, unsigned char areaId );
 	bool RemoveObstacle( const dtObstacleRef ref );
 
 	// Accessors
@@ -132,6 +138,8 @@ public:
 private:
 	// Result data for path finding
 	typedef struct pathfind_resultdata_t {
+		pathfind_resultdata_t() : npolys(0), straightPathOptions(0), nstraightPath(0) {}
+
 		dtPolyRef polys[RECASTMESH_MAX_POLYS];
 		int npolys;
 
@@ -146,11 +154,8 @@ private:
 	} pathfind_resultdata_t;
 
 	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
-	dtStatus DoFindPathToObstacle( dtPolyRef startRef, CUtlVector< dtPolyRef > &endRefs, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
 
 protected:
-	bool m_keepInterResults;
-
 	float m_cellSize;
 	float m_cellHeight;
 	float m_agentHeight;
@@ -176,6 +181,8 @@ protected:
 	int m_cacheLayerCount;
 	int m_cacheBuildMemUsage;
 
+	unsigned short m_allObstacleFlags;
+
 private:
 	CUtlString m_Name;
 	
@@ -198,6 +205,7 @@ private:
 	dtNavMeshQuery* m_navQuery;
 
 	dtQueryFilter m_defaultFilter;
+	dtQueryFilter m_obstacleFilter;
 	pathfind_resultdata_t m_pathfindData;
 };
 
