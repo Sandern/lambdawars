@@ -468,7 +468,7 @@ BSPHeader_t PyGetMapHeader( const char *mapname )
 {
 	FileHandle_t f = filesystem->Open(mapname, "rb");
 	if ( f == FILESYSTEM_INVALID_HANDLE ) {
-		PyErr_SetString(PyExc_Exception, "No such map" );
+		PyErr_SetString(PyExc_ValueError, "No such map" );
 		throw boost::python::error_already_set(); 
 		return BSPHeader_t();
 	}
@@ -476,7 +476,7 @@ BSPHeader_t PyGetMapHeader( const char *mapname )
 	if( fileSize < sizeof(BSPHeader_t) )
 	{
 		filesystem->Close(f);
-		PyErr_SetString(PyExc_Exception, "Invalid map" );
+		PyErr_SetString(PyExc_ValueError, "Invalid map" );
 		throw boost::python::error_already_set(); 
 		return BSPHeader_t();
 	}
@@ -485,7 +485,7 @@ BSPHeader_t PyGetMapHeader( const char *mapname )
 	filesystem->Close(f);
 	if( header.m_nVersion != BSPVERSION)
 	{
-		PyErr_SetString(PyExc_Exception, "Invalid bsp version" );
+		PyErr_SetString(PyExc_ValueError, "Invalid bsp version" );
 		throw boost::python::error_already_set(); 
 		return header;
 	}
