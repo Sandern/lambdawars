@@ -28,9 +28,6 @@ Vector RandomNavAreaPosition( CBaseEntity *unit = NULL );
 Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBaseEntity *unit = NULL );
 
 // Nav mesh editing
-int CreateNavArea( const Vector &corner, const Vector &otherCorner );
-int CreateNavAreaByCorners( const Vector &nwcorner, const Vector &necorner, const Vector &secorner, const Vector &swcorner );
-void DestroyNavArea( unsigned int id );
 void DestroyAllNavAreas();
 
 int GetNavAreaAt( const Vector &pos, float beneathlimit = 120.0f );

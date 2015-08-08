@@ -72,47 +72,6 @@ Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CreateNavArea( const Vector &corner, const Vector &otherCorner )
-{
-	return -1;
-#ifndef CLIENT_DLL
-	//return TheNavMesh->CreateNavArea( corner, otherCorner );
-#else
-	return -1;
-#endif // CLIENT_DLL
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-int CreateNavAreaByCorners( const Vector &nwCorner, const Vector &neCorner, const Vector &seCorner, const Vector &swCorner )
-{
-	return -1;
-#ifndef CLIENT_DLL
-	//return TheNavMesh->CreateNavArea( nwCorner, neCorner, seCorner, swCorner );
-#else
-	return -1;
-#endif // CLIENT_DLL
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void DestroyNavArea( unsigned int id )
-{
-#if 0 // TODO
-	CNavArea *area = TheNavMesh->GetNavAreaByID( id );
-	if( area )
-	{
-		TheNavAreas.FindAndRemove( area );
-		TheNavMesh->DestroyArea( area );
-	}
-#endif // 0
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 void DestroyAllNavAreas()
 {
 	RecastMgr().Reset();

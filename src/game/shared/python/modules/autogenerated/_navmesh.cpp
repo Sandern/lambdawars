@@ -28,28 +28,6 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::CreateNavArea
-    
-        typedef int ( *CreateNavArea_function_type )( ::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "CreateNavArea"
-            , CreateNavArea_function_type( &::CreateNavArea )
-            , ( bp::arg("corner"), bp::arg("otherCorner") ) );
-    
-    }
-
-    { //::CreateNavAreaByCorners
-    
-        typedef int ( *CreateNavAreaByCorners_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "CreateNavAreaByCorners"
-            , CreateNavAreaByCorners_function_type( &::CreateNavAreaByCorners )
-            , ( bp::arg("nwcorner"), bp::arg("necorner"), bp::arg("secorner"), bp::arg("swcorner") ) );
-    
-    }
-
     { //::DestroyAllNavAreas
     
         typedef void ( *DestroyAllNavAreas_function_type )(  );
@@ -79,17 +57,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "DestroyHidingSpotByID"
             , DestroyHidingSpotByID_function_type( &::DestroyHidingSpotByID )
             , ( bp::arg("pos"), bp::arg("hidespotid") ) );
-    
-    }
-
-    { //::DestroyNavArea
-    
-        typedef void ( *DestroyNavArea_function_type )( unsigned int );
-        
-        bp::def( 
-            "DestroyNavArea"
-            , DestroyNavArea_function_type( &::DestroyNavArea )
-            , ( bp::arg("id") ) );
     
     }
 
@@ -207,28 +174,6 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::CreateNavArea
-    
-        typedef int ( *CreateNavArea_function_type )( ::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "CreateNavArea"
-            , CreateNavArea_function_type( &::CreateNavArea )
-            , ( bp::arg("corner"), bp::arg("otherCorner") ) );
-    
-    }
-
-    { //::CreateNavAreaByCorners
-    
-        typedef int ( *CreateNavAreaByCorners_function_type )( ::Vector const &,::Vector const &,::Vector const &,::Vector const & );
-        
-        bp::def( 
-            "CreateNavAreaByCorners"
-            , CreateNavAreaByCorners_function_type( &::CreateNavAreaByCorners )
-            , ( bp::arg("nwcorner"), bp::arg("necorner"), bp::arg("secorner"), bp::arg("swcorner") ) );
-    
-    }
-
     { //::DestroyAllNavAreas
     
         typedef void ( *DestroyAllNavAreas_function_type )(  );
@@ -258,17 +203,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "DestroyHidingSpotByID"
             , DestroyHidingSpotByID_function_type( &::DestroyHidingSpotByID )
             , ( bp::arg("pos"), bp::arg("hidespotid") ) );
-    
-    }
-
-    { //::DestroyNavArea
-    
-        typedef void ( *DestroyNavArea_function_type )( unsigned int );
-        
-        bp::def( 
-            "DestroyNavArea"
-            , DestroyNavArea_function_type( &::DestroyNavArea )
-            , ( bp::arg("id") ) );
     
     }
 
