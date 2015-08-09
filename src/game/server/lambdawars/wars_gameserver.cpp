@@ -119,9 +119,9 @@ void CWarsGameServer::ProcessMessages()
 						m_pLocalPlayerGameData = pGameData->MakeCopy();
 
 						// Tell lobby owner the game is accepted and players can connect to the server
-						//WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
-						//pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
-						//pMessageData->steamIDRemote = messageData->steamIDRemote;
+						WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+						pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+						pMessageData->steamIDRemote = messageData->steamIDRemote;
 
 						//g_ServerGameDLL.ApplyGameSettings( pGameData );
 
