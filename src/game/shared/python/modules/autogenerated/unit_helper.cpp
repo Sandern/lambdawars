@@ -2369,6 +2369,16 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , GetStopDistance_function_type( &::UnitVPhysicsLocomotion::GetStopDistance ) );
         
         }
+        { //::UnitVPhysicsLocomotion::Move
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*Move_function_type )( float,::UnitBaseMoveCommand & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "Move"
+                , Move_function_type( &::UnitVPhysicsLocomotion::Move )
+                , ( bp::arg("interval"), bp::arg("move_command") ) );
+        
+        }
         { //::UnitVPhysicsLocomotion::MoveFacing
         
             typedef void ( ::UnitVPhysicsLocomotion::*MoveFacing_function_type )(  ) ;
@@ -6555,6 +6565,16 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitVPhysicsLocomotion_exposer.def( 
                 "GetStopDistance"
                 , GetStopDistance_function_type( &::UnitVPhysicsLocomotion::GetStopDistance ) );
+        
+        }
+        { //::UnitVPhysicsLocomotion::Move
+        
+            typedef void ( ::UnitVPhysicsLocomotion::*Move_function_type )( float,::UnitBaseMoveCommand & ) ;
+            
+            UnitVPhysicsLocomotion_exposer.def( 
+                "Move"
+                , Move_function_type( &::UnitVPhysicsLocomotion::Move )
+                , ( bp::arg("interval"), bp::arg("move_command") ) );
         
         }
         { //::UnitVPhysicsLocomotion::MoveFacing

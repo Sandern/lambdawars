@@ -26,6 +26,7 @@ public:
 
 	virtual void SetupMove( UnitBaseMoveCommand &mv );
 	virtual void FinishMove( UnitBaseMoveCommand &mv );
+	virtual void Move( float interval, UnitBaseMoveCommand &move_command );
 
 	virtual void	FullWalkMove();
 	virtual float	GetStopDistance();

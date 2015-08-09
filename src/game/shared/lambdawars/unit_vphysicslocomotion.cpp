@@ -78,6 +78,23 @@ void UnitVPhysicsLocomotion::FinishMove( UnitBaseMoveCommand &mv )
 }
 
 //-----------------------------------------------------------------------------
+// Main move function
+//-----------------------------------------------------------------------------
+void UnitVPhysicsLocomotion::Move( float interval, UnitBaseMoveCommand &move_command )
+{
+	VPROF_BUDGET( "UnitBaseLocomotion::Move", VPROF_BUDGETGROUP_UNITS );
+
+	mv = &move_command;
+
+	mv->interval = interval;
+	mv->outwishvel.Init();
+
+	Friction();
+	FullWalkMove();
+	MoveFacing();
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 void UnitVPhysicsLocomotion::FullWalkMove( )
@@ -288,7 +305,9 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 
 		AngularImpulse impulse = WorldToLocalRotation( SetupMatrixAngles(GetLocalAngles()), vecRight, -mv->velocity.Length() );
 
-		m_vecAngular = m_vecAngular + (impulse - m_vecAngular) * mv->interval;
+		//m_vecAngular = m_vecAngular + (impulse - m_vecAngular) * mv->interval;
+		//m_vecAngular = impulse;
+		m_vecAngular = 0.2f * m_vecAngular + 0.8f * impulse;
 
 		pPhysObj->SetVelocity( NULL, &m_vecAngular );
 	}
