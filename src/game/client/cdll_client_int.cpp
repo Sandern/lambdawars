@@ -149,6 +149,7 @@
 // =======================================
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
+#include "srcpy_client_class.h"
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions
@@ -779,6 +780,11 @@ void ProcessWarsMessages()
 					}
 #ifdef ENABLE_PYTHON
 					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
+#endif // ENABLE_PYTHON
+					break;
+				case k_EMsgClient_PyEntityClasses:
+#ifdef ENABLE_PYTHON
+					WarsNet_ReceiveEntityClasses( messageData->buf );
 #endif // ENABLE_PYTHON
 					break;
 				case k_EMsgClient_PyEntityUpdate:

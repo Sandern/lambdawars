@@ -9,6 +9,9 @@
 #include "srcpy_server_class.h"
 #include "srcpy.h"
 
+#include "wars_network.h"
+#include "wars/iwars_extension.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -263,6 +266,9 @@ void FullClientUpdatePyNetworkCls( CBasePlayer *pPlayer )
 	FullClientUpdatePyNetworkClsByFilter(filter);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Sends Python network class setup through user messages
+//-----------------------------------------------------------------------------
 void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 {
 	if( !SrcPySystem()->IsPythonRunning() )
@@ -290,6 +296,10 @@ void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 	}
 }
 
+#if 0
+//-----------------------------------------------------------------------------
+// Purpose: Sends Python network class setup through commands
+//-----------------------------------------------------------------------------
 void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 {
 	if( !SrcPySystem()->IsPythonRunning() )
@@ -316,6 +326,71 @@ void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 
 		p = p->m_pPyNext;
 	}
+}
+#endif //0
+
+//-----------------------------------------------------------------------------
+// Purpose: Sends Python network class setup through Steam p2p/loopback
+//			TODO: Test with Steam P2P
+//-----------------------------------------------------------------------------
+void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
+{
+	if( !SrcPySystem()->IsPythonRunning() )
+	{
+		DevMsg("FullClientUpdatePyNetworkClsByEdict: Python is not running\n");
+		return;
+	}
+
+	Assert(g_SetupNetworkTablesOnHold == false);
+
+	// Count
+	int nCount = 0;
+	PyServerClass *p = g_pPyServerClassHead;
+	while( p )
+	{
+		if( p->m_bFree ) {
+			p = p->m_pPyNext;
+			continue;
+		}
+
+		nCount++;
+		p = p->m_pPyNext;
+	}
+
+	if( !nCount )
+		return;
+
+	CUtlBuffer messageData;
+	WarsEntityClassesMessage_t baseMessageData;
+	baseMessageData.type = k_EMsgClient_PyEntityClasses;
+
+	messageData.Put( &baseMessageData, sizeof( baseMessageData ) );
+
+	messageData.Put( &nCount, sizeof( nCount ) );
+
+	p = g_pPyServerClassHead;
+	while( p )
+	{
+		if( p->m_bFree ) {
+			p = p->m_pPyNext;
+			continue;
+		}
+
+		messageData.Put( &p->m_iType, sizeof( p->m_iType ) );
+		int lenClientClass = V_strlen( p->m_pNetworkName );
+		messageData.Put( &lenClientClass, sizeof( lenClientClass ) );
+		messageData.Put( p->m_pNetworkName, lenClientClass );
+
+		int lenNetworkName = V_strlen( p->m_pNetworkedClass->m_pNetworkName );
+		messageData.Put( &lenNetworkName, sizeof( lenNetworkName ) );
+		messageData.Put( p->m_pNetworkedClass->m_pNetworkName, lenNetworkName );
+
+		p = p->m_pPyNext;
+	}
+
+	// Always loopback for now
+	WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+	pMessageData->buf.Put( messageData.Base(), messageData.TellMaxPut() );
 }
 
 CUtlVector<EntityInfoOnHold> g_SetupNetworkTablesOnHoldList;

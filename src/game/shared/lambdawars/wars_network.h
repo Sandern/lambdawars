@@ -45,6 +45,13 @@ typedef struct WarsEntityUpdateMessage_t : public WarsMessage_t
 	long iEncodedEHandle;
 } WarsEntityUpdateMessage_t;
 
+typedef struct WarsEntityClassesMessage_t : public WarsMessage_t
+{
+	WarsEntityClassesMessage_t() {}
+
+	long iEncodedEHandle;
+} WarsEntityClassesMessage_t;
+
 #ifndef CLIENT_DLL
 // Entity data updates
 void WarsNet_StartEntityUpdate( edict_t *pClientEdict, EHANDLE ent );

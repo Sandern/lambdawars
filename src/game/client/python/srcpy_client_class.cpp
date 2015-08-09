@@ -33,6 +33,7 @@
 #include "c_wars_weapon.h"
 #include "wars_func_unit.h"
 #include "wars_mapboundary.h"
+#include "wars_network.h"
 #endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -493,6 +494,82 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	}
 }
 
+void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
+{
+	if( data.TellMaxPut() <  sizeof(WarsEntityClassesMessage_t) )
+	{
+		Warning("Received invalid WarsEntityUpdateMessage!\n");
+		return;
+	}
+
+	WarsEntityClassesMessage_t *entityClassesMsg = (WarsEntityClassesMessage_t *)data.Base();
+
+	data.SeekGet( CUtlBuffer::SEEK_HEAD, sizeof(WarsEntityClassesMessage_t) );
+
+	int nCount = data.GetInt();
+
+	for( int i = 0; i < nCount; i++ )
+	{
+		int iType = data.GetInt();
+
+		int lenClientClass = data.GetInt();
+		char *clientClass = (char *)stackalloc( lenClientClass + 1 );
+		data.Get( clientClass, lenClientClass );
+		clientClass[lenClientClass] = 0;
+
+		int lenNetworkName = data.GetInt();
+		char *networkName = (char *)stackalloc( lenNetworkName + 1 );
+		data.Get( networkName, lenNetworkName );
+		networkName[lenNetworkName] = 0;
+
+		DbgStrPyMsg( "WarsNet_ReceiveEntityClasses: Registering Python network class message %d %s %s\n", iType, clientClass, networkName );
+
+		// Get module path
+		const char *pch = V_strrchr( networkName, '.' );
+		if( !pch )
+		{
+			Warning( "Invalid python class name %s\n", networkName );
+			return;
+		}
+		int n = pch - networkName + 1;
+
+		char modulePath[PYNETCLS_BUFSIZE];
+		V_strncpy( modulePath, networkName, n );
+
+		// Make sure the client class is imported
+		SrcPySystem()->Import( modulePath );
+
+		// Read which client class we are modifying
+		PyClientClassBase *p = FindPyClientClass( clientClass );
+		if( !p )
+		{
+			Warning( "WarsNet_ReceiveEntityClasses: Invalid networked class %s\n", clientClass );
+			return;
+		}
+	
+		// Set type
+		p->SetType( iType );
+		SetupClientClassRecv( p, iType );
+
+		// Read network class name
+		V_strncpy( p->m_strPyNetworkedClassName, networkName, sizeof( p->m_strPyNetworkedClassName ) );
+
+		// Attach if a network class exists
+		unsigned short lookup = m_NetworkClassDatabase.Find( networkName );
+		if ( lookup != m_NetworkClassDatabase.InvalidIndex() )
+		{
+			m_NetworkClassDatabase.Element(lookup)->AttachClientClass( p );
+		}
+		else
+		{
+			Warning( "WarsNet_ReceiveEntityClasses: Invalid networked class %s\n", networkName );
+		}
+
+		stackfree( clientClass );
+		stackfree( networkName );
+	}
+}
+
 // register message handler once
 void HookPyNetworkCls() 
 {
@@ -503,6 +580,7 @@ void HookPyNetworkCls()
 	}
 }
 
+#if 0
 CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 {
 	int iType = atoi(args[1]);
@@ -546,6 +624,7 @@ CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 		Warning( "register_py_class: Invalid networked class %s\n", args[3] );
 	}
 }
+#endif // 0
 
 // Debugging
 CON_COMMAND_F( print_py_clientclass_list, "Print client class list", 0 )

@@ -67,6 +67,7 @@ void PyResetAllNetworkTables();
 IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_type, int entnum, int serialNum);
 void InitAllPythonEntities();
 void CheckEntities(PyClientClassBase *pCC, boost::python::object pyClass );
+void WarsNet_ReceiveEntityClasses( CUtlBuffer &data );
 
 // For each available free client class we need a unique class because of the static data
 // No way around this since stuff is called from the engine

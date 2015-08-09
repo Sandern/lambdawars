@@ -65,6 +65,7 @@ public:
 void FullClientUpdatePyNetworkCls( CBasePlayer *pPlayer );
 void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter );
 void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict );
+void FullClientUpdatePyNetworkClsByEdict2( edict_t *pEdict );
 
 typedef struct EntityInfoOnHold {
 	CBaseEntity *ent;
