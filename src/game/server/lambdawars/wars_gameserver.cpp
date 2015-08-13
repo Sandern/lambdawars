@@ -118,13 +118,7 @@ void CWarsGameServer::ProcessMessages()
 
 						m_pLocalPlayerGameData = pGameData->MakeCopy();
 
-						// Tell lobby owner the game is accepted and players can connect to the server
-						WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
-						pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
-						pMessageData->steamIDRemote = messageData->steamIDRemote;
-
-						//g_ServerGameDLL.ApplyGameSettings( pGameData );
-
+						// Note: we don't send the accept message yet, because we have no reservation ticket yet.
 						SetState( k_EGameServer_StartingGame );
 						m_LobbyPlayerRequestingGameID = messageData->steamIDRemote;
 
@@ -169,11 +163,12 @@ void CWarsGameServer::ProcessMessages()
 						Msg("Starting wars game server with following settings: ");
 						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
+						// Game server is already running, so we have an IP
+						// Tell lobby owner the game is accepted and players can connect to the server
 						acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
 						acceptGameMsg.gamePort = hostport.GetInt();
 						acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
-
-						// Tell lobby owner the game is accepted and players can connect to the server
+						
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 						g_ServerGameDLL.ApplyGameSettings( pGameData );
 					}
@@ -214,34 +209,37 @@ void CWarsGameServer::UpdateServer()
 	}
 	m_nConnectedPlayers = nConnected;
 
+	if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 )
+	{
+		// m_LobbyPlayerRequestingGameID is set when the game server is not running yet (when a local player starts the server).
+		// This delays the accept message.
+		if( m_LobbyPlayerRequestingGameID.IsValid() ) 
+		{
+			ConVarRef hostport("hostport");
+
+			WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
+			acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
+			acceptGameMsg.gamePort = hostport.GetInt();
+			acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
+
+			WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
+			pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
+			pMessageData->steamIDRemote = m_LobbyPlayerRequestingGameID;
+
+			m_LobbyPlayerRequestingGameID.Clear();
+		}
+		
+		if( m_pLocalPlayerGameData )
+		{
+			m_pLocalPlayerGameData->deleteThis();
+			m_pLocalPlayerGameData = NULL;
+		}
+	}
+
 	switch( GetState() )
 	{
 		case k_EGameServer_StartingGame:
 		{
-			if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 )
-			{
-				if( m_LobbyPlayerRequestingGameID.IsValid() ) 
-				{
-					ConVarRef hostport("hostport");
-
-					WarsAcceptGameMessage_t acceptGameMsg( k_EMsgClientRequestGameAccepted );
-					acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
-					acceptGameMsg.gamePort = hostport.GetInt();
-					acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
-
-					WarsMessageData_t *pMessageData = warsextension->InsertClientMessage();
-					pMessageData->buf.Put( &acceptGameMsg, sizeof(acceptGameMsg) );
-					pMessageData->steamIDRemote = m_LobbyPlayerRequestingGameID;
-				}
-
-				m_LobbyPlayerRequestingGameID.Clear();
-				if( m_pLocalPlayerGameData )
-				{
-					m_pLocalPlayerGameData->deleteThis();
-					m_pLocalPlayerGameData = NULL;
-				}
-				SetState( k_EGameServer_StartingGame );
-			}
 			break;
 		}
 		case k_EGameServer_InGame:
