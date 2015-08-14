@@ -505,6 +505,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFram
     CefBrowserSettings settings;
 	settings.web_security = STATE_DISABLED;
 	settings.windowless_frame_rate = renderFrameRate;
+	CefString(&settings.default_encoding) = CefString( "UTF-8" );
 
     // Creat the new child browser window
 	if( g_debug_cef.GetBool() )
