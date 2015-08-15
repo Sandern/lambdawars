@@ -1534,7 +1534,7 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 	{
 		// HACK for debug mode, but unstable. bool_type operator causes a crash.
 #if defined( CLIENT_DLL ) && defined( _DEBUG )
-		if( PyObject_IsTrue( (m_methodPerFrameList[i].method == method).ptr() ) )
+		if( PyObject_IsTrue( (m_methodPerFrameList[i] == method).ptr() ) )
 			return true;
 #else
 		if( m_methodPerFrameList[i] == method )

@@ -502,7 +502,7 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 		return;
 	}
 
-	WarsEntityClassesMessage_t *entityClassesMsg = (WarsEntityClassesMessage_t *)data.Base();
+	//WarsEntityClassesMessage_t *entityClassesMsg = (WarsEntityClassesMessage_t *)data.Base();
 
 	data.SeekGet( CUtlBuffer::SEEK_HEAD, sizeof(WarsEntityClassesMessage_t) );
 

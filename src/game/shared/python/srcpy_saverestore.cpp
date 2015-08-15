@@ -196,7 +196,7 @@ void PyRestoreHelper::ReadOutputEvent( PyOutputEvent &ev )
 			
 	typeDesc.pSaveRestoreOps->Restore( fieldInfo, m_pRestore );
 			
-	Assert( posNextField >= GetReadPos() );
+	Assert( posNextField >= m_pRestore->GetReadPos() );
 	m_pRestore->SetReadPos( posNextField );
 }
 #endif // CLIENT_DLL
