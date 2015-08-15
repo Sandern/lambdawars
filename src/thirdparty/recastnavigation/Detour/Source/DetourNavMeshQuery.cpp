@@ -448,10 +448,12 @@ dtStatus dtNavMeshQuery::findRandomPointAroundCircle(dtPolyRef startRef, const f
 			
 			if (neighbourNode->flags & DT_NODE_OPEN)
 			{
+				// Already in open, update node location.
 				m_openList->modify(neighbourNode);
 			}
 			else
 			{
+				// Put the node in open list.
 				neighbourNode->flags = DT_NODE_OPEN;
 				m_openList->push(neighbourNode);
 			}
