@@ -47,10 +47,9 @@ ConVar recast_areaslope_debug( "recast_areaslope_debug", "0", FCVAR_CHEAT, "" );
 ConVar recast_findpath_debug( "cl_recast_findpath_debug", "0", FCVAR_CHEAT, "" );
 ConVar recast_areaslope_debug( "cl_recast_areaslope_debug", "0", FCVAR_CHEAT, "" );
 #endif // CLIENT_DLL
-static ConVar recast_target_querytiles_bloat("recast_target_querytiles_bloat", "2.0", FCVAR_REPLICATED);
 
 // Defaults
-static ConVar recast_maxslope("recast_maxslope", "45.0", FCVAR_REPLICATED);
+static ConVar recast_maxslope( "recast_maxslope", "45.0", FCVAR_REPLICATED|FCVAR_CHEAT );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -323,14 +322,14 @@ bool CRecastMesh::Reset()
 }
 
 #ifdef CLIENT_DLL
-ConVar recast_draw_trimeshslope("recast_draw_trimeshslope", "0");
+ConVar recast_draw_trimeshslope("recast_draw_trimeshslope", "0", FCVAR_CHEAT, "" );
 #if 0
-ConVar recast_draw_contours("recast_draw_contours", "0");
-ConVar recast_draw_polymesh("recast_draw_polymesh", "0");
-ConVar recast_draw_polymeshdetail("recast_draw_polymeshdetail", "0");
+ConVar recast_draw_contours("recast_draw_contours", "0", FCVAR_CHEAT, "" );
+ConVar recast_draw_polymesh("recast_draw_polymesh", "0", FCVAR_CHEAT, "" );
+ConVar recast_draw_polymeshdetail("recast_draw_polymeshdetail", "0", FCVAR_CHEAT, "" );
 #endif // 0
-ConVar recast_draw_navmesh("recast_draw_navmesh", "0");
-ConVar recast_draw_server("recast_draw_server", "1");
+ConVar recast_draw_navmesh("recast_draw_navmesh", "0", FCVAR_CHEAT, "" );
+ConVar recast_draw_server("recast_draw_server", "1", FCVAR_CHEAT, "" );
 
 //-----------------------------------------------------------------------------
 // Purpose: Draws the mesh
