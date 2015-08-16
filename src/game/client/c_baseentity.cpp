@@ -6713,8 +6713,10 @@ void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object 
 {
 	try 
 	{
-		if( hasattr( m_pyInstance, pName ) && getattr( m_pyInstance, pName ) == data )
-			return;
+		// Maybe compare here, but would give problems with EHANDLES, which might compare to None successfully.
+		// It would also indicate the data was send for nothing if the compare succeeds here.
+		//if( hasattr( m_pyInstance, pName ) && getattr( m_pyInstance, pName ) == data )
+		//	return;
 
 		setattr( m_pyInstance, pName, data );
 	} 
