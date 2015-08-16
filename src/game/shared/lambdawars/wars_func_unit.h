@@ -177,7 +177,7 @@ private:
 	bool m_bCanBeSeen;
 
 	bool m_bHasEnterOffset;
-	Vector m_vEnterOffset; 
+	Vector m_vEnterOffset;
 
 #ifndef CLIENT_DLL
 	string_t						m_UnitType;
