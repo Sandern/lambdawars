@@ -51,6 +51,7 @@ public:
 
 	void Ignite( float flFlameLifetime, float flSize );
 	void IgniteLifetime( float flFlameLifetime );
+	void Flatten( bool bFlatten ) { m_bFlattened = bFlatten; }
 
 	bool Initialize();
 
@@ -83,6 +84,7 @@ public:
 #endif // ENABLE_PYTHON
 	static void		DestructFloraInRadius( const Vector &position, float radius );
 	static void		IgniteFloraInRadius( const Vector &position, float radius, float lifetime = 30.0f );
+	static void		FlattenFloraInRadius( const Vector &position, float radius, bool flatten );
 
 	bool			IsEditorManaged();
 
@@ -120,6 +122,7 @@ private:
 #ifdef CLIENT_DLL
 	Vector			m_vCurrentSway;
 	float			m_fAvoidTimeOut;
+	bool			m_bFlattened;
 #endif // CLIENT_DLL
 
 	bool			m_bEditorManaged;

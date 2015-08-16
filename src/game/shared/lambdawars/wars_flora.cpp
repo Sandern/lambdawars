@@ -503,7 +503,7 @@ void CWarsFlora::UpdateUnitAvoid()
 
 		SetPoseParameter( m_iPoseX, m_vCurrentSway.y );
 		SetPoseParameter( m_iPoseY, -m_vCurrentSway.x );
-		SetPoseParameter( m_iPoseZ, m_vCurrentSway.z );
+		SetPoseParameter( m_iPoseZ, m_bFlattened ? 1.0f : m_vCurrentSway.z );
 	}
 	else if( m_iSqueezeDownSequence != -1 )
 	{
@@ -1183,6 +1183,7 @@ void CWarsFlora::DestructFloraInRadius( const Vector &vPosition, float fRadius )
 //-----------------------------------------------------------------------------
 // Purpose: Put flora on fire!
 //-----------------------------------------------------------------------------
+#ifdef CLIENT_DLL
 class WarsFloraIgnite
 {
 public:
@@ -1197,6 +1198,7 @@ public:
 private:
 	float m_fLifetime;
 };
+#endif // CLIENT_DLL
 void CWarsFlora::IgniteFloraInRadius( const Vector &vPosition, float fRadius, float fLifetime )
 {
 #ifdef CLIENT_DLL
@@ -1208,6 +1210,36 @@ void CWarsFlora::IgniteFloraInRadius( const Vector &vPosition, float fRadius, fl
 	g_TEIgniteFloraEvent.m_fRadius = fRadius;
 	g_TEIgniteFloraEvent.m_fLifetime = fLifetime;
 	g_TEIgniteFloraEvent.Create( filter, 0.0f );
+#endif // CLIENT_DLL
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Flattens flora in radius (if supported on the flora model)
+//-----------------------------------------------------------------------------
+#ifdef CLIENT_DLL
+class WarsFloraFlatten
+{
+public:
+	WarsFloraFlatten( bool bFlatten ) : m_bFlatten(bFlatten) {}
+
+	bool operator()( CWarsFlora *flora )
+	{
+		flora->Flatten( m_bFlatten );
+		return true;
+	}
+
+private:
+	bool m_bFlatten;
+};
+#endif // CLIENT_DLL
+
+void CWarsFlora::FlattenFloraInRadius( const Vector &vPosition, float fRadius, bool bFlatten )
+{
+#ifdef CLIENT_DLL
+	WarsFloraFlatten functor( bFlatten );
+	ForAllFloraInRadius<WarsFloraFlatten>( functor, vPosition, fRadius );
+#else
+	Warning("FlattenFloraInRadius not supported on server\n");
 #endif // CLIENT_DLL
 }
 
