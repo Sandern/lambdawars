@@ -442,7 +442,7 @@ void CWarsGameServer::OnP2PSessionConnectFail( P2PSessionConnectFail_t *pCallbac
 	}
 
 	// General warning
-	Warning( "CWarsGameServer::OnP2PSessionConnectFail: %d\n", WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
+	Warning( "CWarsGameServer::OnP2PSessionConnectFail: %s\n", WarsNet_TranslateP2PConnectErr( pCallback->m_eP2PSessionError ) );
 }
 
 //-----------------------------------------------------------------------------
