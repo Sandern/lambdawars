@@ -428,6 +428,7 @@ void LoadingProgress::SetupControlStates()
 				"posters/poster4",
 				"posters/poster5",
 				"posters/poster6",
+				"posters/poster7",
 				"Console/hl2wars_bg1_widescreen"
 			};
 
