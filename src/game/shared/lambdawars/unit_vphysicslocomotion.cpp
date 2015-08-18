@@ -18,7 +18,8 @@
 #ifdef ENABLE_PYTHON
 UnitVPhysicsLocomotion::UnitVPhysicsLocomotion( boost::python::object outer ) : UnitBaseLocomotion(outer), m_pMotionController(NULL)
 {
-	m_vecAngular.Init();
+	m_vecLinear.Init(0, 0, 0);
+	m_vecAngular.Init(0, 0, 0);
 }
 #endif // ENABLE_PYTHON
 
@@ -108,6 +109,8 @@ void UnitVPhysicsLocomotion::FullWalkMove( )
 		HandleJump();
 
 	VPhysicsMove();
+
+	mv->stopdistance = 0;
 
 	FinishGravity();
 
