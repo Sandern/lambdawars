@@ -421,7 +421,7 @@ void LoadingProgress::SetupControlStates()
 			//m_pBGImage->SetImage( "../vgui/LoadingScreen_background" );
 
 			// Change loading background
-			static char pics[7][64] = {
+			static char pics[8][64] = {
 				"posters/poster1",
 				"posters/poster2",
 				"posters/poster3",
