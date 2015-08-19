@@ -40,9 +40,11 @@ typedef struct UnitBlocker_t
 class UnitBaseMoveCommand
 {
 public:
-	UnitBaseMoveCommand()
+	UnitBaseMoveCommand() : totaldistance(0.0f), outstepheight(0.0f), stopdistance(0.0f), interval(0.1f)
 	{
 		blockers.EnsureCount( 10 );
+		outwishvel.Init();
+		idealviewangles.Init();
 		Clear();
 	}
 
