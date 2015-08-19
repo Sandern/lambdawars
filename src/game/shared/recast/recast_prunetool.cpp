@@ -100,5 +100,7 @@ bool CRecastMesh::DisableUnreachablePolygons( const CUtlVector< Vector > &sample
 
 	disableUnvisitedPolys( m_navMesh, flags );
 
+	delete flags;
+
 	return true;
 }

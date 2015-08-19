@@ -819,6 +819,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 			NavmeshFlags *flags = new NavmeshFlags;
 			flags->init( m_navMesh );
 			markObstaclePolygonsWalkableNavmesh( m_navMesh, flags, endRef, obstacleFlag, enabledPolys );
+			delete flags;
 		}
 	}
 
