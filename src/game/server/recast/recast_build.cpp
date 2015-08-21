@@ -610,6 +610,8 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 			navmeshMemUsage += tile->dataSize;
 	}
 
+	PostLoad();
+
 	DevMsg( "CRecastMesh: Generated navigation mesh %s in %f seconds\n", m_Name.Get(), Plat_FloatTime() - fStartTime );
 
 	return true;

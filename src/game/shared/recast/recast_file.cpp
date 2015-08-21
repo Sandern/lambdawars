@@ -174,6 +174,8 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 		return false;
 	}
 
+	PostLoad();
+
 	return true;
 }
 

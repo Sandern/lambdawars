@@ -17,6 +17,7 @@
 
 class UnitBaseWaypoint;
 class CMapMesh;
+class NavmeshFlags;
 
 class dtNavMesh;
 class dtTileCache;
@@ -72,6 +73,8 @@ public:
 	void Init( const char *name );
 	void Init( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope );
 	bool IsLoaded();
+
+	virtual void PostLoad();
 
 	virtual void Update( float dt );
 
@@ -207,6 +210,8 @@ private:
 	dtQueryFilter m_defaultFilter;
 	dtQueryFilter m_obstacleFilter;
 	pathfind_resultdata_t m_pathfindData;
+
+	NavmeshFlags *m_pNavMeshFlags;
 };
 
 inline const char *CRecastMesh::GetName()

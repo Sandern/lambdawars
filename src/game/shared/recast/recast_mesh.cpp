@@ -71,7 +71,8 @@ CRecastMesh::CRecastMesh() :
 	m_navQuery(0),
 	m_talloc(0),
 	m_tcomp(0),
-	m_tmproc(0)
+	m_tmproc(0),
+	m_pNavMeshFlags(0)
 {
 	m_Name.Set("default");
 
@@ -132,6 +133,12 @@ CRecastMesh::~CRecastMesh()
 	{
 		delete m_tmproc;
 		m_tmproc = 0;
+	}
+
+	if( m_pNavMeshFlags )
+	{
+		delete m_pNavMeshFlags;
+		m_pNavMeshFlags = 0;
 	}
 }
 
@@ -243,6 +250,15 @@ void CRecastMesh::Init( const char *name, float agentRadius, float agentHeight, 
 	m_agentMaxSlope = agentMaxSlope;
 	m_cellSize = round( m_agentRadius / 3.0f );
 	m_cellHeight = round( m_cellSize / 2.0f );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CRecastMesh::PostLoad()
+{
+	m_pNavMeshFlags = new NavmeshFlags;
+	m_pNavMeshFlags->init( m_navMesh );
 }
 
 //-----------------------------------------------------------------------------
@@ -780,7 +796,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 	bool bHasTargetAndIsObstacle = pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX;
 
 	// Determine end point and area
-	// TODO: Special case for targets which act as obstacle on the nav mesh. These have a special flag to identify their polygon. We temporary mark
+	// Note: Special case for targets which act as obstacle on the nav mesh. These have a special flag to identify their polygon. We temporary mark
 	// these polygons of the obstacle as walkable. Obstacles next to this obstacle have different flags, so they all have their own polygons.
 	float epos[3];
 	epos[0] = vEnd[0];
@@ -816,10 +832,8 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 			// Find the obstacle flag
 			obstacleFlag &= m_allObstacleFlags;
 			// Make this ref and all linked refs with this flag walkable
-			NavmeshFlags *flags = new NavmeshFlags;
-			flags->init( m_navMesh );
-			markObstaclePolygonsWalkableNavmesh( m_navMesh, flags, endRef, obstacleFlag, enabledPolys );
-			delete flags;
+			m_pNavMeshFlags->clearAllFlags();
+			markObstaclePolygonsWalkableNavmesh( m_navMesh, m_pNavMeshFlags, endRef, obstacleFlag, enabledPolys );
 		}
 	}
 
@@ -884,43 +898,65 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 	spos[1] = vStart[2];
 	spos[2] = vStart[1];
 
-	float epos[3];
-	if( pTarget )
-	{
-		Vector vDir = vStart - vEnd;
-		VectorNormalize( vDir );
-		Vector vModifiedEnd = vEnd + vDir * pTarget->CollisionProp()->BoundingRadius2D();
-
-		epos[0] = vModifiedEnd[0];
-		epos[1] = vModifiedEnd[2];
-		epos[2] = vModifiedEnd[1];
-	}
-	else
-	{
-		epos[0] = vEnd[0];
-		epos[1] = vEnd[2];
-		epos[2] = vEnd[1];
-	}
-	dtVcopy(m_pathfindData.adjustedEndPos, epos);
-
 	// The search distance along each axis. [(x, y, z)]
 	float polyPickExt[3];
 	polyPickExt[0] = 256.0f;
 	polyPickExt[1] = fBeneathLimit;
 	polyPickExt[2] = 256.0f;
 
+	// Find the start area
 	status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);
 	if( !dtStatusSucceed( status ) )
 	{
-		return -1;
-	}
-	status = m_navQuery->findNearestPoly(epos, polyPickExt, &m_defaultFilter, &endRef, 0);
-	if( !dtStatusSucceed( status ) )
-	{
-		return -1;
+		return NULL;
 	}
 
-	status = DoFindPath(startRef, endRef, spos, epos, m_pathfindData );
+	CUtlVector< originalPolyFlags_t > enabledPolys;
+	bool bHasTargetAndIsObstacle = pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX;
+
+	// Determine end point and area
+	// Note: Special case for targets which act as obstacle on the nav mesh. These have a special flag to identify their polygon. We temporary mark
+	// these polygons of the obstacle as walkable. Obstacles next to this obstacle have different flags, so they all have their own polygons.
+	float epos[3];
+	epos[0] = vEnd[0];
+	epos[1] = vEnd[2];
+	epos[2] = vEnd[1];
+
+	// Find the end area
+	status = m_navQuery->findNearestPoly(epos, polyPickExt, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
+
+	dtVcopy(m_pathfindData.adjustedEndPos, epos);
+	status = m_navQuery->closestPointOnPoly(endRef, epos, m_pathfindData.adjustedEndPos, 0);
+	if( !dtStatusSucceed( status ) )
+	{
+		return NULL;
+	}
+
+	if( recast_findpath_debug.GetBool() )
+	{
+		NDebugOverlay::Box( Vector(m_pathfindData.adjustedEndPos[0], m_pathfindData.adjustedEndPos[2], m_pathfindData.adjustedEndPos[1] + 16.0f), 
+			-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
+	}
+
+	if( bHasTargetAndIsObstacle )
+	{
+		unsigned short obstacleFlag = 0;
+		status = m_navMesh->getPolyFlags( endRef, &obstacleFlag );
+		if( dtStatusSucceed( status ) )
+		{
+			// Find the obstacle flag
+			obstacleFlag &= m_allObstacleFlags;
+			// Make this ref and all linked refs with this flag walkable
+			m_pNavMeshFlags->clearAllFlags();
+			markObstaclePolygonsWalkableNavmesh( m_navMesh, m_pNavMeshFlags, endRef, obstacleFlag, enabledPolys );
+		}
+	}
+
+	status = DoFindPath(startRef, endRef, spos, m_pathfindData.adjustedEndPos, m_pathfindData );
 	if( dtStatusSucceed( status ) && !m_pathfindData.isPartial )
 	{
 		float fPathDistance = 0;
@@ -934,6 +970,11 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 		return fPathDistance;
 	}
 
+	for( int i = 0; i < enabledPolys.Count(); i++ )
+	{
+		m_navMesh->setPolyFlags( enabledPolys[i].ref, enabledPolys[i].flags );
+	}
+	
 	return -1;
 }
 
