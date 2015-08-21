@@ -76,6 +76,7 @@ bool CWarsGrid::LoadGridData()
 	CEditorWarsMapMgr::BuildCurrentWarsPath( curMap, sizeof( curMap ) );
 
 	KeyValues *pKVWars = new KeyValues( "WarsMap" );
+	KeyValues::AutoDelete autodelete( pKVWars );
 	if( pKVWars->LoadFromFile( filesystem, curMap, NULL ) )
 	{
 		LoadCover( pKVWars );

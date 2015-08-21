@@ -138,6 +138,7 @@ void MountExtraContent()
 	memset(g_AppStatus, 0, sizeof(g_AppStatus));
 
 	KeyValues *pMountList = new KeyValues( "MountList" );
+	KeyValues::AutoDelete autodelete( pMountList );
 	if( !pMountList->LoadFromFile( filesystem, "mountlist.txt" ) )
 	{
 		// Create default
@@ -158,12 +159,6 @@ void MountExtraContent()
 	TryMountVPKGame( "Left 4 Dead", "../../common/left 4 dead/left4dead", APP_L4D1, "left4dead", pMountList );
 	TryMountVPKGame( "Counter-Strike Global Offensive", "../../common/Counter-Strike Global Offensive/csgo", APP_CSGO, "csgo", pMountList );
 	TryMountVPKGame( "Dear Esther", "../../common/dear esther/dearesther", APP_DEARESTHER, "dearesther", pMountList );
-
-	if( pMountList )
-	{
-		pMountList->deleteThis();
-		pMountList = NULL;
-	}
 }
 
 #if 0

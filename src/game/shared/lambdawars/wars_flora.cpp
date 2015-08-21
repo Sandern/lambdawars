@@ -747,7 +747,8 @@ void CWarsFlora::SpawnMapFlora()
 	char curMap[MAX_PATH];
 	CEditorWarsMapMgr::BuildCurrentWarsPath( curMap, sizeof( curMap ) );
 
-	KeyValues *pKVWars = new KeyValues( "WarsMap" ); // VmfToKeyValues( m_szCurrentMap );
+	KeyValues *pKVWars = new KeyValues( "WarsMap" );
+	KeyValues::AutoDelete autodelete( pKVWars );
 	if( pKVWars->LoadFromFile( filesystem, curMap, NULL ) )
 	{
 		KeyValues *pFlora = pKVWars->FindKey( "flora" );

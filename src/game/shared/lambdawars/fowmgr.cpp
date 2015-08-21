@@ -232,15 +232,13 @@ void CFogOfWarMgr::LevelInitPreEntity()
 	Q_snprintf( buf, sizeof( buf ), "%s.res", buf );
 
 	KeyValues *pMapData = new KeyValues("MapData");
+	KeyValues::AutoDelete autodelete( pMapData );
 	if( pMapData->LoadFromFile( filesystem, buf ) )
 	{
 		mat_fogofwar_r.SetValue( pMapData->GetString("fow_r", mat_fogofwar_r.GetDefault()) );
 		mat_fogofwar_g.SetValue( pMapData->GetString("fow_g", mat_fogofwar_g.GetDefault()) );
 		mat_fogofwar_b.SetValue( pMapData->GetString("fow_b", mat_fogofwar_b.GetDefault()) );
 		mat_fogofwar_a.SetValue( pMapData->GetString("fow_a", mat_fogofwar_a.GetDefault()) );
-
-		pMapData->deleteThis();
-		pMapData = NULL;
 	}
 	else
 	{

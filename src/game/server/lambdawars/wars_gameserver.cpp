@@ -67,8 +67,6 @@ void CWarsGameServer::ProcessMessages()
 
 	bool bGameServerIsRunning = steamgameserverapicontext->SteamGameServer() != NULL;
 
-	KeyValues *pData = NULL, *pGameData = NULL;
-
 	warsextension->ReceiveServerSteamP2PMessages( steamgameserverapicontext->SteamGameServerNetworking() );
 
 	// Process server messages
@@ -101,7 +99,8 @@ void CWarsGameServer::ProcessMessages()
 					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
 
 					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.TellMaxPut() - sizeof( WarsRequestServerMessage_t ) );
-					pGameData = new KeyValues( "GameData" );
+					KeyValues *pGameData = new KeyValues( "GameData" );
+					KeyValues::AutoDelete autodelete( pGameData );
 					if( !pGameData->ReadAsBinary( data ) )
 					{
 						Warning("k_EMsgServerRequestGame: reading game data failed\n");
@@ -146,7 +145,8 @@ void CWarsGameServer::ProcessMessages()
 					WarsRequestServerMessage_t *requestMsg = (WarsRequestServerMessage_t *)messageData->buf.Base();
 
 					data.Put( (char *)messageData->buf.Base() + sizeof( WarsRequestServerMessage_t ), messageData->buf.TellMaxPut() - sizeof( WarsRequestServerMessage_t ) );
-					pGameData = new KeyValues( "GameData" );
+					KeyValues *pGameData = new KeyValues( "GameData" );
+					KeyValues::AutoDelete autodelete( pGameData );
 					if( !pGameData->ReadAsBinary( data ) )
 					{
 						Warning("k_EMsgServerRequestGame: reading game data failed\n");
@@ -183,9 +183,6 @@ void CWarsGameServer::ProcessMessages()
 		warsextension->NextServerMessage();
 		messageData = warsextension->ServerMessageHead();
 	}
-
-	if( pData )
-		pData->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
