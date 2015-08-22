@@ -152,7 +152,8 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 		{
 			// We are already reserved, but we still need to let the engine
 			// baseserver know how many human slots to allocate
-			pKV->SetInt( "members/numSlots", g_bOfflineGame ? 1 : 8 );
+			// This overrides mm_max_players
+			pKV->SetInt( "members/numSlots", pKV->GetInt( "members/numSlots", g_bOfflineGame ? 1 : MAX_PLAYERS ) );
 			return;
 		}
 
