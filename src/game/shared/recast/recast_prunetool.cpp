@@ -95,7 +95,11 @@ bool CRecastMesh::DisableUnreachablePolygons( const CUtlVector< Vector > &sample
 
 	for( int i = 0; i < samplePositions.Count(); i++ )
 	{
-		floodNavmesh( m_navMesh, flags, GetPolyRef( samplePositions[i] ), 1 );
+		dtPolyRef polyRefSample = GetPolyRef( samplePositions[i] );
+		if( !polyRefSample )
+			continue;
+
+		floodNavmesh( m_navMesh, flags, polyRefSample, 1 );
 	}
 
 	disableUnvisitedPolys( m_navMesh, flags );
