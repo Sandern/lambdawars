@@ -66,7 +66,7 @@ void AddMapDataToDownloadList( const char *pMapName )
 	char path_to_info[MAX_PATH];
 
 	// Check if the map data file is in the correct place
-	Q_snprintf( path_to_info, sizeof( path_to_info ), "maps/%s.pyc\0", pMapName );
+	V_snprintf( path_to_info, sizeof( path_to_info ), "maps/%s.pyc\0", pMapName );
 	if( filesystem->FileExists(path_to_info) == false ) {
 		Warning("%s is missing\n", path_to_info);
 		return;
@@ -75,13 +75,13 @@ void AddMapDataToDownloadList( const char *pMapName )
 
 	const char *pMinimap = SrcPySystem()->Get<const char *>("minimap_material", mapdata, NULL);
 	if( pMinimap ) {
-		Q_snprintf( path_to_info, sizeof( path_to_info ), "materials/%s.vmt\0", pMinimap );
+		V_snprintf( path_to_info, sizeof( path_to_info ), "materials/%s.vmt\0", pMinimap );
 		if( filesystem->FileExists(path_to_info) == false ) {
 			Warning("%s is missing\n", path_to_info);
 			return;
 		}
 		AddDownload(path_to_info);
-		Q_snprintf( path_to_info, sizeof( path_to_info ), "materials/%s.vtf\0", pMinimap );
+		V_snprintf( path_to_info, sizeof( path_to_info ), "materials/%s.vtf\0", pMinimap );
 		if( filesystem->FileExists(path_to_info) == false ) {
 			Warning("%s is missing\n", path_to_info);
 			return;
@@ -123,7 +123,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	bool bAlreadyLoadingMap = false;
 	char const *szBspName = NULL;
 	const char *pGameDir = COM_GetModDirectory();
-	if ( !Q_stricmp( pKV->GetName(), "::ExecGameTypeCfg" ) )
+	if ( !V_stricmp( pKV->GetName(), "::ExecGameTypeCfg" ) )
 	{
 		if ( !engine )
 			return;
@@ -153,14 +153,14 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 			// We are already reserved, but we still need to let the engine
 			// baseserver know how many human slots to allocate
 			// This overrides mm_max_players
-			pKV->SetInt( "members/numSlots", pKV->GetInt( "members/numSlots", g_bOfflineGame ? 1 : MAX_PLAYERS ) );
+			pKV->SetInt( "members/numSlots", g_bOfflineGame ? 1 : MAX_PLAYERS );
 			return;
 		}
 
 		pKV->SetName( pGameDir );
 	}
 
-	if ( Q_stricmp( pKV->GetName(), pGameDir ) || bAlreadyLoadingMap )
+	if ( V_stricmp( pKV->GetName(), pGameDir ) || bAlreadyLoadingMap )
 		return;
 
 	if( WarsGameServer() )
@@ -176,7 +176,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	}
 
 	//g_bOfflineGame = pKV->GetString( "map/offline", NULL ) != NULL;
-	g_bOfflineGame = !Q_stricmp( pKV->GetString( "system/network", "LIVE" ), "offline" );
+	g_bOfflineGame = !V_stricmp( pKV->GetString( "system/network", "LIVE" ), "offline" );
 
 	DevMsg( "GameInterface reservation payload:\n" );
 	KeyValuesDumpAsDevMsg( pKV );
@@ -206,7 +206,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 #endif // 0
 
 	// LAUNCH GAME
-	if ( !Q_stricmp( szMode, "sdk" ) )
+	if ( !V_stricmp( szMode, "sdk" ) )
 	{
 		szBspName = pKV->GetString( "game/mission", NULL );
 		if ( !szBspName )
