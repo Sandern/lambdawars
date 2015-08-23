@@ -400,7 +400,7 @@ unsigned char CRecastMgr::DetermineAreaID( CBaseEntity *pEntity, const Vector &m
 
 	// Determine areaId
 	bool usedPolyAreas[20];
-	V_memset( usedPolyAreas, 0, sizeof(usedPolyAreas) );
+	V_memset( usedPolyAreas, 0, ARRAYSIZE(usedPolyAreas) * sizeof(bool) );
 	CBaseEntity *pEnts[256];
 	int n = UTIL_EntitiesInBox( pEnts, 256, pEntity->GetAbsOrigin() + mins - Vector(64.0f, 64.0f, 64.0f), pEntity->GetAbsOrigin() + maxs + Vector(64.0f, 64.0f, 64.0f), 0 );
 	for( int i = 0; i < n; i++ )
@@ -422,7 +422,7 @@ unsigned char CRecastMgr::DetermineAreaID( CBaseEntity *pEntity, const Vector &m
 		usedPolyAreas[otherAreaId] = true;
 	}
 
-	while( areaId != SAMPLE_POLYAREA_OBSTACLE_END && usedPolyAreas[areaId] )
+	while( areaId != SAMPLE_POLYAREA_OBSTACLE_END - 1 && usedPolyAreas[areaId] )
 	{
 		areaId++;
 	}

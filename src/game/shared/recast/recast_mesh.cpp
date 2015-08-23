@@ -72,8 +72,7 @@ CRecastMesh::CRecastMesh() :
 	m_navQuery(0),
 	m_talloc(0),
 	m_tcomp(0),
-	m_tmproc(0),
-	m_pNavMeshFlags(0)
+	m_tmproc(0)
 {
 	m_Name.Set("default");
 
@@ -134,12 +133,6 @@ CRecastMesh::~CRecastMesh()
 	{
 		delete m_tmproc;
 		m_tmproc = 0;
-	}
-
-	if( m_pNavMeshFlags )
-	{
-		delete m_pNavMeshFlags;
-		m_pNavMeshFlags = 0;
 	}
 }
 
@@ -261,8 +254,6 @@ void CRecastMesh::Init( const char *name, float agentRadius, float agentHeight, 
 //-----------------------------------------------------------------------------
 void CRecastMesh::PostLoad()
 {
-	m_pNavMeshFlags = new NavmeshFlags;
-	m_pNavMeshFlags->init( m_navMesh );
 }
 
 //-----------------------------------------------------------------------------
@@ -658,6 +649,9 @@ static void markObstaclePolygonsWalkableNavmesh(dtNavMesh* nav, NavmeshFlags* fl
 	PolyRefArray openList;
 	openList.push(start);
 
+	// Mark as visited, so start is not revisited again
+	flags->setFlags(start, 1);
+
 	while (openList.size())
 	{
 		const dtPolyRef ref = openList.pop();
@@ -674,6 +668,13 @@ static void markObstaclePolygonsWalkableNavmesh(dtNavMesh* nav, NavmeshFlags* fl
 		{
 			continue;
 		}
+
+#if defined(_DEBUG)
+		for( int k = 0; k < enabledPolys.Count(); k++ )
+		{
+			AssertMsg( enabledPolys[k].ref != ref, ("Already visited poly!")  );
+		}
+#endif // _DEBUG
 
 		// Mark walkable and remember
 		enabledPolys.AddToTail();
@@ -723,17 +724,22 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 		findpathData.cacheValid = false;
 
 		CUtlVector< originalPolyFlags_t > enabledPolys;
+
 		if( bHasTargetAndIsObstacle )
 		{
 			unsigned short obstacleFlag = 0;
 			status = m_navMesh->getPolyFlags( endRef, &obstacleFlag );
 			if( dtStatusSucceed( status ) )
 			{
+				NavmeshFlags *pNavMeshFlags = new NavmeshFlags;
+				pNavMeshFlags->init( m_navMesh );
+
 				// Find the obstacle flag
 				obstacleFlag &= m_allObstacleFlags;
 				// Make this ref and all linked refs with this flag walkable
-				m_pNavMeshFlags->clearAllFlags();
-				markObstaclePolygonsWalkableNavmesh( m_navMesh, m_pNavMeshFlags, endRef, obstacleFlag, enabledPolys );
+				markObstaclePolygonsWalkableNavmesh( m_navMesh, pNavMeshFlags, endRef, obstacleFlag, enabledPolys );
+
+				delete pNavMeshFlags;
 			}
 		}
 
@@ -981,8 +987,6 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 	{
 		return NULL;
 	}
-
-	CUtlVector< originalPolyFlags_t > enabledPolys;
 
 	if( recast_findpath_debug.GetBool() )
 	{

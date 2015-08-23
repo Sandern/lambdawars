@@ -222,8 +222,6 @@ private:
 	dtQueryFilter m_defaultFilter;
 	dtQueryFilter m_obstacleFilter;
 	pathfind_resultdata_t m_pathfindData;
-
-	NavmeshFlags *m_pNavMeshFlags;
 };
 
 inline const char *CRecastMesh::GetName()
