@@ -2459,7 +2459,11 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 			return waypoints;
 	}
 
-	if( unit_route_fallback_direct.GetBool() )
+	
+	CRecastMesh *pNavMesh = GetNavMesh();
+	bool bIsOffMesh = !pNavMesh || pNavMesh->GetPolyRef( GetAbsOrigin(), 128.0f, 32.0f ) == 0;
+
+	if( unit_route_fallback_direct.GetBool() && bIsOffMesh )
 	{
 		// Fallback to a direct path
 		if( unit_navigator_debug.GetBool() )

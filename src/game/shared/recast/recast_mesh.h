@@ -81,7 +81,7 @@ public:
 	// Load/build 
 	static bool ComputeMeshSettings( const char *pMeshName, 
 		float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope,
-		float &fCellSize, float &fCellHeight );
+		float &fCellSize, float &fCellHeight, float &fTileSize );
 
 	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
 	virtual bool Reset();
@@ -111,7 +111,8 @@ public:
 
 #ifndef CLIENT_DLL
 	// Path find functions
-	UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit = 120.0f, CBaseEntity *pTarget = NULL, bool *bIsPartial = NULL, const Vector *vStartTestPos = NULL );
+	UnitBaseWaypoint *FindPath( const Vector &vStart, const Vector &vEnd, float fBeneathLimit = 120.0f, CBaseEntity *pTarget = NULL, 
+		bool *bIsPartial = NULL, const Vector *pStartTestPos = NULL );
 #endif // CLIENT_DLL
 	bool TestRoute( const Vector &vStart, const Vector &vEnd );
 	float FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget = NULL, float fBeneathLimit = 120.0f );
@@ -141,22 +142,33 @@ public:
 private:
 	// Result data for path finding
 	typedef struct pathfind_resultdata_t {
-		pathfind_resultdata_t() : npolys(0), straightPathOptions(0), nstraightPath(0) {}
+		pathfind_resultdata_t() : cacheValid(false), startRef(0), endRef(0), npolys(0), straightPathOptions(0), nstraightPath(0) {}
 
+		// For caching purposes, keep the start/end information around for which the path was computed
+		bool cacheValid;
+		dtPolyRef startRef;
+		dtPolyRef endRef;
+
+		// Data from findPath
 		dtPolyRef polys[RECASTMESH_MAX_POLYS];
 		int npolys;
+		bool isPartial;
 
-		float adjustedEndPos[3];
-
+		// Data from findStraightPath
 		int straightPathOptions;
 		float straightPath[RECASTMESH_MAX_POLYS*3];
 		unsigned char straightPathFlags[RECASTMESH_MAX_POLYS];
 		dtPolyRef straightPathPolys[RECASTMESH_MAX_POLYS];
 		int nstraightPath;
-		bool isPartial;
 	} pathfind_resultdata_t;
 
-	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], pathfind_resultdata_t &findpathData );
+	bool CanUseCachedPath( dtPolyRef startRef, dtPolyRef endRef, pathfind_resultdata_t &findpathData );
+	dtStatus ComputeAdjustedStartAndEnd( float spos[3], float epos[3], dtPolyRef &startRef, dtPolyRef &endRef, float fBeneathLimit, bool bHasTargetAndIsObstacle = false, const Vector *pStartTestPos = NULL );
+	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], bool bHasTargetAndIsObstacle, pathfind_resultdata_t &findpathData );
+
+#ifndef CLIENT_DLL
+	UnitBaseWaypoint *ConstructWaypointsFromStraightPath( pathfind_resultdata_t &findpathData );
+#endif // CLIENT_DLL
 
 protected:
 	float m_cellSize;

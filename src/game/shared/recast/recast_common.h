@@ -31,7 +31,7 @@ public:
 			if (!m_cap) m_cap = n;
 			while (m_cap < n) m_cap *= 2;
 			dtPolyRef* newData = (dtPolyRef*)dtAlloc(m_cap*sizeof(dtPolyRef), DT_ALLOC_TEMP);
-			if (m_size && newData) memcpy(newData, m_data, m_size*sizeof(dtPolyRef));
+			if (m_size && newData) V_memcpy(newData, m_data, m_size*sizeof(dtPolyRef));
 			dtFree(m_data);
 			m_data = newData;
 		}
@@ -81,7 +81,7 @@ public:
 		{
 			return false;
 		}
-		memset(m_tiles, 0, sizeof(TileFlags)*m_ntiles);
+		V_memset(m_tiles, 0, sizeof(TileFlags)*m_ntiles);
 		
 		// Alloc flags for each tile.
 		for (int i = 0; i < nav->getMaxTiles(); ++i)
@@ -96,7 +96,7 @@ public:
 				tf->flags = (unsigned char*)dtAlloc(tf->nflags, DT_ALLOC_TEMP);
 				if (!tf->flags)
 					return false;
-				memset(tf->flags, 0, tf->nflags);
+				V_memset(tf->flags, 0, tf->nflags);
 			}
 		}
 		
@@ -111,7 +111,7 @@ public:
 		{
 			TileFlags* tf = &m_tiles[i];
 			if (tf->nflags)
-				memset(tf->flags, 0, tf->nflags);
+				V_memset(tf->flags, 0, tf->nflags);
 		}
 	}
 	

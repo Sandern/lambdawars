@@ -117,7 +117,7 @@ MeshProcess::MeshProcess( const char *meshName )
 static void TestAgentRadius( const char *meshName, float &fAgentRadius )
 {
 	float meshAgentRadius, stub;
-	CRecastMesh::ComputeMeshSettings( meshName, meshAgentRadius, stub, stub, stub, stub, stub );
+	CRecastMesh::ComputeMeshSettings( meshName, meshAgentRadius, stub, stub, stub, stub, stub, stub );
 	if( meshAgentRadius > fAgentRadius ) 
 	{
 		fAgentRadius = meshAgentRadius;
