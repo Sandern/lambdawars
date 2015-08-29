@@ -267,6 +267,8 @@ public:
 
 	Vector blocker_hitpos;
 
+	bool no_unstuck;
+
 protected:
 	UnitBaseMoveCommand *mv;
 

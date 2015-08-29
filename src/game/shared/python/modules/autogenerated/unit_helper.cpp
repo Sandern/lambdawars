@@ -2202,6 +2202,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseLocomotion_exposer.def_readwrite( "acceleration", &UnitBaseLocomotion::acceleration );
         UnitBaseLocomotion_exposer.def_readwrite( "airacceleration", &UnitBaseLocomotion::airacceleration );
         UnitBaseLocomotion_exposer.def_readwrite( "blocker_hitpos", &UnitBaseLocomotion::blocker_hitpos );
+        UnitBaseLocomotion_exposer.def_readwrite( "no_unstuck", &UnitBaseLocomotion::no_unstuck );
         UnitBaseLocomotion_exposer.def_readwrite( "stepsize", &UnitBaseLocomotion::stepsize );
         UnitBaseLocomotion_exposer.def_readwrite( "stopspeed", &UnitBaseLocomotion::stopspeed );
         UnitBaseLocomotion_exposer.def_readwrite( "surfacefriction", &UnitBaseLocomotion::surfacefriction );
@@ -5651,6 +5652,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseLocomotion_exposer.def_readwrite( "acceleration", &UnitBaseLocomotion::acceleration );
         UnitBaseLocomotion_exposer.def_readwrite( "airacceleration", &UnitBaseLocomotion::airacceleration );
         UnitBaseLocomotion_exposer.def_readwrite( "blocker_hitpos", &UnitBaseLocomotion::blocker_hitpos );
+        UnitBaseLocomotion_exposer.def_readwrite( "no_unstuck", &UnitBaseLocomotion::no_unstuck );
         UnitBaseLocomotion_exposer.def_readwrite( "stepsize", &UnitBaseLocomotion::stepsize );
         UnitBaseLocomotion_exposer.def_readwrite( "stopspeed", &UnitBaseLocomotion::stopspeed );
         UnitBaseLocomotion_exposer.def_readwrite( "surfacefriction", &UnitBaseLocomotion::surfacefriction );

@@ -295,11 +295,13 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 		trace.m_pEnt->SetNavIgnore();
 	}
 
+#if 0
 	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
 	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
 	{
 		DoUnstuck();
 	}
+#endif // 0
 
 	if( !m_pMotionController )
 	{
