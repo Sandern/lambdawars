@@ -846,20 +846,18 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( dtNavMeshQuery *navQuery, floa
 	status = navQuery->findNearestPoly(epos, polyPickExt, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
 	if( !dtStatusSucceed( status ) )
 	{
-		if( bDisallowBigPicker )
+		return status;
+	}
+
+	if( !endRef && !bDisallowBigPicker )
+	{
+		// Try again, bigger picker querying more tiles
+		// This is mostly the case at the map borders, where we have no nav polygons. It's useful to have some tolerance, rather than just bug
+		// out with a "can't move there" notification.
+		status = navQuery->findNearestPoly(epos, polyPickExtEndBig, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
+		if( !dtStatusSucceed( status ) )
 		{
 			return status;
-		}
-		else
-		{
-			// Try again, bigger picker querying more tiles
-			// This is mostly the case at the map borders, where we have no nav polygons. It's useful to have some tolerance, rather than just bug
-			// out with a "can't move there" notification.
-			status = navQuery->findNearestPoly(epos, polyPickExtEndBig, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
-			if( !dtStatusSucceed( status ) )
-			{
-				return status;
-			}
 		}
 	}
 
