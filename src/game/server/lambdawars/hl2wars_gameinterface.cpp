@@ -181,7 +181,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	DevMsg( "GameInterface reservation payload:\n" );
 	KeyValuesDumpAsDevMsg( pKV );
 
-	if( !g_bOfflineGame )
+	if( !g_bOfflineGame && !(V_stricmp( COM_GetModDirectory(), "lambdawarsdev" ) == 0) )
 	{
 		// Vitaliy: Disable cheats as part of reservation in case they were enabled (unless we are on Steam Beta)
 		if ( sv_force_transmit_ents.IsFlagSet( FCVAR_DEVELOPMENTONLY ) &&	// any convar with FCVAR_DEVELOPMENTONLY flag will be sufficient here
@@ -206,19 +206,21 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 #endif // 0
 
 	// LAUNCH GAME
+	bool bSuccess = false;
 	if ( !V_stricmp( szMode, "sdk" ) )
 	{
 		szBspName = pKV->GetString( "game/mission", NULL );
-		if ( !szBspName )
-			return;
-
-		engine->ServerCommand( CFmtStr( "%s %s sdk reserved\n",
-			szMapCommand,
-			szBspName ) );
+		if ( szBspName )
+		{
+			bSuccess = true;
+			engine->ServerCommand( CFmtStr( "%s %s sdk reserved\n",
+				szMapCommand,
+				szBspName ) );
+		}
 	}
 	else
 	{
-		bool bSuccess = false;
+		
 #ifdef ENABLE_PYTHON
 		try 
 		{
@@ -229,13 +231,13 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 			PyErr_Print();
 		}
 #endif // ENABLE_PYTHON
+	}
 
-		if( !bSuccess )
-		{
-			Warning( "ApplyGameSettings: Unknown game mode \"%s\"! Falling back to gamelobby.\n", szMode );
-			engine->ServerCommand( CFmtStr( "%s gamelobby reserved\n",
-				szMapCommand ) );
-		}
+	if( !bSuccess )
+	{
+		Warning( "ApplyGameSettings: Unknown game mode \"%s\"! Falling back to gamelobby.\n", szMode );
+		engine->ServerCommand( CFmtStr( "%s gamelobby reserved\n",
+			szMapCommand ) );
 	}
 }
 
