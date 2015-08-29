@@ -406,6 +406,7 @@ void CBaseProp::UpdateNavObstacle( bool bForce )
 		mins.x, mins.y, mins.z, 
 		maxs.x, maxs.y, maxs.z,
 		maxs.z - mins.z );*/
+	mins.z -= 16.0f; // Bloat it a bit, otherwise it may not make the cut for some small props
 	if( !RecastMgr().AddEntBoxObstacle( this, mins, maxs, maxs.z - mins.z ) )
 	{
 		Warning("UpdateNavObstacle: could not add prop obstacle to nav mesh\n");

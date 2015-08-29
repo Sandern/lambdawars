@@ -863,6 +863,17 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( dtNavMeshQuery *navQuery, floa
 		}
 	}
 
+	if( !endRef && bHasTargetAndIsObstacle )
+	{
+		// Work-around: in case of some small physics obstacles may not generate as an obstacle on the mesh
+		// Todo: figure out something better?
+		status = navQuery->findNearestPoly(epos, polyPickExt, &m_defaultFilter, &endRef, 0);
+		if( !dtStatusSucceed( status ) )
+		{
+			return status;
+		}
+	}
+
 	if( endRef )
 	{
 		float epos2[3];
