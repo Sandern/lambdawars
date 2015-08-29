@@ -53,6 +53,13 @@ void WarsRequestGameServer( CSteamID serverSteamId, CSteamID lobbySteamId, KeyVa
 		pMessageData->buf.Put( pszData, dataSize );
 		pMessageData->steamIDRemote = steamapicontext->SteamUser()->GetSteamID();
 
+		// Make sure no session is running (but should never be the case?)
+		if( g_pMatchFramework->GetMatchSession() != NULL )
+		{
+			Warning( "WarsRequestGameServer: requesting local, but old session is still active. Closing it...\n");
+			g_pMatchFramework->CloseSession();
+		}
+
 		// Creates the session
 		s_activeGameServerRequestID = serverSteamId;
 		g_pMatchFramework->CreateSession( pGameData );
