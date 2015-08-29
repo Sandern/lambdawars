@@ -16,6 +16,9 @@
 // Process entry point.
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow )
 {
+	// Enable High-DPI support on Windows 7 or newer.
+	CefEnableHighDPISupport();
+
 	// Parse command-line arguments.
 	//CefRefPtr<CefCommandLine> command_line = CefCommandLine::CreateCommandLine();
 	//command_line->InitFromString(::GetCommandLineW());

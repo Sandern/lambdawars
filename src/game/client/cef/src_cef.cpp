@@ -275,6 +275,9 @@ bool CCefSystem::Init()
 	s_pChainedWndProc = reinterpret_cast<WNDPROC>( SetWindowLongPtr( GetMainWindow(), GWL_WNDPROC, reinterpret_cast<LONG_PTR>( CefWndProcHook ) ) );
 #endif // WIN32
 
+	// Enable High-DPI support on Windows 7 or newer.
+	CefEnableHighDPISupport();
+
 	// Arguments
 	HINSTANCE hinst = (HINSTANCE)GetModuleHandle(NULL);
 	CefMainArgs main_args( hinst );
