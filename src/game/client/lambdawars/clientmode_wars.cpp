@@ -92,6 +92,52 @@ void SurfaceCursorOverride::SetCursor(HCursor cursor)
 
 static SurfaceCursorOverride s_SurfacePassThru;
 
+// Voice data
+void VoxCallback( IConVar *var, const char *oldString, float oldFloat )
+{
+	if ( engine && engine->IsConnected() )
+	{
+		ConVarRef voice_vox( var->GetName() );
+		if ( voice_vox.GetBool() /*&& voice_modenable.GetBool()*/ )
+		{
+			engine->ClientCmd( "voicerecord_toggle on\n" );
+		}
+		else
+		{
+			engine->ClientCmd( "voicerecord_toggle off\n" );
+		}
+	}
+}
+ConVar voice_vox( "voice_vox", "0", FCVAR_ARCHIVE, "Voice chat uses a vox-style always on", false, 0, true, 1, VoxCallback );
+
+//--------------------------------------------------------------------------------------------------------
+class CVoxManager : public CAutoGameSystem
+{
+public:
+	CVoxManager() : CAutoGameSystem( "VoxManager" ) { }
+
+	virtual void LevelInitPostEntity( void )
+	{
+		if ( voice_vox.GetBool() /*&& voice_modenable.GetBool()*/ )
+		{
+			engine->ClientCmd( "voicerecord_toggle on\n" );
+		}
+	}
+
+
+	virtual void LevelShutdownPreEntity( void )
+	{
+		if ( voice_vox.GetBool() )
+		{
+			engine->ClientCmd( "voicerecord_toggle off\n" );
+		}
+	}
+};
+
+
+//--------------------------------------------------------------------------------------------------------
+static CVoxManager s_VoxManager;
+
 // --------------------------------------------------------------------------------- //
 // CSDKModeManager.
 // --------------------------------------------------------------------------------- //
