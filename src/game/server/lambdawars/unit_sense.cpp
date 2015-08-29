@@ -9,8 +9,13 @@
 #include "wars_func_unit.h"
 #include "vprof.h"
 
+#include "recast/recast_mgr.h"
+#include "recast/recast_mesh.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+#define DEFAULT_SENSE_MESH "human"
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -85,6 +90,8 @@ void UnitBaseSense::UpdateRememberedSeen()
 	// Nearest is used by enemy selection, so do full test
 	if( !m_hNearestEnemy || !TestEntity( m_hNearestEnemy ) || m_pOuter->IRelationType( m_hNearestEnemy ) != D_HT )
 	{
+		CRecastMesh *pMesh = m_pOuter ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) ) : RecastMgr().GetMesh( DEFAULT_SENSE_MESH );
+
 		int iAttackPriority;
 		float fBestEnemyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
 		int iBestAttackPriority = -1000;
@@ -100,9 +107,13 @@ void UnitBaseSense::UpdateRememberedSeen()
 			if( iAttackPriority > iBestAttackPriority 
 				|| (iAttackPriority == iBestAttackPriority && m_SeenEnemies[i].distancesqr < fBestEnemyDist) )
 			{
-				fBestEnemyDist = m_SeenEnemies[i].distancesqr;
-				m_hNearestEnemy = m_SeenEnemies[i].entity;
-				iBestAttackPriority = iAttackPriority;
+				bool bReachable = !pMesh || pMesh->FindPathDistance( m_pOuter->GetAbsOrigin(), pEnemy->GetAbsOrigin(), pEnemy, 120.0f, true ) >= 0;
+				if( bReachable )
+				{
+					fBestEnemyDist = m_SeenEnemies[i].distancesqr;
+					m_hNearestEnemy = m_SeenEnemies[i].entity;
+					iBestAttackPriority = iAttackPriority;
+				}
 			}
 		}
 	}
@@ -201,6 +212,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	if( !m_bEnabled )
 		return CountSeen();
 
+	CRecastMesh *pMesh = m_pOuter ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) ) : RecastMgr().GetMesh( DEFAULT_SENSE_MESH );
+
 	const Vector &origin = GetOuter()->GetAbsOrigin();
 	distSqr = iDistance * iDistance;
 
@@ -232,9 +245,13 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			if( iAttackPriority > iBestAttackPriority 
 				|| (iAttackPriority == iBestAttackPriority && otherDist < fBestEnemyDist) )
 			{
-				fBestEnemyDist = otherDist;
-				m_hNearestEnemy = pOther;
-				iBestAttackPriority = iAttackPriority;
+				bool bReachable = !pMesh || pMesh->FindPathDistance( origin, pOther->GetAbsOrigin(), pOther, 120.0f, true ) >= 0;
+				if( bReachable )
+				{
+					fBestEnemyDist = otherDist;
+					m_hNearestEnemy = pOther;
+					iBestAttackPriority = iAttackPriority;
+				}
 			}
 		}
 		else
@@ -334,9 +351,13 @@ int UnitBaseSense::LookForUnits( int iDistance )
 				if( iAttackPriority > iBestAttackPriority 
 					|| (iAttackPriority == iBestAttackPriority && otherDist < fBestEnemyDist) )
 				{
-					fBestEnemyDist = otherDist;
-					m_hNearestEnemy = pEntOther;
-					iBestAttackPriority = iAttackPriority;
+					bool bReachable = !pMesh || pMesh->FindPathDistance( origin, pEntOther->GetAbsOrigin(), pEntOther, 120.0f, true ) >= 0;
+					if( bReachable )
+					{
+						fBestEnemyDist = otherDist;
+						m_hNearestEnemy = pEntOther;
+						iBestAttackPriority = iAttackPriority;
+					}
 				}
 			}
 			else

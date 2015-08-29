@@ -167,10 +167,17 @@ bool CRecastMesh::Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh )
 	}
 
 	// Init nav query
-	status = m_navQuery->init( m_navMesh, RECAST_NAVQUERY_MAXNODES );
+	status = m_navQuery->init( m_navMesh, RECAST_NAVQUERY_MAX_NODES );
 	if( dtStatusFailed(status) )
 	{
 		Warning("Could not init Detour navmesh query\n");
+		return false;
+	}
+
+	status = m_navQueryLimitedNodes->init( m_navMesh, RECAST_NAVQUERY_LIMITED_NODES );
+	if (dtStatusFailed(status))
+	{
+		Warning("Could not init Detour navmesh query");
 		return false;
 	}
 

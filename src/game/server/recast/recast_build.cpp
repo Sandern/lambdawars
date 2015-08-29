@@ -543,13 +543,19 @@ bool CRecastMesh::Build( CMapMesh *pMapMesh )
 		return false;
 	}
 	
-	status = m_navQuery->init( m_navMesh, RECAST_NAVQUERY_MAXNODES );
+	status = m_navQuery->init( m_navMesh, RECAST_NAVQUERY_MAX_NODES );
 	if (dtStatusFailed(status))
 	{
 		ctx.log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
 		return false;
 	}
 	
+	status = m_navQueryLimitedNodes->init( m_navMesh, RECAST_NAVQUERY_LIMITED_NODES );
+	if (dtStatusFailed(status))
+	{
+		ctx.log(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
+		return false;
+	}
 
 	// Preprocess tiles.
 	

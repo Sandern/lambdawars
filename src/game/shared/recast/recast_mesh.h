@@ -24,7 +24,9 @@ class dtTileCache;
 
 // Number of nodes used during pathfinding.
 // For very large maps we might need a larger number.
-#define RECAST_NAVQUERY_MAXNODES 4096
+#define RECAST_NAVQUERY_MAX_NODES 4096
+// Mainly selecting the nearest enemy. The ones who return a path to an enemy
+#define RECAST_NAVQUERY_LIMITED_NODES 128
 
 enum SamplePartitionType
 {
@@ -115,7 +117,7 @@ public:
 		bool *bIsPartial = NULL, const Vector *pStartTestPos = NULL );
 #endif // CLIENT_DLL
 	bool TestRoute( const Vector &vStart, const Vector &vEnd );
-	float FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget = NULL, float fBeneathLimit = 120.0f );
+	float FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget = NULL, float fBeneathLimit = 120.0f, bool bLimitedSearch = false );
 
 	// Obstacle management
 	dtObstacleRef AddTempObstacle( const Vector &vPos, float radius, float height, unsigned char areaId );
@@ -163,8 +165,10 @@ private:
 	} pathfind_resultdata_t;
 
 	bool CanUseCachedPath( dtPolyRef startRef, dtPolyRef endRef, pathfind_resultdata_t &findpathData );
-	dtStatus ComputeAdjustedStartAndEnd( float spos[3], float epos[3], dtPolyRef &startRef, dtPolyRef &endRef, float fBeneathLimit, bool bHasTargetAndIsObstacle = false, const Vector *pStartTestPos = NULL );
-	dtStatus DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], bool bHasTargetAndIsObstacle, pathfind_resultdata_t &findpathData );
+	dtStatus ComputeAdjustedStartAndEnd( dtNavMeshQuery *navQuery, float spos[3], float epos[3], dtPolyRef &startRef, dtPolyRef &endRef, 
+		float fBeneathLimit, bool bHasTargetAndIsObstacle = false, bool bDisallowBigPicker = false, const Vector *pStartTestPos = NULL );
+	dtStatus DoFindPath( dtNavMeshQuery *navQuery, dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], 
+		bool bHasTargetAndIsObstacle, pathfind_resultdata_t &findpathData );
 
 #ifndef CLIENT_DLL
 	UnitBaseWaypoint *ConstructWaypointsFromStraightPath( pathfind_resultdata_t &findpathData );
@@ -218,6 +222,7 @@ private:
 	dtNavMesh* m_navMesh;
 	dtTileCache* m_tileCache;
 	dtNavMeshQuery* m_navQuery;
+	dtNavMeshQuery* m_navQueryLimitedNodes;
 
 	dtQueryFilter m_defaultFilter;
 	dtQueryFilter m_obstacleFilter;

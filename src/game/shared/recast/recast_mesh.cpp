@@ -70,6 +70,7 @@ CRecastMesh::CRecastMesh() :
 	m_cacheLayerCount(0),
 	m_cacheBuildMemUsage(0),
 	m_navQuery(0),
+	m_navQueryLimitedNodes(0),
 	m_talloc(0),
 	m_tcomp(0),
 	m_tmproc(0)
@@ -115,6 +116,12 @@ CRecastMesh::~CRecastMesh()
 	{
 		dtFreeNavMeshQuery( m_navQuery );
 		m_navQuery = 0;
+	}
+
+	if( m_navQueryLimitedNodes )
+	{
+		dtFreeNavMeshQuery( m_navQueryLimitedNodes );
+		m_navQueryLimitedNodes = 0;
 	}
 
 	if( m_talloc )
@@ -218,6 +225,7 @@ void CRecastMesh::Init( const char *name )
 	m_Name.Set( name );
 
 	m_navQuery = dtAllocNavMeshQuery();
+	m_navQueryLimitedNodes = dtAllocNavMeshQuery();
 
 	m_talloc = new LinearAllocator(32000);
 	m_tcomp = new FastLZCompressor;
@@ -236,6 +244,7 @@ void CRecastMesh::Init( const char *name, float agentRadius, float agentHeight, 
 	m_Name.Set( name );
 
 	m_navQuery = dtAllocNavMeshQuery();
+	m_navQueryLimitedNodes = dtAllocNavMeshQuery();
 
 	m_talloc = new LinearAllocator(32000);
 	m_tcomp = new FastLZCompressor;
@@ -707,7 +716,8 @@ static void markObstaclePolygonsWalkableNavmesh(dtNavMesh* nav, NavmeshFlags* fl
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float spos[3], float epos[3], bool bHasTargetAndIsObstacle, pathfind_resultdata_t &findpathData )
+dtStatus CRecastMesh::DoFindPath( dtNavMeshQuery *navQuery, dtPolyRef startRef, dtPolyRef endRef, 
+	float spos[3], float epos[3], bool bHasTargetAndIsObstacle, pathfind_resultdata_t &findpathData )
 {
 	VPROF_BUDGET( "CRecastMesh::DoFindPath", "RecastNav" );
 
@@ -743,17 +753,12 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 			}
 		}
 
-		status = m_navQuery->findPath( startRef, endRef, spos, epos, &m_defaultFilter, findpathData.polys, &findpathData.npolys, RECASTMESH_MAX_POLYS );
+		status = navQuery->findPath( startRef, endRef, spos, epos, &m_defaultFilter, findpathData.polys, &findpathData.npolys, RECASTMESH_MAX_POLYS );
 
 		// Restore obstacle polyflags again (if any)
 		for( int i = 0; i < enabledPolys.Count(); i++ )
 		{
 			m_navMesh->setPolyFlags( enabledPolys[i].ref, enabledPolys[i].flags );
-		}
-
-		if( !dtStatusSucceed( status ) )
-		{
-			return status;
 		}
 
 		findpathData.isPartial = (status & DT_PARTIAL_RESULT) != 0;
@@ -769,6 +774,11 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 			if( status & DT_BUFFER_TOO_SMALL )
 				Warning( "Buffer is too small to hold path find result\n" );
 		}
+
+		if( !dtStatusSucceed( status ) )
+		{
+			return status;
+		}
 	}
 
 	// Store information for caching purposes
@@ -778,7 +788,7 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 
 	if( findpathData.npolys )
 	{	
-		status = m_navQuery->findStraightPath(spos, epos, findpathData.polys, findpathData.npolys,
+		status = navQuery->findStraightPath(spos, epos, findpathData.polys, findpathData.npolys,
 										findpathData.straightPath, findpathData.straightPathFlags,
 										findpathData.straightPathPolys, &findpathData.nstraightPath, 
 										RECASTMESH_MAX_POLYS, findpathData.straightPathOptions);
@@ -791,8 +801,8 @@ dtStatus CRecastMesh::DoFindPath( dtPolyRef startRef, dtPolyRef endRef, float sp
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( float spos[3], float epos[3], dtPolyRef &startRef, dtPolyRef &endRef, 
-	float fBeneathLimit, bool bHasTargetAndIsObstacle, const Vector *pStartTestPos )
+dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( dtNavMeshQuery *navQuery, float spos[3], float epos[3], dtPolyRef &startRef, dtPolyRef &endRef, 
+	float fBeneathLimit, bool bHasTargetAndIsObstacle, bool bDisallowBigPicker, const Vector *pStartTestPos )
 {
 	VPROF_BUDGET( "CRecastMesh::ComputeAdjustedStartAndEnd", "RecastNav" );
 
@@ -805,9 +815,9 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( float spos[3], float epos[3], 
 	polyPickExt[2] = 32.0f;
 
 	float polyPickExtEndBig[3];
-	polyPickExt[0] = 512.0f;
-	polyPickExt[1] = fBeneathLimit;
-	polyPickExt[2] = 512.0f;
+	polyPickExtEndBig[0] = 512.0f;
+	polyPickExtEndBig[1] = fBeneathLimit;
+	polyPickExtEndBig[2] = 512.0f;
 
 	// Find the start area. Optional use a different test position for finding the best area.
 	if( pStartTestPos )
@@ -816,11 +826,11 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( float spos[3], float epos[3], 
 		spostest[0] = (*pStartTestPos)[0];
 		spostest[1] = (*pStartTestPos)[2];
 		spostest[2] = (*pStartTestPos)[1];
-		status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0, spostest);
+		status = navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0, spostest);
 	}
 	else
 	{
-		status = m_navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);
+		status = navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);
 	}
 
 	if( !dtStatusSucceed( status ) )
@@ -833,22 +843,32 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( float spos[3], float epos[3], 
 	// these polygons of the obstacle as walkable. Obstacles next to this obstacle have different flags, so they all have their own polygons.
 
 	// Find the end area
-	status = m_navQuery->findNearestPoly(epos, polyPickExt, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
+	status = navQuery->findNearestPoly(epos, polyPickExt, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
 	if( !dtStatusSucceed( status ) )
 	{
-		// Try again, bigger picker querying more tiles
-		// This is mostly the case at the map borders, where we have no nav polygons. It's useful to have some tolerance, rather than just bug
-		// out with a "can't move there" notification.
-		status = m_navQuery->findNearestPoly(epos, polyPickExtEndBig, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
-		if( !dtStatusSucceed( status ) )
+		if( bDisallowBigPicker )
 		{
 			return status;
 		}
+		else
+		{
+			// Try again, bigger picker querying more tiles
+			// This is mostly the case at the map borders, where we have no nav polygons. It's useful to have some tolerance, rather than just bug
+			// out with a "can't move there" notification.
+			status = navQuery->findNearestPoly(epos, polyPickExtEndBig, bHasTargetAndIsObstacle ? &m_obstacleFilter : &m_defaultFilter, &endRef, 0);
+			if( !dtStatusSucceed( status ) )
+			{
+				return status;
+			}
+		}
 	}
 
-	float epos2[3];
-	dtVcopy(epos2, epos);
-	status = m_navQuery->closestPointOnPoly(endRef, epos2, epos, 0);
+	if( endRef )
+	{
+		float epos2[3];
+		dtVcopy(epos2, epos);
+		status = navQuery->closestPointOnPoly(endRef, epos2, epos, 0);
+	}
 	return status;
 }
 
@@ -913,7 +933,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 
 	dtStatus status;
 
-	dtPolyRef startRef, endRef;
+	dtPolyRef startRef = 0, endRef = 0;
 
 	float spos[3];
 	spos[0] = vStart[0];
@@ -926,7 +946,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 
 	bool bHasTargetAndIsObstacle = pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX;
 
-	status = ComputeAdjustedStartAndEnd( spos, epos, startRef, endRef, fBeneathLimit, bHasTargetAndIsObstacle, pStartTestPos );
+	status = ComputeAdjustedStartAndEnd( m_navQuery, spos, epos, startRef, endRef, fBeneathLimit, bHasTargetAndIsObstacle, pTarget != NULL, pStartTestPos );
 	if( !dtStatusSucceed( status ) )
 	{
 		return NULL;
@@ -938,7 +958,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 			-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
 	}
 
-	DoFindPath(startRef, endRef, spos, epos, bHasTargetAndIsObstacle, m_pathfindData );
+	DoFindPath( m_navQuery, startRef, endRef, spos, epos, bHasTargetAndIsObstacle, m_pathfindData );
 
 	if( m_pathfindData.cacheValid )
 	{
@@ -958,7 +978,7 @@ UnitBaseWaypoint * CRecastMesh::FindPath( const Vector &vStart, const Vector &vE
 // Purpose: Finds the path distance between two points
 // Returns: The distance, or -1 if not found.
 //-----------------------------------------------------------------------------
-float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget, float fBeneathLimit )
+float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, CBaseEntity *pTarget, float fBeneathLimit, bool bLimitedSearch )
 {
 	VPROF_BUDGET( "CRecastMesh::FindPathDistance", "RecastNav" );
 
@@ -967,8 +987,7 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 
 	dtStatus status;
 
-	dtPolyRef startRef;
-	dtPolyRef endRef;
+	dtPolyRef startRef = 0, endRef = 0;
 
 	float spos[3];
 	spos[0] = vStart[0];
@@ -980,9 +999,12 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 	epos[1] = vEnd[2];
 	epos[2] = vEnd[1];
 
+	// Faster search for nearby units. Mainly intended for unit sensing code, so it quickly filters out "unreachable" enemies
+	dtNavMeshQuery *navQuery = bLimitedSearch ? m_navQueryLimitedNodes : m_navQuery;
+
 	bool bHasTargetAndIsObstacle = pTarget && pTarget->GetNavObstacleRef() != NAV_OBSTACLE_INVALID_INDEX;
 
-	status = ComputeAdjustedStartAndEnd( spos, epos, startRef, endRef, fBeneathLimit, bHasTargetAndIsObstacle, NULL );
+	status = ComputeAdjustedStartAndEnd( navQuery, spos, epos, startRef, endRef, fBeneathLimit, bHasTargetAndIsObstacle, pTarget != NULL, NULL );
 	if( !dtStatusSucceed( status ) )
 	{
 		return NULL;
@@ -994,7 +1016,7 @@ float CRecastMesh::FindPathDistance( const Vector &vStart, const Vector &vEnd, C
 			-Vector(8, 8, 8), Vector(8, 8, 8), 255, 0, 0, 255, 5.0f);
 	}
 
-	status = DoFindPath( startRef, endRef, spos, epos, bHasTargetAndIsObstacle, m_pathfindData );
+	status = DoFindPath( navQuery, startRef, endRef, spos, epos, bHasTargetAndIsObstacle, m_pathfindData );
 	if( dtStatusSucceed( status ) && !m_pathfindData.isPartial )
 	{
 		float fPathDistance = 0;
