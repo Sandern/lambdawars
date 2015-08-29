@@ -180,6 +180,21 @@ bool NavIsAreaFlat( const Vector &mins, const Vector &maxs, float fFlatTol, CUni
 	return pMesh->IsAreaFlat( (maxs + mins) / 2.0f, (maxs - mins) / 2.0f, fFlatTol );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Test if area is walkable. Simplified test for now by just checking
+//			if raycast from corners succeeds.
+//-----------------------------------------------------------------------------
+bool NavTestAreaWalkable( const Vector &origin, const Vector &mins, const Vector &maxs, CUnitBase *pUnit )
+{
+	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	if( !pMesh )
+		return false;
+
+	float fOffset = 32.0f;
+	return pMesh->TestRoute( origin + Vector(mins.x, mins.y, mins.z+ fOffset), origin + Vector(maxs.x, maxs.y, mins.z + fOffset) ) && 
+		pMesh->TestRoute( origin + Vector(maxs.x, mins.y, mins.z+ fOffset), origin + Vector(mins.x, maxs.y, mins.z + fOffset) );
+}
+
 #define HIDESPOT_DEBUG_DURATION 0.25f
 
 #ifdef CLIENT_DLL

@@ -34,6 +34,7 @@ int GetNavAreaAt( const Vector &pos, float beneathlimit = 120.0f );
 
 // Nav mesh testing
 bool NavIsAreaFlat( const Vector &mins, const Vector &maxs, float flattol = 0.7f, CUnitBase *unit = NULL );
+bool NavTestAreaWalkable( const Vector &origin, const Vector &mins, const Vector &maxs, CUnitBase *unit = NULL );
 
 // Hiding/cover spot functions
 boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUnitBase *unit = NULL, bool sort = true, const Vector *sortpos = NULL );

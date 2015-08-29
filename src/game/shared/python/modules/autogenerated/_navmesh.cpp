@@ -125,6 +125,17 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
+    { //::NavTestAreaWalkable
+    
+        typedef bool ( *NavTestAreaWalkable_function_type )( ::Vector const &,::Vector const &,::Vector const &,::C_UnitBase * );
+        
+        bp::def( 
+            "NavTestAreaWalkable"
+            , NavTestAreaWalkable_function_type( &::NavTestAreaWalkable )
+            , ( bp::arg("origin"), bp::arg("mins"), bp::arg("maxs"), bp::arg("unit")=bp::object() ) );
+    
+    }
+
     { //::RandomNavAreaPosition
     
         typedef ::Vector ( *RandomNavAreaPosition_function_type )( ::C_BaseEntity * );
@@ -268,6 +279,17 @@ BOOST_PYTHON_MODULE(_navmesh){
             "NavMeshGetPositionNearestNavArea"
             , NavMeshGetPositionNearestNavArea_function_type( &::NavMeshGetPositionNearestNavArea )
             , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f, bp::arg("maxradius")=2.56e+2f, bp::arg("unit")=bp::object() ) );
+    
+    }
+
+    { //::NavTestAreaWalkable
+    
+        typedef bool ( *NavTestAreaWalkable_function_type )( ::Vector const &,::Vector const &,::Vector const &,::CUnitBase * );
+        
+        bp::def( 
+            "NavTestAreaWalkable"
+            , NavTestAreaWalkable_function_type( &::NavTestAreaWalkable )
+            , ( bp::arg("origin"), bp::arg("mins"), bp::arg("maxs"), bp::arg("unit")=bp::object() ) );
     
     }
 
