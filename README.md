@@ -1,7 +1,7 @@
 ## Lambda Wars (based on Alien Swarm SDK).
 Source code of Lambda Wars (http://lambdawars.com/), available on Steam: http://steamcommunity.com/app/270370
 
-Game code can be found at: http://svn.lambdawars.com/
+Game code can be found at: http://svn.lambdawars.com/ (svn checkout http://svn.lambdawars.com/lambdawars/trunk/ lambdawarsdev)
 
 ## Compiling
 Tested with Visual Studio 2013:
