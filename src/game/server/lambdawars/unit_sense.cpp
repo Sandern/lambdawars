@@ -107,7 +107,7 @@ void UnitBaseSense::UpdateRememberedSeen()
 			if( iAttackPriority > iBestAttackPriority 
 				|| (iAttackPriority == iBestAttackPriority && m_SeenEnemies[i].distancesqr < fBestEnemyDist) )
 			{
-				bool bReachable = !pMesh || pMesh->FindPathDistance( m_pOuter->GetAbsOrigin(), pEnemy->GetAbsOrigin(), pEnemy, 120.0f, true ) >= 0;
+				bool bReachable = !pMesh || pMesh->FindPathDistance( m_pOuter->GetAbsOrigin(), pEnemy->GetAbsOrigin(), pEnemy, 1024.0f, true ) >= 0;
 				if( bReachable )
 				{
 					fBestEnemyDist = m_SeenEnemies[i].distancesqr;
@@ -245,7 +245,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			if( iAttackPriority > iBestAttackPriority 
 				|| (iAttackPriority == iBestAttackPriority && otherDist < fBestEnemyDist) )
 			{
-				bool bReachable = !pMesh || pMesh->FindPathDistance( origin, pOther->GetAbsOrigin(), pOther, 120.0f, true ) >= 0;
+				bool bReachable = !pMesh || pMesh->FindPathDistance( origin, pOther->GetAbsOrigin(), pOther, 1024.0f, true ) >= 0;
 				if( bReachable )
 				{
 					fBestEnemyDist = otherDist;
