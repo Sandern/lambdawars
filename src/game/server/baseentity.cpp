@@ -9154,7 +9154,6 @@ void CBaseEntity::PySendMessage( boost::python::list msg, bool reliable )
 	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		return;
 	}
 

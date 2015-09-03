@@ -1094,12 +1094,14 @@ void CUnitBase::SetNavigator( boost::python::object navigator )
 		return;
 	}
 
-	try {
+	try 
+	{
 		m_pNavigator = boost::python::extract<UnitBaseNavigator *>(navigator);
 		m_pyNavigator = navigator;
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
-		PyErr_Clear();
 		m_pNavigator = NULL;
 		m_pyNavigator = boost::python::object();
 		return;
@@ -1159,7 +1161,6 @@ void CUnitBase::HandleAnimEvent( animevent_t *pEvent )
 				catch( boost::python::error_already_set &) 
 				{
 					PyErr_Print();
-					PyErr_Clear();
 				}
 #endif // ENABLE_PYTHON
 			}

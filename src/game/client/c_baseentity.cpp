@@ -6689,7 +6689,7 @@ void C_BaseEntity::PyReceiveMessageInternal( int classID, bf_read &msg )
 	boost::python::list recvlist;
 	i = 0;
 	length = msg.ReadByte();
-	for( i=0; i<length; i++)
+	for( i = 0; i < length; i++)
 	{
 		try 
 		{
@@ -6698,7 +6698,6 @@ void C_BaseEntity::PyReceiveMessageInternal( int classID, bf_read &msg )
 		catch(boost::python::error_already_set &) 
 		{
 			PyErr_Print();
-			PyErr_Clear();
 			return;
 		}
 	}
@@ -6723,7 +6722,6 @@ void C_BaseEntity::PyUpdateNetworkVar( const char *pName, boost::python::object 
 	catch(boost::python::error_already_set &) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		return;
 	}
 
@@ -6750,7 +6748,6 @@ void C_BaseEntity::PyNetworkVarChanged( const char *pName )
 	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 	}
 }
 

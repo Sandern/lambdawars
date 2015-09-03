@@ -61,7 +61,6 @@ void PyHandle::Set( bp::object ent )
 	catch( bp::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		return;
 	}
 

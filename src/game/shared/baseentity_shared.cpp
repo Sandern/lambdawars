@@ -2948,7 +2948,6 @@ void CBaseEntity::PyThink()
 	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 	}
 }
 
@@ -2964,7 +2963,6 @@ void CBaseEntity::PyTouch( ::CBaseEntity *pOther )
 	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 	}
 }
 #endif // ENABLE_PYTHON

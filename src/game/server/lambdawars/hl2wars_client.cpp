@@ -117,12 +117,13 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 
 		// Notify gamemgr (before other client active's)
 		boost::python::object ca;
-		try {
+		try 
+		{
 			ca = SrcPySystem()->Get("_ClientActive", "gamemgr");
 			ca(*pPlayer);
-		} catch(...) {
+		} 
+		catch( boost::python::error_already_set & ) {
 			PyErr_Print();
-			PyErr_Clear();
 		}
 
 		// Send clientactive signal
@@ -235,7 +236,6 @@ void InstallGameRules()
 		catch( boost::python::error_already_set & ) 
 		{
 			PyErr_Print();
-			PyErr_Clear();
 		}
 	}
 #endif // ENABLE_PYTHON

@@ -171,6 +171,7 @@ static void WarsNet_WritePythonDataInternal( CUtlBuffer &buf, boost::python::obj
 		{
 			PyErr_Clear();
 		}
+
 		try 
 		{
 			CBaseEntity *pEnt = boost::python::extract<CBaseEntity *>(data);

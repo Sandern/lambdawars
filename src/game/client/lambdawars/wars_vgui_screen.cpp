@@ -148,7 +148,6 @@ void WarsVGUIScreen::SetPanel( boost::python::object panel )
 		m_pyPanel = panel;
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
-		PyErr_Clear();
 		m_pPanel = NULL;
 		m_pyPanel = boost::python::object();
 		return;

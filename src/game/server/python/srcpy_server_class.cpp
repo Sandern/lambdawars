@@ -242,10 +242,10 @@ void NetworkedClass::SetupServerClass()
 		iType = boost::python::call_method<int>(m_PyClass.ptr(), "GetPyNetworkType");
 		m_pServerClass->SetupServerClass( iType );
 		PyObject_SetAttrString(m_PyClass.ptr(), "pyServerClass", bp::object(bp::ptr((ServerClass *)m_pServerClass)).ptr());
-	} catch(bp::error_already_set &) 
+	} 
+	catch(bp::error_already_set &) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 	}
 
 	// Send message to all clients

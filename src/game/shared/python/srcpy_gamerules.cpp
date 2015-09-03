@@ -59,7 +59,6 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 	} catch(bp::error_already_set &) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		return;
 	}
 
@@ -88,7 +87,6 @@ void PyInstallGameRulesInternal( boost::python::object gamerules )
 	catch(bp::error_already_set &) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		InstallDefaultGamerules();
 		return;
 	}

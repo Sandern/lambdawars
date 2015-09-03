@@ -140,7 +140,6 @@ int PyConCommand::AutoCompleteSuggest( const char *partial, CUtlVector< CUtlStri
 	catch(boost::python::error_already_set &) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 		return 0;
 	}
 
@@ -154,7 +153,6 @@ int PyConCommand::AutoCompleteSuggest( const char *partial, CUtlVector< CUtlStri
 		catch(boost::python::error_already_set &) 
 		{
 			PyErr_Print();
-			PyErr_Clear();
 		}
 	}
 
@@ -440,7 +438,6 @@ void PyGameEventListener::FireGameEvent( IGameEvent *event )
 		pPyEvent->Init(NULL);
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
-		PyErr_Clear();
 	}
 }
 

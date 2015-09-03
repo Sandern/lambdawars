@@ -388,8 +388,7 @@ Color CHudChat::GetClientColor( int clientIndex )
 		} 
 		catch( boost::python::error_already_set & ) 
 		{	
-			PyErr_Print();	
-			PyErr_Clear();	
+			PyErr_Print();
 		}		
 	}
 #endif // ENABLE_PYTHON

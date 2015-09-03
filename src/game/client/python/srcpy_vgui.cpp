@@ -332,7 +332,6 @@ void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx )
 	catch( boost::python::error_already_set & ) 
 	{
 		PyErr_Print();
-		PyErr_Clear();
 	}
 
 	// remove panel from any list
@@ -380,7 +379,6 @@ void PyDeletePanel( Panel *pPanel, PyPanel *pPyPanel, int iRemoveIdx )
 	{
 		Warning("PyDeletePanel: error occurred while deleting Python panel %s\n", pPanel->GetName());
 		PyErr_Print();
-		PyErr_Clear();
 	}
 }
 
@@ -525,7 +523,6 @@ bool Panel_DispatchMessage(CUtlDict<py_message_entry_t, short> &messageMap, cons
 		}
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
-		PyErr_Clear();
 	}
 	return true;
 }

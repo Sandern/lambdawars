@@ -89,8 +89,7 @@ static boost::python::object WarsNet_ReadHandle( CUtlBuffer &data )
 	catch( boost::python::error_already_set & ) 
 	{					
 		Warning( "WarsNet_ReadHandle: Failed to create a PyHandle!\n" );				
-		PyErr_Print();																		
-		PyErr_Clear();												
+		PyErr_Print();											
 	}	
 	return boost::python::object();
 }
@@ -188,7 +187,6 @@ static boost::python::object WarsNet_ReadPythonVarData( CUtlBuffer &data, bool &
 	{
 		Warning( "WarsNet_ReadPythonVarData: failed to parse data for type %d: \n", type );
 		PyErr_Print();
-		PyErr_Clear();
 	}
 
 	// Error state

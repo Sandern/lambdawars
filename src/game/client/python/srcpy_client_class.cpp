@@ -227,7 +227,6 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 	{
 		Warning("Failed to create python client side entity, falling back to base c++ class\n");
 		PyErr_Print();
-		PyErr_Clear();
 		
 		// Call the correct fallback factory
 		IClientNetworkable *pResult = NULL;
@@ -434,7 +433,6 @@ void NetworkedClass::AttachClientClass( PyClientClassBase *pClientClass )
 		PyObject_SetAttrString(m_pyClass.ptr(), "pyClientClass", bp::object(bp::ptr((ClientClass *)m_pClientClass)).ptr());
 	} catch(boost::python::error_already_set &) {
 		PyErr_Print();
-		PyErr_Clear();
 	}
 }
 

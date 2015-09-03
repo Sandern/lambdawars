@@ -936,12 +936,14 @@ void CUnitBase::SetAnimState( boost::python::object animstate )
 		return;
 	}
 
-	try {
+	try 
+	{
 		m_pAnimState = boost::python::extract<UnitBaseAnimState *>(animstate);
 		m_pyAnimState = animstate;
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch(boost::python::error_already_set &) 
+	{
 		PyErr_Print();
-		PyErr_Clear();
 		m_pAnimState = NULL;
 		m_pyAnimState = boost::python::object();
 		return;
