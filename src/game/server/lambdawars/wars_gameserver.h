@@ -23,10 +23,12 @@ public:
 	void UpdateServer();
 	void RunFrame();
 
+	void ClientDisconnect( edict_t *pEdict );
+
 	void SetState( EGameServerState state );
 	EGameServerState GetState();
 
-	virtual char *GetMatchmakingTags( char *buf, size_t bufSize );
+	virtual char *GetMatchmakingTags( char *buf, size_t &bufSize );
 
 	// Shutdowns game once all players have left
 	void ScheduleShutdown();

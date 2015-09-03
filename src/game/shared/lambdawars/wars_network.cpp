@@ -239,8 +239,8 @@ bool WarsNet_EndEntityUpdate()
 
 	if( wars_net_debug_send.GetBool() )
 	{
-		Msg("WarsNet wrote entity update of %d bytes, sending using %s\n", 
-			s_variableMessageData.TellMaxPut(), s_isLoopback ? "loopback" : "Steam P2P Networking" );
+		Msg("%.2f: WarsNet wrote entity update of %d bytes, sending using %s\n", 
+			Plat_FloatTime(), s_variableMessageData.TellMaxPut(), s_isLoopback ? "loopback" : "Steam P2P Networking" );
 	}
 
 	if( s_isLoopback )
@@ -263,7 +263,7 @@ void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool
 
 	if( wars_net_debug_send.GetBool() )
 	{
-		Msg("WarsNet Writing entity variable update for %s\n", name);
+		Msg("%.2f: WarsNet Writing entity variable update for %s\n", Plat_FloatTime(), name);
 	}
 
 	// Indicate we are writing a new variable
@@ -312,8 +312,8 @@ void WarsNet_WriteMessageData( IRecipientFilter& filter, const char *name, boost
 
 		if( wars_net_debug_send.GetBool() )
 		{
-			Msg("WarsNet wrote message update of %d bytes, sending using %s\n", 
-				buf.TellMaxPut(), isLoopback ? "loopback" : "Steam P2P Networking" );
+			Msg("%.2f: WarsNet wrote message update of %d bytes, sending using %s\n", 
+				Plat_FloatTime(), buf.TellMaxPut(), isLoopback ? "loopback" : "Steam P2P Networking" );
 		}
 
 		if( s_isLoopback )

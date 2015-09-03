@@ -69,6 +69,9 @@ void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data );
 
 // Receiving generic messages
 void WarsNet_ReceiveMessageUpdate( CUtlBuffer &data );
+
+// Process all messages
+void WarsNet_ProcessWarsMessages();
 #endif // CLIENT_DLL
 
 #endif // ENABLE_PYTHON

@@ -3081,6 +3081,13 @@ void CServerGameClients::ClientDisconnect( edict_t *pEdict )
 {
 	extern bool	g_fGameOver;
 
+#ifdef HL2WARS_DLL
+	if( WarsGameServer() )
+	{
+		WarsGameServer()->ClientDisconnect( pEdict );
+	}
+#endif // HL2WARS_DLL
+
 	CBasePlayer *player = ( CBasePlayer * )CBaseEntity::Instance( pEdict );
 	if ( player )
 	{

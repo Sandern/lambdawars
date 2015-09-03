@@ -228,7 +228,7 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 		{
 			if( wars_net_debug_receive.GetBool() )
 			{
-				Msg( "#%d Received PyNetworkVar %s\n", ent->entindex(), varName );
+				Msg( "%.2f: #%d Received PyNetworkVar %s\n", Plat_FloatTime(), ent->entindex(), varName );
 			}
 			ent->PyUpdateNetworkVar( varName, pyData, entExpectedType == WARSNET_ENTVAR_CC );
 		}
@@ -236,8 +236,8 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 		{
 			if( wars_net_debug_receive.GetBool() )
 			{
-				Msg( "#%d Received PyNetworkVar, but entity is NULL. Delaying apply data until entity exists...\n", 
-					ent.GetEntryIndex(), varName );
+				Msg( "%.2f: #%d Received PyNetworkVar, but entity is NULL. Delaying apply data for \"%s\" until entity exists...\n", 
+					Plat_FloatTime(), ent.GetEntryIndex(), varName );
 			}
 			SrcPySystem()->AddToDelayedUpdateList( ent, varName, pyData, entExpectedType == WARSNET_ENTVAR_CC );
 		}
@@ -271,7 +271,7 @@ void WarsNet_ReceiveEntityUpdate( CUtlBuffer &data )
 
 	if( wars_net_debug_receive.GetBool() )
 	{
-		Msg( "WarsNet_ReceiveEntityUpdate: got entity data update of size %d bytes\n", data.TellMaxPut() );
+		Msg( "%.2f: WarsNet_ReceiveEntityUpdate: got entity data update of size %d bytes\n", Plat_FloatTime(), data.TellMaxPut() );
 	}
 
 	while( WarsNet_ReadEntityVar( handle, data ) )
@@ -304,7 +304,7 @@ void WarsNet_ReceiveMessageUpdate( CUtlBuffer &data )
 
 	if( wars_net_debug_receive.GetBool() )
 	{
-		Msg( "WarsNet_ReceiveMessageUpdate: got message update %s of size %d bytes\n", msgName, data.TellMaxPut() );
+		Msg( "%.2f: WarsNet_ReceiveMessageUpdate: got message update %s of size %d bytes\n", Plat_FloatTime(), msgName, data.TellMaxPut() );
 	}
 
 	bool success;
@@ -318,6 +318,116 @@ void WarsNet_ReceiveMessageUpdate( CUtlBuffer &data )
 	{
 		Warning( "WarsNet_ReceiveMessageUpdate: Failed to read message %s\n", msgName );
 		return;
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void WarsNet_ProcessWarsMessages()
+{
+	// Receive/Process client messages
+	if( warsextension )
+	{
+		warsextension->ReceiveClientSteamP2PMessages( steamapicontext->SteamNetworking() );
+
+		// Process client messages
+		WarsMessageData_t *messageData = warsextension->ClientMessageHead();
+		while( messageData )
+		{
+			EMessageClient eMsg = (EMessageClient)( *(uint32*)messageData->buf.Base() );
+			const CSteamID &steamIDRemote = messageData->steamIDRemote;
+
+#ifdef ENABLE_PYTHON
+			boost::python::dict kwargs;
+			boost::python::object signal;
+#endif // ENABLE_PYTHON
+			uint32 publicIP = 0;
+			uint32 gamePort = 0;
+			CSteamID serverSteamID;
+			WarsAcceptGameMessage_t *acceptMessageData;
+
+			switch( eMsg )
+			{
+				case k_EMsgClientRequestGameAccepted:
+					if( messageData->buf.TellMaxPut() < sizeof(WarsAcceptGameMessage_t) )
+					{
+						break;
+					}
+					if( WarsGetActiveRequestGameServerSteamID() != steamIDRemote )
+					{
+						break;
+					}
+					
+					acceptMessageData = (WarsAcceptGameMessage_t *)messageData->buf.Base();
+
+					publicIP = acceptMessageData->publicIP;
+					gamePort = acceptMessageData->gamePort;
+					serverSteamID.SetFromUint64(acceptMessageData->serverSteamID);
+
+#ifdef ENABLE_PYTHON
+					kwargs["sender"] = boost::python::object();
+					kwargs["publicip"] = publicIP;
+					kwargs["gameport"] = gamePort;
+					kwargs["serversteamid"] = serverSteamID;
+					signal = SrcPySystem()->Get("lobby_gameserver_accept", "core.signals", true);
+					SrcPySystem()->CallSignal( signal, kwargs );
+#endif // ENABLE_PYTHON
+					break;
+				case k_EMsgClientRequestGameDenied:
+					if( WarsGetActiveRequestGameServerSteamID() != steamIDRemote )
+					{
+						break;
+					}
+#ifdef ENABLE_PYTHON
+					SrcPySystem()->CallSignalNoArgs( SrcPySystem()->Get( "lobby_gameserver_denied", "core.signals", true ) );
+#endif // ENABLE_PYTHON
+					break;
+				case k_EMsgClient_PyEntityClasses:
+#ifdef ENABLE_PYTHON
+					WarsNet_ReceiveEntityClasses( messageData->buf );
+#endif // ENABLE_PYTHON
+					break;
+				case k_EMsgClient_PyEntityUpdate:
+#ifdef ENABLE_PYTHON
+					WarsNet_ReceiveEntityUpdate( messageData->buf );
+#endif // ENABLE_PYTHON
+					break;
+				case k_EMsgClient_PyMessageUpdate:
+#ifdef ENABLE_PYTHON
+					WarsNet_ReceiveMessageUpdate( messageData->buf );
+#endif // ENABLE_PYTHON
+					break;
+				case k_EMsgClient_Ping:
+				{
+					WarsSendPongMessage( messageData->steamIDRemote );
+					break;
+				}
+				case k_EMsgClient_Pong:
+				{
+#ifdef ENABLE_PYTHON
+					try
+					{
+						boost::python::dict kwargs;
+						kwargs["sender"] = boost::python::object();
+						kwargs["steamidremote"] = messageData->steamIDRemote;
+						SrcPySystem()->CallSignal( SrcPySystem()->Get( "lobby_received_pong", "core.signals", true ), kwargs );
+					}
+					catch( boost::python::error_already_set & ) 
+					{
+						PyErr_Print();
+					}
+#endif // ENABLE_PYTHON
+					break;
+				}
+				default:
+					Warning("Unknown client message type %d\n", eMsg); 
+					break;
+			}
+
+			warsextension->NextClientMessage();
+			messageData = warsextension->ClientMessageHead();
+		}
 	}
 }
 

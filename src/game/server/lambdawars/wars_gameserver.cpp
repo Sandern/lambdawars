@@ -347,6 +347,29 @@ void CWarsGameServer::RunFrame()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+void CWarsGameServer::ClientDisconnect( edict_t *pEdict )
+{
+	if( !steamgameserverapicontext->SteamGameServer() )
+	{
+		return;
+	}
+
+	const CSteamID *pClientSteamID = engine->GetClientSteamID( pEdict );
+	if( !pClientSteamID || !pClientSteamID->IsValid() )
+	{
+		return;
+	}
+
+	steamgameserverapicontext->SteamGameServerNetworking()->CloseP2PSessionWithUser( *pClientSteamID );
+	if( wars_gamserver_debug.GetBool() ) 
+	{
+		Msg( "WarsGameserver closed P2P session with %I64u\n", pClientSteamID->ConvertToUint64() );
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
 void CWarsGameServer::SetState( EGameServerState state )
 {
 	if( m_State == state ) 
@@ -388,7 +411,7 @@ void CWarsGameServer::SetState( EGameServerState state )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-char *CWarsGameServer::GetMatchmakingTags( char *buf, size_t bufSize )
+char *CWarsGameServer::GetMatchmakingTags( char *buf, size_t &bufSize )
 {
 	int len = 0;
 	if( m_State == k_EGameServer_Available )
