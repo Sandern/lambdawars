@@ -206,7 +206,11 @@ void CWarsGameServer::UpdateServer()
 	}
 	m_nConnectedPlayers = nConnected;
 
-	if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 )
+	// When playing an offline game, the host might never get a public IP due having no internet connection. Just send the accept message
+	// for offline games in this case (but improvement is desirable).
+	bool bIsOfflineGame = m_pLocalPlayerGameData && !V_stricmp( m_pLocalPlayerGameData->GetString( "system/network", "LIVE" ), "offline" );
+
+	if( steamgameserverapicontext->SteamGameServer()->GetPublicIP() != 0 || bIsOfflineGame )
 	{
 		// m_LobbyPlayerRequestingGameID is set when the game server is not running yet (when a local player starts the server).
 		// This delays the accept message.
