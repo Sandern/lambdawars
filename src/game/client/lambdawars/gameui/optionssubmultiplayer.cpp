@@ -404,7 +404,9 @@ COptionsSubMultiplayer::COptionsSubMultiplayer(vgui::Panel *parent) : vgui::Prop
 
 	m_pLogoList = new CLabeledCommandComboBox( this, "SpraypaintList" );
     m_LogoName[0] = 0;
+#if 0
 	InitLogoList( m_pLogoList );
+#endif // 0
 
 	m_pModelImage = new CBitmapImagePanel( this, "ModelImage", NULL );
 	m_pModelImage->AddActionSignalTarget( this );
@@ -2577,6 +2579,7 @@ void COptionsSubMultiplayer::OnApplyChanges()
 		engine->ClientCmd_Unrestricted(cmd);
 	}
 
+#if 0
 	// save the logo name
 	char cmd[512];
 	if ( m_LogoName[ 0 ] )
@@ -2588,6 +2591,9 @@ void COptionsSubMultiplayer::OnApplyChanges()
 		Q_strncpy( cmd, "cl_logofile \"\"\n", sizeof( cmd ) );
 	}
 	engine->ClientCmd_Unrestricted(cmd);
+#else
+	char cmd[512];
+#endif // 0
 
 	if ( m_pModelList && m_pModelList->IsVisible() && m_pModelList->GetActiveItemCommand() )
 	{

@@ -382,7 +382,7 @@ void Multiplayer::OnCommand(const char *command)
 		CGameUIConVarRef net_allow_multicast( "net_allow_multicast" );
 		net_allow_multicast.SetValue( !Q_stricmp( sz, "Enabled" ) );
 	}
-
+#if 0
 	else if ( StringHasPrefix( command, "_spraypaint" ) )
 	{
 		int iCommandNumberPosition = Q_strlen( MULTIPLAYER_SPRAYPAINT_COMMAND_PREFIX );
@@ -476,6 +476,7 @@ void Multiplayer::OnCommand(const char *command)
 		m_hImportSprayDialog->DoModal(false);
 		m_hImportSprayDialog->Activate();
 	}
+#endif // 0
 	else if( Q_stricmp( "Back", command ) == 0 )
 	{
 		OnKeyCodePressed( ButtonCodeToJoystickButtonCode( KEY_XBUTTON_B, CBaseModPanel::GetSingleton().GetLastActiveUserId() ) );
