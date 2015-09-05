@@ -455,7 +455,7 @@ void CSentence::ParsePlaintext( CUtlBuffer& buf )
 	text[ 0 ] = 0;
 	while ( 1 )
 	{
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( !stricmp( token, "}" ) )
 			break;
 
@@ -474,19 +474,19 @@ void CSentence::ParseWords( CUtlBuffer& buf )
 
 	while ( 1 )
 	{
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( !stricmp( token, "}" ) )
 			break;
 
 		if ( stricmp( token, "WORD" ) )
 			break;
 
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		Q_strncpy( word, token, sizeof( word ) );
 
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		start = atof( token );
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		end = atof( token );
 
 		CWordTag *wt = new CWordTag( word );
@@ -496,13 +496,13 @@ void CSentence::ParseWords( CUtlBuffer& buf )
 
 		AddWordTag( wt );
 
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( stricmp( token, "{" ) )
 			break;
 
 		while ( 1 )
 		{
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			if ( !stricmp( token, "}" ) )
 				break;
 
@@ -514,13 +514,13 @@ void CSentence::ParseWords( CUtlBuffer& buf )
 
 			code = atoi( token );
 
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			Q_strncpy( phonemename, token, sizeof( phonemename ) );
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			start = atof( token );
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			end = atof( token );
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			volume = atof( token );
 
 			CPhonemeTag *pt = new CPhonemeTag();
@@ -540,13 +540,13 @@ void CSentence::ParseEmphasis( CUtlBuffer& buf )
 	char token[ 4096 ];
 	while ( 1 )
 	{
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( !stricmp( token, "}" ) )
 			break;
 
 		char t[ 256 ];
 		Q_strncpy( t, token, sizeof( t ) );
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 
 		char value[ 256 ];
 		Q_strncpy( value, token, sizeof( value ) );
@@ -574,15 +574,15 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 		//   PHRASE char streamlength "streambytes" starttime endtime
 		//   PHRASE unicode streamlength "streambytes" starttime endtime
 		// }
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( !stricmp( token, "}" ) )
 			break;
 
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( stricmp( token, "{" ) )
 			break;
 
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		while ( 1 )
 		{
 			if ( !stricmp( token, "}" ) )
@@ -597,7 +597,7 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 
 			memset( cc_stream, 0, sizeof( cc_stream ) );
 
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			Q_strncpy( cc_type, token, sizeof( cc_type ) );
 
 			bool unicode = false;
@@ -610,7 +610,7 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 				Assert( 0 );
 			}
 
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 			cc_length = atoi( token );
 			Assert( cc_length >= 0 && cc_length < sizeof( cc_stream ) );
 			// Skip space
@@ -620,10 +620,10 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 			
 			// Skip space
 			buf.GetChar();
-			buf.GetString( token );
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
+			buf.GetString( token, sizeof(token) );
 
-			buf.GetString( token );
+			buf.GetString( token, sizeof(token) );
 		}
 	}
 }
@@ -633,7 +633,7 @@ void CSentence::ParseOptions( CUtlBuffer& buf )
 	char token[ 4096 ];
 	while ( 1 )
 	{
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( !stricmp( token, "}" ) )
 			break;
 
@@ -643,7 +643,7 @@ void CSentence::ParseOptions( CUtlBuffer& buf )
 		char key[ 256 ];
 		Q_strncpy( key, token, sizeof( key ) );
 		char value[ 256 ];
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		Q_strncpy( value, token, sizeof( value ) );
 
 		if ( !strcmpi( key, "voice_duck" ) )
@@ -669,14 +669,14 @@ void CSentence::ParseDataVersionOnePointZero( CUtlBuffer& buf )
 
 	while ( 1 )
 	{
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( strlen( token ) <= 0 )
 			break;
 
 		char section[ 256 ];
 		Q_strncpy( section, token, sizeof( section ) );
 
-		buf.GetString( token );
+		buf.GetString( token, sizeof(token) );
 		if ( stricmp( token, "{" ) )
 			break;
 
@@ -1111,12 +1111,12 @@ void CSentence::InitFromBuffer( CUtlBuffer& buf )
 	Reset();
 
 	char token[ 4096 ];
-	buf.GetString( token );
+	buf.GetString( token, sizeof(token) );
 
 	if ( stricmp( token, "VERSION" ) )
 		return;
 
-	buf.GetString( token );
+	buf.GetString( token, sizeof(token) );
 	if ( atof( token ) == 1.0f )
 	{
 		ParseDataVersionOnePointZero( buf );
@@ -1745,6 +1745,9 @@ int CSentence::CountWords( char const *str )
 bool CSentence::ShouldSplitWord( char in )
 {
 	if ( in <= 32 )
+		return true;
+
+	if ( in >= 128 )
 		return true;
 
 	if ( ispunct( in ) )
