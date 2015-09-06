@@ -859,7 +859,16 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	{
 		sv_allow_lobby_connect_only->SetValue( 0 );
 	}
-	
+	ConVar *sv_allowupload = g_pCVar->FindVar( "sv_allowupload" );
+	if ( sv_allowupload )
+	{
+		sv_allowupload->SetValue( 0 );
+	}
+	ConVar *sv_allowdownload = g_pCVar->FindVar( "sv_allowdownload" );
+	if ( sv_allowdownload )
+	{
+		sv_allowdownload->SetValue( 0 );
+	}
 #endif // HL2WARS_DLL
 
 	g_pcv_commentary = g_pCVar->FindVar( "commentary" );
