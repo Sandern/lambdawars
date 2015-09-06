@@ -1130,6 +1130,16 @@ bool CSrcPython::ExecuteFile( const char* pScript )
 		{
 			Py_DECREF(v);
 		}
+		else
+		{
+#ifdef CLIENT_DLL
+			DevMsg( "CLIENT: " );
+#else
+			DevMsg( "SERVER: " );
+#endif // CLIENT_DLL
+			DevMsg( "RunPythonFile failed -> file: %s\n", pScript );
+			PyErr_Print();
+		}
 
 		Py_DECREF(filename);
 	}
