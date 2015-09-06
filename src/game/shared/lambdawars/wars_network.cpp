@@ -21,6 +21,7 @@
 #ifdef ENABLE_PYTHON
 
 ConVar wars_net_debug_send( "wars_net_debug_send", "0", FCVAR_CHEAT|FCVAR_REPLICATED );
+ConVar wars_net_debug_send_track_var( "wars_net_debug_send_track_var", "", FCVAR_CHEAT|FCVAR_REPLICATED );
 
 static void WarsNet_WritePythonDataInternal( CUtlBuffer &buf, boost::python::object data );
 
@@ -262,9 +263,9 @@ void WarsNet_WriteEntityData( const char *name, boost::python::object data, bool
 {
 	s_wroteData = true;
 
-	if( wars_net_debug_send.GetBool() )
+	if( wars_net_debug_send.GetBool() || !V_strcmp( wars_net_debug_send_track_var.GetString(), name ) )
 	{
-		Msg("%.2f: WarsNet Writing entity variable update for %s\n", Plat_FloatTime(), name);
+		Msg( "%.2f: WarsNet Writing entity variable update for %s\n", Plat_FloatTime(), name );
 	}
 
 	// Indicate we are writing a new variable

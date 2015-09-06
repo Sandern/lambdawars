@@ -19,6 +19,7 @@
 
 #ifdef ENABLE_PYTHON
 ConVar wars_net_debug_receive( "wars_net_debug_receive", "0", FCVAR_CHEAT );
+ConVar wars_net_debug_receive_track_var( "wars_net_debug_receive_track_var", "", FCVAR_CHEAT );
 
 static boost::python::object WarsNet_ReadPythonVarData( CUtlBuffer &data, bool &success );
 
@@ -208,7 +209,7 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 
 	// Read variable name
 	int lenName = data.GetInt();
-	if( lenName == 0 )
+	if( lenName <= 0 )
 	{
 		Warning("WarsNet_ReadEntityVar: Reading wars net var, but no name written\n");
 		return false;
@@ -224,7 +225,7 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 	{
 		if( ent )
 		{
-			if( wars_net_debug_receive.GetBool() )
+			if( wars_net_debug_receive.GetBool() || !V_strcmp( wars_net_debug_receive_track_var.GetString(), varName ) )
 			{
 				Msg( "%.2f: #%d Received PyNetworkVar %s\n", Plat_FloatTime(), ent->entindex(), varName );
 			}
@@ -232,7 +233,7 @@ static bool WarsNet_ReadEntityVar( EHANDLE &ent, CUtlBuffer &data )
 		}
 		else
 		{
-			if( wars_net_debug_receive.GetBool() )
+			if( wars_net_debug_receive.GetBool() || !V_strcmp( wars_net_debug_receive_track_var.GetString(), varName ) )
 			{
 				Msg( "%.2f: #%d Received PyNetworkVar, but entity is NULL. Delaying apply data for \"%s\" until entity exists...\n", 
 					Plat_FloatTime(), ent.GetEntryIndex(), varName );
