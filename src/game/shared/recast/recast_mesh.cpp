@@ -98,11 +98,14 @@ CRecastMesh::CRecastMesh() :
 		curFlag = curFlag << 1;
 	}
 
-	m_defaultFilter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL ^ (SAMPLE_POLYFLAGS_DISABLED|m_allObstacleFlags));
-	m_defaultFilter.setExcludeFlags(0);
+	m_defaultFilter.setIncludeFlags( SAMPLE_POLYFLAGS_ALL ^ (SAMPLE_POLYFLAGS_DISABLED|m_allObstacleFlags) );
+	m_defaultFilter.setExcludeFlags( 0 );
 
-	m_obstacleFilter.setIncludeFlags(m_allObstacleFlags);
-	m_obstacleFilter.setExcludeFlags(0);
+	m_obstacleFilter.setIncludeFlags( m_allObstacleFlags );
+	m_obstacleFilter.setExcludeFlags( 0 );
+
+	m_allFilter.setIncludeFlags( SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED );
+	m_allFilter.setExcludeFlags( 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -820,6 +823,7 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( dtNavMeshQuery *navQuery, floa
 	polyPickExtEndBig[2] = 512.0f;
 
 	// Find the start area. Optional use a different test position for finding the best area.
+	// Don't care for now if start ref is an obstacle area or not
 	if( pStartTestPos )
 	{
 		float spostest[3];
@@ -833,6 +837,28 @@ dtStatus CRecastMesh::ComputeAdjustedStartAndEnd( dtNavMeshQuery *navQuery, floa
 		status = navQuery->findNearestPoly(spos, polyPickExt, &m_defaultFilter, &startRef, 0);
 	}
 
+	if( !dtStatusSucceed( status ) )
+	{
+		return status;
+	}
+
+	// Try any filter next time
+	if( !startRef )
+	{
+		if( pStartTestPos )
+		{
+			float spostest[3];
+			spostest[0] = (*pStartTestPos)[0];
+			spostest[1] = (*pStartTestPos)[2];
+			spostest[2] = (*pStartTestPos)[1];
+			status = navQuery->findNearestPoly(spos, polyPickExt, &m_allFilter, &startRef, 0, spostest);
+		}
+		else
+		{
+			status = navQuery->findNearestPoly(spos, polyPickExt, &m_allFilter, &startRef, 0);
+		}
+	}
+	
 	if( !dtStatusSucceed( status ) )
 	{
 		return status;

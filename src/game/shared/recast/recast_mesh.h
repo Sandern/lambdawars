@@ -226,6 +226,7 @@ private:
 
 	dtQueryFilter m_defaultFilter;
 	dtQueryFilter m_obstacleFilter;
+	dtQueryFilter m_allFilter;
 	pathfind_resultdata_t m_pathfindData;
 };
 
