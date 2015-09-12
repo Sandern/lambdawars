@@ -75,6 +75,7 @@ ipch/
 *.ncb
 *.opensdf
 *.sdf
+*.idb
 
 # Visual Studio profiler
 *.psess
@@ -203,12 +204,16 @@ src/cef_process_helper/Release
 exposed_decl.pypp.txt
 named_tuple.py
 
+*.exp
+*.pyd
+
 # Shaders
 .vcs
 src/materialsystem/stdshaders/fxctmp9_tmp/*
 src/materialsystem/stdshaders/vshtmp9_tmp/*
 src/materialsystem/stdshaders/Release_dx9/*
 src/materialsystem/stdshaders/Debug_dx9/*
+src/materialsystem/shaderlib/Debug
 
 src/materialsystem/stdshaders/buildsdkshaders_wars_dev.bat
 src/materialsystem/stdshaders/stdshader_dx9_20b_wars_dev.txt
@@ -220,6 +225,7 @@ src/materialsystem/stdshaders/uniquefilestocopy.txt
 src/materialsystem/stdshaders/vcslist.txt
 src/materialsystem/stdshaders/filestocopy.txt
 src/materialsystem/stdshaders/shaders/*
+src/materialsystem/stdshaders/NIL
 
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
@@ -228,3 +234,5 @@ src/lib/public/python34.lib
 src/lib/public/python34_d.lib
 src/lib/public/libcef_d.lib
 src/lib/public/libcef_dll_wrapper_d.lib
+
+src/vice3

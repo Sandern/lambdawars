@@ -22,7 +22,7 @@ target_folder = 'python/lib'
 file_types = ['.py']
 
 # Patch target folder
-distutils.dir_util.copy_tree('../srcpypp/srcpy_patchlib', target_folder)
+distutils.dir_util.copy_tree('../../srcpypp/srcpy_patchlib', target_folder)
 
 response_path = os.path.join(os.getcwd(),"vpk_list.txt")
 script_path = os.path.join(os.getcwd(),"vpk_script.bat")
