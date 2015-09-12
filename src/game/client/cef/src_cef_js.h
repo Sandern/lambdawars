@@ -15,7 +15,7 @@
 // Forward declarations
 class CefFrame;
 
-class JSObject
+class JSObject : public CefBase
 {
 public:
 	JSObject( const char *pName = "", const char *pUUID = NULL );

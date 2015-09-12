@@ -55,7 +55,7 @@ public:
 };
 
 // Browsers representation on render process (maintains js objects)
-class RenderBrowser
+class RenderBrowser : public CefBase
 {
 public:
 	RenderBrowser( CefRefPtr<CefBrowser> browser, CefRefPtr<ClientApp> clientApp );
