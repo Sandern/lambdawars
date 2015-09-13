@@ -56,7 +56,8 @@ typedef uint64_t dtTileRef;
 typedef unsigned int dtTileRef;
 #endif
 
-#define DETOUR_DEBUG_LINKS
+// Turn on to debug/validate links
+//#define DETOUR_DEBUG_LINKS
 
 /// The maximum number of vertices per navigation polygon.
 /// @ingroup detour
