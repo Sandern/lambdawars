@@ -56,6 +56,8 @@ typedef uint64_t dtTileRef;
 typedef unsigned int dtTileRef;
 #endif
 
+#define DETOUR_DEBUG_LINKS
+
 /// The maximum number of vertices per navigation polygon.
 /// @ingroup detour
 static const int DT_VERTS_PER_POLYGON = 6;
@@ -342,6 +344,11 @@ public:
 	
 	/// The navigation mesh initialization params.
 	const dtNavMeshParams* getParams() const;
+
+#ifdef DETOUR_DEBUG_LINKS
+	/// Temporary code to validate/debug links
+	void validateLinks( int tileX, int tileY, int tileLayer );
+#endif // DETOUR_DEBUG_LINKS
 
 	/// Adds a tile to the navigation mesh.
 	///  @param[in]		data		Data for the new tile mesh. (See: #dtCreateNavMeshData)
