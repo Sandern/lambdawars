@@ -71,7 +71,8 @@ class GameInterface(SemiSharedModuleGenerator):
         
         # Precache functions
         mb.free_function('PrecacheMaterial').include()
-        mb.free_function('PrecacheEffect').include()
+        if self.settings.branch == 'swarm':
+            mb.free_function('PrecacheEffect').include()
         
         # ConVar wrapper
         cls = mb.class_('PyConVar')
@@ -230,7 +231,8 @@ class GameInterface(SemiSharedModuleGenerator):
         else:
             cls = mb.class_('dheader_t')
         cls.include()
-        cls.var('m_nVersion').rename('version')
+        if self.settings.branch == 'swarm':
+            cls.var('m_nVersion').rename('version')
         cls.var('mapRevision').rename('maprevision')
         
         mb.class_('lump_t').include()

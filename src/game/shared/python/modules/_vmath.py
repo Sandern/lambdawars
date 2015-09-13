@@ -380,7 +380,8 @@ class VMath(SharedModuleGenerator):
         cls.mem_funs('Base').exclude()
         cls.vars('m').exclude()
         
-        cls.mem_fun('As3x4', matchers.calldef_matcher_t(return_type=reference_t(declarated_t(mb.class_('matrix3x4_t'))))).exclude()
+        if self.settings.branch == 'swarm':
+            cls.mem_fun('As3x4', matchers.calldef_matcher_t(return_type=reference_t(declarated_t(mb.class_('matrix3x4_t'))))).exclude()
         cls.mem_fun('GetTranslation', matchers.calldef_matcher_t(return_type=reference_t(declarated_t(mb.class_('Vector'))))).exclude()
         
         cls.add_wrapper_code( str_vmatrix_wrapper % {'cls_name':'VMatrix'} )

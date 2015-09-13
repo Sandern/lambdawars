@@ -964,7 +964,9 @@ class Entities(SemiSharedModuleGenerator):
         mb.mem_funs('GetProficiencyValues').exclude()
         mb.mem_funs('GetControlPanelClassName').exclude()
         mb.mem_funs('GetControlPanelInfo').exclude()
-        
+        if self.settings.branch == 'source2013':
+            mb.mem_funs('PoseParamList').exclude()
+                
         if self.isclient:
             # Exclude anything returning a pointer to CHudTexture (don't care for now)
             hudtexture = mb.class_('CHudTexture')

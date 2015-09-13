@@ -28,7 +28,9 @@
 #include <filesystem.h>
 #include <filesystem_init.h>
 
-#include <Windows.h>
+#ifdef WIN32
+#include <winlite.h>
+#endif // WIN32
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

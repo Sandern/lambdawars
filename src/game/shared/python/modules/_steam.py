@@ -10,13 +10,6 @@ from pygccxml.declarations import matchers, pointer_t, const_t, declarated_t, ch
 # Templates for the most common callback cases
 callback_wrapper_tmpl = '''struct %(name)sCallback_wrapper : %(name)sCallback, bp::wrapper< %(name)sCallback > {
 
-    %(name)sCallback_wrapper(%(name)sCallback const & arg )
-    : %(name)sCallback( arg )
-      , bp::wrapper< %(name)sCallback >(){
-        // copy constructor
-        
-    }
-
     %(name)sCallback_wrapper()
     : %(name)sCallback()
       , bp::wrapper< %(name)sCallback >(){
@@ -46,7 +39,7 @@ callback_wrapper_tmpl = '''struct %(name)sCallback_wrapper : %(name)sCallback, b
 '''
 
 callback_reg_tmpl = '''{ //::%(name)sCallback
-        typedef bp::class_< %(name)sCallback_wrapper > %(name)sCallback_exposer_t;
+        typedef bp::class_< %(name)sCallback_wrapper, boost::noncopyable > %(name)sCallback_exposer_t;
         %(name)sCallback_exposer_t %(name)sCallback_exposer = %(name)sCallback_exposer_t( "%(name)sCallback", bp::init<>() );
         bp::scope %(name)sCallback_scope( %(name)sCallback_exposer );
         { //::%(name)sCallback::On%(name)s
@@ -65,12 +58,6 @@ callback_reg_tmpl = '''{ //::%(name)sCallback
 '''
 
 callresult_wrapper_tmpl = '''struct %(name)sCallResult_wrapper : %(name)sCallResult, bp::wrapper< %(name)sCallResult > {
-
-    %(name)sCallResult_wrapper(%(name)sCallResult const & arg )
-    : %(name)sCallResult( arg )
-      , bp::wrapper< %(name)sCallResult >(){
-        // copy constructor
-    }
 
     %(name)sCallResult_wrapper(::SteamAPICall_t steamapicall )
     : %(name)sCallResult( steamapicall )
@@ -100,7 +87,7 @@ callresult_wrapper_tmpl = '''struct %(name)sCallResult_wrapper : %(name)sCallRes
 '''
 
 callresult_reg_tmpl = '''{ //::%(name)sCallResult
-        typedef bp::class_< %(name)sCallResult_wrapper > %(name)sCallResult_exposer_t;
+        typedef bp::class_< %(name)sCallResult_wrapper, boost::noncopyable > %(name)sCallResult_exposer_t;
         %(name)sCallResult_exposer_t %(name)sCallResult_exposer = %(name)sCallResult_exposer_t( "%(name)sCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
         bp::scope %(name)sCallResult_scope( %(name)sCallResult_exposer );
         bp::implicitly_convertible< SteamAPICall_t, %(name)sCallResult >();
@@ -177,6 +164,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamApps')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         
         cls.mem_fun('GetCurrentBetaName').exclude()
@@ -194,6 +182,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamFriends')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('GetFriendGamePlayed').exclude()
         
@@ -226,6 +215,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamMatchmaking')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_funs('GetLobbyGameServer').add_transformation(FT.output('punGameServerIP'), FT.output('punGameServerPort'), FT.output('psteamIDGameServer'))
         
@@ -299,6 +289,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamUserStats')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         
         self.AddSteamCallResult('NumberOfCurrentPlayers', 'NumberOfCurrentPlayers_t')
@@ -310,6 +301,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamGameServer')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         
     def ParseServerOnly(self, mb):
@@ -318,6 +310,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('CSteamGameServerAPIContext')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
         cls.mem_fun('SteamGameServerUtils').exclude()
@@ -326,7 +319,8 @@ class Steam(SemiSharedModuleGenerator):
         
         if self.steamsdkversion > (1, 16):
             cls.mem_fun('SteamHTTP').exclude()
-        
+            cls.mem_fun('SteamUGC').exclude()
+            
         cls.mem_funs('SteamGameServer').call_policies = call_policies.return_internal_reference()
     
         self.ParseGameServer(mb)
@@ -369,6 +363,7 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('CSteamAPIContext')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_fun('Init').exclude()
         cls.mem_fun('Clear').exclude()
         
@@ -409,12 +404,14 @@ class Steam(SemiSharedModuleGenerator):
         cls = mb.class_('ISteamUser')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         
         # Utils
         cls = mb.class_('ISteamUtils')
         cls.include()
         cls.no_init = True
+        cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('GetImageRGBA').exclude()
         cls.mem_fun('GetImageSize').exclude()
