@@ -15,6 +15,10 @@
 #include "tier0/memdbgon.h"
 
 #ifdef CLIENT_DLL
+
+// To be used with matchmaking when searching for servers
+static ConVar mm_password( "mm_password", "", FCVAR_ARCHIVE, "Password/code for searching for a specific dedicated server." );
+
 // To prevent handling multiple messages from game servers
 static CSteamID s_activeGameServerRequestID;
 

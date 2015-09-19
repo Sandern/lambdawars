@@ -2184,10 +2184,16 @@ void CServerGameDLL::GetMatchmakingGameData( char *buf, size_t bufSize )
 	int len = 0;
 
 	// Put the game key
-	Q_snprintf( buf, bufSize, "g:lw," );
+	V_snprintf( buf, bufSize, "g:lw," );
 	len = strlen( buf );
 	buf += len;
 	bufSize -= len;
+
+	// Let wars game server add more stuff
+	if( WarsGameServer() )
+	{
+		buf = WarsGameServer()->GetMatchmakingGameData( buf, bufSize );
+	}
 #endif // GAME
 
 #ifdef TERROR

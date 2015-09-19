@@ -30,7 +30,6 @@ typedef struct WarsMessage_t
 	WarsMessage_t() {}
 	WarsMessage_t( uint32 _type ) : type(_type) {}
 
-	//uint16 protocolversion;
 	uint32 type;
 } WarsMessage_t;
 

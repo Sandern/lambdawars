@@ -29,6 +29,7 @@ public:
 	EGameServerState GetState();
 
 	virtual char *GetMatchmakingTags( char *buf, size_t &bufSize );
+	virtual char *GetMatchmakingGameData( char *buf, size_t &bufSize );
 
 	// Shutdowns game once all players have left
 	void ScheduleShutdown();

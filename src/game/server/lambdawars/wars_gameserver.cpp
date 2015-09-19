@@ -14,10 +14,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-static ConVar wars_gamserver_debug("wars_gamserver_debug", "0");
+static ConVar wars_gameserver_debug( "wars_gameserver_debug", "0" );
 
-static ConVar wars_gamserver_graceperiod("wars_gamserver_graceperiod", "15", 0, "Period after game ended before game server becomes available again");
-static ConVar wars_gamserver_noplayers_timeout("wars_gamserver_noplayers_timeout", "60", 0, "Time before game server changes back to available when no players are connected.");
+static ConVar wars_gameserver_graceperiod( "wars_gameserver_graceperiod", "15", 0, "Period after game ended before game server becomes available again" );
+static ConVar wars_gameserver_noplayers_timeout("wars_gameserver_noplayers_timeout", "60", 0, "Time before game server changes back to available when no players are connected." );
+
+static ConVar wars_gameserver_password( "wars_gameserver_password", "", FCVAR_PROTECTED, "Only allows clients with matching mm_password to connect through lobby." );
 
 extern CServerGameDLL g_ServerGameDLL;
 
@@ -153,6 +155,11 @@ void CWarsGameServer::ProcessMessages()
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 
 					}
+					else if( wars_gameserver_password.GetString() && V_strcmp( pGameData->GetString( "server/password", "" ), wars_gameserver_password.GetString() ) != 0 )
+					{
+						Warning( "Denying game server request: provided password does not match wars_gameserver_password setting\n" );
+						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
+					}
 					else
 					{
 						SetState( k_EGameServer_StartingGame );
@@ -250,7 +257,7 @@ void CWarsGameServer::UpdateServer()
 			{
 				m_fLastPlayedConnectedTime = Plat_FloatTime();
 			}
-			else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > wars_gamserver_noplayers_timeout.GetFloat() )
+			else if( Plat_FloatTime() - m_fLastPlayedConnectedTime > wars_gameserver_noplayers_timeout.GetFloat() )
 			{
 				SetState( k_EGameServer_Available );
 				Msg("Changing wars game server back to available due inactivity (no connected players)\n");
@@ -263,7 +270,7 @@ void CWarsGameServer::UpdateServer()
 			// k_EGameServer_InGame uses a time out before doing so.
 			if( m_nConnectedPlayers == 0 )
 			{
-				m_fGracePeriodEnd = Plat_FloatTime() + wars_gamserver_graceperiod.GetFloat();
+				m_fGracePeriodEnd = Plat_FloatTime() + wars_gameserver_graceperiod.GetFloat();
 				SetState( k_EGameServer_GracePeriod );
 				Msg("Changing wars game server back to grace period because game ended and no players are connected anymore\n");
 			}
@@ -365,7 +372,7 @@ void CWarsGameServer::ClientDisconnect( edict_t *pEdict )
 	}
 
 	steamgameserverapicontext->SteamGameServerNetworking()->CloseP2PSessionWithUser( *pClientSteamID );
-	if( wars_gamserver_debug.GetBool() ) 
+	if( wars_gameserver_debug.GetBool() ) 
 	{
 		Msg( "WarsGameserver closed P2P session with %I64u\n", pClientSteamID->ConvertToUint64() );
 	}
@@ -381,7 +388,7 @@ void CWarsGameServer::SetState( EGameServerState state )
 		return;
 	}
 
-	if( wars_gamserver_debug.GetBool() ) 
+	if( wars_gameserver_debug.GetBool() ) 
 	{
 		Msg( "WarsGameserver state changed from %d to %d\n", m_State, state );
 	}
@@ -418,10 +425,29 @@ void CWarsGameServer::SetState( EGameServerState state )
 char *CWarsGameServer::GetMatchmakingTags( char *buf, size_t &bufSize )
 {
 	int len = 0;
+
 	if( m_State == k_EGameServer_Available )
 	{
 		V_strncpy( buf, "Available,", bufSize );
 		len = V_strlen( buf );
+		buf += len;
+		bufSize -= len;
+	}
+
+	return buf;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+char *CWarsGameServer::GetMatchmakingGameData( char *buf, size_t &bufSize )
+{
+	int len = 0;
+
+	if( wars_gameserver_password.GetString() )
+	{
+		V_snprintf( buf, bufSize, "password:%s,", wars_gameserver_password.GetString() );
+		len = strlen( buf );
 		buf += len;
 		bufSize -= len;
 	}
