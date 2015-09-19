@@ -46,7 +46,7 @@ CWarsGameServer::CWarsGameServer() :
 	m_pLocalPlayerGameData(NULL),
 	m_bShutdownScheduled(false)
 {
-	DevMsg("Created Wars game server\n");
+	DevMsg( "Created Wars game server.\n" );
 }
 
 //-----------------------------------------------------------------------------
@@ -314,7 +314,7 @@ void CWarsGameServer::UpdateServer()
 	{
 		m_bUpdateMatchmakingTags = false;
 
-		char buf[1024];
+		char buf[k_cbMaxGameServerTags];
 		buf[0] = 0;
 		g_ServerGameDLL.GetMatchmakingTags( buf, sizeof(buf) );
 
@@ -444,10 +444,13 @@ char *CWarsGameServer::GetMatchmakingGameData( char *buf, size_t &bufSize )
 {
 	int len = 0;
 
-	if( wars_gameserver_password.GetString() )
+	// This extra execute is needed because the server cfg command might not be processed yet at server startup :(
+	engine->ServerExecute();
+
+	if( V_strlen( wars_gameserver_password.GetString() ) > 0 )
 	{
 		V_snprintf( buf, bufSize, "password:%s,", wars_gameserver_password.GetString() );
-		len = strlen( buf );
+		len = V_strlen( buf );
 		buf += len;
 		bufSize -= len;
 	}
