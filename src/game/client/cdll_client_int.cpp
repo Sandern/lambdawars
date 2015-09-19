@@ -1032,13 +1032,6 @@ bool InitGameSystems( CreateInterfaceFn appSystemFactory )
 	IGameSystem::Add( SrcPySystem() );
 #endif // ENABLE_PYTHON
 
-	ActivityList_Init();
-	ActivityList_Free();
-	ActivityList_RegisterSharedActivities();
-	EventList_Init();
-	EventList_Free();
-	EventList_RegisterSharedEvents();
-
 	modemanager->Init( );
 
 	// Load the ClientScheme just once

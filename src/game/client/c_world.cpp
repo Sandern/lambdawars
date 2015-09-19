@@ -7,11 +7,13 @@
 #include "cbase.h"
 #include "c_world.h"
 #include "ivmodemanager.h"
+#include "activitylist.h"
 #include "decals.h"
 #include "engine/ivmodelinfo.h"
 #include "ivieweffects.h"
 #include "shake.h"
 #include "precache_register.h"
+#include "eventlist.h"
 
 // =======================================
 // PySource Additions
@@ -83,12 +85,16 @@ C_World::~C_World( void )
 bool C_World::Init( int entnum, int iSerialNum )
 {
 	m_flWaveHeight = 0.0f;
+	ActivityList_Init();
+	EventList_Init();
 
 	return BaseClass::Init( entnum, iSerialNum );
 }
 
 void C_World::Release()
 {
+	ActivityList_Free();
+
 // =======================================
 // PySource Additions
 // =======================================
@@ -143,6 +149,12 @@ void C_World::OnDataChanged( DataUpdateType_t updateType )
 	}
 }
 
+void C_World::RegisterSharedActivities( void )
+{
+	ActivityList_RegisterSharedActivities();
+	EventList_RegisterSharedEvents();
+}
+
 // -----------------------------------------
 //	Sprite Index info
 // -----------------------------------------
@@ -176,6 +188,15 @@ void W_Precache(void)
 
 void C_World::Precache( void )
 {
+	// UNDONE: Make most of these things server systems or precache_registers
+	// =================================================
+	//	Activities
+	// =================================================
+	ActivityList_Free();
+	EventList_Free();
+
+	RegisterSharedActivities();
+
 	// Get weapon precaches
 	W_Precache();	
 		

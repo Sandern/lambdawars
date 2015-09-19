@@ -37,7 +37,6 @@ public:
 	static void RegisterSharedEvents( void );
 	virtual void Spawn( void );
 	virtual void Precache( void );
-	virtual void UpdateOnRemove( void );
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
 	virtual void DecalTrace( trace_t *pTrace, char const *decalName );
 	virtual void VPhysicsCollision( int index, gamevcollisionevent_t *pEvent ) {}
