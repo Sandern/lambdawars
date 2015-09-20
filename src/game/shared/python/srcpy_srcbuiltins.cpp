@@ -7,6 +7,7 @@
 #include "cbase.h"
 #include "srcpy_srcbuiltins.h"
 #include "srcpy.h"
+#include "tier1/fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -203,9 +204,7 @@ static void PyDictToKeyValuesConvertValue( const char *pKeyName, boost::python::
 
 					for( int i = 0; i < n; i++ ) 
 					{
-						char buf[5];
-						itoa( i, buf, 10 );
-						PyDictToKeyValuesConvertValue( buf, value[i], pListSubKey, keys_sorted );
+						PyDictToKeyValuesConvertValue( CNumStr( i ).String(), value[i], pListSubKey, keys_sorted );
 					}
 				}
 			}

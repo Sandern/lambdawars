@@ -56,6 +56,7 @@ bool CSrcPython::InitStandAloneInterpreter()
 	char originalPath[MAX_PATH];
 	V_GetCurrentDirectory( originalPath, sizeof( originalPath ) );
 
+#ifdef WIN32
 	// Hook up the filesystem
 	TCHAR fullPath[MAX_PATH];
 	TCHAR driveLetter[3];
@@ -64,6 +65,9 @@ bool CSrcPython::InitStandAloneInterpreter()
 	_splitpath(fullPath, driveLetter, directory, NULL, NULL);
 
 	V_SetCurrentDirectory( VarArgs( "%s%s//..//..", driveLetter, directory ) );
+#else
+	// TODO when we need to use this on other platforms...
+#endif
 
 	CSysModule *h = Sys_LoadModule( "filesystem_stdio.dll" );
 
