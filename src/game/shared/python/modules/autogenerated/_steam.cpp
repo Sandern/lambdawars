@@ -1234,6 +1234,9 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .value("k_EChatEntryTypeReserved1", k_EChatEntryTypeReserved1)
+        .value("k_EChatEntryTypeReserved2", k_EChatEntryTypeReserved2)
+        .value("k_EChatEntryTypeLinkBlocked", k_EChatEntryTypeLinkBlocked)
         .export_values()
         ;
 
@@ -1446,6 +1449,17 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
         .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
         .value("k_EResultTwoFactorActivationCodeMismatch", k_EResultTwoFactorActivationCodeMismatch)
+        .value("k_EResultAccountAssociatedToMultiplePartners", k_EResultAccountAssociatedToMultiplePartners)
+        .value("k_EResultNotModified", k_EResultNotModified)
+        .value("k_EResultNoMobileDevice", k_EResultNoMobileDevice)
+        .value("k_EResultTimeNotSynced", k_EResultTimeNotSynced)
+        .value("k_EResultSmsCodeFailed", k_EResultSmsCodeFailed)
+        .value("k_EResultAccountLimitExceeded", k_EResultAccountLimitExceeded)
+        .value("k_EResultAccountActivityLimitExceeded", k_EResultAccountActivityLimitExceeded)
+        .value("k_EResultPhoneActivityLimitExceeded", k_EResultPhoneActivityLimitExceeded)
+        .value("k_EResultRefundToWallet", k_EResultRefundToWallet)
+        .value("k_EResultEmailSendFailure", k_EResultEmailSendFailure)
+        .value("k_EResultNotSettled", k_EResultNotSettled)
         .export_values()
         ;
 
@@ -2006,6 +2020,9 @@ BOOST_PYTHON_MODULE(_steam){
             "BIsVACBanned"
             , (bool ( ::ISteamApps::* )(  ) )( &::ISteamApps::BIsVACBanned ) )    
         .def( 
+            "GetAppBuildId"
+            , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetAppBuildId ) )    
+        .def( 
             "GetAppInstallDir"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t,char *,::uint32 ) )( &::ISteamApps::GetAppInstallDir )
             , ( bp::arg("appID"), bp::arg("pchFolder"), bp::arg("cchFolderBufferSize") ) )    
@@ -2021,6 +2038,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetDLCCount"
             , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetDLCCount ) )    
+        .def( 
+            "GetDlcDownloadProgress"
+            , (bool ( ::ISteamApps::* )( ::AppId_t,::uint64 *,::uint64 * ) )( &::ISteamApps::GetDlcDownloadProgress )
+            , ( bp::arg("nAppID"), bp::arg("punBytesDownloaded"), bp::arg("punBytesTotal") ) )    
         .def( 
             "GetEarliestPurchaseUnixTime"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t ) )( &::ISteamApps::GetEarliestPurchaseUnixTime )
@@ -2200,6 +2221,29 @@ BOOST_PYTHON_MODULE(_steam){
             "GetFriendRichPresenceKeyCount"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRichPresenceKeyCount )
             , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendSteamLevel"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendSteamLevel )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendsGroupCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetFriendsGroupCount ) )    
+        .def( 
+            "GetFriendsGroupIDByIndex"
+            , (::FriendsGroupID_t ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetFriendsGroupIDByIndex )
+            , ( bp::arg("iFG") ) )    
+        .def( 
+            "GetFriendsGroupMembersCount"
+            , (int ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupMembersCount )
+            , ( bp::arg("friendsGroupID") ) )    
+        .def( 
+            "GetFriendsGroupMembersList"
+            , (void ( ::ISteamFriends::* )( ::FriendsGroupID_t,::CSteamID *,int ) )( &::ISteamFriends::GetFriendsGroupMembersList )
+            , ( bp::arg("friendsGroupID"), bp::arg("pOutSteamIDMembers"), bp::arg("nMembersCount") ) )    
+        .def( 
+            "GetFriendsGroupName"
+            , (char const * ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupName )
+            , ( bp::arg("friendsGroupID") ) )    
         .def( 
             "GetLargeFriendAvatar"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetLargeFriendAvatar )
@@ -2526,6 +2570,10 @@ BOOST_PYTHON_MODULE(_steam){
             , (::SteamAPICall_t ( ::ISteamUser::* )( void *,int ) )( &::ISteamUser::RequestEncryptedAppTicket )
             , ( bp::arg("pDataToInclude"), bp::arg("cbDataToInclude") ) )    
         .def( 
+            "RequestStoreAuthURL"
+            , (::SteamAPICall_t ( ::ISteamUser::* )( char const * ) )( &::ISteamUser::RequestStoreAuthURL )
+            , ( bp::arg("pchRedirectURL") ) )    
+        .def( 
             "StartVoiceRecording"
             , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StartVoiceRecording ) )    
         .def( 
@@ -2780,6 +2828,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "RunFrame"
             , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
+        .def( 
+            "SetOverlayNotificationInset"
+            , (void ( ::ISteamUtils::* )( int,int ) )( &::ISteamUtils::SetOverlayNotificationInset )
+            , ( bp::arg("nHorizontalInset"), bp::arg("nVerticalInset") ) )    
         .def( 
             "SetOverlayNotificationPosition"
             , (void ( ::ISteamUtils::* )( ::ENotificationPosition ) )( &::ISteamUtils::SetOverlayNotificationPosition )
@@ -3067,7 +3119,7 @@ BOOST_PYTHON_MODULE(_steam){
 
     { //::servernetadr_t
         typedef bp::class_< servernetadr_t > servernetadr_exposer_t;
-        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr" );
+        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr", bp::init< >() );
         bp::scope servernetadr_scope( servernetadr_exposer );
         { //::servernetadr_t::GetConnectionAddressString
         
@@ -4948,6 +5000,9 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .value("k_EChatEntryTypeReserved1", k_EChatEntryTypeReserved1)
+        .value("k_EChatEntryTypeReserved2", k_EChatEntryTypeReserved2)
+        .value("k_EChatEntryTypeLinkBlocked", k_EChatEntryTypeLinkBlocked)
         .export_values()
         ;
 
@@ -5160,6 +5215,17 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
         .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
         .value("k_EResultTwoFactorActivationCodeMismatch", k_EResultTwoFactorActivationCodeMismatch)
+        .value("k_EResultAccountAssociatedToMultiplePartners", k_EResultAccountAssociatedToMultiplePartners)
+        .value("k_EResultNotModified", k_EResultNotModified)
+        .value("k_EResultNoMobileDevice", k_EResultNoMobileDevice)
+        .value("k_EResultTimeNotSynced", k_EResultTimeNotSynced)
+        .value("k_EResultSmsCodeFailed", k_EResultSmsCodeFailed)
+        .value("k_EResultAccountLimitExceeded", k_EResultAccountLimitExceeded)
+        .value("k_EResultAccountActivityLimitExceeded", k_EResultAccountActivityLimitExceeded)
+        .value("k_EResultPhoneActivityLimitExceeded", k_EResultPhoneActivityLimitExceeded)
+        .value("k_EResultRefundToWallet", k_EResultRefundToWallet)
+        .value("k_EResultEmailSendFailure", k_EResultEmailSendFailure)
+        .value("k_EResultNotSettled", k_EResultNotSettled)
         .export_values()
         ;
 
@@ -5727,6 +5793,9 @@ BOOST_PYTHON_MODULE(_steam){
             "BIsVACBanned"
             , (bool ( ::ISteamApps::* )(  ) )( &::ISteamApps::BIsVACBanned ) )    
         .def( 
+            "GetAppBuildId"
+            , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetAppBuildId ) )    
+        .def( 
             "GetAppInstallDir"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t,char *,::uint32 ) )( &::ISteamApps::GetAppInstallDir )
             , ( bp::arg("appID"), bp::arg("pchFolder"), bp::arg("cchFolderBufferSize") ) )    
@@ -5742,6 +5811,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetDLCCount"
             , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetDLCCount ) )    
+        .def( 
+            "GetDlcDownloadProgress"
+            , (bool ( ::ISteamApps::* )( ::AppId_t,::uint64 *,::uint64 * ) )( &::ISteamApps::GetDlcDownloadProgress )
+            , ( bp::arg("nAppID"), bp::arg("punBytesDownloaded"), bp::arg("punBytesTotal") ) )    
         .def( 
             "GetEarliestPurchaseUnixTime"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t ) )( &::ISteamApps::GetEarliestPurchaseUnixTime )
@@ -5921,6 +5994,29 @@ BOOST_PYTHON_MODULE(_steam){
             "GetFriendRichPresenceKeyCount"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRichPresenceKeyCount )
             , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendSteamLevel"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendSteamLevel )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendsGroupCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetFriendsGroupCount ) )    
+        .def( 
+            "GetFriendsGroupIDByIndex"
+            , (::FriendsGroupID_t ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetFriendsGroupIDByIndex )
+            , ( bp::arg("iFG") ) )    
+        .def( 
+            "GetFriendsGroupMembersCount"
+            , (int ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupMembersCount )
+            , ( bp::arg("friendsGroupID") ) )    
+        .def( 
+            "GetFriendsGroupMembersList"
+            , (void ( ::ISteamFriends::* )( ::FriendsGroupID_t,::CSteamID *,int ) )( &::ISteamFriends::GetFriendsGroupMembersList )
+            , ( bp::arg("friendsGroupID"), bp::arg("pOutSteamIDMembers"), bp::arg("nMembersCount") ) )    
+        .def( 
+            "GetFriendsGroupName"
+            , (char const * ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupName )
+            , ( bp::arg("friendsGroupID") ) )    
         .def( 
             "GetLargeFriendAvatar"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetLargeFriendAvatar )
@@ -6413,6 +6509,10 @@ BOOST_PYTHON_MODULE(_steam){
             , (::SteamAPICall_t ( ::ISteamUser::* )( void *,int ) )( &::ISteamUser::RequestEncryptedAppTicket )
             , ( bp::arg("pDataToInclude"), bp::arg("cbDataToInclude") ) )    
         .def( 
+            "RequestStoreAuthURL"
+            , (::SteamAPICall_t ( ::ISteamUser::* )( char const * ) )( &::ISteamUser::RequestStoreAuthURL )
+            , ( bp::arg("pchRedirectURL") ) )    
+        .def( 
             "StartVoiceRecording"
             , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StartVoiceRecording ) )    
         .def( 
@@ -6667,6 +6767,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "RunFrame"
             , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
+        .def( 
+            "SetOverlayNotificationInset"
+            , (void ( ::ISteamUtils::* )( int,int ) )( &::ISteamUtils::SetOverlayNotificationInset )
+            , ( bp::arg("nHorizontalInset"), bp::arg("nVerticalInset") ) )    
         .def( 
             "SetOverlayNotificationPosition"
             , (void ( ::ISteamUtils::* )( ::ENotificationPosition ) )( &::ISteamUtils::SetOverlayNotificationPosition )
@@ -6954,7 +7058,7 @@ BOOST_PYTHON_MODULE(_steam){
 
     { //::servernetadr_t
         typedef bp::class_< servernetadr_t > servernetadr_exposer_t;
-        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr" );
+        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr", bp::init< >() );
         bp::scope servernetadr_scope( servernetadr_exposer );
         { //::servernetadr_t::GetConnectionAddressString
         

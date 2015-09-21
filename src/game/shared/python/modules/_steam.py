@@ -108,7 +108,7 @@ callresult_reg_tmpl = '''{ //::%(name)sCallResult
 
 class Steam(SemiSharedModuleGenerator):
     module_name = '_steam'
-    steamsdkversion = (1, 15)
+    steamsdkversion = (1, 34)
     
     @property
     def files(self):
@@ -317,9 +317,9 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_fun('SteamGameServerNetworking').exclude()
         cls.mem_fun('SteamGameServerStats').exclude()
         
-        if self.steamsdkversion > (1, 16):
-            cls.mem_fun('SteamHTTP').exclude()
-            cls.mem_fun('SteamUGC').exclude()
+        #if self.steamsdkversion > (1, 16):
+        #    cls.mem_fun('SteamHTTP').exclude()
+        #    cls.mem_fun('SteamUGC').exclude()
             
         cls.mem_funs('SteamGameServer').call_policies = call_policies.return_internal_reference()
     
@@ -385,6 +385,9 @@ class Steam(SemiSharedModuleGenerator):
             cls.mem_fun('SteamMusicRemote').exclude()
             cls.mem_fun('SteamUGC').exclude() 
             cls.mem_fun('SteamHTMLSurface').exclude()
+        if self.steamsdkversion > (1, 30):
+            cls.mem_fun('SteamInventory').exclude()
+            cls.mem_fun('SteamVideo').exclude()
             
         cls.mem_funs('SteamApps').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamFriends').call_policies = call_policies.return_internal_reference()

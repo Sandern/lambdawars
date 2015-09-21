@@ -241,24 +241,6 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: callback hook for debug text emitted from the Steam API
-//-----------------------------------------------------------------------------
-extern "C" void __cdecl SteamAPIDebugTextHook( int nSeverity, const char *pchDebugText )
-{
-	// if you're running in the debugger, only warnings (nSeverity >= 1) will be sent
-	// if you add -debug_steamapi to the command-line, a lot of extra informational messages will also be sent
-	Warning( pchDebugText );
-	Warning("\n");
-
-	if ( nSeverity >= 1 )
-	{
-		// place to set a breakpoint for catching API errors
-		int x = 3;
-		x = x;
-	}
-}
-
 void WarsUpdateGameServer()
 {
 	//if( !engine->IsDedicatedServer() )
@@ -272,7 +254,7 @@ void WarsUpdateGameServer()
 		steamgameserverapicontext->Init();
 
 		// set our debug handler
-		g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
+		//g_pSteamClientGameServer->SetWarningMessageHook( &SteamAPIDebugTextHook );
 	}
 
 	/*if( !steamgameserverapicontext->SteamGameServerNetworking() )
