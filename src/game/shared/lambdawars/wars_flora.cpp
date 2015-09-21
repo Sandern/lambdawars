@@ -942,7 +942,7 @@ bool CWarsFlora::SpawnFlora( const char *pModelname, const Vector &vPosition, co
 	bool bEditorManaged = EditorSystem()->IsActive();
 
 	// Create flora entity
-	CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName("wars_flora"); //new CWarsFlora();
+	CWarsFlora *pEntity = (CWarsFlora *)CreateEntityByName("wars_flora");
 	if ( !pEntity )
 	{	
 		Warning("wars_flora_spawn: Failed to create entity\n");
