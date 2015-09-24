@@ -22,6 +22,8 @@
 
 #include "steam/isteamuserstats.h"
 
+#include "steam/isteamugc.h"
+
 #include "srcpy_steam.h"
 
 #include "srcpy.h"
@@ -113,6 +115,13 @@ static boost::python::tuple GetLobbyGameServer_e3badaaa69eb32a59ea528ba9e97e8ee(
                             , punGameServerIP2
                             , punGameServerPort2
                             , psteamIDGameServer2 );
+}
+
+static boost::python::tuple GetItemDownloadInfo_c0e3f4a5f6b6bbab274b0d3ba6980900( ::ISteamUGC & inst, ::PublishedFileId_t nPublishedFileID ){
+    long long unsigned int punBytesDownloaded2;
+    long long unsigned int punBytesTotal2;
+    bool result = inst.GetItemDownloadInfo(nPublishedFileID, &punBytesDownloaded2, &punBytesTotal2);
+    return bp::make_tuple( result, punBytesDownloaded2, punBytesTotal2 );
 }
 
 struct PySteamMatchmakingPingResponse_wrapper : PySteamMatchmakingPingResponse, bp::wrapper< PySteamMatchmakingPingResponse > {
@@ -1203,6 +1212,66 @@ struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResu
     }
 };
 
+PY_STEAM_CALLRESULT_WRAPPER( CreateItemResult, CreateItemResult_t );
+
+struct CreateItemResultCallResult_wrapper : CreateItemResultCallResult, bp::wrapper< CreateItemResultCallResult > {
+
+    CreateItemResultCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : CreateItemResultCallResult( steamapicall )
+      , bp::wrapper< CreateItemResultCallResult >(){
+        // constructor
+    }
+
+    virtual void OnCreateItemResult( ::CreateItemResult_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( CreateItemResultCallResult, OnCreateItemResult )
+        PY_OVERRIDE_LOG( _steam, CreateItemResultCallResult, OnCreateItemResult )
+        bp::override func_OnCreateItemResult = this->get_override( "OnCreateItemResult" );
+        if( func_OnCreateItemResult.ptr() != Py_None )
+            try {
+                func_OnCreateItemResult( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CreateItemResultCallResult::OnCreateItemResult( pData, bIOFailure );
+            }
+        else
+            this->CreateItemResultCallResult::OnCreateItemResult( pData, bIOFailure );
+    }
+    
+    void default_OnCreateItemResult( ::CreateItemResult_t * pData, bool bIOFailure ) {
+        CreateItemResultCallResult::OnCreateItemResult( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLRESULT_WRAPPER( SubmitItemUpdateResult, SubmitItemUpdateResult_t );
+
+struct SubmitItemUpdateResultCallResult_wrapper : SubmitItemUpdateResultCallResult, bp::wrapper< SubmitItemUpdateResultCallResult > {
+
+    SubmitItemUpdateResultCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : SubmitItemUpdateResultCallResult( steamapicall )
+      , bp::wrapper< SubmitItemUpdateResultCallResult >(){
+        // constructor
+    }
+
+    virtual void OnSubmitItemUpdateResult( ::SubmitItemUpdateResult_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( SubmitItemUpdateResultCallResult, OnSubmitItemUpdateResult )
+        PY_OVERRIDE_LOG( _steam, SubmitItemUpdateResultCallResult, OnSubmitItemUpdateResult )
+        bp::override func_OnSubmitItemUpdateResult = this->get_override( "OnSubmitItemUpdateResult" );
+        if( func_OnSubmitItemUpdateResult.ptr() != Py_None )
+            try {
+                func_OnSubmitItemUpdateResult( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult( pData, bIOFailure );
+            }
+        else
+            this->SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult( pData, bIOFailure );
+    }
+    
+    void default_OnSubmitItemUpdateResult( ::SubmitItemUpdateResult_t * pData, bool bIOFailure ) {
+        SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult( pData, bIOFailure );
+    }
+};
+
 BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
@@ -1234,6 +1303,9 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .value("k_EChatEntryTypeReserved1", k_EChatEntryTypeReserved1)
+        .value("k_EChatEntryTypeReserved2", k_EChatEntryTypeReserved2)
+        .value("k_EChatEntryTypeLinkBlocked", k_EChatEntryTypeLinkBlocked)
         .export_values()
         ;
 
@@ -1446,6 +1518,17 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
         .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
         .value("k_EResultTwoFactorActivationCodeMismatch", k_EResultTwoFactorActivationCodeMismatch)
+        .value("k_EResultAccountAssociatedToMultiplePartners", k_EResultAccountAssociatedToMultiplePartners)
+        .value("k_EResultNotModified", k_EResultNotModified)
+        .value("k_EResultNoMobileDevice", k_EResultNoMobileDevice)
+        .value("k_EResultTimeNotSynced", k_EResultTimeNotSynced)
+        .value("k_EResultSmsCodeFailed", k_EResultSmsCodeFailed)
+        .value("k_EResultAccountLimitExceeded", k_EResultAccountLimitExceeded)
+        .value("k_EResultAccountActivityLimitExceeded", k_EResultAccountActivityLimitExceeded)
+        .value("k_EResultPhoneActivityLimitExceeded", k_EResultPhoneActivityLimitExceeded)
+        .value("k_EResultRefundToWallet", k_EResultRefundToWallet)
+        .value("k_EResultEmailSendFailure", k_EResultEmailSendFailure)
+        .value("k_EResultNotSettled", k_EResultNotSettled)
         .export_values()
         ;
 
@@ -1467,6 +1550,28 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EUniverseInternal", k_EUniverseInternal)
         .value("k_EUniverseDev", k_EUniverseDev)
         .value("k_EUniverseMax", k_EUniverseMax)
+        .export_values()
+        ;
+
+    bp::enum_< EWorkshopFileType>("EWorkshopFileType")
+        .value("k_EWorkshopFileTypeFirst", k_EWorkshopFileTypeFirst)
+        .value("k_EWorkshopFileTypeCommunity", k_EWorkshopFileTypeCommunity)
+        .value("k_EWorkshopFileTypeMicrotransaction", k_EWorkshopFileTypeMicrotransaction)
+        .value("k_EWorkshopFileTypeCollection", k_EWorkshopFileTypeCollection)
+        .value("k_EWorkshopFileTypeArt", k_EWorkshopFileTypeArt)
+        .value("k_EWorkshopFileTypeVideo", k_EWorkshopFileTypeVideo)
+        .value("k_EWorkshopFileTypeScreenshot", k_EWorkshopFileTypeScreenshot)
+        .value("k_EWorkshopFileTypeGame", k_EWorkshopFileTypeGame)
+        .value("k_EWorkshopFileTypeSoftware", k_EWorkshopFileTypeSoftware)
+        .value("k_EWorkshopFileTypeConcept", k_EWorkshopFileTypeConcept)
+        .value("k_EWorkshopFileTypeWebGuide", k_EWorkshopFileTypeWebGuide)
+        .value("k_EWorkshopFileTypeIntegratedGuide", k_EWorkshopFileTypeIntegratedGuide)
+        .value("k_EWorkshopFileTypeMerch", k_EWorkshopFileTypeMerch)
+        .value("k_EWorkshopFileTypeControllerBinding", k_EWorkshopFileTypeControllerBinding)
+        .value("k_EWorkshopFileTypeSteamworksAccessInvite", k_EWorkshopFileTypeSteamworksAccessInvite)
+        .value("k_EWorkshopFileTypeSteamVideo", k_EWorkshopFileTypeSteamVideo)
+        .value("k_EWorkshopFileTypeGameManagedItem", k_EWorkshopFileTypeGameManagedItem)
+        .value("k_EWorkshopFileTypeMax", k_EWorkshopFileTypeMax)
         .export_values()
         ;
 
@@ -1494,6 +1599,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "SteamMatchmaking"
             , (::ISteamMatchmaking * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamMatchmaking )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUGC"
+            , (::ISteamUGC * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUGC )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUser"
@@ -1820,6 +1929,16 @@ BOOST_PYTHON_MODULE(_steam){
         ClanOfficerListResponse_t_exposer.def_readwrite( "steamidclan", &ClanOfficerListResponse_t::m_steamIDClan );
     }
 
+    { //::CreateItemResult_t
+        typedef bp::class_< CreateItemResult_t > CreateItemResult_t_exposer_t;
+        CreateItemResult_t_exposer_t CreateItemResult_t_exposer = CreateItemResult_t_exposer_t( "CreateItemResult_t" );
+        bp::scope CreateItemResult_t_scope( CreateItemResult_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)CreateItemResult_t::k_iCallback;
+        CreateItemResult_t_exposer.def_readwrite( "userneedstoacceptworkshoplegalagreement", &CreateItemResult_t::m_bUserNeedsToAcceptWorkshopLegalAgreement );
+        CreateItemResult_t_exposer.def_readwrite( "result", &CreateItemResult_t::m_eResult );
+        CreateItemResult_t_exposer.def_readwrite( "publishedfileid", &CreateItemResult_t::m_nPublishedFileId );
+    }
+
     { //::DownloadClanActivityCountsResult_t
         typedef bp::class_< DownloadClanActivityCountsResult_t > DownloadClanActivityCountsResult_t_exposer_t;
         DownloadClanActivityCountsResult_t_exposer_t DownloadClanActivityCountsResult_t_exposer = DownloadClanActivityCountsResult_t_exposer_t( "DownloadClanActivityCountsResult_t" );
@@ -2006,6 +2125,9 @@ BOOST_PYTHON_MODULE(_steam){
             "BIsVACBanned"
             , (bool ( ::ISteamApps::* )(  ) )( &::ISteamApps::BIsVACBanned ) )    
         .def( 
+            "GetAppBuildId"
+            , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetAppBuildId ) )    
+        .def( 
             "GetAppInstallDir"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t,char *,::uint32 ) )( &::ISteamApps::GetAppInstallDir )
             , ( bp::arg("appID"), bp::arg("pchFolder"), bp::arg("cchFolderBufferSize") ) )    
@@ -2021,6 +2143,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetDLCCount"
             , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetDLCCount ) )    
+        .def( 
+            "GetDlcDownloadProgress"
+            , (bool ( ::ISteamApps::* )( ::AppId_t,::uint64 *,::uint64 * ) )( &::ISteamApps::GetDlcDownloadProgress )
+            , ( bp::arg("nAppID"), bp::arg("punBytesDownloaded"), bp::arg("punBytesTotal") ) )    
         .def( 
             "GetEarliestPurchaseUnixTime"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t ) )( &::ISteamApps::GetEarliestPurchaseUnixTime )
@@ -2200,6 +2326,29 @@ BOOST_PYTHON_MODULE(_steam){
             "GetFriendRichPresenceKeyCount"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRichPresenceKeyCount )
             , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendSteamLevel"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendSteamLevel )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendsGroupCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetFriendsGroupCount ) )    
+        .def( 
+            "GetFriendsGroupIDByIndex"
+            , (::FriendsGroupID_t ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetFriendsGroupIDByIndex )
+            , ( bp::arg("iFG") ) )    
+        .def( 
+            "GetFriendsGroupMembersCount"
+            , (int ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupMembersCount )
+            , ( bp::arg("friendsGroupID") ) )    
+        .def( 
+            "GetFriendsGroupMembersList"
+            , (void ( ::ISteamFriends::* )( ::FriendsGroupID_t,::CSteamID *,int ) )( &::ISteamFriends::GetFriendsGroupMembersList )
+            , ( bp::arg("friendsGroupID"), bp::arg("pOutSteamIDMembers"), bp::arg("nMembersCount") ) )    
+        .def( 
+            "GetFriendsGroupName"
+            , (char const * ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupName )
+            , ( bp::arg("friendsGroupID") ) )    
         .def( 
             "GetLargeFriendAvatar"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetLargeFriendAvatar )
@@ -2454,6 +2603,227 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::ELobbyType ) )( &::ISteamMatchmaking::SetLobbyType )
             , ( bp::arg("steamIDLobby"), bp::arg("eLobbyType") ) );
 
+    bp::class_< ISteamUGC, boost::noncopyable >( "ISteamUGC", bp::no_init )    
+        .def( 
+            "AddExcludedTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::AddExcludedTag )
+            , ( bp::arg("handle"), bp::arg("pTagName") ) )    
+        .def( 
+            "AddItemKeyValueTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const *,char const * ) )( &::ISteamUGC::AddItemKeyValueTag )
+            , ( bp::arg("handle"), bp::arg("pchKey"), bp::arg("pchValue") ) )    
+        .def( 
+            "AddItemToFavorites"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::AppId_t,::PublishedFileId_t ) )( &::ISteamUGC::AddItemToFavorites )
+            , ( bp::arg("nAppId"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "AddRequiredKeyValueTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const *,char const * ) )( &::ISteamUGC::AddRequiredKeyValueTag )
+            , ( bp::arg("handle"), bp::arg("pKey"), bp::arg("pValue") ) )    
+        .def( 
+            "AddRequiredTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::AddRequiredTag )
+            , ( bp::arg("handle"), bp::arg("pTagName") ) )    
+        .def( 
+            "CreateItem"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::AppId_t,::EWorkshopFileType ) )( &::ISteamUGC::CreateItem )
+            , ( bp::arg("nConsumerAppId"), bp::arg("eFileType") ) )    
+        .def( 
+            "CreateQueryAllUGCRequest"
+            , (::UGCQueryHandle_t ( ::ISteamUGC::* )( ::EUGCQuery,::EUGCMatchingUGCType,::AppId_t,::AppId_t,::uint32 ) )( &::ISteamUGC::CreateQueryAllUGCRequest )
+            , ( bp::arg("eQueryType"), bp::arg("eMatchingeMatchingUGCTypeFileType"), bp::arg("nCreatorAppID"), bp::arg("nConsumerAppID"), bp::arg("unPage") ) )    
+        .def( 
+            "CreateQueryUGCDetailsRequest"
+            , (::UGCQueryHandle_t ( ::ISteamUGC::* )( ::PublishedFileId_t *,::uint32 ) )( &::ISteamUGC::CreateQueryUGCDetailsRequest )
+            , ( bp::arg("pvecPublishedFileID"), bp::arg("unNumPublishedFileIDs") ) )    
+        .def( 
+            "CreateQueryUserUGCRequest"
+            , (::UGCQueryHandle_t ( ::ISteamUGC::* )( ::AccountID_t,::EUserUGCList,::EUGCMatchingUGCType,::EUserUGCListSortOrder,::AppId_t,::AppId_t,::uint32 ) )( &::ISteamUGC::CreateQueryUserUGCRequest )
+            , ( bp::arg("unAccountID"), bp::arg("eListType"), bp::arg("eMatchingUGCType"), bp::arg("eSortOrder"), bp::arg("nCreatorAppID"), bp::arg("nConsumerAppID"), bp::arg("unPage") ) )    
+        .def( 
+            "DownloadItem"
+            , (bool ( ::ISteamUGC::* )( ::PublishedFileId_t,bool ) )( &::ISteamUGC::DownloadItem )
+            , ( bp::arg("nPublishedFileID"), bp::arg("bHighPriority") ) )    
+        .def( 
+            "GetItemDownloadInfo"
+            , (boost::python::tuple (*)( ::ISteamUGC &,::PublishedFileId_t ))( &GetItemDownloadInfo_c0e3f4a5f6b6bbab274b0d3ba6980900 )
+            , ( bp::arg("inst"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "GetItemState"
+            , (::uint32 ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::GetItemState )
+            , ( bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "GetItemUpdateProgress"
+            , (::EItemUpdateStatus ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,::uint64 *,::uint64 * ) )( &::ISteamUGC::GetItemUpdateProgress )
+            , ( bp::arg("handle"), bp::arg("punBytesProcessed"), bp::arg("punBytesTotal") ) )    
+        .def( 
+            "GetNumSubscribedItems"
+            , (::uint32 ( ::ISteamUGC::* )(  ) )( &::ISteamUGC::GetNumSubscribedItems ) )    
+        .def( 
+            "GetQueryUGCAdditionalPreview"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::uint32,char *,::uint32,bool * ) )( &::ISteamUGC::GetQueryUGCAdditionalPreview )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("previewIndex"), bp::arg("pchURLOrVideoID"), bp::arg("cchURLSize"), bp::arg("pbIsImage") ) )    
+        .def( 
+            "GetQueryUGCChildren"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::PublishedFileId_t *,::uint32 ) )( &::ISteamUGC::GetQueryUGCChildren )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pvecPublishedFileID"), bp::arg("cMaxEntries") ) )    
+        .def( 
+            "GetQueryUGCKeyValueTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::uint32,char *,::uint32,char *,::uint32 ) )( &::ISteamUGC::GetQueryUGCKeyValueTag )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("keyValueTagIndex"), bp::arg("pchKey"), bp::arg("cchKeySize"), bp::arg("pchValue"), bp::arg("cchValueSize") ) )    
+        .def( 
+            "GetQueryUGCMetadata"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,char *,::uint32 ) )( &::ISteamUGC::GetQueryUGCMetadata )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pchMetadata"), bp::arg("cchMetadatasize") ) )    
+        .def( 
+            "GetQueryUGCNumAdditionalPreviews"
+            , (::uint32 ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::GetQueryUGCNumAdditionalPreviews )
+            , ( bp::arg("handle"), bp::arg("index") ) )    
+        .def( 
+            "GetQueryUGCNumKeyValueTags"
+            , (::uint32 ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::GetQueryUGCNumKeyValueTags )
+            , ( bp::arg("handle"), bp::arg("index") ) )    
+        .def( 
+            "GetQueryUGCPreviewURL"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,char *,::uint32 ) )( &::ISteamUGC::GetQueryUGCPreviewURL )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pchURL"), bp::arg("cchURLSize") ) )    
+        .def( 
+            "GetQueryUGCResult"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::SteamUGCDetails_t * ) )( &::ISteamUGC::GetQueryUGCResult )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pDetails") ) )    
+        .def( 
+            "GetQueryUGCStatistic"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::EItemStatistic,::uint32 * ) )( &::ISteamUGC::GetQueryUGCStatistic )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("eStatType"), bp::arg("pStatValue") ) )    
+        .def( 
+            "GetSubscribedItems"
+            , (::uint32 ( ::ISteamUGC::* )( ::PublishedFileId_t *,::uint32 ) )( &::ISteamUGC::GetSubscribedItems )
+            , ( bp::arg("pvecPublishedFileID"), bp::arg("cMaxEntries") ) )    
+        .def( 
+            "GetUserItemVote"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::GetUserItemVote )
+            , ( bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "ReleaseQueryUGCRequest"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t ) )( &::ISteamUGC::ReleaseQueryUGCRequest )
+            , ( bp::arg("handle") ) )    
+        .def( 
+            "RemoveItemFromFavorites"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::AppId_t,::PublishedFileId_t ) )( &::ISteamUGC::RemoveItemFromFavorites )
+            , ( bp::arg("nAppId"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "RemoveItemKeyValueTags"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::RemoveItemKeyValueTags )
+            , ( bp::arg("handle"), bp::arg("pchKey") ) )    
+        .def( 
+            "RequestUGCDetails"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t,::uint32 ) )( &::ISteamUGC::RequestUGCDetails )
+            , ( bp::arg("nPublishedFileID"), bp::arg("unMaxAgeSeconds") ) )    
+        .def( 
+            "SendQueryUGCRequest"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::UGCQueryHandle_t ) )( &::ISteamUGC::SendQueryUGCRequest )
+            , ( bp::arg("handle") ) )    
+        .def( 
+            "SetAllowCachedResponse"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::SetAllowCachedResponse )
+            , ( bp::arg("handle"), bp::arg("unMaxAgeSeconds") ) )    
+        .def( 
+            "SetCloudFileNameFilter"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::SetCloudFileNameFilter )
+            , ( bp::arg("handle"), bp::arg("pMatchCloudFileName") ) )    
+        .def( 
+            "SetItemContent"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemContent )
+            , ( bp::arg("handle"), bp::arg("pszContentFolder") ) )    
+        .def( 
+            "SetItemDescription"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemDescription )
+            , ( bp::arg("handle"), bp::arg("pchDescription") ) )    
+        .def( 
+            "SetItemMetadata"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemMetadata )
+            , ( bp::arg("handle"), bp::arg("pchMetaData") ) )    
+        .def( 
+            "SetItemPreview"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemPreview )
+            , ( bp::arg("handle"), bp::arg("pszPreviewFile") ) )    
+        .def( 
+            "SetItemTags"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,::SteamParamStringArray_t const * ) )( &::ISteamUGC::SetItemTags )
+            , ( bp::arg("updateHandle"), bp::arg("pTags") ) )    
+        .def( 
+            "SetItemTitle"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemTitle )
+            , ( bp::arg("handle"), bp::arg("pchTitle") ) )    
+        .def( 
+            "SetItemUpdateLanguage"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemUpdateLanguage )
+            , ( bp::arg("handle"), bp::arg("pchLanguage") ) )    
+        .def( 
+            "SetItemVisibility"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,::ERemoteStoragePublishedFileVisibility ) )( &::ISteamUGC::SetItemVisibility )
+            , ( bp::arg("handle"), bp::arg("eVisibility") ) )    
+        .def( 
+            "SetLanguage"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::SetLanguage )
+            , ( bp::arg("handle"), bp::arg("pchLanguage") ) )    
+        .def( 
+            "SetMatchAnyTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetMatchAnyTag )
+            , ( bp::arg("handle"), bp::arg("bMatchAnyTag") ) )    
+        .def( 
+            "SetRankedByTrendDays"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::SetRankedByTrendDays )
+            , ( bp::arg("handle"), bp::arg("unDays") ) )    
+        .def( 
+            "SetReturnAdditionalPreviews"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnAdditionalPreviews )
+            , ( bp::arg("handle"), bp::arg("bReturnAdditionalPreviews") ) )    
+        .def( 
+            "SetReturnChildren"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnChildren )
+            , ( bp::arg("handle"), bp::arg("bReturnChildren") ) )    
+        .def( 
+            "SetReturnKeyValueTags"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnKeyValueTags )
+            , ( bp::arg("handle"), bp::arg("bReturnKeyValueTags") ) )    
+        .def( 
+            "SetReturnLongDescription"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnLongDescription )
+            , ( bp::arg("handle"), bp::arg("bReturnLongDescription") ) )    
+        .def( 
+            "SetReturnMetadata"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnMetadata )
+            , ( bp::arg("handle"), bp::arg("bReturnMetadata") ) )    
+        .def( 
+            "SetReturnTotalOnly"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnTotalOnly )
+            , ( bp::arg("handle"), bp::arg("bReturnTotalOnly") ) )    
+        .def( 
+            "SetSearchText"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::SetSearchText )
+            , ( bp::arg("handle"), bp::arg("pSearchText") ) )    
+        .def( 
+            "SetUserItemVote"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t,bool ) )( &::ISteamUGC::SetUserItemVote )
+            , ( bp::arg("nPublishedFileID"), bp::arg("bVoteUp") ) )    
+        .def( 
+            "StartItemUpdate"
+            , (::UGCUpdateHandle_t ( ::ISteamUGC::* )( ::AppId_t,::PublishedFileId_t ) )( &::ISteamUGC::StartItemUpdate )
+            , ( bp::arg("nConsumerAppId"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "SubmitItemUpdate"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SubmitItemUpdate )
+            , ( bp::arg("handle"), bp::arg("pchChangeNote") ) )    
+        .def( 
+            "SubscribeItem"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::SubscribeItem )
+            , ( bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "UnsubscribeItem"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::UnsubscribeItem )
+            , ( bp::arg("nPublishedFileID") ) );
+
     bp::class_< ISteamUser, boost::noncopyable >( "ISteamUser", bp::no_init )    
         .def( 
             "AdvertiseGame"
@@ -2525,6 +2895,10 @@ BOOST_PYTHON_MODULE(_steam){
             "RequestEncryptedAppTicket"
             , (::SteamAPICall_t ( ::ISteamUser::* )( void *,int ) )( &::ISteamUser::RequestEncryptedAppTicket )
             , ( bp::arg("pDataToInclude"), bp::arg("cbDataToInclude") ) )    
+        .def( 
+            "RequestStoreAuthURL"
+            , (::SteamAPICall_t ( ::ISteamUser::* )( char const * ) )( &::ISteamUser::RequestStoreAuthURL )
+            , ( bp::arg("pchRedirectURL") ) )    
         .def( 
             "StartVoiceRecording"
             , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StartVoiceRecording ) )    
@@ -2781,6 +3155,10 @@ BOOST_PYTHON_MODULE(_steam){
             "RunFrame"
             , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
         .def( 
+            "SetOverlayNotificationInset"
+            , (void ( ::ISteamUtils::* )( int,int ) )( &::ISteamUtils::SetOverlayNotificationInset )
+            , ( bp::arg("nHorizontalInset"), bp::arg("nVerticalInset") ) )    
+        .def( 
             "SetOverlayNotificationPosition"
             , (void ( ::ISteamUtils::* )( ::ENotificationPosition ) )( &::ISteamUtils::SetOverlayNotificationPosition )
             , ( bp::arg("eNotificationPosition") ) )    
@@ -3005,6 +3383,15 @@ BOOST_PYTHON_MODULE(_steam){
         SetPersonaNameResponse_t_exposer.def_readwrite( "result", &SetPersonaNameResponse_t::m_result );
     }
 
+    { //::SubmitItemUpdateResult_t
+        typedef bp::class_< SubmitItemUpdateResult_t > SubmitItemUpdateResult_t_exposer_t;
+        SubmitItemUpdateResult_t_exposer_t SubmitItemUpdateResult_t_exposer = SubmitItemUpdateResult_t_exposer_t( "SubmitItemUpdateResult_t" );
+        bp::scope SubmitItemUpdateResult_t_scope( SubmitItemUpdateResult_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)SubmitItemUpdateResult_t::k_iCallback;
+        SubmitItemUpdateResult_t_exposer.def_readwrite( "userneedstoacceptworkshoplegalagreement", &SubmitItemUpdateResult_t::m_bUserNeedsToAcceptWorkshopLegalAgreement );
+        SubmitItemUpdateResult_t_exposer.def_readwrite( "result", &SubmitItemUpdateResult_t::m_eResult );
+    }
+
     bp::class_< gameserveritem_t >( "gameserveritem_t", bp::init< >() )    
         .def( 
             "GetName"
@@ -3067,7 +3454,7 @@ BOOST_PYTHON_MODULE(_steam){
 
     { //::servernetadr_t
         typedef bp::class_< servernetadr_t > servernetadr_exposer_t;
-        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr" );
+        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr", bp::init< >() );
         bp::scope servernetadr_scope( servernetadr_exposer );
         { //::servernetadr_t::GetConnectionAddressString
         
@@ -3167,6 +3554,17 @@ BOOST_PYTHON_MODULE(_steam){
         }
     }
 
+    { //::PyGetItemInstallInfo
+    
+        typedef ::boost::python::tuple ( *PyGetItemInstallInfo_function_type )( ::PublishedFileId_t );
+        
+        bp::def( 
+            "PyGetItemInstallInfo"
+            , PyGetItemInstallInfo_function_type( &::PyGetItemInstallInfo )
+            , ( bp::arg("nPublishedFileID") ) );
+    
+    }
+
     { //::PyGetLobbyChatEntry
     
         typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
@@ -3231,6 +3629,8 @@ BOOST_PYTHON_MODULE(_steam){
             , SteamAPI_RunCallbacks_function_type( &::SteamAPI_RunCallbacks ) );
     
     }
+
+    bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 
     bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
 
@@ -3713,7 +4113,45 @@ BOOST_PYTHON_MODULE(_steam){
         }
     }
 
-    bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
+    { //::CreateItemResultCallResult
+        typedef bp::class_< CreateItemResultCallResult_wrapper, boost::noncopyable > CreateItemResultCallResult_exposer_t;
+        CreateItemResultCallResult_exposer_t CreateItemResultCallResult_exposer = CreateItemResultCallResult_exposer_t( "CreateItemResultCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope CreateItemResultCallResult_scope( CreateItemResultCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, CreateItemResultCallResult >();
+        { //::CreateItemResultCallResult::OnCreateItemResult
+        
+            typedef void ( ::CreateItemResultCallResult::*OnCreateItemResult_function_type )( ::CreateItemResult_t *,bool ) ;
+            typedef void ( CreateItemResultCallResult_wrapper::*default_OnCreateItemResult_function_type )( ::CreateItemResult_t *,bool ) ;
+            
+            CreateItemResultCallResult_exposer.def( 
+                "OnCreateItemResult"
+                , OnCreateItemResult_function_type(&::CreateItemResultCallResult::OnCreateItemResult)
+                , default_OnCreateItemResult_function_type(&CreateItemResultCallResult_wrapper::default_OnCreateItemResult)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::SubmitItemUpdateResultCallResult
+        typedef bp::class_< SubmitItemUpdateResultCallResult_wrapper, boost::noncopyable > SubmitItemUpdateResultCallResult_exposer_t;
+        SubmitItemUpdateResultCallResult_exposer_t SubmitItemUpdateResultCallResult_exposer = SubmitItemUpdateResultCallResult_exposer_t( "SubmitItemUpdateResultCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope SubmitItemUpdateResultCallResult_scope( SubmitItemUpdateResultCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, SubmitItemUpdateResultCallResult >();
+        { //::SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult
+        
+            typedef void ( ::SubmitItemUpdateResultCallResult::*OnSubmitItemUpdateResult_function_type )( ::SubmitItemUpdateResult_t *,bool ) ;
+            typedef void ( SubmitItemUpdateResultCallResult_wrapper::*default_OnSubmitItemUpdateResult_function_type )( ::SubmitItemUpdateResult_t *,bool ) ;
+            
+            SubmitItemUpdateResultCallResult_exposer.def( 
+                "OnSubmitItemUpdateResult"
+                , OnSubmitItemUpdateResult_function_type(&::SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult)
+                , default_OnSubmitItemUpdateResult_function_type(&SubmitItemUpdateResultCallResult_wrapper::default_OnSubmitItemUpdateResult)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    bp::scope().attr("k_uAppIdInvalid") = k_uAppIdInvalid;
 }
 #else
 #include "__array_1.pypp.hpp"
@@ -3735,6 +4173,8 @@ BOOST_PYTHON_MODULE(_steam){
 #include "steam/steamclientpublic.h"
 
 #include "steam/isteamuserstats.h"
+
+#include "steam/isteamugc.h"
 
 #include "srcpy_steam.h"
 
@@ -3827,6 +4267,13 @@ static boost::python::tuple GetLobbyGameServer_e3badaaa69eb32a59ea528ba9e97e8ee(
                             , punGameServerIP2
                             , punGameServerPort2
                             , psteamIDGameServer2 );
+}
+
+static boost::python::tuple GetItemDownloadInfo_c0e3f4a5f6b6bbab274b0d3ba6980900( ::ISteamUGC & inst, ::PublishedFileId_t nPublishedFileID ){
+    long long unsigned int punBytesDownloaded2;
+    long long unsigned int punBytesTotal2;
+    bool result = inst.GetItemDownloadInfo(nPublishedFileID, &punBytesDownloaded2, &punBytesTotal2);
+    return bp::make_tuple( result, punBytesDownloaded2, punBytesTotal2 );
 }
 
 struct PySteamMatchmakingPingResponse_wrapper : PySteamMatchmakingPingResponse, bp::wrapper< PySteamMatchmakingPingResponse > {
@@ -4917,6 +5364,66 @@ struct NumberOfCurrentPlayersCallResult_wrapper : NumberOfCurrentPlayersCallResu
     }
 };
 
+PY_STEAM_CALLRESULT_WRAPPER( CreateItemResult, CreateItemResult_t );
+
+struct CreateItemResultCallResult_wrapper : CreateItemResultCallResult, bp::wrapper< CreateItemResultCallResult > {
+
+    CreateItemResultCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : CreateItemResultCallResult( steamapicall )
+      , bp::wrapper< CreateItemResultCallResult >(){
+        // constructor
+    }
+
+    virtual void OnCreateItemResult( ::CreateItemResult_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( CreateItemResultCallResult, OnCreateItemResult )
+        PY_OVERRIDE_LOG( _steam, CreateItemResultCallResult, OnCreateItemResult )
+        bp::override func_OnCreateItemResult = this->get_override( "OnCreateItemResult" );
+        if( func_OnCreateItemResult.ptr() != Py_None )
+            try {
+                func_OnCreateItemResult( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->CreateItemResultCallResult::OnCreateItemResult( pData, bIOFailure );
+            }
+        else
+            this->CreateItemResultCallResult::OnCreateItemResult( pData, bIOFailure );
+    }
+    
+    void default_OnCreateItemResult( ::CreateItemResult_t * pData, bool bIOFailure ) {
+        CreateItemResultCallResult::OnCreateItemResult( pData, bIOFailure );
+    }
+};
+
+PY_STEAM_CALLRESULT_WRAPPER( SubmitItemUpdateResult, SubmitItemUpdateResult_t );
+
+struct SubmitItemUpdateResultCallResult_wrapper : SubmitItemUpdateResultCallResult, bp::wrapper< SubmitItemUpdateResultCallResult > {
+
+    SubmitItemUpdateResultCallResult_wrapper(::SteamAPICall_t steamapicall )
+    : SubmitItemUpdateResultCallResult( steamapicall )
+      , bp::wrapper< SubmitItemUpdateResultCallResult >(){
+        // constructor
+    }
+
+    virtual void OnSubmitItemUpdateResult( ::SubmitItemUpdateResult_t * pData, bool bIOFailure ) {
+        PY_OVERRIDE_CHECK( SubmitItemUpdateResultCallResult, OnSubmitItemUpdateResult )
+        PY_OVERRIDE_LOG( _steam, SubmitItemUpdateResultCallResult, OnSubmitItemUpdateResult )
+        bp::override func_OnSubmitItemUpdateResult = this->get_override( "OnSubmitItemUpdateResult" );
+        if( func_OnSubmitItemUpdateResult.ptr() != Py_None )
+            try {
+                func_OnSubmitItemUpdateResult( boost::python::ptr(pData), bIOFailure );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult( pData, bIOFailure );
+            }
+        else
+            this->SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult( pData, bIOFailure );
+    }
+    
+    void default_OnSubmitItemUpdateResult( ::SubmitItemUpdateResult_t * pData, bool bIOFailure ) {
+        SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult( pData, bIOFailure );
+    }
+};
+
 BOOST_PYTHON_MODULE(_steam){
     bp::docstring_options doc_options( true, true, false );
 
@@ -4948,6 +5455,9 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EChatEntryTypeWasBanned", k_EChatEntryTypeWasBanned)
         .value("k_EChatEntryTypeDisconnected", k_EChatEntryTypeDisconnected)
         .value("k_EChatEntryTypeHistoricalChat", k_EChatEntryTypeHistoricalChat)
+        .value("k_EChatEntryTypeReserved1", k_EChatEntryTypeReserved1)
+        .value("k_EChatEntryTypeReserved2", k_EChatEntryTypeReserved2)
+        .value("k_EChatEntryTypeLinkBlocked", k_EChatEntryTypeLinkBlocked)
         .export_values()
         ;
 
@@ -5160,6 +5670,17 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EResultAccountLoginDeniedThrottle", k_EResultAccountLoginDeniedThrottle)
         .value("k_EResultTwoFactorCodeMismatch", k_EResultTwoFactorCodeMismatch)
         .value("k_EResultTwoFactorActivationCodeMismatch", k_EResultTwoFactorActivationCodeMismatch)
+        .value("k_EResultAccountAssociatedToMultiplePartners", k_EResultAccountAssociatedToMultiplePartners)
+        .value("k_EResultNotModified", k_EResultNotModified)
+        .value("k_EResultNoMobileDevice", k_EResultNoMobileDevice)
+        .value("k_EResultTimeNotSynced", k_EResultTimeNotSynced)
+        .value("k_EResultSmsCodeFailed", k_EResultSmsCodeFailed)
+        .value("k_EResultAccountLimitExceeded", k_EResultAccountLimitExceeded)
+        .value("k_EResultAccountActivityLimitExceeded", k_EResultAccountActivityLimitExceeded)
+        .value("k_EResultPhoneActivityLimitExceeded", k_EResultPhoneActivityLimitExceeded)
+        .value("k_EResultRefundToWallet", k_EResultRefundToWallet)
+        .value("k_EResultEmailSendFailure", k_EResultEmailSendFailure)
+        .value("k_EResultNotSettled", k_EResultNotSettled)
         .export_values()
         ;
 
@@ -5181,6 +5702,28 @@ BOOST_PYTHON_MODULE(_steam){
         .value("k_EUniverseInternal", k_EUniverseInternal)
         .value("k_EUniverseDev", k_EUniverseDev)
         .value("k_EUniverseMax", k_EUniverseMax)
+        .export_values()
+        ;
+
+    bp::enum_< EWorkshopFileType>("EWorkshopFileType")
+        .value("k_EWorkshopFileTypeFirst", k_EWorkshopFileTypeFirst)
+        .value("k_EWorkshopFileTypeCommunity", k_EWorkshopFileTypeCommunity)
+        .value("k_EWorkshopFileTypeMicrotransaction", k_EWorkshopFileTypeMicrotransaction)
+        .value("k_EWorkshopFileTypeCollection", k_EWorkshopFileTypeCollection)
+        .value("k_EWorkshopFileTypeArt", k_EWorkshopFileTypeArt)
+        .value("k_EWorkshopFileTypeVideo", k_EWorkshopFileTypeVideo)
+        .value("k_EWorkshopFileTypeScreenshot", k_EWorkshopFileTypeScreenshot)
+        .value("k_EWorkshopFileTypeGame", k_EWorkshopFileTypeGame)
+        .value("k_EWorkshopFileTypeSoftware", k_EWorkshopFileTypeSoftware)
+        .value("k_EWorkshopFileTypeConcept", k_EWorkshopFileTypeConcept)
+        .value("k_EWorkshopFileTypeWebGuide", k_EWorkshopFileTypeWebGuide)
+        .value("k_EWorkshopFileTypeIntegratedGuide", k_EWorkshopFileTypeIntegratedGuide)
+        .value("k_EWorkshopFileTypeMerch", k_EWorkshopFileTypeMerch)
+        .value("k_EWorkshopFileTypeControllerBinding", k_EWorkshopFileTypeControllerBinding)
+        .value("k_EWorkshopFileTypeSteamworksAccessInvite", k_EWorkshopFileTypeSteamworksAccessInvite)
+        .value("k_EWorkshopFileTypeSteamVideo", k_EWorkshopFileTypeSteamVideo)
+        .value("k_EWorkshopFileTypeGameManagedItem", k_EWorkshopFileTypeGameManagedItem)
+        .value("k_EWorkshopFileTypeMax", k_EWorkshopFileTypeMax)
         .export_values()
         ;
 
@@ -5208,6 +5751,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "SteamMatchmaking"
             , (::ISteamMatchmaking * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamMatchmaking )
+            , bp::return_internal_reference< >() )    
+        .def( 
+            "SteamUGC"
+            , (::ISteamUGC * ( ::CSteamAPIContext::* )(  ) )( &::CSteamAPIContext::SteamUGC )
             , bp::return_internal_reference< >() )    
         .def( 
             "SteamUser"
@@ -5541,6 +6088,16 @@ BOOST_PYTHON_MODULE(_steam){
         ClanOfficerListResponse_t_exposer.def_readwrite( "steamidclan", &ClanOfficerListResponse_t::m_steamIDClan );
     }
 
+    { //::CreateItemResult_t
+        typedef bp::class_< CreateItemResult_t > CreateItemResult_t_exposer_t;
+        CreateItemResult_t_exposer_t CreateItemResult_t_exposer = CreateItemResult_t_exposer_t( "CreateItemResult_t" );
+        bp::scope CreateItemResult_t_scope( CreateItemResult_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)CreateItemResult_t::k_iCallback;
+        CreateItemResult_t_exposer.def_readwrite( "userneedstoacceptworkshoplegalagreement", &CreateItemResult_t::m_bUserNeedsToAcceptWorkshopLegalAgreement );
+        CreateItemResult_t_exposer.def_readwrite( "result", &CreateItemResult_t::m_eResult );
+        CreateItemResult_t_exposer.def_readwrite( "publishedfileid", &CreateItemResult_t::m_nPublishedFileId );
+    }
+
     { //::DownloadClanActivityCountsResult_t
         typedef bp::class_< DownloadClanActivityCountsResult_t > DownloadClanActivityCountsResult_t_exposer_t;
         DownloadClanActivityCountsResult_t_exposer_t DownloadClanActivityCountsResult_t_exposer = DownloadClanActivityCountsResult_t_exposer_t( "DownloadClanActivityCountsResult_t" );
@@ -5727,6 +6284,9 @@ BOOST_PYTHON_MODULE(_steam){
             "BIsVACBanned"
             , (bool ( ::ISteamApps::* )(  ) )( &::ISteamApps::BIsVACBanned ) )    
         .def( 
+            "GetAppBuildId"
+            , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetAppBuildId ) )    
+        .def( 
             "GetAppInstallDir"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t,char *,::uint32 ) )( &::ISteamApps::GetAppInstallDir )
             , ( bp::arg("appID"), bp::arg("pchFolder"), bp::arg("cchFolderBufferSize") ) )    
@@ -5742,6 +6302,10 @@ BOOST_PYTHON_MODULE(_steam){
         .def( 
             "GetDLCCount"
             , (int ( ::ISteamApps::* )(  ) )( &::ISteamApps::GetDLCCount ) )    
+        .def( 
+            "GetDlcDownloadProgress"
+            , (bool ( ::ISteamApps::* )( ::AppId_t,::uint64 *,::uint64 * ) )( &::ISteamApps::GetDlcDownloadProgress )
+            , ( bp::arg("nAppID"), bp::arg("punBytesDownloaded"), bp::arg("punBytesTotal") ) )    
         .def( 
             "GetEarliestPurchaseUnixTime"
             , (::uint32 ( ::ISteamApps::* )( ::AppId_t ) )( &::ISteamApps::GetEarliestPurchaseUnixTime )
@@ -5921,6 +6485,29 @@ BOOST_PYTHON_MODULE(_steam){
             "GetFriendRichPresenceKeyCount"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendRichPresenceKeyCount )
             , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendSteamLevel"
+            , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetFriendSteamLevel )
+            , ( bp::arg("steamIDFriend") ) )    
+        .def( 
+            "GetFriendsGroupCount"
+            , (int ( ::ISteamFriends::* )(  ) )( &::ISteamFriends::GetFriendsGroupCount ) )    
+        .def( 
+            "GetFriendsGroupIDByIndex"
+            , (::FriendsGroupID_t ( ::ISteamFriends::* )( int ) )( &::ISteamFriends::GetFriendsGroupIDByIndex )
+            , ( bp::arg("iFG") ) )    
+        .def( 
+            "GetFriendsGroupMembersCount"
+            , (int ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupMembersCount )
+            , ( bp::arg("friendsGroupID") ) )    
+        .def( 
+            "GetFriendsGroupMembersList"
+            , (void ( ::ISteamFriends::* )( ::FriendsGroupID_t,::CSteamID *,int ) )( &::ISteamFriends::GetFriendsGroupMembersList )
+            , ( bp::arg("friendsGroupID"), bp::arg("pOutSteamIDMembers"), bp::arg("nMembersCount") ) )    
+        .def( 
+            "GetFriendsGroupName"
+            , (char const * ( ::ISteamFriends::* )( ::FriendsGroupID_t ) )( &::ISteamFriends::GetFriendsGroupName )
+            , ( bp::arg("friendsGroupID") ) )    
         .def( 
             "GetLargeFriendAvatar"
             , (int ( ::ISteamFriends::* )( ::CSteamID ) )( &::ISteamFriends::GetLargeFriendAvatar )
@@ -6341,6 +6928,227 @@ BOOST_PYTHON_MODULE(_steam){
             , (bool ( ::ISteamMatchmaking::* )( ::CSteamID,::ELobbyType ) )( &::ISteamMatchmaking::SetLobbyType )
             , ( bp::arg("steamIDLobby"), bp::arg("eLobbyType") ) );
 
+    bp::class_< ISteamUGC, boost::noncopyable >( "ISteamUGC", bp::no_init )    
+        .def( 
+            "AddExcludedTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::AddExcludedTag )
+            , ( bp::arg("handle"), bp::arg("pTagName") ) )    
+        .def( 
+            "AddItemKeyValueTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const *,char const * ) )( &::ISteamUGC::AddItemKeyValueTag )
+            , ( bp::arg("handle"), bp::arg("pchKey"), bp::arg("pchValue") ) )    
+        .def( 
+            "AddItemToFavorites"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::AppId_t,::PublishedFileId_t ) )( &::ISteamUGC::AddItemToFavorites )
+            , ( bp::arg("nAppId"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "AddRequiredKeyValueTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const *,char const * ) )( &::ISteamUGC::AddRequiredKeyValueTag )
+            , ( bp::arg("handle"), bp::arg("pKey"), bp::arg("pValue") ) )    
+        .def( 
+            "AddRequiredTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::AddRequiredTag )
+            , ( bp::arg("handle"), bp::arg("pTagName") ) )    
+        .def( 
+            "CreateItem"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::AppId_t,::EWorkshopFileType ) )( &::ISteamUGC::CreateItem )
+            , ( bp::arg("nConsumerAppId"), bp::arg("eFileType") ) )    
+        .def( 
+            "CreateQueryAllUGCRequest"
+            , (::UGCQueryHandle_t ( ::ISteamUGC::* )( ::EUGCQuery,::EUGCMatchingUGCType,::AppId_t,::AppId_t,::uint32 ) )( &::ISteamUGC::CreateQueryAllUGCRequest )
+            , ( bp::arg("eQueryType"), bp::arg("eMatchingeMatchingUGCTypeFileType"), bp::arg("nCreatorAppID"), bp::arg("nConsumerAppID"), bp::arg("unPage") ) )    
+        .def( 
+            "CreateQueryUGCDetailsRequest"
+            , (::UGCQueryHandle_t ( ::ISteamUGC::* )( ::PublishedFileId_t *,::uint32 ) )( &::ISteamUGC::CreateQueryUGCDetailsRequest )
+            , ( bp::arg("pvecPublishedFileID"), bp::arg("unNumPublishedFileIDs") ) )    
+        .def( 
+            "CreateQueryUserUGCRequest"
+            , (::UGCQueryHandle_t ( ::ISteamUGC::* )( ::AccountID_t,::EUserUGCList,::EUGCMatchingUGCType,::EUserUGCListSortOrder,::AppId_t,::AppId_t,::uint32 ) )( &::ISteamUGC::CreateQueryUserUGCRequest )
+            , ( bp::arg("unAccountID"), bp::arg("eListType"), bp::arg("eMatchingUGCType"), bp::arg("eSortOrder"), bp::arg("nCreatorAppID"), bp::arg("nConsumerAppID"), bp::arg("unPage") ) )    
+        .def( 
+            "DownloadItem"
+            , (bool ( ::ISteamUGC::* )( ::PublishedFileId_t,bool ) )( &::ISteamUGC::DownloadItem )
+            , ( bp::arg("nPublishedFileID"), bp::arg("bHighPriority") ) )    
+        .def( 
+            "GetItemDownloadInfo"
+            , (boost::python::tuple (*)( ::ISteamUGC &,::PublishedFileId_t ))( &GetItemDownloadInfo_c0e3f4a5f6b6bbab274b0d3ba6980900 )
+            , ( bp::arg("inst"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "GetItemState"
+            , (::uint32 ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::GetItemState )
+            , ( bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "GetItemUpdateProgress"
+            , (::EItemUpdateStatus ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,::uint64 *,::uint64 * ) )( &::ISteamUGC::GetItemUpdateProgress )
+            , ( bp::arg("handle"), bp::arg("punBytesProcessed"), bp::arg("punBytesTotal") ) )    
+        .def( 
+            "GetNumSubscribedItems"
+            , (::uint32 ( ::ISteamUGC::* )(  ) )( &::ISteamUGC::GetNumSubscribedItems ) )    
+        .def( 
+            "GetQueryUGCAdditionalPreview"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::uint32,char *,::uint32,bool * ) )( &::ISteamUGC::GetQueryUGCAdditionalPreview )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("previewIndex"), bp::arg("pchURLOrVideoID"), bp::arg("cchURLSize"), bp::arg("pbIsImage") ) )    
+        .def( 
+            "GetQueryUGCChildren"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::PublishedFileId_t *,::uint32 ) )( &::ISteamUGC::GetQueryUGCChildren )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pvecPublishedFileID"), bp::arg("cMaxEntries") ) )    
+        .def( 
+            "GetQueryUGCKeyValueTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::uint32,char *,::uint32,char *,::uint32 ) )( &::ISteamUGC::GetQueryUGCKeyValueTag )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("keyValueTagIndex"), bp::arg("pchKey"), bp::arg("cchKeySize"), bp::arg("pchValue"), bp::arg("cchValueSize") ) )    
+        .def( 
+            "GetQueryUGCMetadata"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,char *,::uint32 ) )( &::ISteamUGC::GetQueryUGCMetadata )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pchMetadata"), bp::arg("cchMetadatasize") ) )    
+        .def( 
+            "GetQueryUGCNumAdditionalPreviews"
+            , (::uint32 ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::GetQueryUGCNumAdditionalPreviews )
+            , ( bp::arg("handle"), bp::arg("index") ) )    
+        .def( 
+            "GetQueryUGCNumKeyValueTags"
+            , (::uint32 ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::GetQueryUGCNumKeyValueTags )
+            , ( bp::arg("handle"), bp::arg("index") ) )    
+        .def( 
+            "GetQueryUGCPreviewURL"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,char *,::uint32 ) )( &::ISteamUGC::GetQueryUGCPreviewURL )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pchURL"), bp::arg("cchURLSize") ) )    
+        .def( 
+            "GetQueryUGCResult"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::SteamUGCDetails_t * ) )( &::ISteamUGC::GetQueryUGCResult )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("pDetails") ) )    
+        .def( 
+            "GetQueryUGCStatistic"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32,::EItemStatistic,::uint32 * ) )( &::ISteamUGC::GetQueryUGCStatistic )
+            , ( bp::arg("handle"), bp::arg("index"), bp::arg("eStatType"), bp::arg("pStatValue") ) )    
+        .def( 
+            "GetSubscribedItems"
+            , (::uint32 ( ::ISteamUGC::* )( ::PublishedFileId_t *,::uint32 ) )( &::ISteamUGC::GetSubscribedItems )
+            , ( bp::arg("pvecPublishedFileID"), bp::arg("cMaxEntries") ) )    
+        .def( 
+            "GetUserItemVote"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::GetUserItemVote )
+            , ( bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "ReleaseQueryUGCRequest"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t ) )( &::ISteamUGC::ReleaseQueryUGCRequest )
+            , ( bp::arg("handle") ) )    
+        .def( 
+            "RemoveItemFromFavorites"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::AppId_t,::PublishedFileId_t ) )( &::ISteamUGC::RemoveItemFromFavorites )
+            , ( bp::arg("nAppId"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "RemoveItemKeyValueTags"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::RemoveItemKeyValueTags )
+            , ( bp::arg("handle"), bp::arg("pchKey") ) )    
+        .def( 
+            "RequestUGCDetails"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t,::uint32 ) )( &::ISteamUGC::RequestUGCDetails )
+            , ( bp::arg("nPublishedFileID"), bp::arg("unMaxAgeSeconds") ) )    
+        .def( 
+            "SendQueryUGCRequest"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::UGCQueryHandle_t ) )( &::ISteamUGC::SendQueryUGCRequest )
+            , ( bp::arg("handle") ) )    
+        .def( 
+            "SetAllowCachedResponse"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::SetAllowCachedResponse )
+            , ( bp::arg("handle"), bp::arg("unMaxAgeSeconds") ) )    
+        .def( 
+            "SetCloudFileNameFilter"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::SetCloudFileNameFilter )
+            , ( bp::arg("handle"), bp::arg("pMatchCloudFileName") ) )    
+        .def( 
+            "SetItemContent"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemContent )
+            , ( bp::arg("handle"), bp::arg("pszContentFolder") ) )    
+        .def( 
+            "SetItemDescription"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemDescription )
+            , ( bp::arg("handle"), bp::arg("pchDescription") ) )    
+        .def( 
+            "SetItemMetadata"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemMetadata )
+            , ( bp::arg("handle"), bp::arg("pchMetaData") ) )    
+        .def( 
+            "SetItemPreview"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemPreview )
+            , ( bp::arg("handle"), bp::arg("pszPreviewFile") ) )    
+        .def( 
+            "SetItemTags"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,::SteamParamStringArray_t const * ) )( &::ISteamUGC::SetItemTags )
+            , ( bp::arg("updateHandle"), bp::arg("pTags") ) )    
+        .def( 
+            "SetItemTitle"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemTitle )
+            , ( bp::arg("handle"), bp::arg("pchTitle") ) )    
+        .def( 
+            "SetItemUpdateLanguage"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SetItemUpdateLanguage )
+            , ( bp::arg("handle"), bp::arg("pchLanguage") ) )    
+        .def( 
+            "SetItemVisibility"
+            , (bool ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,::ERemoteStoragePublishedFileVisibility ) )( &::ISteamUGC::SetItemVisibility )
+            , ( bp::arg("handle"), bp::arg("eVisibility") ) )    
+        .def( 
+            "SetLanguage"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::SetLanguage )
+            , ( bp::arg("handle"), bp::arg("pchLanguage") ) )    
+        .def( 
+            "SetMatchAnyTag"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetMatchAnyTag )
+            , ( bp::arg("handle"), bp::arg("bMatchAnyTag") ) )    
+        .def( 
+            "SetRankedByTrendDays"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,::uint32 ) )( &::ISteamUGC::SetRankedByTrendDays )
+            , ( bp::arg("handle"), bp::arg("unDays") ) )    
+        .def( 
+            "SetReturnAdditionalPreviews"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnAdditionalPreviews )
+            , ( bp::arg("handle"), bp::arg("bReturnAdditionalPreviews") ) )    
+        .def( 
+            "SetReturnChildren"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnChildren )
+            , ( bp::arg("handle"), bp::arg("bReturnChildren") ) )    
+        .def( 
+            "SetReturnKeyValueTags"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnKeyValueTags )
+            , ( bp::arg("handle"), bp::arg("bReturnKeyValueTags") ) )    
+        .def( 
+            "SetReturnLongDescription"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnLongDescription )
+            , ( bp::arg("handle"), bp::arg("bReturnLongDescription") ) )    
+        .def( 
+            "SetReturnMetadata"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnMetadata )
+            , ( bp::arg("handle"), bp::arg("bReturnMetadata") ) )    
+        .def( 
+            "SetReturnTotalOnly"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,bool ) )( &::ISteamUGC::SetReturnTotalOnly )
+            , ( bp::arg("handle"), bp::arg("bReturnTotalOnly") ) )    
+        .def( 
+            "SetSearchText"
+            , (bool ( ::ISteamUGC::* )( ::UGCQueryHandle_t,char const * ) )( &::ISteamUGC::SetSearchText )
+            , ( bp::arg("handle"), bp::arg("pSearchText") ) )    
+        .def( 
+            "SetUserItemVote"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t,bool ) )( &::ISteamUGC::SetUserItemVote )
+            , ( bp::arg("nPublishedFileID"), bp::arg("bVoteUp") ) )    
+        .def( 
+            "StartItemUpdate"
+            , (::UGCUpdateHandle_t ( ::ISteamUGC::* )( ::AppId_t,::PublishedFileId_t ) )( &::ISteamUGC::StartItemUpdate )
+            , ( bp::arg("nConsumerAppId"), bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "SubmitItemUpdate"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::UGCUpdateHandle_t,char const * ) )( &::ISteamUGC::SubmitItemUpdate )
+            , ( bp::arg("handle"), bp::arg("pchChangeNote") ) )    
+        .def( 
+            "SubscribeItem"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::SubscribeItem )
+            , ( bp::arg("nPublishedFileID") ) )    
+        .def( 
+            "UnsubscribeItem"
+            , (::SteamAPICall_t ( ::ISteamUGC::* )( ::PublishedFileId_t ) )( &::ISteamUGC::UnsubscribeItem )
+            , ( bp::arg("nPublishedFileID") ) );
+
     bp::class_< ISteamUser, boost::noncopyable >( "ISteamUser", bp::no_init )    
         .def( 
             "AdvertiseGame"
@@ -6412,6 +7220,10 @@ BOOST_PYTHON_MODULE(_steam){
             "RequestEncryptedAppTicket"
             , (::SteamAPICall_t ( ::ISteamUser::* )( void *,int ) )( &::ISteamUser::RequestEncryptedAppTicket )
             , ( bp::arg("pDataToInclude"), bp::arg("cbDataToInclude") ) )    
+        .def( 
+            "RequestStoreAuthURL"
+            , (::SteamAPICall_t ( ::ISteamUser::* )( char const * ) )( &::ISteamUser::RequestStoreAuthURL )
+            , ( bp::arg("pchRedirectURL") ) )    
         .def( 
             "StartVoiceRecording"
             , (void ( ::ISteamUser::* )(  ) )( &::ISteamUser::StartVoiceRecording ) )    
@@ -6668,6 +7480,10 @@ BOOST_PYTHON_MODULE(_steam){
             "RunFrame"
             , (void ( ::ISteamUtils::* )(  ) )( &::ISteamUtils::RunFrame ) )    
         .def( 
+            "SetOverlayNotificationInset"
+            , (void ( ::ISteamUtils::* )( int,int ) )( &::ISteamUtils::SetOverlayNotificationInset )
+            , ( bp::arg("nHorizontalInset"), bp::arg("nVerticalInset") ) )    
+        .def( 
             "SetOverlayNotificationPosition"
             , (void ( ::ISteamUtils::* )( ::ENotificationPosition ) )( &::ISteamUtils::SetOverlayNotificationPosition )
             , ( bp::arg("eNotificationPosition") ) )    
@@ -6892,6 +7708,15 @@ BOOST_PYTHON_MODULE(_steam){
         SetPersonaNameResponse_t_exposer.def_readwrite( "result", &SetPersonaNameResponse_t::m_result );
     }
 
+    { //::SubmitItemUpdateResult_t
+        typedef bp::class_< SubmitItemUpdateResult_t > SubmitItemUpdateResult_t_exposer_t;
+        SubmitItemUpdateResult_t_exposer_t SubmitItemUpdateResult_t_exposer = SubmitItemUpdateResult_t_exposer_t( "SubmitItemUpdateResult_t" );
+        bp::scope SubmitItemUpdateResult_t_scope( SubmitItemUpdateResult_t_exposer );
+        bp::scope().attr("k_iCallback") = (int)SubmitItemUpdateResult_t::k_iCallback;
+        SubmitItemUpdateResult_t_exposer.def_readwrite( "userneedstoacceptworkshoplegalagreement", &SubmitItemUpdateResult_t::m_bUserNeedsToAcceptWorkshopLegalAgreement );
+        SubmitItemUpdateResult_t_exposer.def_readwrite( "result", &SubmitItemUpdateResult_t::m_eResult );
+    }
+
     bp::class_< gameserveritem_t >( "gameserveritem_t", bp::init< >() )    
         .def( 
             "GetName"
@@ -6954,7 +7779,7 @@ BOOST_PYTHON_MODULE(_steam){
 
     { //::servernetadr_t
         typedef bp::class_< servernetadr_t > servernetadr_exposer_t;
-        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr" );
+        servernetadr_exposer_t servernetadr_exposer = servernetadr_exposer_t( "servernetadr", bp::init< >() );
         bp::scope servernetadr_scope( servernetadr_exposer );
         { //::servernetadr_t::GetConnectionAddressString
         
@@ -7054,6 +7879,17 @@ BOOST_PYTHON_MODULE(_steam){
         }
     }
 
+    { //::PyGetItemInstallInfo
+    
+        typedef ::boost::python::tuple ( *PyGetItemInstallInfo_function_type )( ::PublishedFileId_t );
+        
+        bp::def( 
+            "PyGetItemInstallInfo"
+            , PyGetItemInstallInfo_function_type( &::PyGetItemInstallInfo )
+            , ( bp::arg("nPublishedFileID") ) );
+    
+    }
+
     { //::PyGetLobbyChatEntry
     
         typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
@@ -7118,6 +7954,8 @@ BOOST_PYTHON_MODULE(_steam){
             , SteamAPI_RunCallbacks_function_type( &::SteamAPI_RunCallbacks ) );
     
     }
+
+    bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
 
     bp::scope().attr( "steamapicontext" ) = boost::ref(steamapicontext);
 
@@ -7600,9 +8438,47 @@ BOOST_PYTHON_MODULE(_steam){
         }
     }
 
+    { //::CreateItemResultCallResult
+        typedef bp::class_< CreateItemResultCallResult_wrapper, boost::noncopyable > CreateItemResultCallResult_exposer_t;
+        CreateItemResultCallResult_exposer_t CreateItemResultCallResult_exposer = CreateItemResultCallResult_exposer_t( "CreateItemResultCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope CreateItemResultCallResult_scope( CreateItemResultCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, CreateItemResultCallResult >();
+        { //::CreateItemResultCallResult::OnCreateItemResult
+        
+            typedef void ( ::CreateItemResultCallResult::*OnCreateItemResult_function_type )( ::CreateItemResult_t *,bool ) ;
+            typedef void ( CreateItemResultCallResult_wrapper::*default_OnCreateItemResult_function_type )( ::CreateItemResult_t *,bool ) ;
+            
+            CreateItemResultCallResult_exposer.def( 
+                "OnCreateItemResult"
+                , OnCreateItemResult_function_type(&::CreateItemResultCallResult::OnCreateItemResult)
+                , default_OnCreateItemResult_function_type(&CreateItemResultCallResult_wrapper::default_OnCreateItemResult)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
+    { //::SubmitItemUpdateResultCallResult
+        typedef bp::class_< SubmitItemUpdateResultCallResult_wrapper, boost::noncopyable > SubmitItemUpdateResultCallResult_exposer_t;
+        SubmitItemUpdateResultCallResult_exposer_t SubmitItemUpdateResultCallResult_exposer = SubmitItemUpdateResultCallResult_exposer_t( "SubmitItemUpdateResultCallResult", bp::init< SteamAPICall_t >(( bp::arg("steamapicall") )) );
+        bp::scope SubmitItemUpdateResultCallResult_scope( SubmitItemUpdateResultCallResult_exposer );
+        bp::implicitly_convertible< SteamAPICall_t, SubmitItemUpdateResultCallResult >();
+        { //::SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult
+        
+            typedef void ( ::SubmitItemUpdateResultCallResult::*OnSubmitItemUpdateResult_function_type )( ::SubmitItemUpdateResult_t *,bool ) ;
+            typedef void ( SubmitItemUpdateResultCallResult_wrapper::*default_OnSubmitItemUpdateResult_function_type )( ::SubmitItemUpdateResult_t *,bool ) ;
+            
+            SubmitItemUpdateResultCallResult_exposer.def( 
+                "OnSubmitItemUpdateResult"
+                , OnSubmitItemUpdateResult_function_type(&::SubmitItemUpdateResultCallResult::OnSubmitItemUpdateResult)
+                , default_OnSubmitItemUpdateResult_function_type(&SubmitItemUpdateResultCallResult_wrapper::default_OnSubmitItemUpdateResult)
+                , ( bp::arg("data"), bp::arg("iofailure") ) );
+        
+        }
+    }
+
     bp::scope().attr( "steamgameserverapicontext" ) = boost::ref(steamgameserverapicontext);
 
-    bp::scope().attr("k_uAPICallInvalid") = k_uAPICallInvalid;
+    bp::scope().attr("k_uAppIdInvalid") = k_uAppIdInvalid;
 }
 #endif
 
