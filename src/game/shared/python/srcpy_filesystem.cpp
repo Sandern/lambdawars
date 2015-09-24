@@ -243,3 +243,23 @@ bool PyFS_IsDirectory( const char *pFileName, const char *pathID )
 		return false;
 	return filesystem->IsDirectory( pFileName, pathID );
 }
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+int	PyFS_FindOrAddFileName( char const *pFileName )
+{
+	if( !pFileName )
+		return 0;
+	return (int)filesystem->FindOrAddFileName( pFileName );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+boost::python::tuple PyFS_String( int handle )
+{
+	char buf[MAX_PATH];
+	bool success = filesystem->String( (FileNameHandle_t)handle, buf, sizeof( buf ) );
+	return boost::python::make_tuple( success, buf );
+}

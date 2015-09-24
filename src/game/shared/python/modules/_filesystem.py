@@ -14,6 +14,8 @@ class SrcFilesystem(SharedModuleGenerator):
         # Exclude everything by default
         mb.decls().exclude()
         
+        mb.typedef('FileNameHandle_t').include()
+        
         # All functions named 'PyFS_' are part of the _filessytem module
         # Just strip the "PyFS_' suffix and include the function
         for decl in mb.free_functions():

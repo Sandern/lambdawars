@@ -28,4 +28,7 @@ void PyFS_CreateDirHierarchy( const char *path, const char *pathID = 0 );
 boost::python::list PyFS_ListDir( const char *path, const char *pathid = NULL, const char *wildcard = "*", bool appendslashdir = true );
 bool PyFS_IsDirectory( const char *pFileName, const char *pathID = 0 );
 
+int	PyFS_FindOrAddFileName( char const *pFileName );
+boost::python::tuple PyFS_String( int handle );
+
 #endif // SRCPY_FILESYSTEM_H

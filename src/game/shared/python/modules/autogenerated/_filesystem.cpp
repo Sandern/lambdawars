@@ -39,6 +39,17 @@ BOOST_PYTHON_MODULE(_filesystem){
     
     }
 
+    { //::PyFS_FindOrAddFileName
+    
+        typedef int ( *FindOrAddFileName_function_type )( char const * );
+        
+        bp::def( 
+            "FindOrAddFileName"
+            , FindOrAddFileName_function_type( &::PyFS_FindOrAddFileName )
+            , ( bp::arg("pFileName") ) );
+    
+    }
+
     { //::PyFS_FullPathToRelativePath
     
         typedef ::boost::python::api::object ( *FullPathToRelativePath_function_type )( char const *,char const *,::boost::python::api::object );
@@ -124,6 +135,17 @@ BOOST_PYTHON_MODULE(_filesystem){
             "Size"
             , Size_function_type( &::PyFS_Size )
             , ( bp::arg("pFileName"), bp::arg("pPathID")=bp::object() ) );
+    
+    }
+
+    { //::PyFS_String
+    
+        typedef ::boost::python::tuple ( *String_function_type )( int const );
+        
+        bp::def( 
+            "String"
+            , String_function_type( &::PyFS_String )
+            , ( bp::arg("handle") ) );
     
     }
 
