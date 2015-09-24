@@ -2008,6 +2008,9 @@
     <ClCompile Include="..\shared\recast\recast_prunetool.cpp">
       <Filter>Source Files\Recast</Filter>
     </ClCompile>
+    <ClCompile Include="..\shared\lambdawars\wars_workshop.cpp">
+      <Filter>Source Files\wars\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\shared\python\srcpy_converters_ents.h">
@@ -3908,6 +3911,9 @@
     </ClInclude>
     <ClInclude Include="..\shared\recast\recast_common.h">
       <Filter>Source Files\Recast</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shared\lambdawars\wars_workshop.h">
+      <Filter>Source Files\wars\Shared</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
