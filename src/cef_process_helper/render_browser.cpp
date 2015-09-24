@@ -31,7 +31,8 @@ bool FunctionV8Handler::Execute(const CefString& name,
 					CefRefPtr<CefV8Value>& retval,
 					CefString& exception)
 {
-	return m_RenderBrowser->CallFunction( m_Func, arguments, retval );
+	m_RenderBrowser->CallFunction( m_Func, arguments, retval, exception );
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -43,7 +44,14 @@ bool FunctionWithCallbackV8Handler::Execute(const CefString& name,
 					CefRefPtr<CefV8Value>& retval,
 					CefString& exception)
 {
-	return m_RenderBrowser->CallFunction( m_Func, arguments, retval, arguments.back() );
+	// Last argument is the callback and should be a function
+	if( !arguments.back()->IsFunction() ) 
+	{
+		exception = CefString("Last argument must be a callback function!");
+		return true;
+	}
+	m_RenderBrowser->CallFunction( m_Func, arguments, retval, exception, arguments.back() );
+	return true;
 }
 
 
@@ -236,57 +244,56 @@ bool RenderBrowser::ExecuteJavascriptWithResult( CefString identifier, CefString
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object, 
+void RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object, 
 					const CefV8ValueList& arguments,
-					CefRefPtr<CefV8Value>& retval, 
+					CefRefPtr<CefV8Value>& retval,
+					CefString& exception,
 					CefRefPtr<CefV8Value> callback )
 {
 	CefRefPtr<CefBase> user_data = object->GetUserData();
-	if( user_data )
+	if( !user_data )
 	{
-		WarsCefUserData* user_data_impl = static_cast<WarsCefUserData*>(user_data.get());
-
-		// Create message
-		CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create("methodcall");
-		CefRefPtr<CefListValue> args = message->GetArgumentList();
-
-		CefRefPtr<CefListValue> methodargs = CefListValue::Create();
-		V8ValueListToListValue( this, arguments, methodargs );
-
-		if( callback )
-		{
-			// Remove last, this is the callback method
-			// Do this before the SetList call
-			// SetList will invalidate methodargs and take ownership
-			methodargs->Remove( methodargs->GetSize() - 1 );
-		}
-
-		args->SetString( 0, user_data_impl->function_uuid );
-		args->SetList( 1, methodargs );
-
-		// Store callback
-		if( callback )
-		{
-			m_Callbacks.push_back( jscallback_t() );
-			m_Callbacks.back().callback = callback;
-			m_Callbacks.back().callbackid = s_NextCallbackID++;
-			m_Callbacks.back().thisobject = object;
-
-			args->SetInt( 2, m_Callbacks.back().callbackid );
-		}
-		else
-		{
-			args->SetNull( 2 );
-		}
-
-		// Send message
-		m_Browser->SendProcessMessage(PID_BROWSER, message);
-
-		return true;
+		exception = CefString( "Failed to call js bound function %ls" + object->GetFunctionName().ToString() );
+		return;
 	}
-	
-	m_ClientApp->SendWarning( m_Browser, "Failed to call js bound function %ls\n", object->GetFunctionName().c_str() );
-	return false;
+
+	WarsCefUserData* user_data_impl = static_cast<WarsCefUserData*>(user_data.get());
+
+	// Create message
+	CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create("methodcall");
+	CefRefPtr<CefListValue> args = message->GetArgumentList();
+
+	CefRefPtr<CefListValue> methodargs = CefListValue::Create();
+	V8ValueListToListValue( this, arguments, methodargs );
+
+	if( callback )
+	{
+		// Remove last, this is the callback method
+		// Do this before the SetList call
+		// SetList will invalidate methodargs and take ownership
+		methodargs->Remove( methodargs->GetSize() - 1 );
+	}
+
+	args->SetString( 0, user_data_impl->function_uuid );
+	args->SetList( 1, methodargs );
+
+	// Store callback
+	if( callback )
+	{
+		m_Callbacks.push_back( jscallback_t() );
+		m_Callbacks.back().callback = callback;
+		m_Callbacks.back().callbackid = s_NextCallbackID++;
+		m_Callbacks.back().thisobject = object;
+
+		args->SetInt( 2, m_Callbacks.back().callbackid );
+	}
+	else
+	{
+		args->SetNull( 2 );
+	}
+
+	// Send message
+	m_Browser->SendProcessMessage(PID_BROWSER, message);
 }
 
 //-----------------------------------------------------------------------------

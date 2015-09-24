@@ -85,9 +85,10 @@ public:
 	bool ExecuteJavascriptWithResult( CefString identifier, CefString code );
 
 	// Function handlers
-	bool CallFunction(	CefRefPtr<CefV8Value> object, 
+	void CallFunction(	CefRefPtr<CefV8Value> object, 
 						const CefV8ValueList& arguments,
 						CefRefPtr<CefV8Value>& retval,
+						CefString& exception,
 						CefRefPtr<CefV8Value> callback = NULL );
 
 	bool DoCallback( int iCallbackID, CefRefPtr<CefListValue> methodargs );
