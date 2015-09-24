@@ -120,7 +120,6 @@ class Steam(SemiSharedModuleGenerator):
             'steam/isteamuser.h',
             'steam/steamclientpublic.h',
             'steam/isteamuserstats.h',
-            'steam/isteamugc.h',
             
             'srcpy_steam.h',
         ]
@@ -298,24 +297,6 @@ class Steam(SemiSharedModuleGenerator):
         mb.free_function('PyGetStatFloat').include()
         mb.free_function('PyGetStatInt').include()
         
-    def ParseSteamUGC(self, mb):
-        cls = mb.class_('ISteamUGC')
-        cls.include()
-        cls.no_init = True
-        cls.noncopyable = True
-        cls.mem_funs().virtuality = 'not virtual'
-        
-        #cls.mem_funs('GetItemInstallInfo').add_transformation(FT.output('punSizeOnDisk'), FT.output('pchFolder'), FT.output('cchFolderSize'), FT.output('punTimeStamp'))
-        mb.free_function('PyGetItemInstallInfo').include()
-        cls.mem_funs('GetItemInstallInfo').exclude()
-        cls.mem_funs('GetItemDownloadInfo').add_transformation(FT.output('punBytesDownloaded'), FT.output('punBytesTotal'))
-        
-        mb.typedef('UGCUpdateHandle_t').include()
-        mb.typedef('PublishedFileId_t').include()
-        
-        self.AddSteamCallResult('CreateItemResult', 'CreateItemResult_t')
-        self.AddSteamCallResult('SubmitItemUpdateResult', 'SubmitItemUpdateResult_t')
-        
     def ParseGameServer(self, mb):
         cls = mb.class_('ISteamGameServer')
         cls.include()
@@ -374,10 +355,6 @@ class Steam(SemiSharedModuleGenerator):
         mb.enum('EChatRoomEnterResponse').include()
         mb.enum('EChatMemberStateChange').include()
         
-        mb.typedef('AppId_t').include()
-        mb.var('k_uAppIdInvalid').include()
-        mb.enum('EWorkshopFileType').include()
-        
         # Generic API functions
         mb.free_function('SteamAPI_RunCallbacks').include()
         
@@ -406,6 +383,7 @@ class Steam(SemiSharedModuleGenerator):
             cls.mem_fun('SteamController').exclude()
             cls.mem_fun('SteamMusic').exclude()
             cls.mem_fun('SteamMusicRemote').exclude()
+            cls.mem_fun('SteamUGC').exclude() 
             cls.mem_fun('SteamHTMLSurface').exclude()
             
         cls.mem_funs('SteamApps').call_policies = call_policies.return_internal_reference()
@@ -415,7 +393,6 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_funs('SteamMatchmakingServers').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUser').call_policies = call_policies.return_internal_reference()
         cls.mem_funs('SteamUserStats').call_policies = call_policies.return_internal_reference()
-        cls.mem_funs('SteamUGC').call_policies = call_policies.return_internal_reference()
         
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_NOT_INITIALIZED\" ) = (int)QUERY_PORT_NOT_INITIALIZED;" )
         mb.add_registration_code( "bp::scope().attr( \"QUERY_PORT_ERROR\" ) = (int)QUERY_PORT_ERROR;" )
@@ -441,7 +418,6 @@ class Steam(SemiSharedModuleGenerator):
         
         self.ParseMatchmaking(mb)
         self.ParseUserStats(mb)
-        self.ParseSteamUGC(mb)
         
         #mb.class_('ISteamUtils').mem_funs('GetImageSize').add_transformation( FT.output('pnWidth'), FT.output('pnHeight'))
         #mb.class_('ISteamUtils').mem_funs('GetCSERIPPort').add_transformation( FT.output('unIP'), FT.output('usPort'))

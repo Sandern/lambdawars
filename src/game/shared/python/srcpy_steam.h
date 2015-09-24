@@ -64,9 +64,6 @@ boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CS
 boost::python::object PyGetStatFloat( const char *name );
 boost::python::object PyGetStatInt( const char *name );
 
-// Wrapper functions SteamUGC
-boost::python::tuple PyGetItemInstallInfo( PublishedFileId_t nPublishedFileID );
-
 // Wrapper functions Matchmaking Servers
 class PySteamMatchmakingServerListResponse : public ISteamMatchmakingServerListResponse
 {

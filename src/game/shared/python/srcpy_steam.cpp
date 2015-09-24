@@ -83,21 +83,6 @@ boost::python::object PyGetStatInt( const char *name )
 	return boost::python::object( stat );
 }
 
-boost::python::tuple PyGetItemInstallInfo( PublishedFileId_t nPublishedFileID )
-{
-	if( !steamapicontext->SteamUGC() )
-	{
-		PyErr_SetString(PyExc_Exception, "No steam ugc API available!" );
-		throw boost::python::error_already_set(); 
-	}
-
-	uint64 punSizeOnDisk;
-	uint32 punTimeStamp;
-	char path[MAX_PATH];
-	bool ret = steamapicontext->SteamUGC()->GetItemInstallInfo( nPublishedFileID, &punSizeOnDisk, path, sizeof( path ), &punTimeStamp );
-	return boost::python::make_tuple( ret, punSizeOnDisk, path, punTimeStamp );
-}
-
 #define STEAM_MM_SERVERS_VALID()	if( !steamapicontext->SteamMatchmakingServers() ) \
 	{ \
 		PyErr_SetString(PyExc_Exception, "No steam matchmaking servers API available!" ); \
