@@ -558,7 +558,7 @@ struct C_BaseParticleEntity_wrapper : C_BaseParticleEntity, bp::wrapper< C_BaseP
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseEntity::GetClientClass();
+            return C_BaseParticleEntity::GetClientClass();
 #endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
@@ -573,7 +573,7 @@ struct C_BaseParticleEntity_wrapper : C_BaseParticleEntity, bp::wrapper< C_BaseP
                 PyErr_Print();
             }
         }
-        return C_BaseEntity::GetClientClass();
+        return C_BaseParticleEntity::GetClientClass();
     }
 
     static int m_lifeState_Get( C_BaseParticleEntity const & inst ) { return inst.m_lifeState; }

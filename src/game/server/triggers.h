@@ -27,7 +27,7 @@ class CBaseTrigger : public CBaseToggle
 // =======================================
 // PySource Additions
 // =======================================
-	DECLARE_PYSERVERCLASS( CBaseTrigger, PN_BASETRIGGER );
+	DECLARE_PYSERVERCLASS( CBaseTrigger );
 // =======================================
 // END PySource Additions
 // =======================================

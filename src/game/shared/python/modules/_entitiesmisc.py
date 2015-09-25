@@ -121,6 +121,8 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.no_init = True
         cls.calldefs('ServerClass').exclude()
         cls.mem_fun('GetName').include() # For debugging purposes
+        
+        self.IncludeEmptyClass(mb, 'SendTable')
 
         # Creating a networked variable
         cls = mb.class_('CPythonNetworkVarBase')

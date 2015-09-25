@@ -1056,9 +1056,6 @@ void register_CBaseCombatWeapon_class(){
             "GetPrintName"
             , (char const * ( ::CBaseCombatWeapon::* )(  ) const)( &::CBaseCombatWeapon::GetPrintName ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBaseCombatWeapon::GetPyNetworkType ) )    
-        .def( 
             "GetRandomBurst"
             , (int ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetRandomBurst ) )    
         .def( 
@@ -1073,6 +1070,10 @@ void register_CBaseCombatWeapon_class(){
         .def( 
             "GetSecondaryAttackActivity"
             , (::Activity ( ::CBaseCombatWeapon::* )(  ) )( &::CBaseCombatWeapon::GetSecondaryAttackActivity ) )    
+        .def( 
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBaseCombatWeapon::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetShootSound"
             , (char const * ( ::CBaseCombatWeapon::* )( int ) const)( &::CBaseCombatWeapon::GetShootSound )
@@ -1577,7 +1578,7 @@ void register_CBaseCombatWeapon_class(){
             , (void ( CBaseCombatWeapon_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseCombatWeapon_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .staticmethod( "GetAvailableWeaponsInBox" )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CBaseCombatWeapon_wrapper::m_lifeState_Get, &CBaseCombatWeapon_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBaseCombatWeapon_wrapper::m_takedamage_Get, &CBaseCombatWeapon_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CBaseCombatWeapon_wrapper::m_nSkin_Get, &CBaseCombatWeapon_wrapper::m_nSkin_Set )    

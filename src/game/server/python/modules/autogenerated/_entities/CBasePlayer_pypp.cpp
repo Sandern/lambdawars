@@ -1423,11 +1423,12 @@ void register_CBasePlayer_class(){
             , (::QAngle const & ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::GetPunchAngle )
             , bp::return_value_policy< bp::copy_const_reference >() )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBasePlayer::GetPyNetworkType ) )    
-        .def( 
             "GetReplayEntity"
             , (int ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::GetReplayEntity ) )    
+        .def( 
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBasePlayer::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetSmoothedVelocity"
             , (::Vector ( ::CBasePlayer::* )(  ) )( &::CBasePlayer::GetSmoothedVelocity ) )    
@@ -2433,7 +2434,7 @@ void register_CBasePlayer_class(){
         .staticmethod( "GetOffset_m_Local" )    
         .staticmethod( "GetOffset_m_PlayerFog" )    
         .staticmethod( "GetOffset_pl" )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CBasePlayer_wrapper::m_lifeState_Get, &CBasePlayer_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBasePlayer_wrapper::m_takedamage_Get, &CBasePlayer_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CBasePlayer_wrapper::m_nSkin_Get, &CBasePlayer_wrapper::m_nSkin_Set );

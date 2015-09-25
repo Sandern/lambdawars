@@ -716,8 +716,9 @@ void register_CBaseFuncMapBoundary_class(){
             , (::CBaseFuncMapBoundary * ( ::CBaseFuncMapBoundary::* )(  ) )( &::CBaseFuncMapBoundary::GetNext )
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBaseFuncMapBoundary::GetPyNetworkType ) )    
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBaseFuncMapBoundary::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "IsWithinAnyMapBoundary"
             , (::CBaseFuncMapBoundary * (*)( ::Vector const &,::Vector const &,::Vector const &,bool ))( &::CBaseFuncMapBoundary::IsWithinAnyMapBoundary )
@@ -884,7 +885,7 @@ void register_CBaseFuncMapBoundary_class(){
             , (void ( CBaseFuncMapBoundary_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseFuncMapBoundary_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .staticmethod( "DidHitMapBoundary" )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .staticmethod( "IsWithinAnyMapBoundary" )    
         .staticmethod( "SnapToNearestBoundary" )    
         .add_property( "lifestate", &CBaseFuncMapBoundary_wrapper::m_lifeState_Get, &CBaseFuncMapBoundary_wrapper::m_lifeState_Set )    

@@ -1159,13 +1159,14 @@ void register_CFuncUnit_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CFuncUnit::GetPyNetworkType
+        { //::CFuncUnit::GetSendTable
         
-            typedef int ( *GetPyNetworkType_function_type )(  );
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
             
             CFuncUnit_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CFuncUnit::GetPyNetworkType ) );
+                "GetSendTable"
+                , GetSendTable_function_type( &::CFuncUnit::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CFuncUnit::GetSquad
@@ -1861,7 +1862,7 @@ void register_CFuncUnit_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        CFuncUnit_exposer.staticmethod( "GetPyNetworkType" );
+        CFuncUnit_exposer.staticmethod( "GetSendTable" );
         { //property "selectionpriority"[fget=::CFuncUnit::GetSelectionPriority, fset=::CFuncUnit::SetSelectionPriority]
         
             typedef int ( ::CFuncUnit::*fget )(  ) ;

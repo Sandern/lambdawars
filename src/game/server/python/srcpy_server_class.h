@@ -18,7 +18,7 @@
 
 #ifndef ENABLE_PYTHON
 	#define IMPLEMENT_PYSERVERCLASS_SYSTEM( name, network_name )
-	#define DECLARE_PYSERVERCLASS( name, networkType )
+	#define DECLARE_PYSERVERCLASS( name )
 	#define DECLARE_PYCLASS( name )
 #else
 
@@ -29,20 +29,16 @@
 class NetworkedClass;
 class CBasePlayer;
 
-#define IMPLEMENT_PYSERVERCLASS_SYSTEM( name, network_name ) PyServerClass name(#network_name);	
+#define IMPLEMENT_PYSERVERCLASS_SYSTEM( name, network_name, table ) PyServerClass name( #network_name, table );	
 
 class PyServerClass : public ServerClass
 {
 public:
-	PyServerClass(char *pNetworkName);
-
-	void SetupServerClass( int iType );
+	PyServerClass( char *pNetworkName, SendTable *pTable );
 
 public:
-	SendProp *m_pSendProps;
 	PyServerClass *m_pPyNext;
 	bool m_bFree;
-	int m_iType;
 	NetworkedClass *m_pNetworkedClass;
 };
 
@@ -52,8 +48,6 @@ class NetworkedClass
 public:
 	NetworkedClass( const char *pNetworkName, boost::python::object cls_type );
 	~NetworkedClass();
-
-	void SetupServerClass();
 
 public:
 	boost::python::object m_PyClass;
@@ -67,22 +61,11 @@ void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter );
 void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict );
 void FullClientUpdatePyNetworkClsByEdict2( edict_t *pEdict );
 
-typedef struct EntityInfoOnHold {
-	CBaseEntity *ent;
-	edict_t *edict;
-} EntityInfoOnHold;
-
-void SetupNetworkTables();
-void SetupNetworkTablesOnHold();
-void AddSetupNetworkTablesOnHoldEnt( EntityInfoOnHold info );
-bool SetupNetworkTablesRelease();
-void PyResetAllNetworkTables();
-
 // Implement a networkable python class. Used to determine the right recv/send tables
-#define DECLARE_PYSERVERCLASS( name, networkType )													\
-	DECLARE_PYCLASS( name )																			\
-	public:																							\
-	static int GetPyNetworkType() { return networkType; }
+#define DECLARE_PYSERVERCLASS( name )													\
+	DECLARE_PYCLASS( name )																\
+	public:																				\
+		static SendTable *GetSendTable() { return m_pClassSendTable; }
 
 #endif // ENABLE_PYTHON
 

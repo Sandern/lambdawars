@@ -605,9 +605,6 @@ void register_C_BaseFuncMapBoundary_class(){
             , (::C_BaseFuncMapBoundary * ( ::C_BaseFuncMapBoundary::* )(  ) )( &::C_BaseFuncMapBoundary::GetNext )
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseFuncMapBoundary::GetPyNetworkType ) )    
-        .def( 
             "IsWithinAnyMapBoundary"
             , (::C_BaseFuncMapBoundary * (*)( ::Vector const &,::Vector const &,::Vector const &,bool ))( &::C_BaseFuncMapBoundary::IsWithinAnyMapBoundary )
             , ( bp::arg("vPoint"), bp::arg("vMins"), bp::arg("vMaxs"), bp::arg("bIgnoreZ")=(bool)(false) )
@@ -748,7 +745,6 @@ void register_C_BaseFuncMapBoundary_class(){
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseFuncMapBoundary_wrapper::* )(  ) )(&C_BaseFuncMapBoundary_wrapper::default_UpdateOnRemove) )    
         .staticmethod( "DidHitMapBoundary" )    
-        .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "IsWithinAnyMapBoundary" )    
         .staticmethod( "SnapToNearestBoundary" )    
         .add_property( "lifestate", &C_BaseFuncMapBoundary_wrapper::m_lifeState_Get, &C_BaseFuncMapBoundary_wrapper::m_lifeState_Set )    

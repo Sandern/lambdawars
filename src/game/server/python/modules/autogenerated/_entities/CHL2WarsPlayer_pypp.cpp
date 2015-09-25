@@ -1521,15 +1521,6 @@ void register_CHL2WarsPlayer_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
-        { //::CHL2WarsPlayer::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            CHL2WarsPlayer_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CHL2WarsPlayer::GetPyNetworkType ) );
-        
-        }
         { //::CHL2WarsPlayer::GetSelection
         
             typedef ::boost::python::list ( ::CHL2WarsPlayer::*GetSelection_function_type )(  ) ;
@@ -1537,6 +1528,16 @@ void register_CHL2WarsPlayer_class(){
             CHL2WarsPlayer_exposer.def( 
                 "GetSelection"
                 , GetSelection_function_type( &::CHL2WarsPlayer::GetSelection ) );
+        
+        }
+        { //::CHL2WarsPlayer::GetSendTable
+        
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
+            
+            CHL2WarsPlayer_exposer.def( 
+                "GetSendTable"
+                , GetSendTable_function_type( &::CHL2WarsPlayer::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CHL2WarsPlayer::GetSingleActiveAbility
@@ -2552,7 +2553,7 @@ void register_CHL2WarsPlayer_class(){
                 , ( bp::arg("pWeapon"), bp::arg("viewmodelindex")=(int)(0) ) );
         
         }
-        CHL2WarsPlayer_exposer.staticmethod( "GetPyNetworkType" );
+        CHL2WarsPlayer_exposer.staticmethod( "GetSendTable" );
         { //property "unit"[fget=::CHL2WarsPlayer::GetControlledUnit, fset=::CHL2WarsPlayer::SetControlledUnit]
         
             typedef ::CBaseEntity * ( ::CHL2WarsPlayer::*fget )(  ) const;

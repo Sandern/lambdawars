@@ -808,15 +808,6 @@ void register_C_WarsWeapon_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::C_WarsWeapon::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_WarsWeapon_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_WarsWeapon::GetPyNetworkType ) );
-        
-        }
         { //::C_WarsWeapon::GetShootOriginAndDirection
         
             typedef boost::python::tuple ( *GetShootOriginAndDirection_function_type )( ::C_WarsWeapon & );
@@ -1336,7 +1327,6 @@ void register_C_WarsWeapon_class(){
                 , default_UpdateOnRemove_function_type(&C_WarsWeapon_wrapper::default_UpdateOnRemove) );
         
         }
-        C_WarsWeapon_exposer.staticmethod( "GetPyNetworkType" );
         { //property "primaryattackactivity"[fget=::C_WarsWeapon::GetPrimaryAttackActivity, fset=::C_WarsWeapon::SetPrimaryAttackActivity]
         
             typedef ::Activity ( ::C_WarsWeapon::*fget )(  ) ;

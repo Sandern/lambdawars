@@ -754,11 +754,12 @@ void register_CSprite_class(){
             "GetHDRColorScale"
             , (float ( ::CSprite::* )(  ) )( &::CSprite::GetHDRColorScale ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CSprite::GetPyNetworkType ) )    
-        .def( 
             "GetScale"
             , (float ( ::CSprite::* )(  ) )( &::CSprite::GetScale ) )    
+        .def( 
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CSprite::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "InputColorBlueValue"
             , (void ( ::CSprite::* )( ::inputdata_t & ) )( &::CSprite::InputColorBlueValue )
@@ -1003,7 +1004,7 @@ void register_CSprite_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CSprite_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CSprite_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .staticmethod( "SpriteCreate" )    
         .staticmethod( "SpriteCreatePredictable" )    
         .add_property( "lifestate", &CSprite_wrapper::m_lifeState_Get, &CSprite_wrapper::m_lifeState_Set )    

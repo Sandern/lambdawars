@@ -788,8 +788,9 @@ void register_CBaseProjectile_class(){
             "GetDestroyableHitCount"
             , (int ( ::CBaseProjectile::* )(  ) const)( &::CBaseProjectile::GetDestroyableHitCount ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBaseProjectile::GetPyNetworkType ) )    
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBaseProjectile::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "IncrementDestroyableHitCount"
             , (void ( ::CBaseProjectile::* )(  ) )( &::CBaseProjectile::IncrementDestroyableHitCount ) )    
@@ -963,7 +964,7 @@ void register_CBaseProjectile_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CBaseProjectile_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseProjectile_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CBaseProjectile_wrapper::m_lifeState_Get, &CBaseProjectile_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBaseProjectile_wrapper::m_takedamage_Get, &CBaseProjectile_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CBaseProjectile_wrapper::m_nSkin_Get, &CBaseProjectile_wrapper::m_nSkin_Set );

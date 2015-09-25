@@ -32,7 +32,7 @@ public:
 #ifdef CLIENT_DLL
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
-	DECLARE_PYCLIENTCLASS( C_WarsWeapon, PN_WARSWEAPON );
+	DECLARE_PYCLIENTCLASS( C_WarsWeapon );
 
 	virtual void			OnDataChanged( DataUpdateType_t type );
 	virtual bool			ShouldPredict( void );
@@ -52,7 +52,7 @@ public:
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
 	DECLARE_PREDICTABLE();
-	DECLARE_PYSERVERCLASS( CWarsWeapon, PN_WARSWEAPON );
+	DECLARE_PYSERVERCLASS( CWarsWeapon );
 
 	virtual bool			WeaponLOSCondition( const Vector &ownerPos, const Vector &targetPos, bool bSetConditions );
 

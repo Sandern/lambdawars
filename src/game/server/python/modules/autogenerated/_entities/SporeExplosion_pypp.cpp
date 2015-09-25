@@ -670,7 +670,7 @@ struct SporeExplosion_wrapper : SporeExplosion, bp::wrapper< SporeExplosion > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
+        PY_OVERRIDE_CHECK( SporeExplosion, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -684,7 +684,7 @@ struct SporeExplosion_wrapper : SporeExplosion, bp::wrapper< SporeExplosion > {
                 PyErr_Print();
             }
         }
-        return CBaseEntity::GetServerClass();
+        return SporeExplosion::GetServerClass();
     }
 
     static int m_lifeState_Get( SporeExplosion const & inst ) { return inst.m_lifeState.Get(); }

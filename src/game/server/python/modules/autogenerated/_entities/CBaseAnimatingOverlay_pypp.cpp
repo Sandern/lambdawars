@@ -916,13 +916,14 @@ void register_CBaseAnimatingOverlay_class(){
                 , GetNumAnimOverlays_function_type( &::CBaseAnimatingOverlay::GetNumAnimOverlays ) );
         
         }
-        { //::CBaseAnimatingOverlay::GetPyNetworkType
+        { //::CBaseAnimatingOverlay::GetSendTable
         
-            typedef int ( *GetPyNetworkType_function_type )(  );
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
             
             CBaseAnimatingOverlay_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBaseAnimatingOverlay::GetPyNetworkType ) );
+                "GetSendTable"
+                , GetSendTable_function_type( &::CBaseAnimatingOverlay::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CBaseAnimatingOverlay::GetSkeleton
@@ -1584,7 +1585,7 @@ void register_CBaseAnimatingOverlay_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        CBaseAnimatingOverlay_exposer.staticmethod( "GetPyNetworkType" );
+        CBaseAnimatingOverlay_exposer.staticmethod( "GetSendTable" );
         CBaseAnimatingOverlay_exposer.add_property( "lifestate", &CBaseAnimatingOverlay_wrapper::m_lifeState_Get, &CBaseAnimatingOverlay_wrapper::m_lifeState_Set );
         CBaseAnimatingOverlay_exposer.add_property( "takedamage", &CBaseAnimatingOverlay_wrapper::m_takedamage_Get, &CBaseAnimatingOverlay_wrapper::m_takedamage_Set );
         CBaseAnimatingOverlay_exposer.add_property( "skin", &CBaseAnimatingOverlay_wrapper::m_nSkin_Get, &CBaseAnimatingOverlay_wrapper::m_nSkin_Set );

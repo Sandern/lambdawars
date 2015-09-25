@@ -25,7 +25,7 @@ class C_BaseAnimatingOverlay : public C_BaseAnimating
 	
 protected:
 	DECLARE_CLIENTCLASS();
-	DECLARE_PYCLIENTCLASS( C_BaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY );
+	DECLARE_PYCLIENTCLASS( C_BaseAnimatingOverlay );
 
 	// Inherited from C_BaseAnimating
 public:

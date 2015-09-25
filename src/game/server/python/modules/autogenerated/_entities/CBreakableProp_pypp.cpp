@@ -856,8 +856,9 @@ void register_CBreakableProp_class(){
             "GetPhysicsMode"
             , (int ( ::CBreakableProp::* )(  ) )( &::CBreakableProp::GetPhysicsMode ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBreakableProp::GetPyNetworkType ) )    
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBreakableProp::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "HandleFirstCollisionInteractions"
             , (void ( ::CBreakableProp::* )( int,::gamevcollisionevent_t * ) )( &::CBreakableProp::HandleFirstCollisionInteractions )
@@ -1171,7 +1172,7 @@ void register_CBreakableProp_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CBreakableProp_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBreakableProp_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CBreakableProp_wrapper::m_lifeState_Get, &CBreakableProp_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBreakableProp_wrapper::m_takedamage_Get, &CBreakableProp_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CBreakableProp_wrapper::m_nSkin_Get, &CBreakableProp_wrapper::m_nSkin_Set );

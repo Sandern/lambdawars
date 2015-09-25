@@ -355,7 +355,6 @@ PyEntityFactory::~PyEntityFactory()
 	}
 }
 
-extern bool g_SetupNetworkTablesOnHold;
 IServerNetworkable *PyEntityFactory::Create( const char *pClassName )
 {
 	MEM_ALLOC_CREDIT_("Entities");
@@ -365,23 +364,10 @@ IServerNetworkable *PyEntityFactory::Create( const char *pClassName )
 		boost::python::object inst = m_PyClass();
 
 		pEnt = boost::python::extract<CBaseEntity *>(inst);
-		bool bServerOnly = pEnt->IsEFlagSet(EFL_SERVER_ONLY);
-		if( !bServerOnly && g_SetupNetworkTablesOnHold ) {
-			pEnt->AddEFlags( EFL_NO_AUTO_EDICT_ATTACH );
-		}
 
 		pEnt->SetPyInstance( inst );
 		pEnt->PostConstructor( pClassName );
 		
-		if( !bServerOnly && g_SetupNetworkTablesOnHold )
-		{
-			EntityInfoOnHold info;
-			info.ent = pEnt;
-			info.edict = engine->CreateEdict();
-			AddSetupNetworkTablesOnHoldEnt(info);
-			gEntList.AddNetworkableEntity( pEnt, ENTINDEX(info.edict) );
-		}
-
 		return pEnt->NetworkProp();
 	}
 	catch( bp::error_already_set & )

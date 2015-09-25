@@ -2354,15 +2354,6 @@ void register_C_BaseEntity_class(){
                 , GetHandle_function_type( &::C_BaseEntity::GetPyHandle ) );
         
         }
-        { //::C_BaseEntity::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_BaseEntity_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseEntity::GetPyNetworkType ) );
-        
-        }
         { //::C_BaseEntity::GetPyThink
         
             typedef ::boost::python::api::object ( ::C_BaseEntity::*GetThink_function_type )(  ) ;
@@ -6131,7 +6122,6 @@ void register_C_BaseEntity_class(){
         C_BaseEntity_exposer.staticmethod( "GetParametersForSound" );
         C_BaseEntity_exposer.staticmethod( "GetPredictionPlayer" );
         C_BaseEntity_exposer.staticmethod( "GetPredictionRandomSeed" );
-        C_BaseEntity_exposer.staticmethod( "GetPyNetworkType" );
         C_BaseEntity_exposer.staticmethod( "GetSoundDuration" );
         C_BaseEntity_exposer.staticmethod( "GetTouchTrace" );
         C_BaseEntity_exposer.staticmethod( "Instance" );

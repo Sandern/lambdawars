@@ -1636,15 +1636,6 @@ void register_CUnitBase_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CUnitBase::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            CUnitBase_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CUnitBase::GetPyNetworkType ) );
-        
-        }
         { //::CUnitBase::GetSelectedByPlayers
         
             typedef ::CUtlVector< CHandle< CHL2WarsPlayer >, CUtlMemory< CHandle< CHL2WarsPlayer >, int > > const & ( ::CUnitBase::*GetSelectedByPlayers_function_type )(  ) ;
@@ -1653,6 +1644,16 @@ void register_CUnitBase_class(){
                 "GetSelectedByPlayers"
                 , GetSelectedByPlayers_function_type( &::CUnitBase::GetSelectedByPlayers )
                 , bp::return_value_policy< bp::copy_const_reference >() );
+        
+        }
+        { //::CUnitBase::GetSendTable
+        
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
+            
+            CUnitBase_exposer.def( 
+                "GetSendTable"
+                , GetSendTable_function_type( &::CUnitBase::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CUnitBase::GetShootEnemyDir
@@ -2743,7 +2744,7 @@ void register_CUnitBase_class(){
                 , ( bp::arg("pWeapon"), bp::arg("viewmodelindex")=(int)(0) ) );
         
         }
-        CUnitBase_exposer.staticmethod( "GetPyNetworkType" );
+        CUnitBase_exposer.staticmethod( "GetSendTable" );
         { //property "selectionpriority"[fget=::CUnitBase::GetSelectionPriority, fset=::CUnitBase::SetSelectionPriority]
         
             typedef int ( ::CUnitBase::*fget )(  ) ;

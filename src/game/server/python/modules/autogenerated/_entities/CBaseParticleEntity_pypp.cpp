@@ -670,7 +670,7 @@ struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBasePart
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
+        PY_OVERRIDE_CHECK( CBaseParticleEntity, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -684,7 +684,7 @@ struct CBaseParticleEntity_wrapper : CBaseParticleEntity, bp::wrapper< CBasePart
                 PyErr_Print();
             }
         }
-        return CBaseEntity::GetServerClass();
+        return CBaseParticleEntity::GetServerClass();
     }
 
     static int m_lifeState_Get( CBaseParticleEntity const & inst ) { return inst.m_lifeState.Get(); }

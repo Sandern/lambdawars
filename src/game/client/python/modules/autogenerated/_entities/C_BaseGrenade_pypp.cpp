@@ -760,15 +760,6 @@ void register_C_BaseGrenade_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::C_BaseGrenade::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_BaseGrenade_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseGrenade::GetPyNetworkType ) );
-        
-        }
         { //::C_BaseGrenade::GetShakeAmplitude
         
             typedef float ( ::C_BaseGrenade::*GetShakeAmplitude_function_type )(  ) ;
@@ -1200,7 +1191,6 @@ void register_C_BaseGrenade_class(){
                 , default_UpdateOnRemove_function_type(&C_BaseGrenade_wrapper::default_UpdateOnRemove) );
         
         }
-        C_BaseGrenade_exposer.staticmethod( "GetPyNetworkType" );
         { //property "damage"[fget=::C_BaseGrenade::GetDamage, fset=::C_BaseGrenade::SetDamage]
         
             typedef float ( ::C_BaseGrenade::*fget )(  ) ;

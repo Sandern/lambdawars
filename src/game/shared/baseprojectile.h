@@ -38,9 +38,9 @@ public:
 // PySource Additions
 // =======================================
 #ifdef CLIENT_DLL
-	DECLARE_PYCLIENTCLASS( C_BaseProjectile, PN_BASEPROJECTILE );
+	DECLARE_PYCLIENTCLASS( C_BaseProjectile );
 #else
-	DECLARE_PYSERVERCLASS( CBaseProjectile, PN_BASEPROJECTILE );
+	DECLARE_PYSERVERCLASS( CBaseProjectile );
 #endif // CLIENT_DLL
 // =======================================
 // END PySource Additions

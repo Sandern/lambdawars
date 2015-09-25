@@ -701,8 +701,9 @@ void register_CPlayerResource_class(){
 
     bp::class_< CPlayerResource_wrapper, bp::bases< CBaseEntity >, boost::noncopyable >( "CPlayerResource" )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CPlayerResource::GetPyNetworkType ) )    
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CPlayerResource::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "ObjectCaps"
             , (int ( ::CPlayerResource::* )(  ) )( &::CPlayerResource::ObjectCaps ) )    
@@ -864,7 +865,7 @@ void register_CPlayerResource_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CPlayerResource_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CPlayerResource_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CPlayerResource_wrapper::m_lifeState_Get, &CPlayerResource_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CPlayerResource_wrapper::m_takedamage_Get, &CPlayerResource_wrapper::m_takedamage_Set );
 

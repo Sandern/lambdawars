@@ -636,9 +636,6 @@ void register_C_BaseProjectile_class(){
             , (void ( ::C_BaseProjectile::* )( bool,bool ) )( &::C_BaseProjectile::Destroy )
             , ( bp::arg("bBlinkOut")=(bool)(true), bp::arg("bBreakRocket")=(bool)(false) ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseProjectile::GetPyNetworkType ) )    
-        .def( 
             "IsDestroyable"
             , (bool ( ::C_BaseProjectile::* )(  ) )( &::C_BaseProjectile::IsDestroyable ) )    
         .def( 
@@ -776,7 +773,6 @@ void register_C_BaseProjectile_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseProjectile_wrapper::* )(  ) )(&C_BaseProjectile_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &C_BaseProjectile_wrapper::m_lifeState_Get, &C_BaseProjectile_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BaseProjectile_wrapper::m_takedamage_Get, &C_BaseProjectile_wrapper::m_takedamage_Set )    
         .add_property( "skin", &C_BaseProjectile_wrapper::m_nSkin_Get, &C_BaseProjectile_wrapper::m_nSkin_Set );

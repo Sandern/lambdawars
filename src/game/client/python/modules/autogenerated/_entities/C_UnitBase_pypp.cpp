@@ -1363,15 +1363,6 @@ void register_C_UnitBase_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::C_UnitBase::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_UnitBase_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_UnitBase::GetPyNetworkType ) );
-        
-        }
         { //::C_UnitBase::GetRenderAngles
         
             typedef ::QAngle const & ( ::C_UnitBase::*GetRenderAngles_function_type )(  ) ;
@@ -2267,7 +2258,6 @@ void register_C_UnitBase_class(){
                 , ( bp::arg("pOther") ) );
         
         }
-        C_UnitBase_exposer.staticmethod( "GetPyNetworkType" );
         { //property "selectionpriority"[fget=::C_UnitBase::GetSelectionPriority, fset=::C_UnitBase::SetSelectionPriority]
         
             typedef int ( ::C_UnitBase::*fget )(  ) ;

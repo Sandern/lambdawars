@@ -683,15 +683,6 @@ void register_C_BaseAnimatingOverlay_class(){
                 , GetNumAnimOverlays_function_type( &::C_BaseAnimatingOverlay::GetNumAnimOverlays ) );
         
         }
-        { //::C_BaseAnimatingOverlay::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_BaseAnimatingOverlay_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseAnimatingOverlay::GetPyNetworkType ) );
-        
-        }
         { //::C_BaseAnimatingOverlay::GetRenderBounds
         
             typedef void ( ::C_BaseAnimatingOverlay::*GetRenderBounds_function_type )( ::Vector &,::Vector & ) ;
@@ -1075,7 +1066,6 @@ void register_C_BaseAnimatingOverlay_class(){
                 , default_UpdateOnRemove_function_type(&C_BaseAnimatingOverlay_wrapper::default_UpdateOnRemove) );
         
         }
-        C_BaseAnimatingOverlay_exposer.staticmethod( "GetPyNetworkType" );
         C_BaseAnimatingOverlay_exposer.add_property( "lifestate", &C_BaseAnimatingOverlay_wrapper::m_lifeState_Get, &C_BaseAnimatingOverlay_wrapper::m_lifeState_Set );
         C_BaseAnimatingOverlay_exposer.add_property( "takedamage", &C_BaseAnimatingOverlay_wrapper::m_takedamage_Get, &C_BaseAnimatingOverlay_wrapper::m_takedamage_Set );
         C_BaseAnimatingOverlay_exposer.add_property( "skin", &C_BaseAnimatingOverlay_wrapper::m_nSkin_Get, &C_BaseAnimatingOverlay_wrapper::m_nSkin_Set );

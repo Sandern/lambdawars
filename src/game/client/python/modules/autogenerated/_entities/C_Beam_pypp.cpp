@@ -828,15 +828,6 @@ void register_C_Beam_class(){
                 , GetNoise_function_type( &::C_Beam::GetNoise ) );
         
         }
-        { //::C_Beam::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_Beam_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_Beam::GetPyNetworkType ) );
-        
-        }
         { //::C_Beam::GetScrollRate
         
             typedef float ( ::C_Beam::*GetScrollRate_function_type )(  ) const;
@@ -1612,7 +1603,6 @@ void register_C_Beam_class(){
         }
         C_Beam_exposer.staticmethod( "BeamCreate" );
         C_Beam_exposer.staticmethod( "BeamCreatePredictable" );
-        C_Beam_exposer.staticmethod( "GetPyNetworkType" );
         C_Beam_exposer.add_property( "lifestate", &C_Beam_wrapper::m_lifeState_Get, &C_Beam_wrapper::m_lifeState_Set );
         C_Beam_exposer.add_property( "takedamage", &C_Beam_wrapper::m_takedamage_Get, &C_Beam_wrapper::m_takedamage_Set );
     }

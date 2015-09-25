@@ -808,8 +808,9 @@ void register_CBaseFlex_class(){
             , (float ( ::CBaseFlex::* )( ::LocalFlexController_t ) )( &::CBaseFlex::GetFlexWeight )
             , ( bp::arg("index") ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBaseFlex::GetPyNetworkType ) )    
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBaseFlex::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetViewtarget"
             , (::Vector const & ( ::CBaseFlex::* )(  ) const)( &::CBaseFlex::GetViewtarget )
@@ -1027,7 +1028,7 @@ void register_CBaseFlex_class(){
             , (void ( ::CBaseEntity::* )( int,::gamevcollisionevent_t * ) )(&::CBaseEntity::VPhysicsCollision)
             , (void ( CBaseFlex_wrapper::* )( int,::gamevcollisionevent_t * ) )(&CBaseFlex_wrapper::default_VPhysicsCollision)
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CBaseFlex_wrapper::m_lifeState_Get, &CBaseFlex_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBaseFlex_wrapper::m_takedamage_Get, &CBaseFlex_wrapper::m_takedamage_Set )    
         .add_property( "skin", &CBaseFlex_wrapper::m_nSkin_Get, &CBaseFlex_wrapper::m_nSkin_Set );

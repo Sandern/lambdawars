@@ -1981,7 +1981,7 @@ private:
 // =======================================
 #ifdef ENABLE_PYTHON
 public:
-	DECLARE_PYSERVERCLASS( CBaseEntity, PN_BASEENTITY );
+	DECLARE_PYSERVERCLASS( CBaseEntity );
 
 	// TODO/FIXME: Default placement versions of operator new, boost python seems to wants these...
 	inline void* operator new(std::size_t, void* __p) throw() { Assert(0); Error("CBaseEntity new\n");return __p; }

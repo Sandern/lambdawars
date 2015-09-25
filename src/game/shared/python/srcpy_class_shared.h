@@ -13,6 +13,7 @@
 
 #include "srcpy_boostpython.h"
 
+#if 0
 //-----------------------------------------------------------------------------
 // Shared between server and client class
 // When you add a new type:
@@ -50,6 +51,7 @@ enum PyNetworkTypes
 	PN_BASEFUNCMAPBOUNDARY,
 #endif // HL2WARS_DLL
 };
+#endif // 0
 
 boost::python::object CreatePyHandleHelper( const CBaseEntity *pEnt, const char *handlename );
 

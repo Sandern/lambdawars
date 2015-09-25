@@ -911,13 +911,14 @@ void register_CBaseGrenade_class(){
                 , bp::return_value_policy< bp::return_by_value >() );
         
         }
-        { //::CBaseGrenade::GetPyNetworkType
+        { //::CBaseGrenade::GetSendTable
         
-            typedef int ( *GetPyNetworkType_function_type )(  );
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
             
             CBaseGrenade_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBaseGrenade::GetPyNetworkType ) );
+                "GetSendTable"
+                , GetSendTable_function_type( &::CBaseGrenade::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CBaseGrenade::GetShakeAmplitude
@@ -1438,7 +1439,7 @@ void register_CBaseGrenade_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        CBaseGrenade_exposer.staticmethod( "GetPyNetworkType" );
+        CBaseGrenade_exposer.staticmethod( "GetSendTable" );
         { //property "damage"[fget=::CBaseGrenade::GetDamage, fset=::CBaseGrenade::SetDamage]
         
             typedef float ( ::CBaseGrenade::*fget )(  ) ;

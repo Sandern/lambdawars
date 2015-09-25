@@ -19,7 +19,7 @@ class C_BaseTrigger : public C_BaseToggle
 
 public:
 	DECLARE_CLIENTCLASS();
-	DECLARE_PYCLIENTCLASS( C_BaseTrigger, PN_BASETRIGGER );
+	DECLARE_PYCLIENTCLASS( C_BaseTrigger );
 
 	virtual void UpdatePartitionListEntry();
 

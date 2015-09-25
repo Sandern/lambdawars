@@ -594,9 +594,6 @@ void register_C_BaseToggle_class(){
             , (void ( ::C_BaseToggle::* )( ::Vector & ) )( &::C_BaseToggle::GetGroundVelocityToApply )
             , ( bp::arg("vecGroundVel") ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseToggle::GetPyNetworkType ) )    
-        .def( 
             "Activate"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::Activate)
             , (void ( C_BaseToggle_wrapper::* )(  ) )(&C_BaseToggle_wrapper::default_Activate) )    
@@ -723,7 +720,6 @@ void register_C_BaseToggle_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseToggle_wrapper::* )(  ) )(&C_BaseToggle_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &C_BaseToggle_wrapper::m_lifeState_Get, &C_BaseToggle_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BaseToggle_wrapper::m_takedamage_Get, &C_BaseToggle_wrapper::m_takedamage_Set );
 

@@ -558,7 +558,7 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseEntity::GetClientClass();
+            return C_SmokeTrail::GetClientClass();
 #endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
@@ -573,7 +573,7 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
                 PyErr_Print();
             }
         }
-        return C_BaseEntity::GetClientClass();
+        return C_SmokeTrail::GetClientClass();
     }
 
     static int m_lifeState_Get( C_SmokeTrail const & inst ) { return inst.m_lifeState; }

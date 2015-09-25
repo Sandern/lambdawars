@@ -691,15 +691,6 @@ void register_C_BaseCombatCharacter_class(){
                 , GetNextAttack_function_type( &::C_BaseCombatCharacter::GetNextAttack ) );
         
         }
-        { //::C_BaseCombatCharacter::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_BaseCombatCharacter_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseCombatCharacter::GetPyNetworkType ) );
-        
-        }
         { //::C_BaseCombatCharacter::GetWeapon
         
             typedef ::C_BaseCombatWeapon * ( ::C_BaseCombatCharacter::*GetWeapon_function_type )( int ) const;
@@ -1291,7 +1282,6 @@ void register_C_BaseCombatCharacter_class(){
                 , default_UpdateOnRemove_function_type(&C_BaseCombatCharacter_wrapper::default_UpdateOnRemove) );
         
         }
-        C_BaseCombatCharacter_exposer.staticmethod( "GetPyNetworkType" );
         { //property "activeweapon"[fget=::C_BaseCombatCharacter::GetActiveWeapon]
         
             typedef ::C_BaseCombatWeapon * ( ::C_BaseCombatCharacter::*fget )(  ) const;

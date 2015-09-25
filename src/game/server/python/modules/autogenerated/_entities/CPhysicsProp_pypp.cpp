@@ -746,7 +746,7 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBreakableProp, GetServerClass )
+        PY_OVERRIDE_CHECK( CPhysicsProp, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -760,7 +760,7 @@ struct CPhysicsProp_wrapper : CPhysicsProp, bp::wrapper< CPhysicsProp > {
                 PyErr_Print();
             }
         }
-        return CBreakableProp::GetServerClass();
+        return CPhysicsProp::GetServerClass();
     }
 
     static int m_lifeState_Get( CPhysicsProp const & inst ) { return inst.m_lifeState.Get(); }

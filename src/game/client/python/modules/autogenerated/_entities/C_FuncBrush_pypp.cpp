@@ -558,7 +558,7 @@ struct C_FuncBrush_wrapper : C_FuncBrush, bp::wrapper< C_FuncBrush > {
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseEntity::GetClientClass();
+            return C_FuncBrush::GetClientClass();
 #endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
@@ -573,7 +573,7 @@ struct C_FuncBrush_wrapper : C_FuncBrush, bp::wrapper< C_FuncBrush > {
                 PyErr_Print();
             }
         }
-        return C_BaseEntity::GetClientClass();
+        return C_FuncBrush::GetClientClass();
     }
 
     static int m_lifeState_Get( C_FuncBrush const & inst ) { return inst.m_lifeState; }

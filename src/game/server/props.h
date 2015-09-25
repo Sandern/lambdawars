@@ -67,7 +67,7 @@ public:
 	DECLARE_CLASS( CBreakableProp, CBaseProp );
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
-	DECLARE_PYSERVERCLASS( CBreakableProp, PN_BREAKABLEPROP );
+	DECLARE_PYSERVERCLASS( CBreakableProp );
 
 	virtual void Spawn();
 	virtual void Precache();

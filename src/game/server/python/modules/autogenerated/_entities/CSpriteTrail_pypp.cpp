@@ -670,7 +670,7 @@ struct CSpriteTrail_wrapper : CSpriteTrail, bp::wrapper< CSpriteTrail > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CSprite, GetServerClass )
+        PY_OVERRIDE_CHECK( CSpriteTrail, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -684,7 +684,7 @@ struct CSpriteTrail_wrapper : CSpriteTrail, bp::wrapper< CSpriteTrail > {
                 PyErr_Print();
             }
         }
-        return CSprite::GetServerClass();
+        return CSpriteTrail::GetServerClass();
     }
 
     static int m_lifeState_Get( CSpriteTrail const & inst ) { return inst.m_lifeState.Get(); }

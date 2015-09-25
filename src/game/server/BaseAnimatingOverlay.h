@@ -192,7 +192,7 @@ class CBaseAnimatingOverlay : public CBaseAnimating
 // =======================================
 // PySource Additions
 // =======================================
-	DECLARE_PYSERVERCLASS( CBaseAnimatingOverlay, PN_BASEANIMATINGOVERLAY );
+	DECLARE_PYSERVERCLASS( CBaseAnimatingOverlay );
 // =======================================
 // END PySource Additions
 // =======================================

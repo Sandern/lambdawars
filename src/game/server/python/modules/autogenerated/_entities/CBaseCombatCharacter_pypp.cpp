@@ -1524,13 +1524,14 @@ void register_CBaseCombatCharacter_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
-        { //::CBaseCombatCharacter::GetPyNetworkType
+        { //::CBaseCombatCharacter::GetSendTable
         
-            typedef int ( *GetPyNetworkType_function_type )(  );
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
             
             CBaseCombatCharacter_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBaseCombatCharacter::GetPyNetworkType ) );
+                "GetSendTable"
+                , GetSendTable_function_type( &::CBaseCombatCharacter::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CBaseCombatCharacter::GetSpreadBias
@@ -2833,7 +2834,7 @@ void register_CBaseCombatCharacter_class(){
         CBaseCombatCharacter_exposer.staticmethod( "AllocateDefaultRelationships" );
         CBaseCombatCharacter_exposer.staticmethod( "GetInteractionID" );
         CBaseCombatCharacter_exposer.staticmethod( "GetNumFactions" );
-        CBaseCombatCharacter_exposer.staticmethod( "GetPyNetworkType" );
+        CBaseCombatCharacter_exposer.staticmethod( "GetSendTable" );
         CBaseCombatCharacter_exposer.staticmethod( "InitInteractionSystem" );
         CBaseCombatCharacter_exposer.staticmethod( "ResetVisibilityCache" );
         CBaseCombatCharacter_exposer.staticmethod( "SetDefaultFactionRelationship" );

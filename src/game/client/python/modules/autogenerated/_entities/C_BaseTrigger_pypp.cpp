@@ -590,9 +590,6 @@ void register_C_BaseTrigger_class(){
 
     bp::class_< C_BaseTrigger_wrapper, bp::bases< C_BaseToggle >, boost::noncopyable >( "C_BaseTrigger" )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseTrigger::GetPyNetworkType ) )    
-        .def( 
             "UpdatePartitionListEntry"
             , (void ( ::C_BaseTrigger::* )(  ) )( &::C_BaseTrigger::UpdatePartitionListEntry ) )    
         .def_readwrite( "clientsidepredicted", &C_BaseTrigger::m_bClientSidePredicted )    
@@ -723,7 +720,6 @@ void register_C_BaseTrigger_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseTrigger_wrapper::* )(  ) )(&C_BaseTrigger_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &C_BaseTrigger_wrapper::m_lifeState_Get, &C_BaseTrigger_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BaseTrigger_wrapper::m_takedamage_Get, &C_BaseTrigger_wrapper::m_takedamage_Set );
 

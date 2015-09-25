@@ -171,9 +171,9 @@ public:
 #endif
 
 #ifdef CLIENT_DLL
-	DECLARE_PYCLIENTCLASS( C_UnitBase, PN_UNITBASE );
+	DECLARE_PYCLIENTCLASS( C_UnitBase );
 #else
-	DECLARE_PYSERVERCLASS( CUnitBase, PN_UNITBASE );
+	DECLARE_PYSERVERCLASS( CUnitBase );
 #endif // CLIENT_DLL
 
 	virtual IMouse *GetIMouse()												{ return this; }

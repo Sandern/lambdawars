@@ -670,7 +670,7 @@ struct SmokeTrail_wrapper : SmokeTrail, bp::wrapper< SmokeTrail > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
+        PY_OVERRIDE_CHECK( SmokeTrail, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -684,7 +684,7 @@ struct SmokeTrail_wrapper : SmokeTrail, bp::wrapper< SmokeTrail > {
                 PyErr_Print();
             }
         }
-        return CBaseEntity::GetServerClass();
+        return SmokeTrail::GetServerClass();
     }
 
     static int m_lifeState_Get( SmokeTrail const & inst ) { return inst.m_lifeState.Get(); }

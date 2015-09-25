@@ -640,9 +640,6 @@ void register_C_BreakableProp_class(){
             , (::QAngle const & ( ::C_BreakableProp::* )(  ) )( &::C_BreakableProp::GetNetworkedPreferredPlayerCarryAngles )
             , bp::return_value_policy< bp::copy_const_reference >() )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BreakableProp::GetPyNetworkType ) )    
-        .def( 
             "HasPreferredCarryAnglesForPlayer"
             , (bool ( ::C_BreakableProp::* )( ::C_BasePlayer * ) )( &::C_BreakableProp::HasPreferredCarryAnglesForPlayer )
             , ( bp::arg("pPlayer") ) )    
@@ -787,7 +784,6 @@ void register_C_BreakableProp_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BreakableProp_wrapper::* )(  ) )(&C_BreakableProp_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &C_BreakableProp_wrapper::m_lifeState_Get, &C_BreakableProp_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BreakableProp_wrapper::m_takedamage_Get, &C_BreakableProp_wrapper::m_takedamage_Set )    
         .add_property( "skin", &C_BreakableProp_wrapper::m_nSkin_Get, &C_BreakableProp_wrapper::m_nSkin_Set );

@@ -669,9 +669,6 @@ void register_C_BaseFlex_class(){
             , (char const * (*)( int ))( &::C_BaseFlex::GetGlobalFlexControllerName )
             , ( bp::arg("idx") ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseFlex::GetPyNetworkType ) )    
-        .def( 
             "GetSoundSpatialization"
             , (bool ( ::C_BaseFlex::* )( ::SpatializationInfo_t & ) )( &::C_BaseFlex::GetSoundSpatialization )
             , ( bp::arg("info") ) )    
@@ -847,7 +844,6 @@ void register_C_BaseFlex_class(){
             , (void ( C_BaseFlex_wrapper::* )(  ) )(&C_BaseFlex_wrapper::default_UpdateOnRemove) )    
         .staticmethod( "AddGlobalFlexController" )    
         .staticmethod( "GetGlobalFlexControllerName" )    
-        .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "InvalidateFlexCaches" )    
         .add_property( "lifestate", &C_BaseFlex_wrapper::m_lifeState_Get, &C_BaseFlex_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BaseFlex_wrapper::m_takedamage_Get, &C_BaseFlex_wrapper::m_takedamage_Set )    

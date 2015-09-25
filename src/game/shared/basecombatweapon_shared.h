@@ -139,9 +139,9 @@ public:
 	DECLARE_PREDICTABLE();
 
 #ifdef CLIENT_DLL
-	DECLARE_PYCLIENTCLASS( C_BaseCombatWeapon, PN_BASECOMBATWEAPON );
+	DECLARE_PYCLIENTCLASS( C_BaseCombatWeapon );
 #else
-	DECLARE_PYSERVERCLASS( CBaseCombatWeapon, PN_BASECOMBATWEAPON );
+	DECLARE_PYSERVERCLASS( CBaseCombatWeapon );
 #endif // CLIENT_DLL
 
 							CBaseCombatWeapon();

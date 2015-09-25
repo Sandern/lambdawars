@@ -618,9 +618,6 @@ void register_C_PlayerResource_class(){
             , (int ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetPlayerScore )
             , ( bp::arg("index") ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_PlayerResource::GetPyNetworkType ) )    
-        .def( 
             "GetTeam"
             , (int ( ::C_PlayerResource::* )( int ) )( &::C_PlayerResource::GetTeam )
             , ( bp::arg("index") ) )    
@@ -787,7 +784,6 @@ void register_C_PlayerResource_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_PlayerResource_wrapper::* )(  ) )(&C_PlayerResource_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &C_PlayerResource_wrapper::m_lifeState_Get, &C_PlayerResource_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_PlayerResource_wrapper::m_takedamage_Get, &C_PlayerResource_wrapper::m_takedamage_Set );
 

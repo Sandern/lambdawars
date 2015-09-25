@@ -778,13 +778,14 @@ void register_CBaseTrigger_class(){
                 , ( bp::arg("pOther") ) );
         
         }
-        { //::CBaseTrigger::GetPyNetworkType
+        { //::CBaseTrigger::GetSendTable
         
-            typedef int ( *GetPyNetworkType_function_type )(  );
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
             
             CBaseTrigger_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBaseTrigger::GetPyNetworkType ) );
+                "GetSendTable"
+                , GetSendTable_function_type( &::CBaseTrigger::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CBaseTrigger::GetTouchedEntityOfType
@@ -1298,7 +1299,7 @@ void register_CBaseTrigger_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        CBaseTrigger_exposer.staticmethod( "GetPyNetworkType" );
+        CBaseTrigger_exposer.staticmethod( "GetSendTable" );
         { //property "clientsidepredicted"[fget=::CBaseTrigger::GetClientSidePredicted, fset=::CBaseTrigger::SetClientSidePredicted]
         
             typedef bool ( ::CBaseTrigger::*fget )(  ) ;

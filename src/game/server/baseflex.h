@@ -49,7 +49,7 @@ public:
 	DECLARE_PREDICTABLE();
 	// script description
 	DECLARE_ENT_SCRIPTDESC();
-	DECLARE_PYSERVERCLASS( CBaseFlex, PN_BASEFLEX );
+	DECLARE_PYSERVERCLASS( CBaseFlex );
 
 	// Construction
 						CBaseFlex( void );

@@ -255,7 +255,7 @@ public:
 	DECLARE_SERVERCLASS();
 	// script description
 	DECLARE_ENT_SCRIPTDESC();
-	DECLARE_PYSERVERCLASS( CBasePlayer, PN_BASEPLAYER );
+	DECLARE_PYSERVERCLASS( CBasePlayer );
 
 	CBasePlayer();
 	~CBasePlayer();

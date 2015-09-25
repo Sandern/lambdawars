@@ -54,9 +54,9 @@ public:
 // PySource Additions
 // =======================================
 #ifdef CLIENT_DLL
-	DECLARE_PYCLIENTCLASS( CBaseGrenade, PN_BASEGRENADE );
+	DECLARE_PYCLIENTCLASS( CBaseGrenade );
 #else
-	DECLARE_PYSERVERCLASS( CBaseGrenade, PN_BASEGRENADE );
+	DECLARE_PYSERVERCLASS( CBaseGrenade );
 #endif // CLIENT_DLL
 // =======================================
 // END PySource Additions

@@ -47,9 +47,9 @@ public:
 #endif
 
 #ifdef CLIENT_DLL
-	DECLARE_PYCLIENTCLASS( CFuncUnit, PN_FUNCUNIT );
+	DECLARE_PYCLIENTCLASS( CFuncUnit );
 #else
-	DECLARE_PYSERVERCLASS( CFuncUnit, PN_FUNCUNIT );
+	DECLARE_PYSERVERCLASS( CFuncUnit );
 #endif // CLIENT_DLL
 
 	CFuncUnit();

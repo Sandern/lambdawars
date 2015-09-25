@@ -737,11 +737,6 @@ void CSrcPython::LevelInitPreEntity()
 
 	V_strncpy( m_LevelName, pLevelName, sizeof( m_LevelName ) );
 
-	// BEFORE creating the entities setup the network tables
-#ifndef CLIENT_DLL
-	SetupNetworkTables();
-#endif // CLIENT_DLL
-
 	// srcmgr level init
 	Run<const char *>( Get("_LevelInitPreEntity", "srcmgr", true), m_LevelName );
 	
@@ -833,9 +828,6 @@ void CSrcPython::LevelShutdownPostEntity()
 		Warning( "Failed to retrieve post level shutdown signal (level name: %s):\n", m_LevelName );
 		PyErr_Print();
 	}
-
-	// Reset all send/recv tables
-	PyResetAllNetworkTables();
 
 	// Clear all tick signals next times (level time based)
 	for( int i = m_methodTickList.Count() - 1; i >= 0; i--)

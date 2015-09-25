@@ -922,15 +922,6 @@ void register_CBeam_class(){
                 , GetNoise_function_type( &::CBeam::GetNoise ) );
         
         }
-        { //::CBeam::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            CBeam_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CBeam::GetPyNetworkType ) );
-        
-        }
         { //::CBeam::GetScrollRate
         
             typedef float ( ::CBeam::*GetScrollRate_function_type )(  ) const;
@@ -938,6 +929,16 @@ void register_CBeam_class(){
             CBeam_exposer.def( 
                 "GetScrollRate"
                 , GetScrollRate_function_type( &::CBeam::GetScrollRate ) );
+        
+        }
+        { //::CBeam::GetSendTable
+        
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
+            
+            CBeam_exposer.def( 
+                "GetSendTable"
+                , GetSendTable_function_type( &::CBeam::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CBeam::GetStartAttachment
@@ -1745,7 +1746,7 @@ void register_CBeam_class(){
         }
         CBeam_exposer.staticmethod( "BeamCreate" );
         CBeam_exposer.staticmethod( "BeamCreatePredictable" );
-        CBeam_exposer.staticmethod( "GetPyNetworkType" );
+        CBeam_exposer.staticmethod( "GetSendTable" );
         CBeam_exposer.add_property( "lifestate", &CBeam_wrapper::m_lifeState_Get, &CBeam_wrapper::m_lifeState_Set );
         CBeam_exposer.add_property( "takedamage", &CBeam_wrapper::m_takedamage_Get, &CBeam_wrapper::m_takedamage_Set );
     }

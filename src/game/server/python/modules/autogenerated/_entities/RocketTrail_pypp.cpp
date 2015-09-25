@@ -670,7 +670,7 @@ struct RocketTrail_wrapper : RocketTrail, bp::wrapper< RocketTrail > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
+        PY_OVERRIDE_CHECK( RocketTrail, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -684,7 +684,7 @@ struct RocketTrail_wrapper : RocketTrail, bp::wrapper< RocketTrail > {
                 PyErr_Print();
             }
         }
-        return CBaseEntity::GetServerClass();
+        return RocketTrail::GetServerClass();
     }
 
     static int m_lifeState_Get( RocketTrail const & inst ) { return inst.m_lifeState.Get(); }

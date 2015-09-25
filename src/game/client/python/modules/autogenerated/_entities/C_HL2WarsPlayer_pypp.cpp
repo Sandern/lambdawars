@@ -1199,15 +1199,6 @@ void register_C_HL2WarsPlayer_class(){
                 , bp::return_value_policy< bp::copy_const_reference >() );
         
         }
-        { //::C_HL2WarsPlayer::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_HL2WarsPlayer_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_HL2WarsPlayer::GetPyNetworkType ) );
-        
-        }
         { //::C_HL2WarsPlayer::GetSelectedUnitType
         
             typedef char const * ( ::C_HL2WarsPlayer::*GetSelectedUnitType_function_type )(  ) ;
@@ -2085,7 +2076,6 @@ void register_C_HL2WarsPlayer_class(){
         
         }
         C_HL2WarsPlayer_exposer.staticmethod( "GetLocalHL2WarsPlayer" );
-        C_HL2WarsPlayer_exposer.staticmethod( "GetPyNetworkType" );
         { //property "unit"[fget=::C_HL2WarsPlayer::GetControlledUnit]
         
             typedef ::C_BaseEntity * ( ::C_HL2WarsPlayer::*fget )(  ) const;

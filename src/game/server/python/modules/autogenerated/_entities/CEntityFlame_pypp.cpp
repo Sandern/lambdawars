@@ -670,7 +670,7 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ServerClass* GetServerClass() {
-        PY_OVERRIDE_CHECK( CBaseEntity, GetServerClass )
+        PY_OVERRIDE_CHECK( CEntityFlame, GetServerClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyServerClass") )
         {
             try
@@ -684,7 +684,7 @@ struct CEntityFlame_wrapper : CEntityFlame, bp::wrapper< CEntityFlame > {
                 PyErr_Print();
             }
         }
-        return CBaseEntity::GetServerClass();
+        return CEntityFlame::GetServerClass();
     }
 
     static int m_lifeState_Get( CEntityFlame const & inst ) { return inst.m_lifeState.Get(); }

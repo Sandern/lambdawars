@@ -26,7 +26,7 @@ public:
 // =======================================
 // PySource Additions
 // =======================================
-	DECLARE_PYCLIENTCLASS( C_PlayerResource, PN_PLAYERRESOURCE );
+	DECLARE_PYCLIENTCLASS( C_PlayerResource );
 // =======================================
 // END PySource Additions
 // =======================================

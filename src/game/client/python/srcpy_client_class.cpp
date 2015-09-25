@@ -43,6 +43,7 @@ PyClientClassBase *g_pPyClientClassHead = NULL;
 
 namespace bp = boost::python;
 
+#if 0
 // Recv tables
 EXTERN_RECV_TABLE( DT_BaseAnimating );
 EXTERN_RECV_TABLE( DT_BaseAnimatingOverlay );
@@ -107,100 +108,13 @@ IMPLEMENT_FALLBACK_FACTORY(C_WarsWeapon)
 IMPLEMENT_FALLBACK_FACTORY(C_FuncUnit)
 IMPLEMENT_FALLBACK_FACTORY(CBaseFuncMapBoundary)
 #endif // HL2WARS_DLL
+#endif // 0
 
-// Set the right recv table
-void SetupClientClassRecv( PyClientClassBase *p, int iType  )
-{
-	switch( iType )
-	{
-	case PN_BASEENTITY:
-		p->m_pRecvTable = &(DT_BaseEntity::g_RecvTable);
-		break;
-	case PN_BASEANIMATING:
-		p->m_pRecvTable = &(DT_BaseAnimating::g_RecvTable);
-		break;
-	case PN_BASEANIMATINGOVERLAY:
-		p->m_pRecvTable = &(DT_BaseAnimatingOverlay::g_RecvTable);
-		break;
-	case PN_BASEFLEX:
-		p->m_pRecvTable = &(DT_BaseFlex::g_RecvTable);
-		break;
-	case PN_BASECOMBATCHARACTER:
-		p->m_pRecvTable = &(DT_BaseCombatCharacter::g_RecvTable);
-		break;
-	case PN_BASEPLAYER:
-		p->m_pRecvTable = &(DT_BasePlayer::g_RecvTable);
-		break;
-	case PN_BASEPROJECTILE:
-		p->m_pRecvTable = &(DT_BaseProjectile::g_RecvTable);
-		break;
-	case PN_BASEGRENADE:
-		p->m_pRecvTable = &(DT_BaseGrenade::g_RecvTable);
-		break;
-	case PN_BASECOMBATWEAPON:
-		p->m_pRecvTable = &(DT_BaseCombatWeapon::g_RecvTable);
-		break;
-	case PN_PLAYERRESOURCE:
-		p->m_pRecvTable = &(DT_PlayerResource::g_RecvTable);
-		break;
-	case PN_BREAKABLEPROP:
-		p->m_pRecvTable = &(DT_BreakableProp::g_RecvTable);
-		break;
-	case PN_BASETOGGLE:
-		p->m_pRecvTable = &(DT_BaseToggle::g_RecvTable);
-		break;
-	case PN_BASETRIGGER:
-		p->m_pRecvTable = &(DT_BaseTrigger::g_RecvTable);
-		break;
-	case PN_SPRITE:
-		p->m_pRecvTable = &(DT_Sprite::g_RecvTable);
-		break;	
-	case PN_SMOKETRAIL:
-		p->m_pRecvTable = &(DT_SmokeTrail::g_RecvTable);
-		break;	
-	case PN_BEAM:
-		p->m_pRecvTable = &(DT_Beam::g_RecvTable);
-		break;
-#ifdef HL2WARS_DLL
-	case PN_HL2WARSPLAYER:
-		p->m_pRecvTable = &(DT_HL2WarsPlayer::g_RecvTable);
-		break;
-	case PN_UNITBASE:
-		p->m_pRecvTable = &(DT_UnitBase::g_RecvTable);
-		break;
-	case PN_WARSWEAPON:
-		p->m_pRecvTable = &(DT_WarsWeapon::g_RecvTable);
-		break;
-	case PN_FUNCUNIT:
-		p->m_pRecvTable = &(DT_FuncUnit::g_RecvTable);
-		break;
-	case PN_BASEFUNCMAPBOUNDARY:
-		p->m_pRecvTable = &(DT_BaseFuncMapBoundary::g_RecvTable);
-		break;
-#endif // HL2WARS_DLL
-	default:
-		p->m_pRecvTable = &(DT_BaseEntity::g_RecvTable);
-		break;
-	}
-}
-
-// Call on level shutdown
-// Server will tell us the new recv tables later
-// Level init requires us to be sure
-void PyResetAllNetworkTables()
-{
-	PyClientClassBase *p = g_pPyClientClassHead;
-	while( p )
-	{
-		SetupClientClassRecv(p, PN_BASEENTITY);
-		p = p->m_pPyNext;
-	}
-}
-
-IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_type, int entnum, int serialNum )
+IClientNetworkable *ClientClassFactory( boost::python::object cls_type, int entnum, int serialNum )
 {
 	try	
 	{
+#if 0
 		// Safety check. The base implementations must be match, otherwise it can result in incorrect behavior (crashes)
 		int iNetworkType = boost::python::extract<int>(cls_type.attr("GetPyNetworkType")());
 		if( iNetworkType != iType )
@@ -210,7 +124,7 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 			PyErr_SetString(PyExc_Exception, buf );
 			throw boost::python::error_already_set(); 
 		}
-
+#endif // 0
 		// Spawn and initialize the entity
 		boost::python::object inst = cls_type();
 		C_BaseEntity *pRet = boost::python::extract<C_BaseEntity *>(inst);
@@ -227,70 +141,11 @@ IClientNetworkable *ClientClassFactory( int iType, boost::python::object cls_typ
 	{
 		Warning("Failed to create python client side entity, falling back to base c++ class\n");
 		PyErr_Print();
-		
+
 		// Call the correct fallback factory
+		// TODO: is this really needed?
 		IClientNetworkable *pResult = NULL;
-		switch( iType )
-		{
-		case PN_BASEENTITY:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseEntity, entnum, serialNum );
-			break;
-		case PN_BASEANIMATING:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseAnimating, entnum, serialNum );
-			break;
-		case PN_BASEANIMATINGOVERLAY:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseAnimatingOverlay, entnum, serialNum );
-			break;
-		case PN_BASEFLEX:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseFlex, entnum, serialNum );
-			break;
-		case PN_BASECOMBATCHARACTER:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseCombatCharacter, entnum, serialNum );
-			break;
-		case PN_BASEPLAYER:
-			pResult = CALL_FALLBACK_FACTORY( C_BasePlayer, entnum, serialNum );
-			break;
-		case PN_BASEPROJECTILE:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseProjectile, entnum, serialNum );
-			break;
-		case PN_BASEGRENADE:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseGrenade, entnum, serialNum );
-			break;
-		case PN_BASECOMBATWEAPON:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseCombatWeapon, entnum, serialNum );
-			break;
-		case PN_BREAKABLEPROP:
-			pResult = CALL_FALLBACK_FACTORY( C_BreakableProp, entnum, serialNum );
-			break;
-		case PN_BASETOGGLE:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseToggle, entnum, serialNum );
-			break;
-		case PN_BASETRIGGER:
-			pResult = CALL_FALLBACK_FACTORY( C_BaseTrigger, entnum, serialNum );
-			break;
-		case PN_UNITBASE:
-			pResult = CALL_FALLBACK_FACTORY( C_UnitBase, entnum, serialNum );
-			break;
-		case PN_SPRITE:
-			pResult = CALL_FALLBACK_FACTORY( C_Sprite, entnum, serialNum );
-			break;
-		case PN_BEAM:
-			pResult = CALL_FALLBACK_FACTORY( C_Beam, entnum, serialNum );
-			break;
-		case PN_HL2WARSPLAYER:
-			pResult = CALL_FALLBACK_FACTORY( C_HL2WarsPlayer, entnum, serialNum );
-			break;
-		case PN_WARSWEAPON:
-			pResult = CALL_FALLBACK_FACTORY( C_WarsWeapon, entnum, serialNum );
-			break;
-		case PN_FUNCUNIT:
-			pResult = CALL_FALLBACK_FACTORY( C_FuncUnit, entnum, serialNum );
-			break;
-		default:
-			Warning( "No default fallback for networktype %d. Warn a dev.\n", iType );
-			pResult = CALL_FALLBACK_FACTORY( C_BaseEntity, entnum, serialNum );
-			break;
-		}
+
 		return pResult;
 	}
 }
@@ -428,10 +283,13 @@ void NetworkedClass::AttachClientClass( PyClientClassBase *pClientClass )
 	m_pClientClass = pClientClass;
 	m_pClientClass->m_bFree = false;
 	m_pClientClass->m_pNetworkedClass = this;
-	try {
+	try 
+	{
 		m_pClientClass->SetPyClass(m_pyClass);
 		PyObject_SetAttrString(m_pyClass.ptr(), "pyClientClass", bp::object(bp::ptr((ClientClass *)m_pClientClass)).ptr());
-	} catch(boost::python::error_already_set &) {
+	} 
+	catch( boost::python::error_already_set & ) 
+	{
 		PyErr_Print();
 	}
 }
@@ -444,11 +302,10 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	char clientClass[PYNETCLS_BUFSIZE];
 	char networkName[PYNETCLS_BUFSIZE];
 
-	int iType = msg.ReadByte();
 	msg.ReadString(clientClass, PYNETCLS_BUFSIZE);
 	msg.ReadString(networkName, PYNETCLS_BUFSIZE);
 
-	DbgStrPyMsg( "__MsgFunc_PyNetworkCls: Registering Python network class message %d %s %s\n", iType, clientClass, networkName );
+	DbgStrPyMsg( "__MsgFunc_PyNetworkCls: Registering Python network class message %s %s\n", clientClass, networkName );
 
 	// Get module path
 	const char *pch = V_strrchr( networkName, '.' );
@@ -472,10 +329,6 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 		Warning( "__MsgFunc_PyNetworkCls: Invalid networked class %s\n", clientClass );
 		return;
 	}
-	
-	// Set type
-	p->SetType( iType );
-	SetupClientClassRecv( p, iType );
 
 	// Read network class name
 	V_strncpy( p->m_strPyNetworkedClassName, networkName, sizeof( p->m_strPyNetworkedClassName ) );
@@ -508,8 +361,6 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 
 	for( int i = 0; i < nCount; i++ )
 	{
-		int iType = data.GetInt();
-
 		int lenClientClass = data.GetInt();
 		char *clientClass = (char *)stackalloc( lenClientClass + 1 );
 		data.Get( clientClass, lenClientClass );
@@ -519,8 +370,8 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 		char *networkName = (char *)stackalloc( lenNetworkName + 1 );
 		data.Get( networkName, lenNetworkName );
 		networkName[lenNetworkName] = 0;
-
-		DbgStrPyMsg( "WarsNet_ReceiveEntityClasses: Registering Python network class message %d %s %s\n", iType, clientClass, networkName );
+		
+		DbgStrPyMsg( "WarsNet_ReceiveEntityClasses: Registering Python network class message %s %s\n", clientClass, networkName );
 
 		// Get module path
 		const char *pch = V_strrchr( networkName, '.' );
@@ -544,10 +395,6 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 			Warning( "WarsNet_ReceiveEntityClasses: Invalid networked class %s\n", clientClass );
 			return;
 		}
-	
-		// Set type
-		p->SetType( iType );
-		SetupClientClassRecv( p, iType );
 
 		// Read network class name
 		V_strncpy( p->m_strPyNetworkedClassName, networkName, sizeof( p->m_strPyNetworkedClassName ) );
@@ -581,45 +428,39 @@ void HookPyNetworkCls()
 #if 0
 CON_COMMAND_F( rpc, "", FCVAR_HIDDEN )
 {
-	int iType = atoi(args[1]);
-
-	DbgStrPyMsg( "register_py_class: Registering Python network class message %d %s %s\n", iType, args[2], args[3] );
+	DbgStrPyMsg( "register_py_class: Registering Python network class message %s %s\n", args[1], args[2] );
 
 	// Get module path
-	const char *pch = V_strrchr( args[3], '.' );
+	const char *pch = V_strrchr( args[2], '.' );
 	if( !pch )
 	{
-		Warning("Invalid python class name %s\n", args[3] );
+		Warning("Invalid python class name %s\n", args[2] );
 		return;
 	}
-	int n = pch - args[3] + 1;
+	int n = pch - args[2] + 1;
 
 	char modulePath[PYNETCLS_BUFSIZE];
-	V_strncpy( modulePath, args[3], n );
+	V_strncpy( modulePath, args[2], n );
 
 	SrcPySystem()->Import( modulePath );
-	PyClientClassBase *p = FindPyClientClass(args[2]);
+	PyClientClassBase *p = FindPyClientClass(args[1]);
 	if( !p )
 	{
-		Warning("register_py_class: Invalid networked class %s\n", args[2]);
+		Warning("register_py_class: Invalid networked class %s\n", args[1]);
 		return;
 	}
 
-	// Set type
-	p->SetType(iType );
-	SetupClientClassRecv(p, iType);
-
-	V_strncpy( p->m_strPyNetworkedClassName, args[3], sizeof( p->m_strPyNetworkedClassName ) );
+	V_strncpy( p->m_strPyNetworkedClassName, args[2], sizeof( p->m_strPyNetworkedClassName ) );
 
 	// Attach if a network class exists
-	unsigned short lookup = m_NetworkClassDatabase.Find( args[3] );
+	unsigned short lookup = m_NetworkClassDatabase.Find( args[2] );
 	if ( lookup != m_NetworkClassDatabase.InvalidIndex() )
 	{
 		m_NetworkClassDatabase.Element(lookup)->AttachClientClass( p );
 	}
 	else
 	{
-		Warning( "register_py_class: Invalid networked class %s\n", args[3] );
+		Warning( "register_py_class: Invalid networked class %s\n", args[2] );
 	}
 }
 #endif // 0

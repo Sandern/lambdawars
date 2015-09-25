@@ -928,13 +928,14 @@ void register_CWarsWeapon_class(){
                 , GetMinRestTime_function_type( &::CWarsWeapon::GetMinRestTime ) );
         
         }
-        { //::CWarsWeapon::GetPyNetworkType
+        { //::CWarsWeapon::GetSendTable
         
-            typedef int ( *GetPyNetworkType_function_type )(  );
+            typedef ::SendTable * ( *GetSendTable_function_type )(  );
             
             CWarsWeapon_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::CWarsWeapon::GetPyNetworkType ) );
+                "GetSendTable"
+                , GetSendTable_function_type( &::CWarsWeapon::GetSendTable )
+                , bp::return_value_policy< bp::reference_existing_object >() );
         
         }
         { //::CWarsWeapon::GetShootOriginAndDirection
@@ -1508,7 +1509,7 @@ void register_CWarsWeapon_class(){
                 , ( bp::arg("index"), bp::arg("pEvent") ) );
         
         }
-        CWarsWeapon_exposer.staticmethod( "GetPyNetworkType" );
+        CWarsWeapon_exposer.staticmethod( "GetSendTable" );
         { //property "primaryattackactivity"[fget=::CWarsWeapon::GetPrimaryAttackActivity, fset=::CWarsWeapon::SetPrimaryAttackActivity]
         
             typedef ::Activity ( ::CWarsWeapon::*fget )(  ) ;

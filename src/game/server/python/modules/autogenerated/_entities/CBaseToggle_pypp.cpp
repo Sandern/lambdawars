@@ -741,8 +741,9 @@ void register_CBaseToggle_class(){
             "GetDelay"
             , (float ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::GetDelay ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::CBaseToggle::GetPyNetworkType ) )    
+            "GetSendTable"
+            , (::SendTable * (*)(  ))( &::CBaseToggle::GetSendTable )
+            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "IsLockedByMaster"
             , (bool ( ::CBaseToggle::* )(  ) )( &::CBaseToggle::IsLockedByMaster ) )    
@@ -915,7 +916,7 @@ void register_CBaseToggle_class(){
             , ( bp::arg("index"), bp::arg("pEvent") ) )    
         .staticmethod( "AxisDelta" )    
         .staticmethod( "AxisValue" )    
-        .staticmethod( "GetPyNetworkType" )    
+        .staticmethod( "GetSendTable" )    
         .add_property( "lifestate", &CBaseToggle_wrapper::m_lifeState_Get, &CBaseToggle_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &CBaseToggle_wrapper::m_takedamage_Get, &CBaseToggle_wrapper::m_takedamage_Set );
 

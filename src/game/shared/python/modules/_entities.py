@@ -9,10 +9,7 @@ from pyplusplus import code_creators
 
 # Templates for client and server class
 tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
-#if defined(_WIN32) // POSIX: TODO
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            return %(clsname)s::GetClientClass();
-#endif // _WIN32
+        PY_OVERRIDE_CHECK( %(clsname)s, GetClientClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
             try
@@ -450,7 +447,7 @@ class Entities(SemiSharedModuleGenerator):
         
     def FindNetworkClass(self, mb, cls):
         # Test current class
-        decl = cls.mem_funs('GetPyNetworkType', allow_empty=True)
+        decl = cls.mem_funs('GetClientClass' if self.isclient else 'GetServerClass', allow_empty=True)
         if decl:
             return cls
             
@@ -525,6 +522,10 @@ class Entities(SemiSharedModuleGenerator):
                 
             # Apply common rules
             cls.mem_funs('GetServerClass', allow_empty=True).exclude()
+            #cls.mem_funs('GetServerClass', allow_empty=True).call_policies = call_policies.return_internal_reference()
+            
+            #cls.vars('m_pClassSendTable', allow_empty=True).include()
+            cls.mem_funs('GetSendTable', allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
             
             excludetypes = [
                 pointer_t(declarated_t(mb.class_('IServerVehicle'))),

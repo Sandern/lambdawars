@@ -1462,15 +1462,6 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("pStudioHdr"), bp::arg("poseParameter") ) );
         
         }
-        { //::C_BaseAnimating::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_BaseAnimating_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_BaseAnimating::GetPyNetworkType ) );
-        
-        }
         { //::C_BaseAnimating::GetRagdollInitBoneArrays
         
             typedef void ( ::C_BaseAnimating::*GetRagdollInitBoneArrays_function_type )( ::matrix3x4a_t *,::matrix3x4a_t *,::matrix3x4a_t *,float ) ;
@@ -2901,7 +2892,6 @@ void register_C_BaseAnimating_class(){
                 , default_UpdateOnRemove_function_type(&C_BaseAnimating_wrapper::default_UpdateOnRemove) );
         
         }
-        C_BaseAnimating_exposer.staticmethod( "GetPyNetworkType" );
         C_BaseAnimating_exposer.staticmethod( "InThreadedBoneSetup" );
         C_BaseAnimating_exposer.staticmethod( "InitBoneSetupThreadPool" );
         C_BaseAnimating_exposer.staticmethod( "InvalidateBoneCaches" );

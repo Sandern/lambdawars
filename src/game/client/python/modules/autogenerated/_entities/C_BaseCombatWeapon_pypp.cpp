@@ -902,9 +902,6 @@ void register_C_BaseCombatWeapon_class(){
             "GetPrintName"
             , (char const * ( ::C_BaseCombatWeapon::* )(  ) const)( &::C_BaseCombatWeapon::GetPrintName ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BaseCombatWeapon::GetPyNetworkType ) )    
-        .def( 
             "GetRandomBurst"
             , (int ( ::C_BaseCombatWeapon::* )(  ) )( &::C_BaseCombatWeapon::GetRandomBurst ) )    
         .def( 
@@ -1402,7 +1399,6 @@ void register_C_BaseCombatWeapon_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_BaseCombatWeapon_wrapper::* )(  ) )(&C_BaseCombatWeapon_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .add_property( "lifestate", &C_BaseCombatWeapon_wrapper::m_lifeState_Get, &C_BaseCombatWeapon_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BaseCombatWeapon_wrapper::m_takedamage_Get, &C_BaseCombatWeapon_wrapper::m_takedamage_Set )    
         .add_property( "skin", &C_BaseCombatWeapon_wrapper::m_nSkin_Get, &C_BaseCombatWeapon_wrapper::m_nSkin_Set )    

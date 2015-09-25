@@ -558,7 +558,7 @@ struct C_RocketTrail_wrapper : C_RocketTrail, bp::wrapper< C_RocketTrail > {
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_BaseEntity::GetClientClass();
+            return C_RocketTrail::GetClientClass();
 #endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
@@ -573,7 +573,7 @@ struct C_RocketTrail_wrapper : C_RocketTrail, bp::wrapper< C_RocketTrail > {
                 PyErr_Print();
             }
         }
-        return C_BaseEntity::GetClientClass();
+        return C_RocketTrail::GetClientClass();
     }
 
     static int m_lifeState_Get( C_RocketTrail const & inst ) { return inst.m_lifeState; }

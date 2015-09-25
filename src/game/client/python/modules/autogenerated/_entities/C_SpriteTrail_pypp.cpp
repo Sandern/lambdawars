@@ -558,7 +558,7 @@ struct C_SpriteTrail_wrapper : C_SpriteTrail, bp::wrapper< C_SpriteTrail > {
     virtual ClientClass* GetClientClass() {
 #if defined(_WIN32) // POSIX: TODO
         if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_Sprite::GetClientClass();
+            return C_SpriteTrail::GetClientClass();
 #endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
@@ -573,7 +573,7 @@ struct C_SpriteTrail_wrapper : C_SpriteTrail, bp::wrapper< C_SpriteTrail > {
                 PyErr_Print();
             }
         }
-        return C_Sprite::GetClientClass();
+        return C_SpriteTrail::GetClientClass();
     }
 
     static int m_lifeState_Get( C_SpriteTrail const & inst ) { return inst.m_lifeState; }

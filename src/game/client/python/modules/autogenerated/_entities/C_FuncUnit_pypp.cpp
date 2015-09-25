@@ -1160,15 +1160,6 @@ void register_C_FuncUnit_class(){
                 , GetMaxHealth_function_type( &::C_FuncUnit::GetMaxHealth ) );
         
         }
-        { //::C_FuncUnit::GetPyNetworkType
-        
-            typedef int ( *GetPyNetworkType_function_type )(  );
-            
-            C_FuncUnit_exposer.def( 
-                "GetPyNetworkType"
-                , GetPyNetworkType_function_type( &::C_FuncUnit::GetPyNetworkType ) );
-        
-        }
         { //::C_FuncUnit::GetSquad
         
             typedef ::C_BaseEntity * ( ::C_FuncUnit::*GetSquad_function_type )(  ) ;
@@ -1815,7 +1806,6 @@ void register_C_FuncUnit_class(){
                 , ( bp::arg("pOther") ) );
         
         }
-        C_FuncUnit_exposer.staticmethod( "GetPyNetworkType" );
         { //property "selectionpriority"[fget=::C_FuncUnit::GetSelectionPriority, fset=::C_FuncUnit::SetSelectionPriority]
         
             typedef int ( ::C_FuncUnit::*fget )(  ) ;

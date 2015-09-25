@@ -879,9 +879,6 @@ void register_C_BasePlayer_class(){
             , (::QAngle const & ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::GetPunchAngle )
             , bp::return_value_policy< bp::copy_const_reference >() )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_BasePlayer::GetPyNetworkType ) )    
-        .def( 
             "GetRagdollInitBoneArrays"
             , (void ( ::C_BasePlayer::* )( ::matrix3x4a_t *,::matrix3x4a_t *,::matrix3x4a_t *,float ) )( &::C_BasePlayer::GetRagdollInitBoneArrays )
             , ( bp::arg("pDeltaBones0"), bp::arg("pDeltaBones1"), bp::arg("pCurrentBones"), bp::arg("boneDt") ) )    
@@ -1444,7 +1441,6 @@ void register_C_BasePlayer_class(){
             , (void ( C_BasePlayer_wrapper::* )(  ) )(&C_BasePlayer_wrapper::default_UpdateOnRemove) )    
         .staticmethod( "GetLocalPlayer" )    
         .staticmethod( "GetOffset_m_Local" )    
-        .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "GetSplitScreenSlotForPlayer" )    
         .staticmethod( "HasAnyLocalPlayer" )    
         .staticmethod( "IsLocalPlayer" )    

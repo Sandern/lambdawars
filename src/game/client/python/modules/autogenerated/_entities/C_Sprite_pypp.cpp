@@ -651,9 +651,6 @@ void register_C_Sprite_class(){
             "GetHDRColorScale"
             , (float ( ::C_Sprite::* )(  ) )( &::C_Sprite::GetHDRColorScale ) )    
         .def( 
-            "GetPyNetworkType"
-            , (int (*)(  ))( &::C_Sprite::GetPyNetworkType ) )    
-        .def( 
             "GetRenderBounds"
             , (void ( ::C_Sprite::* )( ::Vector &,::Vector & ) )( &::C_Sprite::GetRenderBounds )
             , ( bp::arg("vecMins"), bp::arg("vecMaxs") ) )    
@@ -849,7 +846,6 @@ void register_C_Sprite_class(){
             "UpdateOnRemove"
             , (void ( ::C_BaseEntity::* )(  ) )(&::C_BaseEntity::UpdateOnRemove)
             , (void ( C_Sprite_wrapper::* )(  ) )(&C_Sprite_wrapper::default_UpdateOnRemove) )    
-        .staticmethod( "GetPyNetworkType" )    
         .staticmethod( "SpriteCreatePredictable" )    
         .add_property( "lifestate", &C_Sprite_wrapper::m_lifeState_Get, &C_Sprite_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_Sprite_wrapper::m_takedamage_Get, &C_Sprite_wrapper::m_takedamage_Set );
