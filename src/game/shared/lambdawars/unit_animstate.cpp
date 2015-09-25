@@ -538,10 +538,15 @@ void UnitAnimState::ComputeMainSequence()
 	{
 		if ( pOuter->GetSequenceActivity( pOuter->GetSequence() ) != m_nSpecificMainActivity )
 		{
-			pOuter->ResetSequence( SelectWeightedSequence( m_nSpecificMainActivity ) );
-			if( pOuter->GetSequence() == -1 )
+			int iSeq = SelectWeightedSequence( m_nSpecificMainActivity );
+			if( iSeq == -1 )
 			{
+				Warning( "UnitAnimState::ComputeMainSequence: Invalid specific main activity (%d)\n", m_nSpecificMainActivity );
 				EndSpecificActivity();
+			}
+			else
+			{
+				pOuter->ResetSequence( iSeq );
 			}
 			return;
 		}
