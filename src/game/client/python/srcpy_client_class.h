@@ -42,7 +42,7 @@ namespace DT_BaseEntity
 class PyClientClassBase : public ClientClass
 {
 public:
-	PyClientClassBase( char *pNetworkName, RecvTable *pRecvTable ) : ClientClass (pNetworkName, NULL, NULL, pRecvTable ), m_pNetworkedClass(NULL)
+	PyClientClassBase( char *pNetworkName, RecvTable *pRecvTable ) : ClientClass(pNetworkName, NULL, NULL, pRecvTable ), m_pNetworkedClass(NULL)
 	{
 		m_pPyNext				= g_pPyClientClassHead;
 		g_pPyClientClassHead	= this;
@@ -57,18 +57,17 @@ public:
 	bool m_bFree;
 	NetworkedClass *m_pNetworkedClass;
 	char m_strPyNetworkedClassName[512];
+	boost::python::object m_PyClass;
 };
 
-//void SetupClientClassRecv( PyClientClassBase *p, int iType );
-//void PyResetAllNetworkTables();
-IClientNetworkable *ClientClassFactory( boost::python::object cls_type, int entnum, int serialNum);
+C_BaseEntity *ClientClassFactory( boost::python::object cls_type, int entnum, int serialNum);
 void InitAllPythonEntities();
 void CheckEntities(PyClientClassBase *pCC, boost::python::object pyClass );
 void WarsNet_ReceiveEntityClasses( CUtlBuffer &data );
 
 // For each available free client class we need a unique class because of the static data
-// No way around this since stuff is called from the engine
-#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name, table )									\
+// No way around this since m_pCreateFn is called from the engine (must always be a static function pointer?)
+#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name, table, fallback_class_name )			\
 	class name : public PyClientClassBase															\
 	{																								\
 	public:																							\
@@ -85,7 +84,13 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data );
 	boost::python::object name::m_PyClass;															\
 	IClientNetworkable* name::PyClientClass_CreateObject( int entnum, int serialNum )				\
 	{																								\
-		return ClientClassFactory(m_PyClass, entnum, serialNum);									\
+		C_BaseEntity *pRet = ClientClassFactory(m_PyClass, entnum, serialNum);						\
+		if( !pRet )																					\
+		{																							\
+			pRet = new fallback_class_name;															\
+			pRet->Init( entnum, serialNum );														\
+		}																							\
+		return pRet;																				\
 	}																								\
 	void name::SetPyClass( boost::python::object cls_type )											\
 	{																								\

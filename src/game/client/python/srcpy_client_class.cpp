@@ -17,22 +17,7 @@
 #include "srcpy.h"
 #include "usermessages.h"
 
-#include "basegrenade_shared.h"
-#include "Sprite.h"
-#include "c_smoke_trail.h"
-#include "beam_shared.h"
-#include "basecombatweapon_shared.h"
-#include "c_playerresource.h"
-#include "c_breakableprop.h"
-#include "c_basetoggle.h"
-#include "c_triggers.h"
-
 #ifdef HL2WARS_DLL
-#include "c_hl2wars_player.h"
-#include "unit_base_shared.h"
-#include "c_wars_weapon.h"
-#include "wars_func_unit.h"
-#include "wars_mapboundary.h"
 #include "wars_network.h"
 #endif // HL2WARS_DLL
 
@@ -43,75 +28,10 @@ PyClientClassBase *g_pPyClientClassHead = NULL;
 
 namespace bp = boost::python;
 
-#if 0
-// Recv tables
-EXTERN_RECV_TABLE( DT_BaseAnimating );
-EXTERN_RECV_TABLE( DT_BaseAnimatingOverlay );
-EXTERN_RECV_TABLE( DT_BaseFlex );
-EXTERN_RECV_TABLE( DT_BaseCombatCharacter );
-EXTERN_RECV_TABLE( DT_BasePlayer );
-EXTERN_RECV_TABLE( DT_BaseProjectile );
-EXTERN_RECV_TABLE( DT_BaseGrenade );
-EXTERN_RECV_TABLE( DT_BaseCombatWeapon );
-EXTERN_RECV_TABLE( DT_PlayerResource );
-EXTERN_RECV_TABLE( DT_BreakableProp );
-EXTERN_RECV_TABLE( DT_BaseToggle );
-EXTERN_RECV_TABLE( DT_BaseTrigger );
-EXTERN_RECV_TABLE( DT_Sprite );
-EXTERN_RECV_TABLE( DT_SmokeTrail );
-EXTERN_RECV_TABLE( DT_Beam );
-
-#ifdef HL2WARS_DLL
-EXTERN_RECV_TABLE( DT_HL2WarsPlayer );
-EXTERN_RECV_TABLE( DT_UnitBase );
-EXTERN_RECV_TABLE( DT_WarsWeapon );
-EXTERN_RECV_TABLE( DT_FuncUnit );
-EXTERN_RECV_TABLE( DT_HL2WarsPlayer );
-EXTERN_RECV_TABLE( DT_BaseFuncMapBoundary );
-#endif // HL2WARS_DLL
-
-// A lot of factories
-#define IMPLEMENT_FALLBACK_FACTORY( clientClassName ) \
-	static IClientNetworkable* _PN##clientClassName##_CreateObject( int entnum, int serialNum ) \
-	{ \
-		clientClassName *pRet = new clientClassName; \
-		if ( !pRet ) \
-			return 0; \
-		pRet->Init( entnum, serialNum ); \
-		return pRet; \
-	}
-
-#define CALL_FALLBACK_FACTORY( clientClassName, entnum, serialNum ) \
-	_PN##clientClassName##_CreateObject(entnum, serialNum);
-
-IMPLEMENT_FALLBACK_FACTORY(C_BaseEntity)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseAnimating)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseAnimatingOverlay)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseFlex)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatCharacter)
-IMPLEMENT_FALLBACK_FACTORY(C_BasePlayer)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseProjectile)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseGrenade)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseCombatWeapon)
-IMPLEMENT_FALLBACK_FACTORY(C_PlayerResource)
-IMPLEMENT_FALLBACK_FACTORY(C_BreakableProp)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseToggle)
-IMPLEMENT_FALLBACK_FACTORY(C_BaseTrigger)
-IMPLEMENT_FALLBACK_FACTORY(C_Sprite)
-IMPLEMENT_FALLBACK_FACTORY(C_SmokeTrail)
-IMPLEMENT_FALLBACK_FACTORY(C_Beam)
-
-#ifdef HL2WARS_DLL
-IMPLEMENT_FALLBACK_FACTORY(C_HL2WarsPlayer)
-IMPLEMENT_FALLBACK_FACTORY(C_UnitBase)
-IMPLEMENT_FALLBACK_FACTORY(C_WarsWeapon)
-IMPLEMENT_FALLBACK_FACTORY(C_FuncUnit)
-IMPLEMENT_FALLBACK_FACTORY(CBaseFuncMapBoundary)
-#endif // HL2WARS_DLL
-#endif // 0
-
-IClientNetworkable *ClientClassFactory( boost::python::object cls_type, int entnum, int serialNum )
+C_BaseEntity *ClientClassFactory( boost::python::object cls_type, int entnum, int serialNum )
 {
+	C_BaseEntity *pResult = NULL;
+
 	try	
 	{
 #if 0
@@ -125,29 +45,25 @@ IClientNetworkable *ClientClassFactory( boost::python::object cls_type, int entn
 			throw boost::python::error_already_set(); 
 		}
 #endif // 0
+
 		// Spawn and initialize the entity
 		boost::python::object inst = cls_type();
-		C_BaseEntity *pRet = boost::python::extract<C_BaseEntity *>(inst);
-		if( !pRet ) {
+		pResult = boost::python::extract<C_BaseEntity *>( inst );
+		if( !pResult ) {
 			Warning("Invalid client entity\n" );
 			return NULL;
 		}
 
-		pRet->SetPyInstance( inst );
-		pRet->Init( entnum, serialNum );
-		return pRet;
+		pResult->SetPyInstance( inst );
+		pResult->Init( entnum, serialNum );
 	}
 	catch(boost::python::error_already_set &)
 	{
-		Warning("Failed to create python client side entity, falling back to base c++ class\n");
+		Warning( "Failed to create python client side entity, falling back to base c++ class\n" );
 		PyErr_Print();
-
-		// Call the correct fallback factory
-		// TODO: is this really needed?
-		IClientNetworkable *pResult = NULL;
-
-		return pResult;
 	}
+
+	return pResult;
 }
 
 void InitAllPythonEntities()
