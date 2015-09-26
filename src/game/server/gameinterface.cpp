@@ -3012,25 +3012,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameClients, IServerGameClients, INTERF
 //-----------------------------------------------------------------------------
 bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 {	
-// =======================================
-// PySource Additions
-// =======================================
-#ifdef ENABLE_PYTHON
-	// The client must directly be informed about the python classes to avoid recv/send table mismatches
-	// NOTE: Will use loopback through wars extension
-	// NOTE2: Dedicated servers send the message in the client active. They seem to check against CBaseEntity recv table.
-	if( !engine->IsDedicatedServer() && ENTINDEX(pEdict) == 1 )
-	{
-		FullClientUpdatePyNetworkClsByEdict(pEdict);
-	}
-
-	// Make sure Python network variables are marked correctly for the new player
-	PyNetworkVarsResetClientTransmitBits( ENTINDEX(pEdict) - 1 );
-#endif // ENABLE_PYTHON
-// =======================================
-// END PySource Additions
-// =======================================
-
 #ifdef HL2WARS_DLL
 	// Reset known entities for the new player
 	FogOfWarMgr()->ResetToKnown( ENTINDEX(pEdict) - 1 );

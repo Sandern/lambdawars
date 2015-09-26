@@ -183,8 +183,8 @@ void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 
 		// Send message
 		UserMessageBegin(filter, "PyNetworkCls");
-		WRITE_STRING(p->m_pNetworkName);
-		WRITE_STRING(p->m_pNetworkedClass->m_pNetworkName);
+		WRITE_WORD( p->m_ClassID );
+		WRITE_STRING( p->m_pNetworkedClass->m_pNetworkName );
 		MessageEnd();
 
 		p = p->m_pPyNext;
@@ -269,9 +269,7 @@ void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 			continue;
 		}
 
-		int lenClientClass = V_strlen( p->m_pNetworkName );
-		messageData.Put( &lenClientClass, sizeof( lenClientClass ) );
-		messageData.Put( p->m_pNetworkName, lenClientClass );
+		messageData.Put( &(p->m_ClassID), sizeof( p->m_ClassID ) );
 
 		int lenNetworkName = V_strlen( p->m_pNetworkedClass->m_pNetworkName );
 		messageData.Put( &lenNetworkName, sizeof( lenNetworkName ) );

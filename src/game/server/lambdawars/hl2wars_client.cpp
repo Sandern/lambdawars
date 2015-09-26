@@ -98,14 +98,24 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 	CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( CBaseEntity::Instance( pEdict ) );
 	FinishClientPutInServer( pPlayer );
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		// Give a full update of the networked python entities
-		// NOTE: Only dedicated servers and clients. The listened host is setup through ClientConnect
 		if( engine->IsDedicatedServer() || ENTINDEX(pEdict) > 1 )
 		{
+			// NOTE: Only dedicated servers and clients
 			FullClientUpdatePyNetworkCls( pPlayer );
+		}
+		else
+		{
+			// Uses loopback for listened host
+			// TODO: Maybe setup this up to use Steam P2P for other players, 
+			//but tends to have a too big delay sometimes
+			FullClientUpdatePyNetworkClsByEdict( pEdict );
 		}
 
 #ifdef CLIENT_DLL
@@ -145,6 +155,9 @@ void ClientActive( edict_t *pEdict, bool bLoadGame )
 		}
 	}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// Notify gamerules
 	if( HL2WarsGameRules() )

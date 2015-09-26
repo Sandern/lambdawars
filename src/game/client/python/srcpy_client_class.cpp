@@ -80,6 +80,9 @@ void InitAllPythonEntities()
 
 static CUtlDict< NetworkedClass*, unsigned short > m_NetworkClassDatabase;
 
+//-----------------------------------------------------------------------------
+// Purpose: Finds Python client class by Name
+//-----------------------------------------------------------------------------
 PyClientClassBase *FindPyClientClass( const char *pName )
 {
 	PyClientClassBase *p = g_pPyClientClassHead;
@@ -94,6 +97,26 @@ PyClientClassBase *FindPyClientClass( const char *pName )
 	return NULL;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Finds Python client class by ID
+//-----------------------------------------------------------------------------
+PyClientClassBase *FindPyClientClassByID( int classID )
+{
+	PyClientClassBase *p = g_pPyClientClassHead;
+	while( p )
+	{
+		if ( p->m_ClassID == classID )
+		{
+			return p;
+		}
+		p = p->m_pPyNext;
+	}
+	return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Finds Python client class by Network class Name
+//-----------------------------------------------------------------------------
 PyClientClassBase *FindPyClientClassToNetworkClass( const char *pNetworkName )
 {
 	PyClientClassBase *p = g_pPyClientClassHead;
@@ -108,6 +131,9 @@ PyClientClassBase *FindPyClientClassToNetworkClass( const char *pNetworkName )
 	return NULL;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Validates existing entities
+//-----------------------------------------------------------------------------
 void CheckEntities( PyClientClassBase *pCC, boost::python::object pyClass )
 {
 	int iHighest = ClientEntityList().GetHighestEntityIndex();
@@ -215,13 +241,13 @@ void NetworkedClass::AttachClientClass( PyClientClassBase *pClientClass )
 // Message handler for PyNetworkCls
 void __MsgFunc_PyNetworkCls( bf_read &msg )
 {
-	char clientClass[PYNETCLS_BUFSIZE];
+	int iClassID;
 	char networkName[PYNETCLS_BUFSIZE];
 
-	msg.ReadString(clientClass, PYNETCLS_BUFSIZE);
-	msg.ReadString(networkName, PYNETCLS_BUFSIZE);
+	iClassID = msg.ReadWord();
+	msg.ReadString( networkName, PYNETCLS_BUFSIZE );
 
-	DbgStrPyMsg( "__MsgFunc_PyNetworkCls: Registering Python network class message %s %s\n", clientClass, networkName );
+	DbgStrPyMsg( "__MsgFunc_PyNetworkCls: Registering Python network class message %d %s\n", iClassID, networkName );
 
 	// Get module path
 	const char *pch = V_strrchr( networkName, '.' );
@@ -239,10 +265,10 @@ void __MsgFunc_PyNetworkCls( bf_read &msg )
 	SrcPySystem()->Import( modulePath );
 
 	// Read which client class we are modifying
-	PyClientClassBase *p = FindPyClientClass( clientClass );
+	PyClientClassBase *p = FindPyClientClassByID( iClassID );
 	if( !p )
 	{
-		Warning( "__MsgFunc_PyNetworkCls: Invalid networked class %s\n", clientClass );
+		Warning( "__MsgFunc_PyNetworkCls: Invalid networked class %d\n", iClassID );
 		return;
 	}
 
@@ -269,25 +295,20 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 		return;
 	}
 
-	//WarsEntityClassesMessage_t *entityClassesMsg = (WarsEntityClassesMessage_t *)data.Base();
-
 	data.SeekGet( CUtlBuffer::SEEK_HEAD, sizeof(WarsEntityClassesMessage_t) );
 
 	int nCount = data.GetInt();
 
 	for( int i = 0; i < nCount; i++ )
 	{
-		int lenClientClass = data.GetInt();
-		char *clientClass = (char *)stackalloc( lenClientClass + 1 );
-		data.Get( clientClass, lenClientClass );
-		clientClass[lenClientClass] = 0;
+		int iClass = data.GetInt();
 
 		int lenNetworkName = data.GetInt();
 		char *networkName = (char *)stackalloc( lenNetworkName + 1 );
 		data.Get( networkName, lenNetworkName );
 		networkName[lenNetworkName] = 0;
 		
-		DbgStrPyMsg( "WarsNet_ReceiveEntityClasses: Registering Python network class message %s %s\n", clientClass, networkName );
+		DbgStrPyMsg( "WarsNet_ReceiveEntityClasses: Registering Python network class message %d %s\n", iClass, networkName );
 
 		// Get module path
 		const char *pch = V_strrchr( networkName, '.' );
@@ -305,10 +326,10 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 		SrcPySystem()->Import( modulePath );
 
 		// Read which client class we are modifying
-		PyClientClassBase *p = FindPyClientClass( clientClass );
+		PyClientClassBase *p = FindPyClientClassByID( iClass );
 		if( !p )
 		{
-			Warning( "WarsNet_ReceiveEntityClasses: Invalid networked class %s\n", clientClass );
+			Warning( "WarsNet_ReceiveEntityClasses: Invalid networked class id %d\n", iClass );
 			return;
 		}
 
