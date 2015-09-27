@@ -13,6 +13,7 @@
 #if HL2WARS_DLL
 #include "hl2wars_player.h"
 #include "collisionutils.h"
+#include "wars_util.h"
 #endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -262,24 +263,6 @@ bool CServerNetworkProperty::IsInPVS( const edict_t *pRecipient, const void *pvs
 #endif // USE_NEW_ISINPVS
 
 	return false;		// not visible
-}
-
-static inline bool TestPointInCamera( const Vector &vPoint, const Vector &vCamLimits, const matrix3x4_t &matAngles, const Vector &vPlayerPos )
-{
-	// Get point direction
-	Vector vecToTarget = vPoint - vPlayerPos;
-	vecToTarget.NormalizeInPlace();
-
-	// Transform into player space
-	VectorITransform( vecToTarget, matAngles, vecToTarget );
-
-	// Test against camera angles of player
-	if( vecToTarget.y > -vCamLimits.y && vecToTarget.y < vCamLimits.y &&
-		vecToTarget.z > -vCamLimits.z && vecToTarget.z < vCamLimits.z )
-	{
-		return true;
-	}
-	return false;
 }
 
 //-----------------------------------------------------------------------------

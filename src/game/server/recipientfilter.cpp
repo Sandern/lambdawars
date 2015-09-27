@@ -12,6 +12,8 @@
 
 #ifdef HL2WARS_DLL
 #include "fowmgr.h"
+#include "hl2wars_player.h"
+#include "wars_util.h"
 #endif // HL2WARS_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -252,20 +254,28 @@ void CRecipientFilter::AddRecipientsByPVS( const Vector& origin )
 	}
 	else
 	{
+#ifdef HL2WARS_DLL
+		// Due the open maps, players pretty much view all leafs all the time, 
+		// so the orignal check does not make much sense.
+		// Since players look down all the time, better to cull off based on 
+		// the camera angles (but may be too aggresive in some cases).
+		int i;
+		for ( i = 1; i <= gpGlobals->maxClients; i++ )
+		{
+			CHL2WarsPlayer *player = ToHL2WarsPlayer( UTIL_PlayerByIndex( i ) );
+			if ( !player ||
+				 FogOfWarMgr()->PointInFOWByPlayerIndex( origin, i ) ||
+				 !UTIL_Wars_InPlayerView( player, origin ) )
+				continue;
+
+			AddRecipient( player );
+		}
+#else
 		CPlayerBitVec playerbits;
 		engine->Message_DetermineMulticastRecipients( false, origin, playerbits );
 		AddPlayersFromBitMask( playerbits );
-	}
-
-#ifdef HL2WARS_DLL
-	// Filter when in the fog of war
-	for( int i = 0; i < GetRecipientCount(); i++ )
-	{
-		int iIdx = GetRecipientIndex( i );
-		if( FogOfWarMgr()->PointInFOWByPlayerIndex( origin, iIdx ) )
-			this->RemoveRecipientByPlayerIndex( iIdx );
-	}
 #endif // HL2WARS_DLL
+	}
 }
 
 void CRecipientFilter::RemoveRecipientsByPVS( const Vector& origin )
