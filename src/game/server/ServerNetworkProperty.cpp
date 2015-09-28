@@ -355,7 +355,7 @@ bool CServerNetworkProperty::IsInPVS( const CCheckTransmitInfo *pInfo )
 		AngleMatrix( pRecipientPlayer->GetAbsAngles(), matAngles );
 
 		// Now check if the entity is within the camera limits
-		const Vector &center = GetOuter()->WorldSpaceCenter();
+		const Vector &center = GetOuter()->GetAbsOrigin();
 		if( GetOuter()->IsPointSized() )
 		{
 			if( TestPointInCamera( center, vCamLimits, matAngles, vPlayerPos ) )
