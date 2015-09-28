@@ -170,6 +170,8 @@ void CWarsGameServer::ProcessMessages()
 						Msg("Starting wars game server with following settings: ");
 						KeyValuesDumpAsDevMsg( pGameData, 0, 0 );
 
+						g_ServerGameDLL.ApplyGameSettings( pGameData );
+
 						// Game server is already running, so we have an IP
 						// Tell lobby owner the game is accepted and players can connect to the server
 						acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
@@ -177,7 +179,6 @@ void CWarsGameServer::ProcessMessages()
 						acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
 						
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &acceptGameMsg, sizeof(acceptGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
-						g_ServerGameDLL.ApplyGameSettings( pGameData );
 					}
 				}
 				break;
