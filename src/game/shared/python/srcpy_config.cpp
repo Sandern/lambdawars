@@ -89,6 +89,9 @@ PyMODINIT_FUNC PyInit__opcode(void);
 PyMODINIT_FUNC PyMarshal_Init(void);
 PyMODINIT_FUNC PyInit_imp(void);
 
+/* Statically added libraries that are normally not static */
+PyMODINIT_FUNC PyInit__socket(void);
+
 }
 
 struct _inittab _PySourceImport_Inittab[] = {
@@ -177,6 +180,9 @@ struct _inittab _PySourceImport_Inittab[] = {
     {"atexit", PyInit_atexit},
     {"_stat", PyInit__stat},
     {"_opcode", PyInit__opcode},
+
+	/* Additional libraries */
+	{"_socket", PyInit__socket},
 
     /* Sentinel */
     {0, 0}

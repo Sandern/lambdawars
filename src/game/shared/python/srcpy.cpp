@@ -48,7 +48,9 @@ namespace bp = boost::python;
 
 #if PY_VERSION_HEX >= 0x03000000
 // Stubs for Python
-const char *Py_GetBuildInfo(void) { return "SourcePy"; }
+// Py_GetBuildInfo is used by sys.version and platform.python_implementation depends the format. 
+// Don't care too much what it exactly contains.
+const char *Py_GetBuildInfo(void) { return "v3.4.3:374f501f4567, Oct 3 2015, 02:16:59"; }
 const char *_Py_hgversion(void) { return "1"; }
 const char *_Py_hgidentifier(void) { return "srcpy"; }
 #endif
