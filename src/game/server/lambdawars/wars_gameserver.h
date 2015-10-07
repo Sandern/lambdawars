@@ -42,6 +42,9 @@ public:
 	KeyValues *GetLocalPlayerGameData();
 
 private:
+	bool ValidateMapExists( KeyValues *pGameData ) const;
+
+private:
 	// Tells us when we have successfully connected to Steam
 	STEAM_GAMESERVER_CALLBACK( CWarsGameServer, OnSteamServersConnected, SteamServersConnected_t, m_CallbackSteamServersConnected );
 

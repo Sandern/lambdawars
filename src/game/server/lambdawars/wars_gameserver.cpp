@@ -2,6 +2,7 @@
 #include "cbase.h"
 #include "wars_gameserver.h"
 #include "gameinterface.h"
+#include "filesystem.h"
 #include "tier1/utlbuffer.h"
 #include "wars_network.h"
 
@@ -160,8 +161,16 @@ void CWarsGameServer::ProcessMessages()
 						Warning( "Denying game server request: provided password does not match wars_gameserver_password setting\n" );
 						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
 					}
+					// Verify it has a valid map. Could get stuck on loading otherwise!
+					else if( !ValidateMapExists( pGameData ) )
+					{
+						Warning( "Denying game server request: no map is set or map does not exists.\n" );
+						steamgameserverapicontext->SteamGameServerNetworking()->SendP2PPacket( messageData->steamIDRemote, &denyGameMsg, sizeof(denyGameMsg), k_EP2PSendReliable, WARSNET_CLIENT_CHANNEL );
+					}
 					else
 					{
+	
+
 						SetState( k_EGameServer_StartingGame );
 						m_ActiveGameLobbySteamID = requestMsg->lobbySteamId;
 
@@ -174,7 +183,13 @@ void CWarsGameServer::ProcessMessages()
 
 						// Game server is already running, so we have an IP
 						// Tell lobby owner the game is accepted and players can connect to the server
-						acceptGameMsg.publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
+						uint32 publicIP = steamgameserverapicontext->SteamGameServer()->GetPublicIP();
+						if( publicIP == 0 )
+						{
+							Warning("CWarsGameServer: Game server has no valid public IP according to Steam.");
+						}
+
+						acceptGameMsg.publicIP = publicIP;
 						acceptGameMsg.gamePort = hostport.GetInt();
 						acceptGameMsg.serverSteamID = steamgameserverapicontext->SteamGameServer()->GetSteamID().ConvertToUint64();
 						
@@ -354,6 +369,22 @@ void CWarsGameServer::RunFrame()
 		UpdateServer();
 		m_bUpdatingServer = false;
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CWarsGameServer::ValidateMapExists( KeyValues *pGameData ) const
+{
+	const char *pMap = pGameData->GetString( "game/mission", NULL );
+	if( !pMap )
+	{
+		return false;
+	}
+
+	char path[MAX_PATH];
+	V_snprintf( path, sizeof( path ), "maps\\%s.bsp", pMap );
+	return filesystem->FileExists( path );
 }
 
 //-----------------------------------------------------------------------------

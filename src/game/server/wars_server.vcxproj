@@ -1688,6 +1688,7 @@ cscript //nologo ..\..\dllcopy.wsf "$(TargetDir)/$(TargetName).pdb" "$(TargetNam
     <Library Include="..\..\lib\public\tier1.lib" />
     <Library Include="..\..\lib\public\tier2.lib" />
     <Library Include="..\..\lib\public\tier3.lib" />
+    <Library Include="..\..\lib\public\unicodedata.lib" />
     <Library Include="..\..\lib\public\vgui_controls.lib" />
     <Library Include="..\..\lib\public\vstdlib.lib" />
     <Library Include="..\..\thirdparty\python\PCbuild\_socket.lib" />

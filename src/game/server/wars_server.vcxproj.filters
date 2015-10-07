@@ -3962,5 +3962,8 @@
     <Library Include="..\..\thirdparty\python\PCbuild\_socket.lib">
       <Filter>Link Libraries</Filter>
     </Library>
+    <Library Include="..\..\lib\public\unicodedata.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
   </ItemGroup>
 </Project>

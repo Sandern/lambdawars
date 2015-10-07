@@ -91,6 +91,7 @@ PyMODINIT_FUNC PyInit_imp(void);
 
 /* Statically added libraries that are normally not static */
 PyMODINIT_FUNC PyInit__socket(void);
+PyMODINIT_FUNC PyInit_unicodedata(void);
 
 }
 
@@ -183,6 +184,7 @@ struct _inittab _PySourceImport_Inittab[] = {
 
 	/* Additional libraries */
 	{"_socket", PyInit__socket},
+	{"unicodedata", PyInit_unicodedata},
 
     /* Sentinel */
     {0, 0}
