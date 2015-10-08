@@ -64,6 +64,12 @@ boost::python::tuple PyGetLobbyChatEntry( CSteamID steamIDLobby, int iChatID, CS
 boost::python::object PyGetStatFloat( const char *name );
 boost::python::object PyGetStatInt( const char *name );
 
+// Wrapper functions for GameServer
+boost::python::object PySteamUser_GetAuthSessionTicket();
+#ifndef CLIENT_DLL
+boost::python::object PyGameServer_GetAuthSessionTicket();
+#endif // CLIENT_DLL
+
 // Wrapper functions Matchmaking Servers
 class PySteamMatchmakingServerListResponse : public ISteamMatchmakingServerListResponse
 {

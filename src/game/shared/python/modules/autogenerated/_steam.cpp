@@ -3222,6 +3222,16 @@ BOOST_PYTHON_MODULE(_steam){
     
     }
 
+    { //::PySteamUser_GetAuthSessionTicket
+    
+        typedef ::boost::python::api::object ( *SteamUser_GetAuthSessionTicket_function_type )(  );
+        
+        bp::def( 
+            "SteamUser_GetAuthSessionTicket"
+            , SteamUser_GetAuthSessionTicket_function_type( &::PySteamUser_GetAuthSessionTicket ) );
+    
+    }
+
     { //::SteamAPI_RunCallbacks
     
         typedef void ( *SteamAPI_RunCallbacks_function_type )(  );
@@ -7054,6 +7064,16 @@ BOOST_PYTHON_MODULE(_steam){
         }
     }
 
+    { //::PyGameServer_GetAuthSessionTicket
+    
+        typedef ::boost::python::api::object ( *GameServer_GetAuthSessionTicket_function_type )(  );
+        
+        bp::def( 
+            "GameServer_GetAuthSessionTicket"
+            , GameServer_GetAuthSessionTicket_function_type( &::PyGameServer_GetAuthSessionTicket ) );
+    
+    }
+
     { //::PyGetLobbyChatEntry
     
         typedef ::boost::python::tuple ( *PyGetLobbyChatEntry_function_type )( ::CSteamID,int,::CSteamID * );
@@ -7106,6 +7126,16 @@ BOOST_PYTHON_MODULE(_steam){
             "PySendLobbyChatMsg"
             , PySendLobbyChatMsg_function_type( &::PySendLobbyChatMsg )
             , ( bp::arg("steamIDLobby"), bp::arg("pvMsgBody") ) );
+    
+    }
+
+    { //::PySteamUser_GetAuthSessionTicket
+    
+        typedef ::boost::python::api::object ( *SteamUser_GetAuthSessionTicket_function_type )(  );
+        
+        bp::def( 
+            "SteamUser_GetAuthSessionTicket"
+            , SteamUser_GetAuthSessionTicket_function_type( &::PySteamUser_GetAuthSessionTicket ) );
     
     }
 
