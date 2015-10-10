@@ -91,14 +91,14 @@ boost::python::object PySteamUser_GetAuthSessionTicket()
 		throw boost::python::error_already_set(); 
 	}
 
-	char rgchToken[1024];
+	uint8 m_rgubTicket[1024];
 	uint32 unTokenLen = 0;
-	steamapicontext->SteamUser()->GetAuthSessionTicket( rgchToken, sizeof( rgchToken ), &unTokenLen );
+	steamapicontext->SteamUser()->GetAuthSessionTicket( m_rgubTicket, sizeof( m_rgubTicket ), &unTokenLen );
 
 	return boost::python::object(
 		boost::python::handle<>(
 			boost::python::borrowed( 
-				PyByteArray_FromStringAndSize( rgchToken, unTokenLen ) 
+				PyByteArray_FromStringAndSize( (const char *)m_rgubTicket, unTokenLen ) 
 			)
 		)
 	);
@@ -113,14 +113,14 @@ boost::python::object PyGameServer_GetAuthSessionTicket()
 		throw boost::python::error_already_set(); 
 	}
 
-	char rgchToken[1024];
+	uint8 m_rgubTicket[1024];
 	uint32 unTokenLen = 0;
-	steamgameserverapicontext->SteamGameServer()->GetAuthSessionTicket( rgchToken, sizeof( rgchToken ), &unTokenLen );
+	steamgameserverapicontext->SteamGameServer()->GetAuthSessionTicket( m_rgubTicket, sizeof( m_rgubTicket ), &unTokenLen );
 
 	return boost::python::object(
 		boost::python::handle<>(
 			boost::python::borrowed( 
-				PyByteArray_FromStringAndSize( rgchToken, unTokenLen ) 
+				PyByteArray_FromStringAndSize( (const char *)m_rgubTicket, unTokenLen ) 
 			)
 		)
 	);
