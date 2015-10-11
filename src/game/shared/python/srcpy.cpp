@@ -519,6 +519,10 @@ bool CSrcPython::PostInitInterpreter( bool bStandAloneInterpreter )
 //-----------------------------------------------------------------------------
 bool CSrcPython::PreShutdownInterpreter( bool bIsStandAlone )
 {
+	// Allows actions before shutting down in game code. Mainly needed to ensure
+	// match data is uploaded to server.
+	CallSignalNoArgs( Get("preshutdown", "core.signals", true) );
+
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
 
