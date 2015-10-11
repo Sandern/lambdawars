@@ -19,7 +19,17 @@
 #include "isteamapps.h"
 #include "isteamnetworking.h"
 #include "isteamremotestorage.h"
+#include "isteamscreenshots.h"
+#include "isteammusic.h"
+#include "isteammusicremote.h"
 #include "isteamhttp.h"
+#include "isteamunifiedmessages.h"
+#include "isteamcontroller.h"
+#include "isteamugc.h"
+#include "isteamapplist.h"
+#include "isteamhtmlsurface.h"
+#include "isteaminventory.h"
+#include "isteamvideo.h"
 
 #if defined( _PS3 )
 #include "steamps3params.h"
@@ -113,6 +123,15 @@ S_API ISteamMatchmakingServers *S_CALLTYPE SteamMatchmakingServers();
 S_API ISteamRemoteStorage *S_CALLTYPE SteamRemoteStorage();
 S_API ISteamScreenshots *S_CALLTYPE SteamScreenshots();
 S_API ISteamHTTP *S_CALLTYPE SteamHTTP();
+S_API ISteamUnifiedMessages *S_CALLTYPE SteamUnifiedMessages();
+S_API ISteamController *S_CALLTYPE SteamController();
+S_API ISteamUGC *S_CALLTYPE SteamUGC();
+S_API ISteamAppList *S_CALLTYPE SteamAppList();
+S_API ISteamMusic *S_CALLTYPE SteamMusic();
+S_API ISteamMusicRemote *S_CALLTYPE SteamMusicRemote();
+S_API ISteamHTMLSurface *S_CALLTYPE SteamHTMLSurface();
+S_API ISteamInventory *S_CALLTYPE SteamInventory();
+S_API ISteamVideo *S_CALLTYPE SteamVideo();
 #ifdef _PS3
 S_API ISteamPS3OverlayRender *S_CALLTYPE SteamPS3OverlayRender();
 #endif
@@ -390,7 +409,17 @@ public:
 	ISteamMatchmakingServers*	SteamMatchmakingServers()	{ return m_pSteamMatchmakingServers; }
 	ISteamNetworking*	SteamNetworking()					{ return m_pSteamNetworking; }
 	ISteamRemoteStorage* SteamRemoteStorage()				{ return m_pSteamRemoteStorage; }
+	ISteamScreenshots*	SteamScreenshots()					{ return m_pSteamScreenshots; }
 	ISteamHTTP*			SteamHTTP()							{ return m_pSteamHTTP; }
+	ISteamUnifiedMessages*	SteamUnifiedMessages()			{ return m_pSteamUnifiedMessages; }
+	ISteamController*	SteamController()					{ return m_pController; }
+	ISteamUGC*			SteamUGC()							{ return m_pSteamUGC; }
+	ISteamAppList*		SteamAppList()						{ return m_pSteamAppList; }
+	ISteamMusic*		SteamMusic()						{ return m_pSteamMusic; }
+	ISteamMusicRemote*	SteamMusicRemote()					{ return m_pSteamMusicRemote; }
+	ISteamHTMLSurface*	SteamHTMLSurface()					{ return m_pSteamHTMLSurface; }
+	ISteamInventory*	SteamInventory()					{ return m_pSteamInventory; }
+	ISteamVideo*		SteamVideo()						{ return m_pSteamVideo; }
 #ifdef _PS3
 	ISteamPS3OverlayRender* SteamPS3OverlayRender()		{ return m_pSteamPS3OverlayRender; }
 #endif
@@ -405,7 +434,17 @@ private:
 	ISteamMatchmakingServers	*m_pSteamMatchmakingServers;
 	ISteamNetworking	*m_pSteamNetworking;
 	ISteamRemoteStorage *m_pSteamRemoteStorage;
+	ISteamScreenshots	*m_pSteamScreenshots;
 	ISteamHTTP			*m_pSteamHTTP;
+	ISteamUnifiedMessages*m_pSteamUnifiedMessages;
+	ISteamController	*m_pController;
+	ISteamUGC			*m_pSteamUGC;
+	ISteamAppList		*m_pSteamAppList;
+	ISteamMusic			*m_pSteamMusic;
+	ISteamMusicRemote	*m_pSteamMusicRemote;
+	ISteamHTMLSurface	*m_pSteamHTMLSurface;
+	ISteamInventory		*m_pSteamInventory;
+	ISteamVideo			*m_pSteamVideo;
 #ifdef _PS3
 	ISteamPS3OverlayRender *m_pSteamPS3OverlayRender;
 #endif
@@ -427,6 +466,20 @@ inline void CSteamAPIContext::Clear()
 	m_pSteamMatchmakingServers = NULL;
 	m_pSteamNetworking = NULL;
 	m_pSteamRemoteStorage = NULL;
+	m_pSteamHTTP = NULL;
+	m_pSteamScreenshots = NULL;
+	m_pSteamMusic = NULL;
+	m_pSteamUnifiedMessages = NULL;
+	m_pController = NULL;
+	m_pSteamUGC = NULL;
+	m_pSteamAppList = NULL;
+	m_pSteamMusic = NULL;
+	m_pSteamMusicRemote= NULL;
+	m_pSteamHTMLSurface = NULL;
+	m_pSteamInventory = NULL;
+#ifdef _PS3
+	m_pSteamPS3OverlayRender = NULL;
+#endif
 }
 
 // This function must be inlined so the module using steam_api.dll gets the version names they want.
@@ -474,9 +527,59 @@ inline bool CSteamAPIContext::Init()
 	if ( !m_pSteamRemoteStorage )
 		return false;
 
+	m_pSteamScreenshots = SteamClient()->GetISteamScreenshots( hSteamUser, hSteamPipe, STEAMSCREENSHOTS_INTERFACE_VERSION );
+	if ( !m_pSteamScreenshots )
+		return false;
+
 	m_pSteamHTTP = SteamClient()->GetISteamHTTP( hSteamUser, hSteamPipe, STEAMHTTP_INTERFACE_VERSION );
 	if ( !m_pSteamHTTP )
 		return false;
+
+	m_pSteamUnifiedMessages = SteamClient()->GetISteamUnifiedMessages( hSteamUser, hSteamPipe, STEAMUNIFIEDMESSAGES_INTERFACE_VERSION );
+	if ( !m_pSteamUnifiedMessages )
+		return false;
+
+	m_pController = SteamClient()->GetISteamController( hSteamUser, hSteamPipe, STEAMCONTROLLER_INTERFACE_VERSION );
+	if ( !m_pController )
+		return false;
+
+	m_pSteamUGC = SteamClient()->GetISteamUGC( hSteamUser, hSteamPipe, STEAMUGC_INTERFACE_VERSION );
+	if ( !m_pSteamUGC )
+		return false;
+
+	m_pSteamAppList = SteamClient()->GetISteamAppList( hSteamUser, hSteamPipe, STEAMAPPLIST_INTERFACE_VERSION );
+	if ( !m_pSteamAppList )
+		return false;
+
+	m_pSteamMusic = SteamClient()->GetISteamMusic( hSteamUser, hSteamPipe, STEAMMUSIC_INTERFACE_VERSION );
+	if ( !m_pSteamMusic )
+	{
+		return false;
+	}
+
+	m_pSteamMusicRemote = SteamClient()->GetISteamMusicRemote( hSteamUser, hSteamPipe, STEAMMUSICREMOTE_INTERFACE_VERSION );
+	if ( !m_pSteamMusicRemote )
+	{
+		return false;
+	}
+
+	m_pSteamHTMLSurface = SteamClient()->GetISteamHTMLSurface( hSteamUser, hSteamPipe, STEAMHTMLSURFACE_INTERFACE_VERSION );
+	if ( !m_pSteamHTMLSurface )
+	{
+		return false;
+	}
+
+	m_pSteamInventory = SteamClient()->GetISteamInventory( hSteamUser, hSteamPipe, STEAMINVENTORY_INTERFACE_VERSION );
+	if ( !m_pSteamInventory )
+	{
+		return false;
+	}
+
+	m_pSteamVideo = SteamClient()->GetISteamVideo( hSteamUser, hSteamPipe, STEAMVIDEO_INTERFACE_VERSION );
+	if ( !m_pSteamVideo )
+	{
+		return false;
+	}
 
 #ifdef _PS3
 	m_pSteamPS3OverlayRender = SteamClient()->GetISteamPS3OverlayRender();
