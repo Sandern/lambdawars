@@ -1526,9 +1526,6 @@ void CHLClient::HudUpdate( bool bActive )
 	C_BaseTempEntity::CheckDynamicTempEnts();
 
 #ifdef HL2WARS_DLL
-	// Hack for different steam_api dll
-	SteamAPI_RunCallbacks();
-
 	WarsNet_ProcessWarsMessages();
 #endif // HL2WARS_DLL
 }

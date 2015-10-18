@@ -70,9 +70,6 @@ boost::python::object PySteamUser_GetAuthSessionTicket();
 boost::python::object PyGameServer_GetAuthSessionTicket();
 #endif // CLIENT_DLL
 
-// Wrapper functions SteamUGC
-boost::python::tuple PyGetItemInstallInfo( PublishedFileId_t nPublishedFileID );
-
 // Wrapper functions Matchmaking Servers
 class PySteamMatchmakingServerListResponse : public ISteamMatchmakingServerListResponse
 {
