@@ -556,10 +556,7 @@ struct C_SmokeTrail_wrapper : C_SmokeTrail, bp::wrapper< C_SmokeTrail > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ClientClass* GetClientClass() {
-#if defined(_WIN32) // POSIX: TODO
-        if( GetCurrentThreadId() != g_hPythonThreadID )
-            return C_SmokeTrail::GetClientClass();
-#endif // _WIN32
+        PY_OVERRIDE_CHECK( C_SmokeTrail, GetClientClass )
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
             try

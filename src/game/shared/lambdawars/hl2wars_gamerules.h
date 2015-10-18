@@ -26,7 +26,6 @@
 	#include "hl2wars_player.h"
 	#include "utlqueue.h"
 	#include "playerclass_info_parse.h"
-
 #endif
 
 
@@ -140,7 +139,7 @@ public:
 
 	// Client connection/disconnection
 	virtual bool ClientConnected( edict_t *pEntity, const char *name, const char *address, char *reject, int maxrejectlen ); // a client just connected to the server (player hasn't spawned yet)
-	virtual bool PyClientConnected( int clientindex, const char *name, const char *address, char *reject, int maxrejectlen ) { return true; }
+	virtual boost::python::object PyClientConnected( int clientindex, const char *name, const char *address ) { return boost::python::object(); }
 	virtual void ClientDisconnected( edict_t *client ); // a client just disconnected from the server
 	virtual void PyClientDisconnected( CBasePlayer *client ) {}
 	virtual void ClientActive( CBasePlayer *client ) {}

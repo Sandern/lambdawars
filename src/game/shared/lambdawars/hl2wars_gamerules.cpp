@@ -547,11 +547,25 @@ CAmmoDef* GetAmmoDef()
 
 bool CHL2WarsGameRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
 {
-	if ( pEntity )
+	int clientIndex = pEntity ? ENTINDEX(pEntity) : -1;
+
+	try
 	{
-		return PyClientConnected(ENTINDEX(pEntity), pszName, pszAddress, reject, maxrejectlen) && BaseClass::ClientConnected(pEntity, pszName, pszAddress, reject, maxrejectlen);
+		boost::python::object result = PyClientConnected( clientIndex, pszName, pszAddress );
+		if (result)
+		{
+			const char *rejectReason = boost::python::extract< const char * >( result );
+
+			V_strncpy( reject, rejectReason, maxrejectlen);
+			return true;
+		}
 	}
-	return PyClientConnected(-1, pszName, pszAddress, reject, maxrejectlen) && BaseClass::ClientConnected(pEntity, pszName, pszAddress, reject, maxrejectlen);
+	catch( boost::python::error_already_set & )
+	{
+		PyErr_Print();
+	}
+
+	return BaseClass::ClientConnected(pEntity, pszName, pszAddress, reject, maxrejectlen);
 }
 
 void CHL2WarsGameRules::ClientDisconnected( edict_t *client ) 

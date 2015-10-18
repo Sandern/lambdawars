@@ -331,23 +331,23 @@ struct CHL2WarsGameRules_wrapper : CHL2WarsGameRules, bp::wrapper< CHL2WarsGameR
         CHL2WarsGameRules::Precache( );
     }
 
-    virtual bool PyClientConnected( int clientindex, char const * name, char const * address, char * reject, int maxrejectlen ) {
+    virtual ::boost::python::api::object PyClientConnected( int clientindex, char const * name, char const * address ) {
         PY_OVERRIDE_CHECK( CHL2WarsGameRules, PyClientConnected )
         PY_OVERRIDE_LOG( _gamerules, CHL2WarsGameRules, PyClientConnected )
         bp::override func_ClientConnected = this->get_override( "ClientConnected" );
         if( func_ClientConnected.ptr() != Py_None )
             try {
-                return func_ClientConnected( clientindex, name, address, reject, maxrejectlen );
+                return func_ClientConnected( clientindex, name, address );
             } catch(bp::error_already_set &) {
                 PyErr_Print();
-                return this->CHL2WarsGameRules::PyClientConnected( clientindex, name, address, reject, maxrejectlen );
+                return this->CHL2WarsGameRules::PyClientConnected( clientindex, name, address );
             }
         else
-            return this->CHL2WarsGameRules::PyClientConnected( clientindex, name, address, reject, maxrejectlen );
+            return this->CHL2WarsGameRules::PyClientConnected( clientindex, name, address );
     }
     
-    bool default_ClientConnected( int clientindex, char const * name, char const * address, char * reject, int maxrejectlen ) {
-        return CHL2WarsGameRules::PyClientConnected( clientindex, name, address, reject, maxrejectlen );
+    ::boost::python::api::object default_ClientConnected( int clientindex, char const * name, char const * address ) {
+        return CHL2WarsGameRules::PyClientConnected( clientindex, name, address );
     }
 
     virtual void PyClientDisconnected( ::CBasePlayer * client ) {
@@ -2749,14 +2749,14 @@ void register_CHL2WarsGameRules_class(){
         }
         { //::CHL2WarsGameRules::PyClientConnected
         
-            typedef bool ( ::CHL2WarsGameRules::*ClientConnected_function_type )( int,char const *,char const *,char *,int ) ;
-            typedef bool ( CHL2WarsGameRules_wrapper::*default_ClientConnected_function_type )( int,char const *,char const *,char *,int ) ;
+            typedef ::boost::python::api::object ( ::CHL2WarsGameRules::*ClientConnected_function_type )( int,char const *,char const * ) ;
+            typedef ::boost::python::api::object ( CHL2WarsGameRules_wrapper::*default_ClientConnected_function_type )( int,char const *,char const * ) ;
             
             CHL2WarsGameRules_exposer.def( 
                 "ClientConnected"
                 , ClientConnected_function_type(&::CHL2WarsGameRules::PyClientConnected)
                 , default_ClientConnected_function_type(&CHL2WarsGameRules_wrapper::default_ClientConnected)
-                , ( bp::arg("clientindex"), bp::arg("name"), bp::arg("address"), bp::arg("reject"), bp::arg("maxrejectlen") ) );
+                , ( bp::arg("clientindex"), bp::arg("name"), bp::arg("address") ) );
         
         }
         { //::CHL2WarsGameRules::PyClientDisconnected
