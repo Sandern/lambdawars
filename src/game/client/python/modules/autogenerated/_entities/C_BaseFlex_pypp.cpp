@@ -594,7 +594,10 @@ struct C_BaseFlex_wrapper : C_BaseFlex, bp::wrapper< C_BaseFlex > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ClientClass* GetClientClass() {
-        PY_OVERRIDE_CHECK( C_BaseFlex, GetClientClass )
+#if defined(_WIN32)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            return C_BaseFlex::GetClientClass();
+#endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
             try

@@ -717,7 +717,10 @@ struct C_HL2WarsPlayer_wrapper : C_HL2WarsPlayer, bp::wrapper< C_HL2WarsPlayer >
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ClientClass* GetClientClass() {
-        PY_OVERRIDE_CHECK( C_HL2WarsPlayer, GetClientClass )
+#if defined(_WIN32)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            return C_HL2WarsPlayer::GetClientClass();
+#endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
             try

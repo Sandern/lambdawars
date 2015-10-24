@@ -8,8 +8,13 @@ from pygccxml.declarations import matcher, matchers, pointer_t, const_t, referen
 from pyplusplus import code_creators
 
 # Templates for client and server class
+# Special case: GetClientClass is called from different threads. Fallback to baseclass in this case.
+# For most cases this does not matter because the send tables will be the same anyway.
 tmpl_clientclass = '''virtual ClientClass* GetClientClass() {
-        PY_OVERRIDE_CHECK( %(clsname)s, GetClientClass )
+#if defined(_WIN32)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            return %(clsname)s::GetClientClass();
+#endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
             try

@@ -641,7 +641,10 @@ struct C_WarsWeapon_wrapper : C_WarsWeapon, bp::wrapper< C_WarsWeapon > {
     virtual PyObject *GetPySelf() const { return bp::detail::wrapper_base_::get_owner(*this); }
 
     virtual ClientClass* GetClientClass() {
-        PY_OVERRIDE_CHECK( C_WarsWeapon, GetClientClass )
+#if defined(_WIN32)
+        if( GetCurrentThreadId() != g_hPythonThreadID )
+            return C_WarsWeapon::GetClientClass();
+#endif // _WIN32
         if( PyObject_HasAttrString(GetPyInstance().ptr(), "pyClientClass") )
         {
             try
