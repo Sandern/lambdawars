@@ -202,7 +202,8 @@ bool NavTestAreaWalkable( const Vector &origin, const Vector &mins, const Vector
 #else
 	ConVar disable_hidingspots( "sv_disable_coverspots", "0", FCVAR_CHEAT );
 #endif // CLIENT_DLL
-ConVar coverspot_required_nav_radius( "coverspot_required_nav_radius", "2", FCVAR_CHEAT|FCVAR_REPLICATED );
+ConVar coverspot_required_nav_radius( "coverspot_required_nav_radius", "2", FCVAR_CHEAT | FCVAR_REPLICATED );
+ConVar coverspot_required_nav_beneath("coverspot_required_nav_beneath", "24", FCVAR_CHEAT | FCVAR_REPLICATED);
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -363,17 +364,31 @@ boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUn
 
 	// Python return result
 	float fRequiredNavRadius = coverspot_required_nav_radius.GetFloat();
+	float fRequiredNavBeneath = coverspot_required_nav_beneath.GetFloat();
 	for( int i = 0; i < coverSpots.Count(); i++ )
 	{
 		// Should be on the navigation mesh! Search in a small radius, cover spots are always for soldiers.
 		if( pMesh && fRequiredNavRadius )
 		{
-			Vector pos = coverSpots[i].pSpot->position;
-			pos.z += 2.0f;
-			if( !pMesh->TestRoute( pos - Vector(fRequiredNavRadius, 0, 0), pos + Vector(fRequiredNavRadius, 0, 0) ) ||
-				!pMesh->TestRoute( pos - Vector(0, fRequiredNavRadius, 0), pos + Vector(0, fRequiredNavRadius, 0) ) )
+			Vector coverPos = coverSpots[i].pSpot->position;
+
+			if ((coverSpots[i].pSpot->flags & wars_coverspot_t::NOTSAVED) != 0)
 			{
-				continue;
+				// Consider not saved spots as dynamically created. For these we do a full check.
+				coverPos.z += 2.0f;
+				if (!pMesh->TestRoute(coverPos - Vector(fRequiredNavRadius, 0, 0), coverPos + Vector(fRequiredNavRadius, 0, 0)) ||
+					!pMesh->TestRoute(coverPos - Vector(0, fRequiredNavRadius, 0), coverPos + Vector(0, fRequiredNavRadius, 0)))
+				{
+					continue;
+				}
+			}
+			else 
+			{
+				// Statically/pre-placed spots just need to touch the nav mesh somewhere
+				if (pMesh->GetPolyRef(coverPos, fRequiredNavBeneath, fRequiredNavRadius) == 0)
+				{
+					continue;
+				}
 			}
 		}
 
