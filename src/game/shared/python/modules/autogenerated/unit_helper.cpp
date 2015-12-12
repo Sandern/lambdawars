@@ -349,25 +349,6 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
         return UnitBaseAnimState::GetOuterXYSpeed(  );
     }
 
-    virtual bool HasAimPoseParameters(  ) {
-        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
-        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
-        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
-        if( func_HasAimPoseParameters.ptr() != Py_None )
-            try {
-                return func_HasAimPoseParameters(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->UnitBaseAnimState::HasAimPoseParameters(  );
-            }
-        else
-            return this->UnitBaseAnimState::HasAimPoseParameters(  );
-    }
-    
-    bool default_HasAimPoseParameters(  ) {
-        return UnitBaseAnimState::HasAimPoseParameters( );
-    }
-
     virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
         PY_OVERRIDE_CHECK( UnitAnimState, OnEndSpecificActivity )
         PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnEndSpecificActivity )
@@ -408,25 +389,6 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
 
     void ResetGroundSpeed(  ){
         UnitAnimState::ResetGroundSpeed(  );
-    }
-
-    virtual void RestartMainSequence(  ) {
-        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
-        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
-        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
-        if( func_RestartMainSequence.ptr() != Py_None )
-            try {
-                func_RestartMainSequence(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->UnitBaseAnimState::RestartMainSequence(  );
-            }
-        else
-            this->UnitBaseAnimState::RestartMainSequence(  );
-    }
-    
-    void default_RestartMainSequence(  ) {
-        UnitBaseAnimState::RestartMainSequence( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -1772,6 +1734,12 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     bp::class_< UnitAnimStateEx_wrapper, bp::bases< UnitAnimState >, boost::noncopyable >( "UnitAnimStateEx", bp::init< bp::api::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) )    
         .def( 
+            "HasAimPoseParameters"
+            , (bool ( ::UnitAnimStateEx::* )(  ) )( &::UnitAnimStateEx::HasAimPoseParameters ) )    
+        .def( 
+            "RestartMainSequence"
+            , (void ( ::UnitAnimStateEx::* )(  ) )( &::UnitAnimStateEx::RestartMainSequence ) )    
+        .def( 
             "Update"
             , (void ( ::UnitAnimStateEx::* )( float,float ) )(&::UnitAnimStateEx::Update)
             , (void ( UnitAnimStateEx_wrapper::* )( float,float ) )(&UnitAnimStateEx_wrapper::default_Update)
@@ -1815,10 +1783,6 @@ BOOST_PYTHON_MODULE(unit_helper){
             , (::QAngle const & ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::GetRenderAngles)
             , bp::return_value_policy< bp::copy_const_reference >() )    
         .def( 
-            "HasAimPoseParameters"
-            , (bool ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::HasAimPoseParameters)
-            , (bool ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_HasAimPoseParameters) )    
-        .def( 
             "OnEndSpecificActivity"
             , (::Activity ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnEndSpecificActivity)
             , (::Activity ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnEndSpecificActivity)
@@ -1830,10 +1794,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         .def( 
             "ResetGroundSpeed"
             , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ResetGroundSpeed) )    
-        .def( 
-            "RestartMainSequence"
-            , (void ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::RestartMainSequence)
-            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_RestartMainSequence) )    
         .def( 
             "SelectWeightedSequence"
             , (int ( ::UnitBaseAnimState::* )( ::Activity ) )(&::UnitBaseAnimState::SelectWeightedSequence)
@@ -3166,25 +3126,6 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
         return UnitBaseAnimState::GetOuterXYSpeed(  );
     }
 
-    virtual bool HasAimPoseParameters(  ) {
-        PY_OVERRIDE_CHECK( UnitBaseAnimState, HasAimPoseParameters )
-        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, HasAimPoseParameters )
-        bp::override func_HasAimPoseParameters = this->get_override( "HasAimPoseParameters" );
-        if( func_HasAimPoseParameters.ptr() != Py_None )
-            try {
-                return func_HasAimPoseParameters(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->UnitBaseAnimState::HasAimPoseParameters(  );
-            }
-        else
-            return this->UnitBaseAnimState::HasAimPoseParameters(  );
-    }
-    
-    bool default_HasAimPoseParameters(  ) {
-        return UnitBaseAnimState::HasAimPoseParameters( );
-    }
-
     virtual ::Activity OnEndSpecificActivity( ::Activity specificactivity ) {
         PY_OVERRIDE_CHECK( UnitAnimState, OnEndSpecificActivity )
         PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnEndSpecificActivity )
@@ -3225,25 +3166,6 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
 
     void ResetGroundSpeed(  ){
         UnitAnimState::ResetGroundSpeed(  );
-    }
-
-    virtual void RestartMainSequence(  ) {
-        PY_OVERRIDE_CHECK( UnitBaseAnimState, RestartMainSequence )
-        PY_OVERRIDE_LOG( unit_helper, UnitBaseAnimState, RestartMainSequence )
-        bp::override func_RestartMainSequence = this->get_override( "RestartMainSequence" );
-        if( func_RestartMainSequence.ptr() != Py_None )
-            try {
-                func_RestartMainSequence(  );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                this->UnitBaseAnimState::RestartMainSequence(  );
-            }
-        else
-            this->UnitBaseAnimState::RestartMainSequence(  );
-    }
-    
-    void default_RestartMainSequence(  ) {
-        UnitBaseAnimState::RestartMainSequence( );
     }
 
     virtual int SelectWeightedSequence( ::Activity activity ) {
@@ -5222,6 +5144,12 @@ BOOST_PYTHON_MODULE(unit_helper){
 
     bp::class_< UnitAnimStateEx_wrapper, bp::bases< UnitAnimState >, boost::noncopyable >( "UnitAnimStateEx", bp::init< bp::api::object, UnitAnimConfig & >(( bp::arg("outer"), bp::arg("animconfig") )) )    
         .def( 
+            "HasAimPoseParameters"
+            , (bool ( ::UnitAnimStateEx::* )(  ) )( &::UnitAnimStateEx::HasAimPoseParameters ) )    
+        .def( 
+            "RestartMainSequence"
+            , (void ( ::UnitAnimStateEx::* )(  ) )( &::UnitAnimStateEx::RestartMainSequence ) )    
+        .def( 
             "Update"
             , (void ( ::UnitAnimStateEx::* )( float,float ) )(&::UnitAnimStateEx::Update)
             , (void ( UnitAnimStateEx_wrapper::* )( float,float ) )(&UnitAnimStateEx_wrapper::default_Update)
@@ -5265,10 +5193,6 @@ BOOST_PYTHON_MODULE(unit_helper){
             , (::QAngle const & ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::GetRenderAngles)
             , bp::return_value_policy< bp::copy_const_reference >() )    
         .def( 
-            "HasAimPoseParameters"
-            , (bool ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::HasAimPoseParameters)
-            , (bool ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_HasAimPoseParameters) )    
-        .def( 
             "OnEndSpecificActivity"
             , (::Activity ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnEndSpecificActivity)
             , (::Activity ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnEndSpecificActivity)
@@ -5280,10 +5204,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         .def( 
             "ResetGroundSpeed"
             , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::ResetGroundSpeed) )    
-        .def( 
-            "RestartMainSequence"
-            , (void ( ::UnitBaseAnimState::* )(  ) )(&::UnitBaseAnimState::RestartMainSequence)
-            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::default_RestartMainSequence) )    
         .def( 
             "SelectWeightedSequence"
             , (int ( ::UnitBaseAnimState::* )( ::Activity ) )(&::UnitBaseAnimState::SelectWeightedSequence)

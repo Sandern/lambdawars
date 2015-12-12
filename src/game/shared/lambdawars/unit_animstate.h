@@ -435,6 +435,9 @@ public:
 	UnitAnimStateEx( boost::python::object outer, UnitAnimConfig &animconfig ) : UnitAnimState( outer, animconfig ) {}
 #endif // ENABLE_PYTHON
 	virtual void Update( float eyeYaw, float eyePitch ) { UnitAnimState::Update( eyeYaw, eyePitch ); }
+
+	void		RestartMainSequence() { UnitAnimState::RestartMainSequence();  }
+	bool		HasAimPoseParameters() { return UnitAnimState::HasAimPoseParameters(); }
 };
 
 #endif // UNIT_ANIMSTATE_H

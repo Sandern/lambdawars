@@ -143,6 +143,7 @@ UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animco
 	m_eCurrentMainSequenceActivity = ACT_IDLE;
 	m_nSpecificMainActivity = ACT_INVALID;
 	m_bSpecMainUseCustomPlaybackrate = false;
+	m_fSpecMainPlaybackRate = 1.0f;
 	m_flLastAnimationStateClearTime = 0.0f;
 
 	m_bPlayFallActInAir = true;

@@ -112,7 +112,7 @@ class UnitHelper(SemiSharedModuleGenerator):
                          , cls.mem_fun('SetAimLayerSequence') )
         
         cls.mem_fun('OnEndSpecificActivity').virtuality = 'virtual'
-        
+
         cls.mem_fun('GetCustomSpecificActPlaybackRate').exclude()
         cls.mem_fun('SetCustomSpecificActPlaybackRate').exclude()
         cls.add_property( 'specmainactplaybackrate'
@@ -157,6 +157,7 @@ class UnitHelper(SemiSharedModuleGenerator):
         # Extensible version of above, with a few more overrible methods (ugly :()
         cls = mb.class_('UnitAnimStateEx')
         cls.include()
+        cls.calldefs().virtuality = 'not virtual'
         cls.mem_fun('Update').virtuality = 'virtual'
         
         # Vehicle Anim State
