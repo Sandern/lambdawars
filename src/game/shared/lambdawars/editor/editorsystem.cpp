@@ -100,15 +100,10 @@ void CEditorSystem::LevelShutdownPreEntity()
 
 #ifndef CLIENT_DLL
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: Remember which editor managed entities got deleted
 //-----------------------------------------------------------------------------
 void CEditorSystem::OnEntityDeleted( CBaseEntity *pEntity )
 {
-	// Remember which editor managed entities got deleted
-	//Msg("Entity %s deleted\n", pEntity->GetClassname());
-	if( !m_MapManager.IsMapLoaded() )
-		return;
-
 	CWarsFlora *pFloraEnt = dynamic_cast<CWarsFlora *>( pEntity );
 	if( pFloraEnt && pFloraEnt->IsEditorManaged() )
 	{

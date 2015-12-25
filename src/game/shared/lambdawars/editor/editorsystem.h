@@ -10,7 +10,6 @@
 #pragma once
 #endif
 
-#include "editormapmgr.h"
 #include "editorwarsmapmgr.h"
 
 #ifdef CLIENT_DLL
@@ -45,9 +44,7 @@ public:
 #ifndef CLIENT_DLL
 	void SaveCurrentVmf();
 #endif // CLIENT_DLL
-	const char *GetCurrentVmfPath();
 	bool IsMapLoaded();
-	const char *GetLastMapError();
 
 	// Listener
 #ifndef CLIENT_DLL
@@ -167,7 +164,6 @@ private:
 #endif // CLIENT_DLL
 
 private:
-	CEditorMapMgr m_MapManager;
 	CEditorWarsMapMgr m_WarsMapManager;
 
 	// Selection
@@ -216,33 +212,22 @@ inline bool CEditorSystem::IsActive()
 // Map managing
 inline void CEditorSystem::ClearLoadedMap()
 {
-	m_MapManager.ClearLoadedMap();
 	m_WarsMapManager.ClearLoadedMap();
 }
 
 inline void CEditorSystem::LoadCurrentVmf()
 {
-	m_MapManager.LoadCurrentVmf();
 	m_WarsMapManager.LoadCurrentMap();
 }
 #ifndef CLIENT_DLL
 inline void CEditorSystem::SaveCurrentVmf()
 {
-	m_MapManager.SaveCurrentVmf();
 	m_WarsMapManager.SaveCurrentMap();
 }
 #endif // CLIENT_DLL
-inline const char *CEditorSystem::GetCurrentVmfPath()
-{
-	return m_MapManager.GetCurrentVmfPath();
-}
 inline bool CEditorSystem::IsMapLoaded()
 {
-	return m_MapManager.IsMapLoaded();
-}
-inline const char *CEditorSystem::GetLastMapError()
-{
-	return m_MapManager.GetLastMapError();
+	return true;
 }
 
 inline bool CEditorSystem::IsSelected( CBaseEntity *pEntity )

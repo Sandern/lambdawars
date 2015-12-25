@@ -158,6 +158,40 @@ FOWListInfo *FOWFindList( FOWListInfo *pHead, int ownernumber )
 	return NULL;
 }
 
+#ifdef CLIENT_DLL
+//-----------------------------------------------------------------------------
+// Purpose: Helper to get map version on client
+//-----------------------------------------------------------------------------
+int GetMapVersion(const char *pszLevelname)
+{
+	char destPath[MAX_PATH];
+	V_snprintf(destPath, sizeof(destPath), "%s", pszLevelname);
+
+	FileHandle_t f = filesystem->Open(destPath, "rb");
+	if (f == FILESYSTEM_INVALID_HANDLE) {
+		Warning("GetMapVersion: could not open \"%s\"\n", destPath);
+		return -1;
+	}
+	unsigned int fileSize = filesystem->Size(f);
+	if (fileSize < sizeof(BSPHeader_t))
+	{
+		Warning("GetMapVersion: file at \"%s\" does not contain a valid bsp header\n", destPath);
+		filesystem->Close(f);
+		return -1;
+	}
+	BSPHeader_t header;
+	filesystem->Read(&header, sizeof(BSPHeader_t), f);
+	filesystem->Close(f);
+	if (header.m_nVersion < MINBSPVERSION)
+	{
+		Warning("GetMapVersion: file at \"%s\" does not fullfill minimum required bsp version %d (instead found %d)\n", destPath, MINBSPVERSION, header.m_nVersion);
+		return -1;
+	}
+
+	return header.mapRevision;
+}
+#endif // CLIENT_DLL
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

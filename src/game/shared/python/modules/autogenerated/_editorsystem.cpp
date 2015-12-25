@@ -131,15 +131,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pPlayer") ) );
         
         }
-        { //::CEditorSystem::GetCurrentVmfPath
-        
-            typedef char const * ( ::CEditorSystem::*GetCurrentVmfPath_function_type )(  ) ;
-            
-            CEditorSystem_exposer.def( 
-                "GetCurrentVmfPath"
-                , GetCurrentVmfPath_function_type( &::CEditorSystem::GetCurrentVmfPath ) );
-        
-        }
         { //::CEditorSystem::GetEditorMode
         
             typedef ::CEditorSystem::EditorInteractionMode_t ( ::CEditorSystem::*GetEditorMode_function_type )(  ) ;
@@ -147,15 +138,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "GetEditorMode"
                 , GetEditorMode_function_type( &::CEditorSystem::GetEditorMode ) );
-        
-        }
-        { //::CEditorSystem::GetLastMapError
-        
-            typedef char const * ( ::CEditorSystem::*GetLastMapError_function_type )(  ) ;
-            
-            CEditorSystem_exposer.def( 
-                "GetLastMapError"
-                , GetLastMapError_function_type( &::CEditorSystem::GetLastMapError ) );
         
         }
         { //::CEditorSystem::GetNumSelected
@@ -550,15 +532,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pPlayer") ) );
         
         }
-        { //::CEditorSystem::GetCurrentVmfPath
-        
-            typedef char const * ( ::CEditorSystem::*GetCurrentVmfPath_function_type )(  ) ;
-            
-            CEditorSystem_exposer.def( 
-                "GetCurrentVmfPath"
-                , GetCurrentVmfPath_function_type( &::CEditorSystem::GetCurrentVmfPath ) );
-        
-        }
         { //::CEditorSystem::GetEditorMode
         
             typedef ::CEditorSystem::EditorInteractionMode_t ( ::CEditorSystem::*GetEditorMode_function_type )(  ) ;
@@ -566,15 +539,6 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "GetEditorMode"
                 , GetEditorMode_function_type( &::CEditorSystem::GetEditorMode ) );
-        
-        }
-        { //::CEditorSystem::GetLastMapError
-        
-            typedef char const * ( ::CEditorSystem::*GetLastMapError_function_type )(  ) ;
-            
-            CEditorSystem_exposer.def( 
-                "GetLastMapError"
-                , GetLastMapError_function_type( &::CEditorSystem::GetLastMapError ) );
         
         }
         { //::CEditorSystem::GetNumSelected
@@ -659,6 +623,15 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 "IsSelected"
                 , IsSelected_function_type( &::CEditorSystem::IsSelected )
                 , ( bp::arg("pEntity") ) );
+        
+        }
+        { //::CEditorSystem::LevelInitPreEntity
+        
+            typedef void ( ::CEditorSystem::*LevelInitPreEntity_function_type )(  ) ;
+            
+            CEditorSystem_exposer.def( 
+                "LevelInitPreEntity"
+                , LevelInitPreEntity_function_type( &::CEditorSystem::LevelInitPreEntity ) );
         
         }
         { //::CEditorSystem::LevelShutdownPreEntity
