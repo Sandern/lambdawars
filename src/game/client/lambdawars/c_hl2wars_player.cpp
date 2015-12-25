@@ -307,7 +307,7 @@ void C_HL2WarsPlayer::OnDataChanged( DataUpdateType_t updateType )
 	}
 
 	// Check if the player's faction changed ( Might want to add a string table )
-	if( m_FactionName == NULL_STRING || Q_strncmp( STRING(m_FactionName), m_NetworkedFactionName, MAX_PATH ) != 0 ) 
+	if( m_FactionName == NULL_STRING || V_strncmp( STRING(m_FactionName), m_NetworkedFactionName, MAX_PATH ) != 0 ) 
 	{
 		ChangeFaction( m_NetworkedFactionName );
 	}
@@ -560,7 +560,7 @@ void C_HL2WarsPlayer::GetBoxSelection( int iXMin, int iYMin, int iXMax, int iYMa
 			continue;
 
 		// Filter on unit type if specified
-		if( pUnitType && Q_stricmp( pUnitType, pUnit->GetUnitType() ) )
+		if( pUnitType && V_stricmp( pUnitType, pUnit->GetUnitType() ) )
 			continue;
 
 		pUnit->CollisionProp()->WorldSpaceSurroundingBounds( &mins, &maxs );
@@ -614,11 +614,11 @@ void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 	int maxn = 47; // Max N per command to stay within the command limit
 	char buf[MAX_COMMAND_SIZE];
 	buf[0] = '\0';
-	Q_strncat( buf, "player_addunit", MAX_COMMAND_SIZE );
+	V_strncat( buf, "player_addunit", MAX_COMMAND_SIZE );
 	for( i = 0; i < selection.Count(); i++)
 	{
 		selection[i]->GetIUnit()->Select(this, false);
-		Q_strncat( buf, VarArgs(" %ld", EncodeEntity(selection[i].Get())), MAX_COMMAND_SIZE );
+		V_strncat( buf, VarArgs(" %ld", EncodeEntity(selection[i].Get())), MAX_COMMAND_SIZE );
 		n++;
 
 		// Send max N per command, because commands are limited to about 256 chars
@@ -628,7 +628,7 @@ void C_HL2WarsPlayer::MakeSelection( CUtlVector< EHANDLE > &selection )
 			engine->ServerCmd( buf );
 			n = 0;
 			buf[0] = '\0';
-			Q_strncat( buf, "player_addunit", MAX_COMMAND_SIZE );
+			V_strncat( buf, "player_addunit", MAX_COMMAND_SIZE );
 		}
 	}
 
@@ -764,6 +764,9 @@ const char *C_HL2WarsPlayer::GetSelectedUnitType( void )
 	return STRING(m_pSelectedUnitType);
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Change the selected unit type
+//-----------------------------------------------------------------------------
 void C_HL2WarsPlayer::SetSelectedUnitType(const char *pUnitType)
 {
 	m_pSelectedUnitType = AllocPooledString(pUnitType);
@@ -776,6 +779,9 @@ void C_HL2WarsPlayer::GetSelectedUnitTypeRange(int &iMin, int &iMax)
 	iMax = m_iSelectedUnitTypeMax;
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: Updates start and end range of selected unit type inside the selection.
+//-----------------------------------------------------------------------------
 void C_HL2WarsPlayer::UpdateSelectedUnitType( void )
 {
 	// reset
@@ -793,7 +799,7 @@ void C_HL2WarsPlayer::UpdateSelectedUnitType( void )
 		 if( !pUnit )
 			 continue;
 
-		if( !Q_stricmp( m_pSelectedUnitType, pUnit->GetIUnit()->GetUnitType() ) )
+		if( !V_stricmp( m_pSelectedUnitType, pUnit->GetIUnit()->GetUnitType() ) )
 		{
 			if( m_iSelectedUnitTypeMin == -1 )
 			{
@@ -814,4 +820,58 @@ void C_HL2WarsPlayer::UpdateSelectedUnitType( void )
 
 	if( m_iSelectedUnitTypeMin == -1 )
 		m_pSelectedUnitType = NULL;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Test if selection contains unit with type
+//-----------------------------------------------------------------------------
+bool C_HL2WarsPlayer::SelectionHasUnitType(const char *pUnitType)
+{
+	if (!pUnitType) {
+		return false;
+	}
+
+	int i;
+	CBaseEntity *pUnit;
+	for (i = 0; i < CountUnits(); i++)
+	{
+		pUnit = GetUnit(i);
+		if (!pUnit)
+			continue;
+
+		if (!V_stricmp(pUnitType, pUnit->GetIUnit()->GetUnitType()))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+CON_COMMAND(player_select_next_unit_type, "Selects the next unit type")
+{
+	C_HL2WarsPlayer* pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
+	if (!pPlayer) {
+		return;
+	}
+
+	int iMin, iMax;
+	pPlayer->GetSelectedUnitTypeRange(iMin, iMax);
+
+	C_BaseEntity *pUnit = pPlayer->GetUnit(iMax < pPlayer->CountUnits() ? iMax : 0);
+	if (!pUnit || !pUnit->GetIUnit()) {
+		return;
+	}
+
+	pPlayer->SetSelectedUnitType(pUnit->GetIUnit()->GetUnitType());
+
+#ifdef ENABLE_PYTHON
+	if (SrcPySystem()->IsPythonRunning())
+	{
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
+		kwargs["player"] = pUnit->GetPyHandle();
+		boost::python::object signal = SrcPySystem()->Get("refreshhud", "core.signals", true);
+		SrcPySystem()->CallSignal(signal, kwargs);
+	}
+#endif // ENABLE_PYTHON
 }

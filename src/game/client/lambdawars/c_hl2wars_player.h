@@ -119,6 +119,7 @@ public:
 	void							SetSelectedUnitType( const char *pUnitType );
 	void							GetSelectedUnitTypeRange(int &iMin, int &iMax);
 	void							UpdateSelectedUnitType( void );
+	bool							SelectionHasUnitType(const char *pUnitType);
 
 	// Group management
 	void							ClearGroup( int group );

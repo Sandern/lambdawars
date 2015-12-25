@@ -1575,6 +1575,16 @@ void register_C_HL2WarsPlayer_class(){
                 , ( bp::arg("group") ) );
         
         }
+        { //::C_HL2WarsPlayer::SelectionHasUnitType
+        
+            typedef bool ( ::C_HL2WarsPlayer::*SelectionHasUnitType_function_type )( char const * ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "SelectionHasUnitType"
+                , SelectionHasUnitType_function_type( &::C_HL2WarsPlayer::SelectionHasUnitType )
+                , ( bp::arg("pUnitType") ) );
+        
+        }
         { //::C_HL2WarsPlayer::SetCamLimits
         
             typedef void ( ::C_HL2WarsPlayer::*SetCamLimits_function_type )( ::Vector const & ) ;
