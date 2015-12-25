@@ -30,7 +30,6 @@
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy.h"
-	namespace bp = boost::python;
 #endif // ENABLE_PYTHON
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -422,18 +421,18 @@ void CHL2WarsPlayer::UpdateButtonState( int nUserCmdButtonMask )
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
 
 		if( (buttonsChanged & IN_SPEED) != 0 )
 		{
 			kwargs["state"] = (bool)(m_nCorrectButtons &IN_SPEED)!= 0;
-			bp::object signal = SrcPySystem()->Get("keyspeed", "core.signals", true);
+			boost::python::object signal = SrcPySystem()->Get("keyspeed", "core.signals", true);
 			SrcPySystem()->CallSignal( signal, kwargs );
 
 			// Signal abilities the speed key changed
-			CUtlVector<bp::object> activeAbilities;
+			CUtlVector<boost::python::object> activeAbilities;
 			activeAbilities = m_vecActiveAbilities;
 			for(int i=0; i< activeAbilities.Count(); i++)
 			{
@@ -443,7 +442,7 @@ void CHL2WarsPlayer::UpdateButtonState( int nUserCmdButtonMask )
 		else if( (buttonsChanged & IN_DUCK) != 0 )
 		{
 			kwargs["state"] = (bool)(m_nCorrectButtons &IN_DUCK)!= 0;
-			bp::object signal = SrcPySystem()->Get("keyduck", "core.signals", true);
+			boost::python::object signal = SrcPySystem()->Get("keyduck", "core.signals", true);
 			SrcPySystem()->CallSignal( signal, kwargs );
 		}
 	}
@@ -981,13 +980,13 @@ void CHL2WarsPlayer::ChangeFaction( const char *faction )
 	{
 		// Dispatch changed faction signal
 		try {
-			bp::dict kwargs;
-			kwargs["sender"] = bp::object();
+			boost::python::dict kwargs;
+			kwargs["sender"] = boost::python::object();
 			kwargs["player"] = GetPyHandle();
-			kwargs["oldfaction"] = (pszOldValue ? bp::str((const char *)pszOldValue) : bp::object());
-			bp::object signal = SrcPySystem()->Get("playerchangedfaction", "core.signals", true);
+			kwargs["oldfaction"] = (pszOldValue ? boost::python::str((const char *)pszOldValue) : boost::python::object());
+			boost::python::object signal = SrcPySystem()->Get("playerchangedfaction", "core.signals", true);
 			SrcPySystem()->CallSignal( signal, kwargs );
-		} catch( bp::error_already_set & ) {
+		} catch( boost::python::error_already_set & ) {
 			PyErr_Print();
 		}
 	}
@@ -1036,7 +1035,7 @@ boost::python::list	CHL2WarsPlayer::GetSelection( void )
 {
 	if( m_bRebuildPySelection )
 	{
-		m_pySelection = bp::list();
+		m_pySelection = boost::python::list();
 
 		CBaseEntity *pUnit;
 		int nCount = CountUnits();
@@ -1181,10 +1180,10 @@ void CHL2WarsPlayer::OnSelectionChanged()
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
-		bp::object signal = SrcPySystem()->Get("selectionchanged", "core.signals", true);
+		boost::python::object signal = SrcPySystem()->Get("selectionchanged", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
 #endif // ENABLE_PYTHON
@@ -1199,10 +1198,10 @@ void CHL2WarsPlayer::OrderUnits()
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
-		bp::object signal = SrcPySystem()->Get("pre_orderunits", "core.signals", true);
+		boost::python::object signal = SrcPySystem()->Get("pre_orderunits", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
 #endif // ENABLE_PYTHON
@@ -1219,10 +1218,10 @@ void CHL2WarsPlayer::OrderUnits()
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
-		bp::object signal = SrcPySystem()->Get("post_orderunits", "core.signals", true);
+		boost::python::object signal = SrcPySystem()->Get("post_orderunits", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
 #endif // ENABLE_PYTHON
@@ -1268,11 +1267,11 @@ void CHL2WarsPlayer::MakeCurrentSelectionGroup( int iGroup, bool bClearGroup )
 #ifdef ENABLE_PYTHON
 	if( SrcPySystem()->IsPythonRunning() )
 	{
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
 		kwargs["group"] = iGroup;
-		bp::object signal = SrcPySystem()->Get("groupchanged", "core.signals", true);
+		boost::python::object signal = SrcPySystem()->Get("groupchanged", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 	}
 #endif // ENABLE_PYTHON
@@ -1351,11 +1350,11 @@ void CHL2WarsPlayer::CleanupGroups( void )
 		{
 			if( SrcPySystem()->IsPythonRunning() )
 			{
-				bp::dict kwargs;
-				kwargs["sender"] = bp::object();
+				boost::python::dict kwargs;
+				kwargs["sender"] = boost::python::object();
 				kwargs["player"] = GetPyHandle();
 				kwargs["group"] = iGroup;
-				bp::object signal = SrcPySystem()->Get("groupchanged", "core.signals", true);
+				boost::python::object signal = SrcPySystem()->Get("groupchanged", "core.signals", true);
 				SrcPySystem()->CallSignal( signal, kwargs );
 			}
 		}
@@ -1375,7 +1374,7 @@ const CUtlVector< EHANDLE > & CHL2WarsPlayer::GetGroup( int iGroup )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CHL2WarsPlayer::AddActiveAbility( bp::object ability )
+void CHL2WarsPlayer::AddActiveAbility( boost::python::object ability )
 {
 	if( ability.ptr() == Py_None ) 
 		return;
@@ -1383,7 +1382,7 @@ void CHL2WarsPlayer::AddActiveAbility( bp::object ability )
 		m_vecActiveAbilities.AddToTail(ability);
 }
 
-void CHL2WarsPlayer::RemoveActiveAbility( bp::object ability )
+void CHL2WarsPlayer::RemoveActiveAbility( boost::python::object ability )
 {
 	if( ability.ptr() == Py_None ) 
 		return;
@@ -1395,7 +1394,7 @@ void CHL2WarsPlayer::RemoveActiveAbility( bp::object ability )
 	SrcPySystem()->Run( SrcPySystem()->Get("OnMouseLost", ability) );
 }
 
-bool CHL2WarsPlayer::IsActiveAbility( bp::object ability )
+bool CHL2WarsPlayer::IsActiveAbility( boost::python::object ability )
 {
 	if( ability.ptr() == Py_None ) 
 		return false;
@@ -1404,7 +1403,7 @@ bool CHL2WarsPlayer::IsActiveAbility( bp::object ability )
 
 void CHL2WarsPlayer::ClearActiveAbilities()
 {
-	CUtlVector<bp::object> clearAbilities;
+	CUtlVector<boost::python::object> clearAbilities;
 	clearAbilities = m_vecActiveAbilities;
 	m_vecActiveAbilities.RemoveAll();
 	for(int i=0; i<clearAbilities.Count(); i++)
@@ -1413,7 +1412,7 @@ void CHL2WarsPlayer::ClearActiveAbilities()
 	}
 }
 
-void CHL2WarsPlayer::SetSingleActiveAbility( bp::object ability )
+void CHL2WarsPlayer::SetSingleActiveAbility( boost::python::object ability )
 {
 	ClearActiveAbilities();
 	if( ability.ptr() == Py_None ) 
@@ -1421,10 +1420,10 @@ void CHL2WarsPlayer::SetSingleActiveAbility( bp::object ability )
 	m_vecActiveAbilities.AddToTail(ability);
 }
 
-bp::object CHL2WarsPlayer::GetSingleActiveAbility()
+boost::python::object CHL2WarsPlayer::GetSingleActiveAbility()
 {
 	if( m_vecActiveAbilities.Count() == 0 )
-		return bp::object();
+		return boost::python::object();
 	return m_vecActiveAbilities[0];
 }
 #endif // ENABLE_PYTHON
@@ -1455,11 +1454,11 @@ void CHL2WarsPlayer::OnChangeOwnerNumber( int old_owner_number )
 	if( SrcPySystem()->IsPythonRunning() )
 	{
 		// Send clientactive signal
-		bp::dict kwargs;
-		kwargs["sender"] = bp::object();
+		boost::python::dict kwargs;
+		kwargs["sender"] = boost::python::object();
 		kwargs["player"] = GetPyHandle();
 		kwargs["oldownernumber"] = old_owner_number;
-		bp::object signal = SrcPySystem()->Get("playerchangedownernumber", "core.signals", true);
+		boost::python::object signal = SrcPySystem()->Get("playerchangedownernumber", "core.signals", true);
 		SrcPySystem()->CallSignal( signal, kwargs );
 
 		signal = SrcPySystem()->Get("map_playerchangedownernumber", "core.signals", true)[pLevelName];
