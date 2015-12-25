@@ -108,6 +108,7 @@ public:
 	void							SelectAllUnitsOfTypeInScreen( const char *pUnitType );
 	void							SimulateOrderUnits( const MouseTraceData_t &mousedata );
 	void							MinimapClick( const MouseTraceData_t &mousedata );
+	void							PortraitClick( const MouseTraceData_t &mousedata );
 	void							MakeSelection( CUtlVector< EHANDLE > &selection );
 #ifdef ENABLE_PYTHON
 	void							PyMakeSelection( boost::python::list selection );
@@ -194,6 +195,8 @@ private:
 	void					OnRightMouseButtonPressedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonDoublePressedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonReleasedInternal( const MouseTraceData_t &data );	
+
+	void					SimulateAbilityClick(const MouseTraceData_t &mousedata, const char *methodName);
 
 private:
 	bool m_bOldIsStrategicModeOn;

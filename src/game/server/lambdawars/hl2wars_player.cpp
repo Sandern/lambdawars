@@ -386,20 +386,21 @@ bool CHL2WarsPlayer::ClientCommand( const CCommand &args )
 		int idx = atol(args[7]);
 		mousedata.m_hEnt = GetEntityFromMouseCommand( idx );
 
-		m_MouseData = mousedata;
-		m_MouseDataRightPressed = mousedata;
-		m_MouseDataRightReleased = mousedata;
-		m_MouseDataLeftPressed = mousedata;
-		m_MouseDataLeftReleased = mousedata;
+		SimulateAbilityClick(mousedata, "OnMinimapClick");
 
-#ifdef ENABLE_PYTHON
-		CUtlVector<boost::python::object> activeAbilities;
-		activeAbilities = m_vecActiveAbilities;
-		for(int i=0; i< activeAbilities.Count(); i++)
-		{
-			SrcPySystem()->RunT<bool, MouseTraceData_t>( SrcPySystem()->Get("OnMinimapClick", activeAbilities[i]), false, mousedata );
-		}
-#endif // ENABLE_PYTHON
+		return true;
+	}
+	else if( !V_stricmp(args[0], "portrait_lm") )
+	{
+		MouseTraceData_t mousedata;
+		mousedata.m_vStartPos = Vector(atof(args[1]), atof(args[2]), atof(args[3]));
+		mousedata.m_vEndPos = Vector(atof(args[4]), atof(args[5]), atof(args[6]));
+		mousedata.m_vWorldOnlyEndPos = mousedata.m_vEndPos;
+
+		int idx = atol(args[7]);
+		mousedata.m_hEnt = GetEntityFromMouseCommand(idx);
+
+		SimulateAbilityClick(mousedata, "OnPortraitClick");
 
 		return true;
 	}

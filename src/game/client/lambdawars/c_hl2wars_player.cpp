@@ -739,23 +739,21 @@ void C_HL2WarsPlayer::SimulateOrderUnits( const MouseTraceData_t &mousedata )
 //-----------------------------------------------------------------------------
 void C_HL2WarsPlayer::MinimapClick( const MouseTraceData_t &mousedata )
 {
-	m_MouseData = mousedata;
-	m_MouseDataRightPressed = mousedata;
-	m_MouseDataRightReleased = mousedata;
-	m_MouseDataLeftPressed = mousedata;
-	m_MouseDataLeftReleased = mousedata;
-
-#ifdef ENABLE_PYTHON
-	CUtlVector< boost::python::object > activeAbilities;
-	activeAbilities = m_vecActiveAbilities;
-	for(int i = 0; i < activeAbilities.Count(); i++)
-	{
-		SrcPySystem()->RunT<bool, MouseTraceData_t>( SrcPySystem()->Get("OnMinimapClick", activeAbilities[i]), false, mousedata );
-	}
-#endif // ENABLE_PYTHON
+	SimulateAbilityClick(mousedata, "OnMinimapClick");
 
 	engine->ServerCmd( VarArgs("minimap_lm %f %f %f %f %f %f %lu", mousedata.m_vStartPos.x, mousedata.m_vStartPos.y, mousedata.m_vStartPos.z, 
 		mousedata.m_vEndPos.x, mousedata.m_vEndPos.y, mousedata.m_vEndPos.z, mousedata.m_hEnt ? mousedata.m_hEnt->index : -1) );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void C_HL2WarsPlayer::PortraitClick( const MouseTraceData_t &mousedata )
+{
+	SimulateAbilityClick(mousedata, "OnPortraitClick");
+
+	engine->ServerCmd(VarArgs("portrait_lm %f %f %f %f %f %f %lu", mousedata.m_vStartPos.x, mousedata.m_vStartPos.y, mousedata.m_vStartPos.z,
+		mousedata.m_vEndPos.x, mousedata.m_vEndPos.y, mousedata.m_vEndPos.z, mousedata.m_hEnt ? mousedata.m_hEnt->index : -1));
 }
 
 //-----------------------------------------------------------------------------

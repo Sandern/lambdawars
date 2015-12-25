@@ -871,6 +871,27 @@ void CHL2WarsPlayer::OnRightMouseButtonReleased( const MouseTraceData_t &data )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
+void CHL2WarsPlayer::SimulateAbilityClick(const MouseTraceData_t &mousedata, const char *methodName)
+{
+	m_MouseData = mousedata;
+	m_MouseDataRightPressed = mousedata;
+	m_MouseDataRightReleased = mousedata;
+	m_MouseDataLeftPressed = mousedata;
+	m_MouseDataLeftReleased = mousedata;
+
+#ifdef ENABLE_PYTHON
+	CUtlVector< boost::python::object > activeAbilities;
+	activeAbilities = m_vecActiveAbilities;
+	for (int i = 0; i < activeAbilities.Count(); i++)
+	{
+		SrcPySystem()->RunT<bool, MouseTraceData_t>(SrcPySystem()->Get(methodName, activeAbilities[i]), false, mousedata);
+	}
+#endif // ENABLE_PYTHON
+}
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
 void CHL2WarsPlayer::ClearMouse()
 {
 	m_bIsMouseCleared = true;

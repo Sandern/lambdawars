@@ -1466,6 +1466,16 @@ void register_C_HL2WarsPlayer_class(){
                 , OrderUnits_function_type( &::C_HL2WarsPlayer::OrderUnits ) );
         
         }
+        { //::C_HL2WarsPlayer::PortraitClick
+        
+            typedef void ( ::C_HL2WarsPlayer::*PortraitClick_function_type )( ::MouseTraceData_t const & ) ;
+            
+            C_HL2WarsPlayer_exposer.def( 
+                "PortraitClick"
+                , PortraitClick_function_type( &::C_HL2WarsPlayer::PortraitClick )
+                , ( bp::arg("mousedata") ) );
+        
+        }
         { //::C_HL2WarsPlayer::PostDataUpdate
         
             typedef void ( ::C_HL2WarsPlayer::*PostDataUpdate_function_type )( ::DataUpdateType_t ) ;

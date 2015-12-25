@@ -197,7 +197,9 @@ private:
 	void					OnLeftMouseButtonReleasedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonPressedInternal( const MouseTraceData_t &data );
 	void					OnRightMouseButtonDoublePressedInternal( const MouseTraceData_t &data );
-	void					OnRightMouseButtonReleasedInternal( const MouseTraceData_t &data );	
+	void					OnRightMouseButtonReleasedInternal( const MouseTraceData_t &data );
+
+	void					SimulateAbilityClick(const MouseTraceData_t &mousedata, const char *methodName);
 
 private:
 	// Mouse data
