@@ -150,6 +150,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_bLimitPositionActive = false;
 	m_iTestRouteMask = MASK_SOLID;
 	m_iConsiderSize = 0;
+	m_iUsedTestDirections = 0;
 }
 #endif // ENABLE_PYTHON
 
