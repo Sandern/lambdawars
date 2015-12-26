@@ -300,19 +300,22 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	CheckGoalStatus_t GoalStatus;
 
 	// Allow the AI to override the desired goal velocity
+	// TODO: Functions badly and causes a lot of confusing logic due other checks. Should be separated in a better way.
 	if( m_vForceGoalVelocity.IsValid() )
 	{
 		vPathDir = m_vForceGoalVelocity;
 		fWaypointDist = VectorNormalize( vPathDir ) + 1000.0f;
 		GoalStatus = CHS_HASGOAL;
-		RegenerateConsiderList( MoveCommand, vPathDir, GoalStatus );
+		// Pass true for dirty hack for Manhack, should always include all units when considering.
+		RegenerateConsiderList( MoveCommand, vPathDir, GoalStatus, true );
+		UpdateGoalInfo();
 	}
 	else
 	{
 		GoalStatus = UpdateGoalAndPath( MoveCommand, vPathDir, fWaypointDist );
 	}
 
-	// Compute velocity
+	// Compute velocity. Dont' do this if we are at our goal position, unless a goal velocity is forced.
 	if( GoalStatus != CHS_ATGOAL || (GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX) )
 	{
 		if( !m_bNoAvoid || GoalStatus == CHS_NOGOAL )
@@ -592,11 +595,11 @@ float UnitBaseNavigator::GetDensityMultiplier()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus  )
+void UnitBaseNavigator::RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll )
 {
 	VPROF_BUDGET( "UnitBaseNavigator::RegenerateConsiderList", VPROF_BUDGETGROUP_UNITS );
 
-	CollectConsiderEntities( MoveCommand, GoalStatus );
+	CollectConsiderEntities( MoveCommand, GoalStatus, bForceIncludeAll );
 	ComputeConsiderDensAndDirs( MoveCommand, vPathDir, GoalStatus );
 }
 
@@ -604,7 +607,7 @@ void UnitBaseNavigator::RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand
 // Purpose: Generates a list of surrounding entities, potentially blocking
 //			the unit.
 //-----------------------------------------------------------------------------
-void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus )
+void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll )
 {
 	int n, i;
 	float fRadius;
@@ -636,40 +639,43 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 			pEnt->IsNavIgnored() || pEnt->GetOwnerEntity() == m_pOuter || (pEnt->GetFlags() & (FL_STATICPROP|FL_WORLDBRUSH)) )
 			continue;
 
-		// RegenerateConsiderList only runs with CHS_ATGOAL with the GF_ATGOAL_RELAX flag
-		// In this case, we want to avoid the target, so it should not be filtered (used for following code)
-		if( GoalStatus != CHS_ATGOAL )
+		if( !bForceIncludeAll )
 		{
-			if( pEnt == GetPath()->m_hTarget )
-				continue;
-
-			// MAYBE?
-#if 0
-			if( GetPath()->m_iGoalFlags & GF_OWNERISTARGET )
+			// RegenerateConsiderList only runs with CHS_ATGOAL with the GF_ATGOAL_RELAX flag
+			// In this case, we want to avoid the target, so it should not be filtered (used for following code)
+			if( GoalStatus != CHS_ATGOAL )
 			{
-				CBaseEntity *pOwnerEntity = pEnt->GetOwnerEntity();
-				if( pOwnerEntity && pOwnerEntity == GetPath()->m_hTarget.Get() )
+				if( pEnt == GetPath()->m_hTarget )
+					continue;
+
+				// MAYBE?
+#if 0
+				if( GetPath()->m_iGoalFlags & GF_OWNERISTARGET )
+				{
+					CBaseEntity *pOwnerEntity = pEnt->GetOwnerEntity();
+					if( pOwnerEntity && pOwnerEntity == GetPath()->m_hTarget.Get() )
+						continue;
+				}
+#endif // 0
+			}
+
+			// If specified, don't avoid enemies
+			if (!GetPath()->m_bAvoidEnemies)
+			{
+				if (m_pOuter->IRelationType(pEnt) == D_HT)
 					continue;
 			}
-#endif // 0
-		}
 
-		// If specified, don't avoid enemies
-		if( !GetPath()->m_bAvoidEnemies )
-		{
-			if( m_pOuter->IRelationType( pEnt ) == D_HT )
-				continue;
-		}
-
-		// Ignore units of who this unit is the follow target
-		// Otherwise we might move out of the way!
-		if( pEnt->MyUnitPointer() )
-		{
-			UnitBaseNavigator *pNavigator = pEnt->MyUnitPointer()->GetNavigator();
-			if( pNavigator )
+			// Ignore units of who this unit is the follow target
+			// Otherwise we might move out of the way!
+			if (pEnt->MyUnitPointer())
 			{
-				if( pNavigator->GetPath()->m_iGoalType == GOALTYPE_TARGETENT && pNavigator->GetPath()->m_hTarget == m_pOuter )
-					continue;
+				UnitBaseNavigator *pNavigator = pEnt->MyUnitPointer()->GetNavigator();
+				if (pNavigator)
+				{
+					if (pNavigator->GetPath()->m_iGoalType == GOALTYPE_TARGETENT && pNavigator->GetPath()->m_hTarget == m_pOuter)
+						continue;
+				}
 			}
 		}
 
@@ -970,7 +976,7 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	if( GetPath()->m_iGoalType != GOALTYPE_NONE && GoalStatus != CHS_ATGOAL )
 		fDist = UnitComputePathDirection( m_vTestPositions[iPos], GetPath()->m_pWaypointHead->GetPos(), vPathDir );
 	else if( m_vForceGoalVelocity.IsValid() )
-		fDist = ( (m_vForceGoalVelocity * 2) - m_vTestPositions[iPos] ).Length2D();
+		fDist = ( (m_vForceGoalVelocity * m_fGoalDistance) - m_vTestPositions[iPos] ).Length2D();
 	else
 		fDist = 0.0f;
 	
@@ -1005,10 +1011,11 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	{
 		vFinalVelocity = vPathVelocity;
 	}
-	else if (fDensity > fThresholdMax )
+	// DISABLED: when flow velocity is zero, it filters out the entire movement
+	/*else if (fDensity > fThresholdMax )
 	{
 		vFinalVelocity = vFlowVelocity;
-	}
+	}*/
 	else
 	{
 		// Computed interpolated speed
@@ -2144,11 +2151,18 @@ void UnitBaseNavigator::UpdateGoalTarget( CBaseEntity *pTarget, UnitBasePath *pP
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::UpdateGoalInfo( void )
 {
+	if (m_vForceGoalVelocity.IsValid())
+	{
+		m_vGoalDir = m_vForceGoalVelocity;
+		m_fGoalDistance = VectorNormalize(m_vGoalDir);
+		return;
+	}
+
 	if( GetPath()->m_iGoalType == GOALTYPE_NONE )
 		return;
 
 	// Get distance and direction
-	if( GetPath()->m_hTarget )
+	if (GetPath()->m_hTarget)
 	{
 		if( GetPath()->m_iGoalFlags & GF_USETARGETDIST )
 		{

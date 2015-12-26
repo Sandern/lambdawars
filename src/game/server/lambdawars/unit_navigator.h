@@ -384,12 +384,12 @@ public:
 	const Vector &		GetWishVelocity() { return m_vLastWishVelocity; }
 
 	virtual float		GetEntityBoundingRadius( CBaseEntity *pEnt );
-	virtual void		RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+	virtual void		RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll = false );
 	//virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
 	virtual bool		ShouldConsiderNavMesh( void );
 
 	
-	virtual void		CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus );
+	virtual void		CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll = false );
 	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
 	virtual bool		IsEntityNavIgnored( UnitBaseMoveCommand &MoveCommand, CBaseEntity *pEnt );
 
