@@ -149,6 +149,7 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_fNextAllowPathRecomputeTime = 0.0f;
 	m_bLimitPositionActive = false;
 	m_iTestRouteMask = MASK_SOLID;
+	m_iConsiderSize = 0;
 }
 #endif // ENABLE_PYTHON
 
