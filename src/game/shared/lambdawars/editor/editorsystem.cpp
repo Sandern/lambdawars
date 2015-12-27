@@ -49,6 +49,7 @@ CEditorSystem *EditorSystem()
 
 bool CEditorSystem::Init()
 {
+	m_bActive = false;
 #ifndef CLIENT_DLL
 	gEntList.AddListenerEntity( this );
 #else
@@ -96,6 +97,7 @@ void CEditorSystem::LevelShutdownPreEntity()
 {
 	ClearLoadedMap();
 	m_hSelectedEntities.Purge();
+	SetActive( false );
 }
 
 #ifndef CLIENT_DLL

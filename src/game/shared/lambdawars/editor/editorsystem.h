@@ -36,6 +36,7 @@ public:
 #endif // CLIENT_DLL
 	virtual void LevelShutdownPreEntity();
 
+	void SetActive( bool bActive );
 	bool IsActive();
 
 	// Map managing
@@ -164,6 +165,7 @@ private:
 #endif // CLIENT_DLL
 
 private:
+	bool m_bActive;
 	CEditorWarsMapMgr m_WarsMapManager;
 
 	// Selection
@@ -203,10 +205,14 @@ private:
 #endif // CLIENT_DLL
 };
 
+inline void CEditorSystem::SetActive(bool bActive)
+{
+	m_bActive = bActive;
+}
 
 inline bool CEditorSystem::IsActive()
 {
-	return IsMapLoaded();
+	return m_bActive;
 }
 
 // Map managing

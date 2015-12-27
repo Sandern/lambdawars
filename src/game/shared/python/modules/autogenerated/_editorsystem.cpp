@@ -342,6 +342,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
                 , ( bp::arg("pCommand") ) );
         
         }
+        { //::CEditorSystem::SetActive
+        
+            typedef void ( ::CEditorSystem::*SetActive_function_type )( bool ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SetActive"
+                , SetActive_function_type( &::CEditorSystem::SetActive )
+                , ( bp::arg("bActive") ) );
+        
+        }
         { //::CEditorSystem::SetEditorMode
         
             typedef void ( ::CEditorSystem::*SetEditorMode_function_type )( ::CEditorSystem::EditorInteractionMode_t ) ;
@@ -758,6 +768,16 @@ BOOST_PYTHON_MODULE(_editorsystem){
             CEditorSystem_exposer.def( 
                 "SaveCurrentVmf"
                 , SaveCurrentVmf_function_type( &::CEditorSystem::SaveCurrentVmf ) );
+        
+        }
+        { //::CEditorSystem::SetActive
+        
+            typedef void ( ::CEditorSystem::*SetActive_function_type )( bool ) ;
+            
+            CEditorSystem_exposer.def( 
+                "SetActive"
+                , SetActive_function_type( &::CEditorSystem::SetActive )
+                , ( bp::arg("bActive") ) );
         
         }
         { //::CEditorSystem::SetEditorMode
