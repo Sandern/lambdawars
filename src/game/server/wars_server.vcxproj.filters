@@ -3959,5 +3959,8 @@
     <Library Include="..\..\lib\public\unicodedata.lib">
       <Filter>Link Libraries</Filter>
     </Library>
+    <Library Include="..\..\lib\public\_ctypes.lib">
+      <Filter>Link Libraries</Filter>
+    </Library>
   </ItemGroup>
 </Project>
