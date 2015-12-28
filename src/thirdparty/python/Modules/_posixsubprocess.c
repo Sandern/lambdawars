@@ -14,6 +14,9 @@
 #ifdef HAVE_SYS_SYSCALL_H
 #include <sys/syscall.h>
 #endif
+#if defined(HAVE_SYS_RESOURCE_H)
+#include <sys/resource.h>
+#endif
 #ifdef HAVE_DIRENT_H
 #include <dirent.h>
 #endif
@@ -44,17 +47,25 @@
 #define POSIX_CALL(call)   do { if ((call) == -1) goto error; } while (0)
 
 
-/* Given the gc module call gc.enable() and return 0 on success. */
+/* If gc was disabled, call gc.enable().  Return 0 on success. */
 static int
-_enable_gc(PyObject *gc_module)
+_enable_gc(int need_to_reenable_gc, PyObject *gc_module)
 {
     PyObject *result;
     _Py_IDENTIFIER(enable);
+    PyObject *exctype, *val, *tb;
 
-    result = _PyObject_CallMethodId(gc_module, &PyId_enable, NULL);
-    if (result == NULL)
-        return 1;
-    Py_DECREF(result);
+    if (need_to_reenable_gc) {
+        PyErr_Fetch(&exctype, &val, &tb);
+        result = _PyObject_CallMethodId(gc_module, &PyId_enable, NULL);
+        if (exctype != NULL) {
+            PyErr_Restore(exctype, val, tb);
+        }
+        if (result == NULL) {
+            return 1;
+        }
+        Py_DECREF(result);
+    }
     return 0;
 }
 
@@ -174,6 +185,13 @@ safe_get_max_fd(void)
     if (local_max_fd >= 0)
         return local_max_fd;
 #endif
+#if defined(HAVE_SYS_RESOURCE_H) && defined(__OpenBSD__)
+    struct rlimit rl;
+    /* Not on the POSIX async signal safe functions list but likely
+     * safe.  TODO - Someone should audit OpenBSD to make sure. */
+    if (getrlimit(RLIMIT_NOFILE, &rl) >= 0)
+        return (long) rl.rlim_max;
+#endif
 #ifdef _SC_OPEN_MAX
     local_max_fd = sysconf(_SC_OPEN_MAX);
     if (local_max_fd == -1)
@@ -207,13 +225,13 @@ _close_fds_by_brute_force(long start_fd, PyObject *py_fds_to_keep)
         if (keep_fd < start_fd)
             continue;
         for (fd_num = start_fd; fd_num < keep_fd; ++fd_num) {
-            while (close(fd_num) < 0 && errno == EINTR);
+            close(fd_num);
         }
         start_fd = keep_fd + 1;
     }
     if (start_fd <= end_fd) {
         for (fd_num = start_fd; fd_num < end_fd; ++fd_num) {
-            while (close(fd_num) < 0 && errno == EINTR);
+            close(fd_num);
         }
     }
 }
@@ -274,11 +292,11 @@ _close_open_fds_safe(int start_fd, PyObject* py_fds_to_keep)
                     continue;  /* Not a number. */
                 if (fd != fd_dir_fd && fd >= start_fd &&
                     !_is_fd_in_sorted_fd_sequence(fd, py_fds_to_keep)) {
-                    while (close(fd) < 0 && errno == EINTR);
+                    close(fd);
                 }
             }
         }
-        while (close(fd_dir_fd) < 0 && errno == EINTR);
+        close(fd_dir_fd);
     }
 }
 
@@ -312,7 +330,7 @@ _close_open_fds_maybe_unsafe(long start_fd, PyObject* py_fds_to_keep)
      * reuse that fd otherwise we might close opendir's file descriptor in
      * our loop.  This trick assumes that fd's are allocated on a lowest
      * available basis. */
-    while (close(start_fd) < 0 && errno == EINTR);
+    close(start_fd);
     ++start_fd;
 #endif
 
@@ -339,7 +357,7 @@ _close_open_fds_maybe_unsafe(long start_fd, PyObject* py_fds_to_keep)
                 continue;  /* Not a number. */
             if (fd != fd_used_by_opendir && fd >= start_fd &&
                 !_is_fd_in_sorted_fd_sequence(fd, py_fds_to_keep)) {
-                while (close(fd) < 0 && errno == EINTR);
+                close(fd);
             }
             errno = 0;
         }
@@ -681,6 +699,7 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
         _PyImport_ReleaseLock() < 0 && !PyErr_Occurred()) {
         PyErr_SetString(PyExc_RuntimeError,
                         "not holding the import lock");
+        pid = -1;
     }
     import_lock_held = 0;
 
@@ -692,9 +711,8 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
     _Py_FreeCharPArray(exec_array);
 
     /* Reenable gc in the parent process (or if fork failed). */
-    if (need_to_reenable_gc && _enable_gc(gc_module)) {
-        Py_XDECREF(gc_module);
-        return NULL;
+    if (_enable_gc(need_to_reenable_gc, gc_module)) {
+        pid = -1;
     }
     Py_XDECREF(preexec_fn_args_tuple);
     Py_XDECREF(gc_module);
@@ -716,14 +734,7 @@ cleanup:
     Py_XDECREF(converted_args);
     Py_XDECREF(fast_args);
     Py_XDECREF(preexec_fn_args_tuple);
-
-    /* Reenable gc if it was disabled. */
-    if (need_to_reenable_gc) {
-        PyObject *exctype, *val, *tb;
-        PyErr_Fetch(&exctype, &val, &tb);
-        _enable_gc(gc_module);
-        PyErr_Restore(exctype, val, tb);
-    }
+    _enable_gc(need_to_reenable_gc, gc_module);
     Py_XDECREF(gc_module);
     return NULL;
 }

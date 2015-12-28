@@ -858,6 +858,11 @@ path_converter(PyObject *o, void *p) {
             Py_DECREF(unicode);
             return 0;
         }
+        if (wcslen(wide) != length) {
+            FORMAT_EXCEPTION(PyExc_TypeError, "embedded null character");
+            Py_DECREF(unicode);
+            return 0;
+        }
 
         path->wide = wide;
         path->narrow = NULL;
@@ -1638,7 +1643,7 @@ get_target_path(HANDLE hdl, wchar_t **target_path)
     if(!buf_size)
         return FALSE;
 
-    buf = (wchar_t *)PyMem_Malloc((buf_size+1)*sizeof(wchar_t));
+    buf = PyMem_New(wchar_t, buf_size+1);
     if (!buf) {
         SetLastError(ERROR_OUTOFMEMORY);
         return FALSE;
@@ -3413,12 +3418,15 @@ posix_lchown(PyObject *self, PyObject *args)
 static PyObject *
 posix_getcwd(int use_bytes)
 {
-    char buf[1026];
-    char *res;
+    char *buf, *tmpbuf;
+    char *cwd;
+    const size_t chunk = 1024;
+    size_t buflen = 0;
+    PyObject *obj;
 
 #ifdef MS_WINDOWS
     if (!use_bytes) {
-        wchar_t wbuf[1026];
+        wchar_t wbuf[MAXPATHLEN];
         wchar_t *wbuf2 = wbuf;
         PyObject *resobj;
         DWORD len;
@@ -3452,14 +3460,31 @@ posix_getcwd(int use_bytes)
         return NULL;
 #endif
 
+    buf = cwd = NULL;
     Py_BEGIN_ALLOW_THREADS
-    res = getcwd(buf, sizeof buf);
+    do {
+        buflen += chunk;
+        tmpbuf = PyMem_RawRealloc(buf, buflen);
+        if (tmpbuf == NULL)
+            break;
+
+        buf = tmpbuf;
+        cwd = getcwd(buf, buflen);
+    } while (cwd == NULL && errno == ERANGE);
     Py_END_ALLOW_THREADS
-    if (res == NULL)
+
+    if (cwd == NULL) {
+        PyMem_RawFree(buf);
         return posix_error();
+    }
+
     if (use_bytes)
-        return PyBytes_FromStringAndSize(buf, strlen(buf));
-    return PyUnicode_DecodeFSDefault(buf);
+        obj = PyBytes_FromStringAndSize(buf, strlen(buf));
+    else
+        obj = PyUnicode_DecodeFSDefault(buf);
+    PyMem_RawFree(buf);
+
+    return obj;
 }
 
 PyDoc_STRVAR(posix_getcwd__doc__,
@@ -3627,7 +3652,7 @@ _listdir_windows_no_opendir(path_t *path, PyObject *list)
             len = wcslen(path->wide);
         }
         /* The +5 is so we can append "\\*.*\0" */
-        wnamebuf = PyMem_Malloc((len + 5) * sizeof(wchar_t));
+        wnamebuf = PyMem_New(wchar_t, len + 5);
         if (!wnamebuf) {
             PyErr_NoMemory();
             goto exit;
@@ -3917,7 +3942,7 @@ posix__getfullpathname(PyObject *self, PyObject *args)
                                   Py_ARRAY_LENGTH(woutbuf),
                                   woutbuf, &wtemp);
         if (result > Py_ARRAY_LENGTH(woutbuf)) {
-            woutbufp = PyMem_Malloc(result * sizeof(wchar_t));
+            woutbufp = PyMem_New(wchar_t, result);
             if (!woutbufp)
                 return PyErr_NoMemory();
             result = GetFullPathNameW(wpath, result, woutbufp, &wtemp);
@@ -3997,7 +4022,7 @@ posix__getfinalpathname(PyObject *self, PyObject *args)
     if(!buf_size)
         return win32_error_object("GetFinalPathNameByHandle", po);
 
-    target_path = (wchar_t *)PyMem_Malloc((buf_size+1)*sizeof(wchar_t));
+    target_path = PyMem_New(wchar_t, buf_size+1);
     if(!target_path)
         return PyErr_NoMemory();
 
@@ -4082,7 +4107,7 @@ posix__getvolumepathname(PyObject *self, PyObject *args)
         return NULL;
     }
 
-    mountpath = (wchar_t *)PyMem_Malloc(buflen * sizeof(wchar_t));
+    mountpath = PyMem_New(wchar_t, buflen);
     if (mountpath == NULL)
         return PyErr_NoMemory();
 
@@ -4670,7 +4695,7 @@ posix_uname(PyObject *self, PyObject *noargs)
 
 
 PyDoc_STRVAR(posix_utime__doc__,
-"utime(path, times=None, *, ns=None, dir_fd=None, follow_symlinks=True)\n\
+"utime(path, times=None, *[, ns], dir_fd=None, follow_symlinks=True)\n\
 Set the access and modified time of path.\n\
 \n\
 path may always be specified as a string.\n\
@@ -4679,10 +4704,10 @@ On some platforms, path may also be specified as an open file descriptor.\n\
 \n\
 If times is not None, it must be a tuple (atime, mtime);\n\
     atime and mtime should be expressed as float seconds since the epoch.\n\
-If ns is not None, it must be a tuple (atime_ns, mtime_ns);\n\
+If ns is specified, it must be a tuple (atime_ns, mtime_ns);\n\
     atime_ns and mtime_ns should be expressed as integer nanoseconds\n\
     since the epoch.\n\
-If both times and ns are None, utime uses the current time.\n\
+If times is None and ns is unspecified, utime uses the current time.\n\
 Specifying tuples for both times and ns is an error.\n\
 \n\
 If dir_fd is not None, it should be a file descriptor open to a directory,\n\
@@ -4756,9 +4781,7 @@ typedef struct {
     } \
 
 
-#define UTIME_HAVE_DIR_FD (defined(HAVE_FUTIMESAT) || defined(HAVE_UTIMENSAT))
-
-#if UTIME_HAVE_DIR_FD
+#if defined(HAVE_FUTIMESAT) || defined(HAVE_UTIMENSAT)
 
 static int
 utime_dir_fd(utime_t *ut, int dir_fd, char *path, int follow_symlinks)
@@ -4781,9 +4804,7 @@ utime_dir_fd(utime_t *ut, int dir_fd, char *path, int follow_symlinks)
 
 #endif
 
-#define UTIME_HAVE_FD (defined(HAVE_FUTIMES) || defined(HAVE_FUTIMENS))
-
-#if UTIME_HAVE_FD
+#if defined(HAVE_FUTIMES) || defined(HAVE_FUTIMENS)
 
 static int
 utime_fd(utime_t *ut, int fd)
@@ -4887,14 +4908,14 @@ posix_utime(PyObject *self, PyObject *args, PyObject *kwargs)
     memset(&path, 0, sizeof(path));
     path.function_name = "utime";
     memset(&utime, 0, sizeof(utime_t));
-#if UTIME_HAVE_FD
+#if defined(HAVE_FUTIMES) || defined(HAVE_FUTIMENS)
     path.allow_fd = 1;
 #endif
     if (!PyArg_ParseTupleAndKeywords(args, kwargs,
             "O&|O$OO&p:utime", keywords,
             path_converter, &path,
             &times, &ns,
-#if UTIME_HAVE_DIR_FD
+#if defined(HAVE_FUTIMESAT) || defined(HAVE_UTIMENSAT)
             dir_fd_converter, &dir_fd,
 #else
             dir_fd_unavailable, &dir_fd,
@@ -5010,13 +5031,13 @@ posix_utime(PyObject *self, PyObject *args, PyObject *kwargs)
     else
 #endif
 
-#if UTIME_HAVE_DIR_FD
+#if defined(HAVE_FUTIMESAT) || defined(HAVE_UTIMENSAT)
     if ((dir_fd != DEFAULT_DIR_FD) || (!follow_symlinks))
         result = utime_dir_fd(&utime, dir_fd, path.narrow, follow_symlinks);
     else
 #endif
 
-#if UTIME_HAVE_FD
+#if defined(HAVE_FUTIMES) || defined(HAVE_FUTIMENS)
     if (path.fd != -1)
         result = utime_fd(&utime, path.fd);
     else
@@ -6213,9 +6234,9 @@ posix_getgrouplist(PyObject *self, PyObject *args)
 #endif
 
 #ifdef __APPLE__
-    groups = PyMem_Malloc(ngroups * sizeof(int));
+    groups = PyMem_New(int, ngroups);
 #else
-    groups = PyMem_Malloc(ngroups * sizeof(gid_t));
+    groups = PyMem_New(gid_t, ngroups);
 #endif
     if (groups == NULL)
         return PyErr_NoMemory();
@@ -6293,7 +6314,7 @@ posix_getgroups(PyObject *self, PyObject *noargs)
         /* groups will fit in existing array */
         alt_grouplist = grouplist;
     } else {
-        alt_grouplist = PyMem_Malloc(n * sizeof(gid_t));
+        alt_grouplist = PyMem_New(gid_t, n);
         if (alt_grouplist == NULL) {
             errno = EINVAL;
             return posix_error();
@@ -6319,7 +6340,7 @@ posix_getgroups(PyObject *self, PyObject *noargs)
                 /* Avoid malloc(0) */
                 alt_grouplist = grouplist;
             } else {
-                alt_grouplist = PyMem_Malloc(n * sizeof(gid_t));
+                alt_grouplist = PyMem_New(gid_t, n);
                 if (alt_grouplist == NULL) {
                     errno = EINVAL;
                     return posix_error();
@@ -8224,10 +8245,10 @@ posix_write(PyObject *self, PyObject *args)
 
 #ifdef HAVE_SENDFILE
 PyDoc_STRVAR(posix_sendfile__doc__,
-"sendfile(out, in, offset, nbytes) -> byteswritten\n\
-sendfile(out, in, offset, nbytes, headers=None, trailers=None, flags=0)\n\
+"sendfile(out, in, offset, count) -> byteswritten\n\
+sendfile(out, in, offset, count[, headers][, trailers], flags=0)\n\
             -> byteswritten\n\
-Copy nbytes bytes from file descriptor in to file descriptor out.");
+Copy count bytes from file descriptor in to file descriptor out.");
 
 static PyObject *
 posix_sendfile(PyObject *self, PyObject *args, PyObject *kwdict)
@@ -8245,6 +8266,7 @@ posix_sendfile(PyObject *self, PyObject *args, PyObject *kwdict)
     off_t sbytes;
     struct sf_hdtr sf;
     int flags = 0;
+    /* Beware that "in" clashes with Python's own "in" operator keyword */
     static char *keywords[] = {"out", "in",
                                 "offset", "count",
                                 "headers", "trailers", "flags", NULL};
@@ -8264,7 +8286,7 @@ posix_sendfile(PyObject *self, PyObject *args, PyObject *kwdict)
     if (headers != NULL) {
         if (!PySequence_Check(headers)) {
             PyErr_SetString(PyExc_TypeError,
-                "sendfile() headers must be a sequence or None");
+                "sendfile() headers must be a sequence");
             return NULL;
         } else {
             Py_ssize_t i = 0; /* Avoid uninitialized warning */
@@ -8281,7 +8303,7 @@ posix_sendfile(PyObject *self, PyObject *args, PyObject *kwdict)
     if (trailers != NULL) {
         if (!PySequence_Check(trailers)) {
             PyErr_SetString(PyExc_TypeError,
-                "sendfile() trailers must be a sequence or None");
+                "sendfile() trailers must be a sequence");
             return NULL;
         } else {
             Py_ssize_t i = 0; /* Avoid uninitialized warning */
@@ -8634,9 +8656,9 @@ exit:
 
 #if defined(HAVE_MKNOD) && defined(HAVE_MAKEDEV)
 PyDoc_STRVAR(posix_mknod__doc__,
-"mknod(filename, mode=0o600, device=0, *, dir_fd=None)\n\n\
+"mknod(path, mode=0o600, device=0, *, dir_fd=None)\n\n\
 Create a filesystem node (file, device special file or named pipe)\n\
-named filename. mode specifies both the permissions to use and the\n\
+named path. mode specifies both the permissions to use and the\n\
 type of node to be created, being combined (bitwise OR) with one of\n\
 S_IFREG, S_IFCHR, S_IFBLK, and S_IFIFO. For S_IFCHR and S_IFBLK,\n\
 device defines the newly created device special file (probably using\n\

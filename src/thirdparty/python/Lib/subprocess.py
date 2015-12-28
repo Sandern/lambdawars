@@ -896,10 +896,12 @@ class Popen(object):
             self.stdout.close()
         if self.stderr:
             self.stderr.close()
-        if self.stdin:
-            self.stdin.close()
-        # Wait for the process to terminate, to avoid zombies.
-        self.wait()
+        try:  # Flushing a BufferedWriter may raise an error
+            if self.stdin:
+                self.stdin.close()
+        finally:
+            # Wait for the process to terminate, to avoid zombies.
+            self.wait()
 
     def __del__(self, _maxsize=sys.maxsize):
         if not self._child_created:
@@ -1239,8 +1241,10 @@ class Popen(object):
             return (stdout, stderr)
 
         def send_signal(self, sig):
-            """Send a signal to the process
-            """
+            """Send a signal to the process."""
+            # Don't signal a process that we know has already died.
+            if self.returncode is not None:
+                return
             if sig == signal.SIGTERM:
                 self.terminate()
             elif sig == signal.CTRL_C_EVENT:
@@ -1251,8 +1255,10 @@ class Popen(object):
                 raise ValueError("Unsupported signal: {}".format(sig))
 
         def terminate(self):
-            """Terminates the process
-            """
+            """Terminates the process."""
+            # Don't terminate a process that we know has already died.
+            if self.returncode is not None:
+                return
             try:
                 _winapi.TerminateProcess(self._handle, 1)
             except PermissionError:
@@ -1676,9 +1682,10 @@ class Popen(object):
 
 
         def send_signal(self, sig):
-            """Send a signal to the process
-            """
-            os.kill(self.pid, sig)
+            """Send a signal to the process."""
+            # Skip signalling a process that we know has already died.
+            if self.returncode is None:
+                os.kill(self.pid, sig)
 
         def terminate(self):
             """Terminate the process with SIGTERM

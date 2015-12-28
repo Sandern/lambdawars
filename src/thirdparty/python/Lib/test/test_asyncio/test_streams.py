@@ -2,8 +2,10 @@
 
 import gc
 import os
+import queue
 import socket
 import sys
+import threading
 import unittest
 from unittest import mock
 try:
@@ -446,6 +448,8 @@ class StreamReaderTests(test_utils.TestCase):
             def handle_client(self, client_reader, client_writer):
                 data = yield from client_reader.readline()
                 client_writer.write(data)
+                yield from client_writer.drain()
+                client_writer.close()
 
             def start(self):
                 sock = socket.socket()
@@ -457,12 +461,8 @@ class StreamReaderTests(test_utils.TestCase):
                 return sock.getsockname()
 
             def handle_client_callback(self, client_reader, client_writer):
-                task = asyncio.Task(client_reader.readline(), loop=self.loop)
-
-                def done(task):
-                    client_writer.write(task.result())
-
-                task.add_done_callback(done)
+                self.loop.create_task(self.handle_client(client_reader,
+                                                         client_writer))
 
             def start_callback(self):
                 sock = socket.socket()
@@ -522,6 +522,8 @@ class StreamReaderTests(test_utils.TestCase):
             def handle_client(self, client_reader, client_writer):
                 data = yield from client_reader.readline()
                 client_writer.write(data)
+                yield from client_writer.drain()
+                client_writer.close()
 
             def start(self):
                 self.server = self.loop.run_until_complete(
@@ -530,18 +532,14 @@ class StreamReaderTests(test_utils.TestCase):
                                               loop=self.loop))
 
             def handle_client_callback(self, client_reader, client_writer):
-                task = asyncio.Task(client_reader.readline(), loop=self.loop)
-
-                def done(task):
-                    client_writer.write(task.result())
-
-                task.add_done_callback(done)
+                self.loop.create_task(self.handle_client(client_reader,
+                                                         client_writer))
 
             def start_callback(self):
-                self.server = self.loop.run_until_complete(
-                    asyncio.start_unix_server(self.handle_client_callback,
-                                              path=self.path,
-                                              loop=self.loop))
+                start = asyncio.start_unix_server(self.handle_client_callback,
+                                                  path=self.path,
+                                                  loop=self.loop)
+                self.server = self.loop.run_until_complete(start)
 
             def stop(self):
                 if self.server is not None:
@@ -580,7 +578,7 @@ class StreamReaderTests(test_utils.TestCase):
 
     @unittest.skipIf(sys.platform == 'win32', "Don't have pipes")
     def test_read_all_from_pipe_reader(self):
-        # See Tulip issue 168.  This test is derived from the example
+        # See asyncio issue 168.  This test is derived from the example
         # subprocess_attach_read_pipe.py, but we configure the
         # StreamReader's limit so that twice it is less than the size
         # of the data writter.  Also we must explicitly attach a child
@@ -621,7 +619,7 @@ os.close(fd)
         self.addCleanup(asyncio.set_event_loop, None)
         asyncio.set_event_loop(self.loop)
 
-        # Tulip issue #184: Ensure that StreamReaderProtocol constructor
+        # asyncio issue #184: Ensure that StreamReaderProtocol constructor
         # retrieves the current loop if the loop parameter is not set
         reader = asyncio.StreamReader()
         self.assertIs(reader._loop, self.loop)
@@ -630,11 +628,94 @@ os.close(fd)
         self.addCleanup(asyncio.set_event_loop, None)
         asyncio.set_event_loop(self.loop)
 
-        # Tulip issue #184: Ensure that StreamReaderProtocol constructor
+        # asyncio issue #184: Ensure that StreamReaderProtocol constructor
         # retrieves the current loop if the loop parameter is not set
         reader = mock.Mock()
         protocol = asyncio.StreamReaderProtocol(reader)
         self.assertIs(protocol._loop, self.loop)
+
+    def test_drain_raises(self):
+        # See http://bugs.python.org/issue25441
+
+        # This test should not use asyncio for the mock server; the
+        # whole point of the test is to test for a bug in drain()
+        # where it never gives up the event loop but the socket is
+        # closed on the  server side.
+
+        q = queue.Queue()
+
+        def server():
+            # Runs in a separate thread.
+            sock = socket.socket()
+            sock.bind(('localhost', 0))
+            sock.listen(1)
+            addr = sock.getsockname()
+            q.put(addr)
+            clt, _ = sock.accept()
+            clt.close()
+
+        @asyncio.coroutine
+        def client(host, port):
+            reader, writer = yield from asyncio.open_connection(host, port, loop=self.loop)
+            while True:
+                writer.write(b"foo\n")
+                yield from writer.drain()
+
+        # Start the server thread and wait for it to be listening.
+        thread = threading.Thread(target=server)
+        thread.setDaemon(True)
+        thread.start()
+        addr = q.get()
+
+        # Should not be stuck in an infinite loop.
+        with self.assertRaises((ConnectionResetError, BrokenPipeError)):
+            self.loop.run_until_complete(client(*addr))
+
+        # Clean up the thread.  (Only on success; on failure, it may
+        # be stuck in accept().)
+        thread.join()
+
+    def test___repr__(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        self.assertEqual("<StreamReader>", repr(stream))
+
+    def test___repr__nondefault_limit(self):
+        stream = asyncio.StreamReader(loop=self.loop, limit=123)
+        self.assertEqual("<StreamReader l=123>", repr(stream))
+
+    def test___repr__eof(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream.feed_eof()
+        self.assertEqual("<StreamReader eof>", repr(stream))
+
+    def test___repr__data(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream.feed_data(b'data')
+        self.assertEqual("<StreamReader 4 bytes>", repr(stream))
+
+    def test___repr__exception(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        exc = RuntimeError()
+        stream.set_exception(exc)
+        self.assertEqual("<StreamReader e=RuntimeError()>", repr(stream))
+
+    def test___repr__waiter(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream._waiter = asyncio.Future(loop=self.loop)
+        self.assertRegex(
+            repr(stream),
+            "<StreamReader w=<Future pending[\S ]*>>")
+        stream._waiter.set_result(None)
+        self.loop.run_until_complete(stream._waiter)
+        stream._waiter = None
+        self.assertEqual("<StreamReader>", repr(stream))
+
+    def test___repr__transport(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream._transport = mock.Mock()
+        stream._transport.__repr__ = mock.Mock()
+        stream._transport.__repr__.return_value = "<Transport>"
+        self.assertEqual("<StreamReader t=<Transport>>", repr(stream))
 
 
 if __name__ == '__main__':

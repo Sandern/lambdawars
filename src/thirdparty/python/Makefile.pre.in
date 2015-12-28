@@ -1123,9 +1123,8 @@ maninstall:	altmaninstall
 	(cd $(DESTDIR)$(MANDIR)/man1; $(LN) -s python$(VERSION).1 python3.1)
 
 # Install the library
-PLATDIR=	plat-$(MACHDEP)
-EXTRAPLATDIR= @EXTRAPLATDIR@
-MACHDEPS=	$(PLATDIR) $(EXTRAPLATDIR)
+PLATDIR=	@PLATDIR@
+MACHDEPS=	$(PLATDIR)
 XMLLIBSUBDIRS=  xml xml/dom xml/etree xml/parsers xml/sax
 LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
 		tkinter/test/test_ttk site-packages test \
@@ -1311,7 +1310,7 @@ inclinstall:
 
 # Install the library and miscellaneous stuff needed for extending/embedding
 # This goes into $(exec_prefix)
-LIBPL=		$(LIBDEST)/config-$(LDVERSION)
+LIBPL=		@LIBPL@
 
 # pkgconfig directory
 LIBPC=		$(LIBDIR)/pkgconfig

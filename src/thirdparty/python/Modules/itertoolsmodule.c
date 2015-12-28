@@ -1725,7 +1725,7 @@ PyDoc_STRVAR(starmap_doc,
 "starmap(function, sequence) --> starmap object\n\
 \n\
 Return an iterator whose values are returned from the function evaluated\n\
-with a argument tuple taken from the given sequence.");
+with an argument tuple taken from the given sequence.");
 
 static PyTypeObject starmap_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -2236,13 +2236,21 @@ product_setstate(productobject *lz, PyObject *state)
     {
         PyObject* indexObject = PyTuple_GET_ITEM(state, i);
         Py_ssize_t index = PyLong_AsSsize_t(indexObject);
+        PyObject* pool;
+        Py_ssize_t poolsize;
         if (index < 0 && PyErr_Occurred())
             return NULL; /* not an integer */
+        pool = PyTuple_GET_ITEM(lz->pools, i);
+        poolsize = PyTuple_GET_SIZE(pool);
+        if (poolsize == 0) {
+            lz->stopped = 1;
+            Py_RETURN_NONE;
+        }
         /* clamp the index */
         if (index < 0)
             index = 0;
-        else if (index > n-1)
-            index = n-1;
+        else if (index > poolsize-1)
+            index = poolsize-1;
         lz->indices[i] = index;
     }
 
@@ -2787,11 +2795,13 @@ cwr_next(cwrobject *co)
         if (result == NULL)
             goto empty;
         co->result = result;
-        elem = PyTuple_GET_ITEM(pool, 0);
-        for (i=0; i<r ; i++) {
-            assert(indices[i] == 0);
-            Py_INCREF(elem);
-            PyTuple_SET_ITEM(result, i, elem);
+        if (n > 0) {
+            elem = PyTuple_GET_ITEM(pool, 0);
+            for (i=0; i<r ; i++) {
+                assert(indices[i] == 0);
+                Py_INCREF(elem);
+                PyTuple_SET_ITEM(result, i, elem);
+            }
         }
     } else {
         /* Copy the previous result tuple or re-use it if available */
@@ -2985,18 +2995,18 @@ def permutations(iterable, r=None):
     cycles = range(n-r+1, n+1)[::-1]
     yield tuple(pool[i] for i in indices[:r])
     while n:
-    for i in reversed(range(r)):
-        cycles[i] -= 1
-        if cycles[i] == 0:
-        indices[i:] = indices[i+1:] + indices[i:i+1]
-        cycles[i] = n - i
+        for i in reversed(range(r)):
+            cycles[i] -= 1
+            if cycles[i] == 0:
+                indices[i:] = indices[i+1:] + indices[i:i+1]
+                cycles[i] = n - i
+            else:
+                j = cycles[i]
+                indices[i], indices[-j] = indices[-j], indices[i]
+                yield tuple(pool[i] for i in indices[:r])
+                break
         else:
-        j = cycles[i]
-        indices[i], indices[-j] = indices[-j], indices[i]
-        yield tuple(pool[i] for i in indices[:r])
-        break
-    else:
-        return
+            return
 */
 
 typedef struct {

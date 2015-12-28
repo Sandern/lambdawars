@@ -508,8 +508,8 @@ PKCS5_PBKDF2_HMAC_fast(const char *pass, int passlen,
         HMAC_CTX_cleanup(&hctx_tpl);
         return 0;
     }
-    while(tkeylen) {
-        if(tkeylen > mdlen)
+    while (tkeylen) {
+        if (tkeylen > mdlen)
             cplen = mdlen;
         else
             cplen = tkeylen;
@@ -706,7 +706,7 @@ _openssl_hash_name_mapper(const OBJ_NAME *openssl_obj_name, void *arg)
     if (openssl_obj_name == NULL)
         return;
     /* Ignore aliased names, they pollute the list and OpenSSL appears to
-     * have a its own definition of alias as the resulting list still
+     * have its own definition of alias as the resulting list still
      * contains duplicate and alternate names for several algorithms.     */
     if (openssl_obj_name->alias)
         return;

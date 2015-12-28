@@ -3,6 +3,7 @@
 import errno
 import logging
 import math
+import os
 import socket
 import sys
 import threading
@@ -16,10 +17,15 @@ from asyncio import constants
 from asyncio import test_utils
 try:
     from test import support
-    from test.script_helper import assert_python_ok
 except ImportError:
     from asyncio import test_support as support
-    from asyncio.test_support import assert_python_ok
+try:
+    from test.support.script_helper import assert_python_ok
+except ImportError:
+    try:
+        from test.script_helper import assert_python_ok
+    except ImportError:
+        from asyncio.test_support import assert_python_ok
 
 
 MOCK_ANY = mock.ANY
@@ -56,7 +62,8 @@ class BaseEventLoopTests(test_utils.TestCase):
             NotImplementedError,
             self.loop._make_write_pipe_transport, m, m)
         gen = self.loop._make_subprocess_transport(m, m, m, m, m, m, m)
-        self.assertRaises(NotImplementedError, next, iter(gen))
+        with self.assertRaises(NotImplementedError):
+            gen.send(None)
 
     def test_close(self):
         self.assertFalse(self.loop.is_closed())
@@ -499,7 +506,7 @@ class BaseEventLoopTests(test_utils.TestCase):
 
         # Test Future.__del__
         with mock.patch('asyncio.base_events.logger') as log:
-            fut = asyncio.async(zero_error_coro(), loop=self.loop)
+            fut = asyncio.ensure_future(zero_error_coro(), loop=self.loop)
             fut.add_done_callback(lambda *args: self.loop.stop())
             self.loop.run_forever()
             fut = None # Trigger Future.__del__ or futures._TracebackLogger
@@ -623,6 +630,42 @@ class BaseEventLoopTests(test_utils.TestCase):
             self.assertIs(type(_context['context']['exception']),
                           ZeroDivisionError)
 
+    def test_set_task_factory_invalid(self):
+        with self.assertRaisesRegex(
+            TypeError, 'task factory must be a callable or None'):
+
+            self.loop.set_task_factory(1)
+
+        self.assertIsNone(self.loop.get_task_factory())
+
+    def test_set_task_factory(self):
+        self.loop._process_events = mock.Mock()
+
+        class MyTask(asyncio.Task):
+            pass
+
+        @asyncio.coroutine
+        def coro():
+            pass
+
+        factory = lambda loop, coro: MyTask(coro, loop=loop)
+
+        self.assertIsNone(self.loop.get_task_factory())
+        self.loop.set_task_factory(factory)
+        self.assertIs(self.loop.get_task_factory(), factory)
+
+        task = self.loop.create_task(coro())
+        self.assertTrue(isinstance(task, MyTask))
+        self.loop.run_until_complete(task)
+
+        self.loop.set_task_factory(None)
+        self.assertIsNone(self.loop.get_task_factory())
+
+        task = self.loop.create_task(coro())
+        self.assertTrue(isinstance(task, asyncio.Task))
+        self.assertFalse(isinstance(task, MyTask))
+        self.loop.run_until_complete(task)
+
     def test_env_var_debug(self):
         code = '\n'.join((
             'import asyncio',
@@ -662,7 +705,7 @@ class BaseEventLoopTests(test_utils.TestCase):
         self.set_event_loop(loop)
 
         coro = test()
-        task = asyncio.async(coro, loop=loop)
+        task = asyncio.ensure_future(coro, loop=loop)
         self.assertIsInstance(task, MyTask)
 
         # make warnings quiet
@@ -714,6 +757,59 @@ class BaseEventLoopTests(test_utils.TestCase):
             pass
         self.assertTrue(func.called)
 
+    def test_single_selecter_event_callback_after_stopping(self):
+        # Python issue #25593: A stopped event loop may cause event callbacks
+        # to run more than once.
+        event_sentinel = object()
+        callcount = 0
+        doer = None
+
+        def proc_events(event_list):
+            nonlocal doer
+            if event_sentinel in event_list:
+                doer = self.loop.call_soon(do_event)
+
+        def do_event():
+            nonlocal callcount
+            callcount += 1
+            self.loop.call_soon(clear_selector)
+
+        def clear_selector():
+            doer.cancel()
+            self.loop._selector.select.return_value = ()
+
+        self.loop._process_events = proc_events
+        self.loop._selector.select.return_value = (event_sentinel,)
+
+        for i in range(1, 3):
+            with self.subTest('Loop %d/2' % i):
+                self.loop.call_soon(self.loop.stop)
+                self.loop.run_forever()
+                self.assertEqual(callcount, 1)
+
+    def test_run_once(self):
+        # Simple test for test_utils.run_once().  It may seem strange
+        # to have a test for this (the function isn't even used!) but
+        # it's a de-factor standard API for library tests.  This tests
+        # the idiom: loop.call_soon(loop.stop); loop.run_forever().
+        count = 0
+
+        def callback():
+            nonlocal count
+            count += 1
+
+        self.loop._process_events = mock.Mock()
+        self.loop.call_soon(callback)
+        test_utils.run_once(self.loop)
+        self.assertEqual(count, 1)
+
+    def test_run_forever_pre_stopped(self):
+        # Test that the old idiom for pre-stopping the loop works.
+        self.loop._process_events = mock.Mock()
+        self.loop.stop()
+        self.loop.run_forever()
+        self.loop._selector.select.assert_called_once_with(0)
+
 
 class MyProto(asyncio.Protocol):
     done = None
@@ -748,11 +844,11 @@ class MyProto(asyncio.Protocol):
 class MyDatagramProto(asyncio.DatagramProtocol):
     done = None
 
-    def __init__(self, create_future=False):
+    def __init__(self, create_future=False, loop=None):
         self.state = 'INITIAL'
         self.nbytes = 0
         if create_future:
-            self.done = asyncio.Future()
+            self.done = asyncio.Future(loop=loop)
 
     def connection_made(self, transport):
         self.transport = transport
@@ -1058,6 +1154,19 @@ class BaseEventLoopWithSelectorTests(test_utils.TestCase):
         self.assertRaises(OSError, self.loop.run_until_complete, f)
 
     @mock.patch('asyncio.base_events.socket')
+    def test_create_server_nosoreuseport(self, m_socket):
+        m_socket.getaddrinfo = socket.getaddrinfo
+        m_socket.SOCK_STREAM = socket.SOCK_STREAM
+        m_socket.SOL_SOCKET = socket.SOL_SOCKET
+        del m_socket.SO_REUSEPORT
+        m_socket.socket.return_value = mock.Mock()
+
+        f = self.loop.create_server(
+            MyProto, '0.0.0.0', 0, reuse_port=True)
+
+        self.assertRaises(ValueError, self.loop.run_until_complete, f)
+
+    @mock.patch('asyncio.base_events.socket')
     def test_create_server_cant_bind(self, m_socket):
 
         class Err(OSError):
@@ -1157,6 +1266,125 @@ class BaseEventLoopWithSelectorTests(test_utils.TestCase):
         self.assertRaises(Err, self.loop.run_until_complete, fut)
         self.assertTrue(m_sock.close.called)
 
+    def test_create_datagram_endpoint_sock(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('127.0.0.1', 0))
+        fut = self.loop.create_datagram_endpoint(
+            lambda: MyDatagramProto(create_future=True, loop=self.loop),
+            sock=sock)
+        transport, protocol = self.loop.run_until_complete(fut)
+        transport.close()
+        self.loop.run_until_complete(protocol.done)
+        self.assertEqual('CLOSED', protocol.state)
+
+    def test_create_datagram_endpoint_sock_sockopts(self):
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, local_addr=('127.0.0.1', 0), sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, remote_addr=('127.0.0.1', 0), sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, family=1, sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, proto=1, sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, flags=1, sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, reuse_address=True, sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, reuse_port=True, sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+        fut = self.loop.create_datagram_endpoint(
+            MyDatagramProto, allow_broadcast=True, sock=object())
+        self.assertRaises(ValueError, self.loop.run_until_complete, fut)
+
+    def test_create_datagram_endpoint_sockopts(self):
+        # Socket options should not be applied unless asked for.
+        # SO_REUSEADDR defaults to on for UNIX.
+        # SO_REUSEPORT is not available on all platforms.
+
+        coro = self.loop.create_datagram_endpoint(
+            lambda: MyDatagramProto(create_future=True, loop=self.loop),
+            local_addr=('127.0.0.1', 0))
+        transport, protocol = self.loop.run_until_complete(coro)
+        sock = transport.get_extra_info('socket')
+
+        reuse_address_default_on = (
+            os.name == 'posix' and sys.platform != 'cygwin')
+        reuseport_supported = hasattr(socket, 'SO_REUSEPORT')
+
+        if reuse_address_default_on:
+            self.assertTrue(
+                sock.getsockopt(
+                    socket.SOL_SOCKET, socket.SO_REUSEADDR))
+        else:
+            self.assertFalse(
+                sock.getsockopt(
+                    socket.SOL_SOCKET, socket.SO_REUSEADDR))
+        if reuseport_supported:
+            self.assertFalse(
+                sock.getsockopt(
+                    socket.SOL_SOCKET, socket.SO_REUSEPORT))
+        self.assertFalse(
+            sock.getsockopt(
+                socket.SOL_SOCKET, socket.SO_BROADCAST))
+
+        transport.close()
+        self.loop.run_until_complete(protocol.done)
+        self.assertEqual('CLOSED', protocol.state)
+
+        coro = self.loop.create_datagram_endpoint(
+            lambda: MyDatagramProto(create_future=True, loop=self.loop),
+            local_addr=('127.0.0.1', 0),
+            reuse_address=True,
+            reuse_port=reuseport_supported,
+            allow_broadcast=True)
+        transport, protocol = self.loop.run_until_complete(coro)
+        sock = transport.get_extra_info('socket')
+
+        self.assertTrue(
+            sock.getsockopt(
+                socket.SOL_SOCKET, socket.SO_REUSEADDR))
+        if reuseport_supported:
+            self.assertTrue(
+                sock.getsockopt(
+                    socket.SOL_SOCKET, socket.SO_REUSEPORT))
+        self.assertTrue(
+            sock.getsockopt(
+                socket.SOL_SOCKET, socket.SO_BROADCAST))
+
+        transport.close()
+        self.loop.run_until_complete(protocol.done)
+        self.assertEqual('CLOSED', protocol.state)
+
+    @mock.patch('asyncio.base_events.socket')
+    def test_create_datagram_endpoint_nosoreuseport(self, m_socket):
+        m_socket.getaddrinfo = socket.getaddrinfo
+        m_socket.SOCK_DGRAM = socket.SOCK_DGRAM
+        m_socket.SOL_SOCKET = socket.SOL_SOCKET
+        del m_socket.SO_REUSEPORT
+        m_socket.socket.return_value = mock.Mock()
+
+        coro = self.loop.create_datagram_endpoint(
+            lambda: MyDatagramProto(loop=self.loop),
+            local_addr=('127.0.0.1', 0),
+            reuse_address=False,
+            reuse_port=True)
+
+        self.assertRaises(ValueError, self.loop.run_until_complete, coro)
+
     def test_accept_connection_retry(self):
         sock = mock.Mock()
         sock.accept.side_effect = BlockingIOError()
@@ -1224,7 +1452,7 @@ class BaseEventLoopWithSelectorTests(test_utils.TestCase):
                          "took .* seconds$")
 
         # slow task
-        asyncio.async(stop_loop_coro(self.loop), loop=self.loop)
+        asyncio.ensure_future(stop_loop_coro(self.loop), loop=self.loop)
         self.loop.run_forever()
         fmt, *args = m_logger.warning.call_args[0]
         self.assertRegex(fmt % tuple(args),

@@ -179,7 +179,7 @@ PyByteArray_Resize(PyObject *self, Py_ssize_t requested_size)
         return -1;
     }
 
-    if (size + logical_offset + 1 < alloc) {
+    if (size + logical_offset + 1 <= alloc) {
         /* Current buffer is large enough to host the requested size,
            decide on a strategy. */
         if (size < alloc / 2) {
@@ -298,11 +298,7 @@ bytearray_iconcat(PyByteArrayObject *self, PyObject *other)
         PyBuffer_Release(&vo);
         return PyErr_NoMemory();
     }
-    if (size < self->ob_alloc) {
-        Py_SIZE(self) = size;
-        PyByteArray_AS_STRING(self)[Py_SIZE(self)] = '\0'; /* Trailing null byte */
-    }
-    else if (PyByteArray_Resize((PyObject *)self, size) < 0) {
+    if (PyByteArray_Resize((PyObject *)self, size) < 0) {
         PyBuffer_Release(&vo);
         return NULL;
     }
@@ -858,8 +854,10 @@ bytearray_init(PyByteArrayObject *self, PyObject *args, PyObject *kwds)
             goto error;
 
         /* Append the byte */
-        if (Py_SIZE(self) < self->ob_alloc)
+        if (Py_SIZE(self) + 1 < self->ob_alloc) {
             Py_SIZE(self)++;
+            PyByteArray_AS_STRING(self)[Py_SIZE(self)] = '\0';
+        }
         else if (PyByteArray_Resize((PyObject *)self, Py_SIZE(self)+1) < 0)
             goto error;
         PyByteArray_AS_STRING(self)[Py_SIZE(self)-1] = value;
@@ -978,13 +976,17 @@ bytearray_richcompare(PyObject *self, PyObject *other, int op)
     Py_buffer self_bytes, other_bytes;
     PyObject *res;
     Py_ssize_t minsize;
-    int cmp;
+    int cmp, rc;
 
     /* Bytes can be compared to anything that supports the (binary)
        buffer API.  Except that a comparison with Unicode is always an
        error, even if the comparison is for equality. */
-    if (PyObject_IsInstance(self, (PyObject*)&PyUnicode_Type) ||
-        PyObject_IsInstance(other, (PyObject*)&PyUnicode_Type)) {
+    rc = PyObject_IsInstance(self, (PyObject*)&PyUnicode_Type);
+    if (!rc)
+        rc = PyObject_IsInstance(other, (PyObject*)&PyUnicode_Type);
+    if (rc < 0)
+        return NULL;
+    if (rc) {
         if (Py_BytesWarningFlag && (op == Py_EQ || op == Py_NE)) {
             if (PyErr_WarnEx(PyExc_BytesWarning,
                             "Comparison between bytearray and string", 1))

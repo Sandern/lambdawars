@@ -372,8 +372,11 @@ PyFile_NewStdPrinter(int fd)
 static PyObject *
 stdprinter_write(PyStdPrinter_Object *self, PyObject *args)
 {
-    char *c;
+    PyObject *unicode;
+    PyObject *bytes = NULL;
+    char *str;
     Py_ssize_t n;
+    int err;
 
     if (self->fd < 0) {
         /* fd might be invalid on Windows
@@ -383,25 +386,41 @@ stdprinter_write(PyStdPrinter_Object *self, PyObject *args)
         Py_RETURN_NONE;
     }
 
-    if (!PyArg_ParseTuple(args, "s", &c)) {
+    if (!PyArg_ParseTuple(args, "U", &unicode))
         return NULL;
+
+    /* encode Unicode to UTF-8 */
+    str = PyUnicode_AsUTF8AndSize(unicode, &n);
+    if (str == NULL) {
+        PyErr_Clear();
+        bytes = _PyUnicode_AsUTF8String(unicode, "backslashreplace");
+        if (bytes == NULL)
+            return NULL;
+        if (PyBytes_AsStringAndSize(bytes, &str, &n) < 0) {
+            Py_DECREF(bytes);
+            return NULL;
+        }
     }
-    n = strlen(c);
 
     Py_BEGIN_ALLOW_THREADS
     errno = 0;
 #ifdef MS_WINDOWS
     if (n > INT_MAX)
         n = INT_MAX;
-    n = write(self->fd, c, (int)n);
+    n = write(self->fd, str, (int)n);
 #else
-    n = write(self->fd, c, n);
+    n = write(self->fd, str, n);
 #endif
+    /* save errno, it can be modified indirectly by Py_XDECREF() */
+    err = errno;
     Py_END_ALLOW_THREADS
 
+    Py_XDECREF(bytes);
+
     if (n < 0) {
-        if (errno == EAGAIN)
+        if (err == EAGAIN)
             Py_RETURN_NONE;
+        errno = err;
         PyErr_SetFromErrno(PyExc_IOError);
         return NULL;
     }

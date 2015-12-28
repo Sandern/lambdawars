@@ -143,7 +143,7 @@ PyTraceBack_Here(PyFrameObject *frame)
 }
 
 /* Insert a frame into the traceback for (funcname, filename, lineno). */
-void _PyTraceback_Add(char *funcname, char *filename, int lineno)
+void _PyTraceback_Add(const char *funcname, const char *filename, int lineno)
 {
     PyObject *globals = NULL;
     PyCodeObject *code = NULL;
@@ -309,13 +309,20 @@ _Py_DisplaySourceLine(PyObject *f, PyObject *filename, int lineno, int indent)
     }
     fob = _PyObject_CallMethodId(io, &PyId_TextIOWrapper, "Os", binary, encoding);
     Py_DECREF(io);
-    Py_DECREF(binary);
     PyMem_FREE(found_encoding);
 
     if (fob == NULL) {
         PyErr_Clear();
+
+        res = _PyObject_CallMethodId(binary, &PyId_close, "");
+        Py_DECREF(binary);
+        if (res)
+            Py_DECREF(res);
+        else
+            PyErr_Clear();
         return 0;
     }
+    Py_DECREF(binary);
 
     /* get the line number lineno */
     for (i = 0; i < lineno; i++) {

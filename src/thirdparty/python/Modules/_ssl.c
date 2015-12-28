@@ -977,7 +977,10 @@ _get_aia_uri(X509 *certificate, int nid) {
     AUTHORITY_INFO_ACCESS *info;
 
     info = X509_get_ext_d2i(certificate, NID_info_access, NULL, NULL);
-    if ((info == NULL) || (sk_ACCESS_DESCRIPTION_num(info) == 0)) {
+    if (info == NULL)
+        return Py_None;
+    if (sk_ACCESS_DESCRIPTION_num(info) == 0) {
+        AUTHORITY_INFO_ACCESS_free(info);
         return Py_None;
     }
 
@@ -1027,25 +1030,23 @@ _get_aia_uri(X509 *certificate, int nid) {
 static PyObject *
 _get_crl_dp(X509 *certificate) {
     STACK_OF(DIST_POINT) *dps;
-    int i, j, result;
-    PyObject *lst;
+    int i, j;
+    PyObject *lst, *res = NULL;
 
 #if OPENSSL_VERSION_NUMBER < 0x10001000L
-    dps = X509_get_ext_d2i(certificate, NID_crl_distribution_points,
-                           NULL, NULL);
+    dps = X509_get_ext_d2i(certificate, NID_crl_distribution_points, NULL, NULL);
 #else
     /* Calls x509v3_cache_extensions and sets up crldp */
     X509_check_ca(certificate);
     dps = certificate->crldp;
 #endif
 
-    if (dps == NULL) {
+    if (dps == NULL)
         return Py_None;
-    }
 
-    if ((lst = PyList_New(0)) == NULL) {
-        return NULL;
-    }
+    lst = PyList_New(0);
+    if (lst == NULL)
+        goto done;
 
     for (i=0; i < sk_DIST_POINT_num(dps); i++) {
         DIST_POINT *dp;
@@ -1058,6 +1059,7 @@ _get_crl_dp(X509 *certificate) {
             GENERAL_NAME *gn;
             ASN1_IA5STRING *uri;
             PyObject *ouri;
+            int err;
 
             gn = sk_GENERAL_NAME_value(gns, j);
             if (gn->type != GEN_URI) {
@@ -1066,28 +1068,25 @@ _get_crl_dp(X509 *certificate) {
             uri = gn->d.uniformResourceIdentifier;
             ouri = PyUnicode_FromStringAndSize((char *)uri->data,
                                                uri->length);
-            if (ouri == NULL) {
-                Py_DECREF(lst);
-                return NULL;
-            }
-            result = PyList_Append(lst, ouri);
+            if (ouri == NULL)
+                goto done;
+
+            err = PyList_Append(lst, ouri);
             Py_DECREF(ouri);
-            if (result < 0) {
-                Py_DECREF(lst);
-                return NULL;
-            }
+            if (err < 0)
+                goto done;
         }
     }
-    /* convert to tuple or None */
-    if (PyList_Size(lst) == 0) {
-        Py_DECREF(lst);
-        return Py_None;
-    } else {
-        PyObject *tup;
-        tup = PyList_AsTuple(lst);
-        Py_DECREF(lst);
-        return tup;
-    }
+
+    /* Convert to tuple. */
+    res = (PyList_GET_SIZE(lst) > 0) ? PyList_AsTuple(lst) : Py_None;
+
+  done:
+    Py_XDECREF(lst);
+#if OPENSSL_VERSION_NUMBER < 0x10001000L
+    sk_DIST_POINT_free(dps);
+#endif
+    return res;
 }
 
 static PyObject *
@@ -1717,26 +1716,6 @@ static PyObject *PySSL_SSLread(PySSLSocket *self, PyObject *args)
     BIO_set_nbio(SSL_get_rbio(self->ssl), nonblocking);
     BIO_set_nbio(SSL_get_wbio(self->ssl), nonblocking);
 
-    /* first check if there are bytes ready to be read */
-    PySSL_BEGIN_ALLOW_THREADS
-    count = SSL_pending(self->ssl);
-    PySSL_END_ALLOW_THREADS
-
-    if (!count) {
-        sockstate = check_socket_and_wait_for_timeout(sock, 0);
-        if (sockstate == SOCKET_HAS_TIMED_OUT) {
-            PyErr_SetString(PySocketModule.timeout_error,
-                            "The read operation timed out");
-            goto error;
-        } else if (sockstate == SOCKET_TOO_LARGE_FOR_SELECT) {
-            PyErr_SetString(PySSLErrorObject,
-                            "Underlying socket too large for select().");
-            goto error;
-        } else if (sockstate == SOCKET_HAS_BEEN_CLOSED) {
-            count = 0;
-            goto done;
-        }
-    }
     do {
         PySSL_BEGIN_ALLOW_THREADS
         count = SSL_read(self->ssl, mem, len);
@@ -2061,6 +2040,8 @@ context_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     options = SSL_OP_ALL & ~SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS;
     if (proto_version != PY_SSL_VERSION_SSL2)
         options |= SSL_OP_NO_SSLv2;
+    if (proto_version != PY_SSL_VERSION_SSL3)
+        options |= SSL_OP_NO_SSLv3;
     SSL_CTX_set_options(self->ctx, options);
 
 #ifndef OPENSSL_NO_ECDH
@@ -2082,6 +2063,15 @@ context_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     SSL_CTX_set_session_id_context(self->ctx, (const unsigned char *) SID_CTX,
                                    sizeof(SID_CTX));
 #undef SID_CTX
+
+#ifdef X509_V_FLAG_TRUSTED_FIRST
+    {
+        /* Improve trust chain building when cross-signed intermediate
+           certificates are present. See https://bugs.python.org/issue23476. */
+        X509_STORE *store = SSL_CTX_get_cert_store(self->ctx);
+        X509_STORE_set_flags(store, X509_V_FLAG_TRUSTED_FIRST);
+    }
+#endif
 
     return (PyObject *)self;
 }
@@ -2704,7 +2694,7 @@ load_verify_locations(PySSLContext *self, PyObject *args, PyObject *kwds)
             cadata_ascii = PyUnicode_AsASCIIString(cadata);
             if (cadata_ascii == NULL) {
                 PyErr_SetString(PyExc_TypeError,
-                                "cadata should be a ASCII string or a "
+                                "cadata should be an ASCII string or a "
                                 "bytes-like object");
                 goto error;
             }
@@ -3383,20 +3373,20 @@ PySSL_get_default_verify_paths(PyObject *self)
     PyObject *odir_env = NULL;
     PyObject *odir = NULL;
 
-#define convert(info, target) { \
+#define CONVERT(info, target) { \
         const char *tmp = (info); \
         target = NULL; \
         if (!tmp) { Py_INCREF(Py_None); target = Py_None; } \
         else if ((target = PyUnicode_DecodeFSDefault(tmp)) == NULL) { \
             target = PyBytes_FromString(tmp); } \
         if (!target) goto error; \
-    } while(0)
+    }
 
-    convert(X509_get_default_cert_file_env(), ofile_env);
-    convert(X509_get_default_cert_file(), ofile);
-    convert(X509_get_default_cert_dir_env(), odir_env);
-    convert(X509_get_default_cert_dir(), odir);
-#undef convert
+    CONVERT(X509_get_default_cert_file_env(), ofile_env);
+    CONVERT(X509_get_default_cert_file(), ofile);
+    CONVERT(X509_get_default_cert_dir_env(), odir_env);
+    CONVERT(X509_get_default_cert_dir(), odir);
+#undef CONVERT
 
     return Py_BuildValue("NNNN", ofile_env, ofile, odir_env, odir);
 
@@ -3599,7 +3589,7 @@ PySSL_enum_certificates(PyObject *self, PyObject *args, PyObject *kwds)
     PyObject *keyusage = NULL, *cert = NULL, *enc = NULL, *tup = NULL;
     PyObject *result = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|s:enum_certificates",
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:enum_certificates",
                                      kwlist, &store_name)) {
         return NULL;
     }
@@ -3687,7 +3677,7 @@ PySSL_enum_crls(PyObject *self, PyObject *args, PyObject *kwds)
     PyObject *crl = NULL, *enc = NULL, *tup = NULL;
     PyObject *result = NULL;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|s:enum_crls",
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "s:enum_crls",
                                      kwlist, &store_name)) {
         return NULL;
     }
@@ -3838,10 +3828,11 @@ static int _setup_ssl_threads(void) {
 
     if (_ssl_locks == NULL) {
         _ssl_locks_count = CRYPTO_num_locks();
-        _ssl_locks = (PyThread_type_lock *)
-            PyMem_Malloc(sizeof(PyThread_type_lock) * _ssl_locks_count);
-        if (_ssl_locks == NULL)
+        _ssl_locks = PyMem_New(PyThread_type_lock, _ssl_locks_count);
+        if (_ssl_locks == NULL) {
+            PyErr_NoMemory();
             return 0;
+        }
         memset(_ssl_locks, 0,
                sizeof(PyThread_type_lock) * _ssl_locks_count);
         for (i = 0;  i < _ssl_locks_count;  i++) {
@@ -4014,6 +4005,10 @@ PyInit__ssl(void)
                             X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL);
     PyModule_AddIntConstant(m, "VERIFY_X509_STRICT",
                             X509_V_FLAG_X509_STRICT);
+#ifdef X509_V_FLAG_TRUSTED_FIRST
+    PyModule_AddIntConstant(m, "VERIFY_X509_TRUSTED_FIRST",
+                            X509_V_FLAG_TRUSTED_FIRST);
+#endif
 
     /* Alert Descriptions from ssl.h */
     /* note RESERVED constants no longer intended for use have been removed */

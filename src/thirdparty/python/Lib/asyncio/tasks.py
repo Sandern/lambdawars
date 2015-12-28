@@ -3,23 +3,22 @@
 __all__ = ['Task',
            'FIRST_COMPLETED', 'FIRST_EXCEPTION', 'ALL_COMPLETED',
            'wait', 'wait_for', 'as_completed', 'sleep', 'async',
-           'gather', 'shield',
+           'gather', 'shield', 'ensure_future', 'run_coroutine_threadsafe',
            ]
 
 import concurrent.futures
 import functools
 import inspect
 import linecache
-import sys
 import traceback
+import warnings
 import weakref
 
+from . import compat
 from . import coroutines
 from . import events
 from . import futures
 from .coroutines import coroutine
-
-_PY34 = (sys.version_info >= (3, 4))
 
 
 class Task(futures.Future):
@@ -72,7 +71,7 @@ class Task(futures.Future):
         super().__init__(loop=loop)
         if self._source_traceback:
             del self._source_traceback[-1]
-        self._coro = iter(coro)  # Use the iterator just in case.
+        self._coro = coro
         self._fut_waiter = None
         self._must_cancel = False
         self._loop.call_soon(self._step)
@@ -81,7 +80,7 @@ class Task(futures.Future):
     # On Python 3.3 or older, objects with a destructor that are part of a
     # reference cycle are never destroyed. That's not the case any more on
     # Python 3.4 thanks to the PEP 442.
-    if _PY34:
+    if compat.PY34:
         def __del__(self):
             if self._state == futures._PENDING and self._log_destroy_pending:
                 context = {
@@ -129,7 +128,11 @@ class Task(futures.Future):
         returned for a suspended coroutine.
         """
         frames = []
-        f = self._coro.gi_frame
+        try:
+            # 'async def' coroutines
+            f = self._coro.cr_frame
+        except AttributeError:
+            f = self._coro.gi_frame
         if f is not None:
             while f is not None:
                 if limit is not None:
@@ -217,9 +220,9 @@ class Task(futures.Future):
         self._must_cancel = True
         return True
 
-    def _step(self, value=None, exc=None):
+    def _step(self, exc=None):
         assert not self.done(), \
-            '_step(): already done: {!r}, {!r}, {!r}'.format(self, value, exc)
+            '_step(): already done: {!r}, {!r}'.format(self, exc)
         if self._must_cancel:
             if not isinstance(exc, futures.CancelledError):
                 exc = futures.CancelledError()
@@ -228,14 +231,14 @@ class Task(futures.Future):
         self._fut_waiter = None
 
         self.__class__._current_tasks[self._loop] = self
-        # Call either coro.throw(exc) or coro.send(value).
+        # Call either coro.throw(exc) or coro.send(None).
         try:
-            if exc is not None:
-                result = coro.throw(exc)
-            elif value is not None:
-                result = coro.send(value)
+            if exc is None:
+                # We use the `send` method directly, because coroutines
+                # don't have `__iter__` and `__next__` methods.
+                result = coro.send(None)
             else:
-                result = next(coro)
+                result = coro.throw(exc)
         except StopIteration as exc:
             self.set_result(exc.value)
         except futures.CancelledError as exc:
@@ -257,7 +260,7 @@ class Task(futures.Future):
                             self._must_cancel = False
                 else:
                     self._loop.call_soon(
-                        self._step, None,
+                        self._step,
                         RuntimeError(
                             'yield was used instead of yield from '
                             'in task {!r} with {!r}'.format(self, result)))
@@ -267,7 +270,7 @@ class Task(futures.Future):
             elif inspect.isgenerator(result):
                 # Yielding a generator is just wrong.
                 self._loop.call_soon(
-                    self._step, None,
+                    self._step,
                     RuntimeError(
                         'yield was used instead of yield from for '
                         'generator in task {!r} with {}'.format(
@@ -275,7 +278,7 @@ class Task(futures.Future):
             else:
                 # Yielding something else is an error.
                 self._loop.call_soon(
-                    self._step, None,
+                    self._step,
                     RuntimeError(
                         'Task got bad yield: {!r}'.format(result)))
         finally:
@@ -284,12 +287,18 @@ class Task(futures.Future):
 
     def _wakeup(self, future):
         try:
-            value = future.result()
+            future.result()
         except Exception as exc:
             # This may also be a cancellation.
-            self._step(None, exc)
+            self._step(exc)
         else:
-            self._step(value, None)
+            # Don't pass the value of `future.result()` explicitly,
+            # as `Future.__iter__` and `Future.__await__` don't need it.
+            # If we call `_step(value, None)` instead of `_step()`,
+            # Python eval loop would use `.send(value)` method call,
+            # instead of `__next__()`, which is slower for futures
+            # that return non-generator iterators from their `__iter__`.
+            self._step()
         self = None  # Needed to break cycles when an exception occurs.
 
 
@@ -327,7 +336,7 @@ def wait(fs, *, loop=None, timeout=None, return_when=ALL_COMPLETED):
     if loop is None:
         loop = events.get_event_loop()
 
-    fs = {async(f, loop=loop) for f in set(fs)}
+    fs = {ensure_future(f, loop=loop) for f in set(fs)}
 
     return (yield from _wait(fs, timeout, return_when, loop))
 
@@ -361,7 +370,7 @@ def wait_for(fut, timeout, *, loop=None):
     timeout_handle = loop.call_later(timeout, _release_waiter, waiter)
     cb = functools.partial(_release_waiter, waiter)
 
-    fut = async(fut, loop=loop)
+    fut = ensure_future(fut, loop=loop)
     fut.add_done_callback(cb)
 
     try:
@@ -449,7 +458,7 @@ def as_completed(fs, *, loop=None, timeout=None):
     if isinstance(fs, futures.Future) or coroutines.iscoroutine(fs):
         raise TypeError("expect a list of futures, not %s" % type(fs).__name__)
     loop = loop if loop is not None else events.get_event_loop()
-    todo = {async(f, loop=loop) for f in set(fs)}
+    todo = {ensure_future(f, loop=loop) for f in set(fs)}
     from .queues import Queue  # Import here to avoid circular import problem.
     done = Queue(loop=loop)
     timeout_handle = None
@@ -487,9 +496,14 @@ def as_completed(fs, *, loop=None, timeout=None):
 @coroutine
 def sleep(delay, result=None, *, loop=None):
     """Coroutine that completes after a given time (in seconds)."""
+    if delay == 0:
+        yield
+        return result
+
     future = futures.Future(loop=loop)
     h = future._loop.call_later(delay,
-                                future._set_result_unless_cancelled, result)
+                                futures._set_result_unless_cancelled,
+                                future, result)
     try:
         return (yield from future)
     finally:
@@ -498,6 +512,20 @@ def sleep(delay, result=None, *, loop=None):
 
 def async(coro_or_future, *, loop=None):
     """Wrap a coroutine in a future.
+
+    If the argument is a Future, it is returned directly.
+
+    This function is deprecated in 3.5. Use asyncio.ensure_future() instead.
+    """
+
+    warnings.warn("asyncio.async() function is deprecated, use ensure_future()",
+                  DeprecationWarning)
+
+    return ensure_future(coro_or_future, loop=loop)
+
+
+def ensure_future(coro_or_future, *, loop=None):
+    """Wrap a coroutine or an awaitable in a future.
 
     If the argument is a Future, it is returned directly.
     """
@@ -512,8 +540,20 @@ def async(coro_or_future, *, loop=None):
         if task._source_traceback:
             del task._source_traceback[-1]
         return task
+    elif compat.PY35 and inspect.isawaitable(coro_or_future):
+        return ensure_future(_wrap_awaitable(coro_or_future), loop=loop)
     else:
-        raise TypeError('A Future or coroutine is required')
+        raise TypeError('A Future, a coroutine or an awaitable is required')
+
+
+@coroutine
+def _wrap_awaitable(awaitable):
+    """Helper for asyncio.ensure_future().
+
+    Wraps awaitable (an object with __await__) into a coroutine
+    that will later be wrapped in a Task by ensure_future().
+    """
+    return (yield from awaitable.__await__())
 
 
 class _GatheringFuture(futures.Future):
@@ -564,7 +604,7 @@ def gather(*coros_or_futures, loop=None, return_exceptions=False):
     arg_to_fut = {}
     for arg in set(coros_or_futures):
         if not isinstance(arg, futures.Future):
-            fut = async(arg, loop=loop)
+            fut = ensure_future(arg, loop=loop)
             if loop is None:
                 loop = fut._loop
             # The caller cannot control this future, the "destroy pending task"
@@ -640,7 +680,7 @@ def shield(arg, *, loop=None):
         except CancelledError:
             res = None
     """
-    inner = async(arg, loop=loop)
+    inner = ensure_future(arg, loop=loop)
     if inner.done():
         # Shortcut.
         return inner
@@ -665,3 +705,24 @@ def shield(arg, *, loop=None):
 
     inner.add_done_callback(_done_callback)
     return outer
+
+
+def run_coroutine_threadsafe(coro, loop):
+    """Submit a coroutine object to a given event loop.
+
+    Return a concurrent.futures.Future to access the result.
+    """
+    if not coroutines.iscoroutine(coro):
+        raise TypeError('A coroutine object is required')
+    future = concurrent.futures.Future()
+
+    def callback():
+        try:
+            futures._chain_future(ensure_future(coro, loop=loop), future)
+        except Exception as exc:
+            if future.set_running_or_notify_cancel():
+                future.set_exception(exc)
+            raise
+
+    loop.call_soon_threadsafe(callback)
+    return future

@@ -300,14 +300,35 @@ typedef struct {
 static int
 _enter_buffered_busy(buffered *self)
 {
+    int relax_locking;
+    PyLockStatus st;
     if (self->owner == PyThread_get_thread_ident()) {
         PyErr_Format(PyExc_RuntimeError,
                      "reentrant call inside %R", self);
         return 0;
     }
+    relax_locking = (_Py_Finalizing != NULL);
     Py_BEGIN_ALLOW_THREADS
-    PyThread_acquire_lock(self->lock, 1);
+    if (!relax_locking)
+        st = PyThread_acquire_lock(self->lock, 1);
+    else {
+        /* When finalizing, we don't want a deadlock to happen with daemon
+         * threads abruptly shut down while they owned the lock.
+         * Therefore, only wait for a grace period (1 s.).
+         * Note that non-daemon threads have already exited here, so this
+         * shouldn't affect carefully written threaded I/O code.
+         */
+        st = PyThread_acquire_lock_timed(self->lock, 1e6, 0);
+    }
     Py_END_ALLOW_THREADS
+    if (relax_locking && st != PY_LOCK_ACQUIRED) {
+        PyObject *msgobj = PyUnicode_FromFormat(
+            "could not acquire lock for %A at interpreter "
+            "shutdown, possibly due to daemon threads",
+            (PyObject *) self);
+        char *msg = PyUnicode_AsUTF8(msgobj);
+        Py_FatalError(msg);
+    }
     return 1;
 }
 
@@ -868,6 +889,8 @@ buffered_peek(buffered *self, PyObject *args)
     PyObject *res = NULL;
 
     CHECK_INITIALIZED(self)
+    CHECK_CLOSED(self, "peek of closed file")
+
     if (!PyArg_ParseTuple(args, "|n:peek", &n)) {
         return NULL;
     }
@@ -942,6 +965,9 @@ buffered_read1(buffered *self, PyObject *args)
                         "read length must be positive");
         return NULL;
     }
+
+    CHECK_CLOSED(self, "read of closed file")
+
     if (n == 0)
         return PyBytes_FromStringAndSize(NULL, 0);
 
@@ -2365,12 +2391,18 @@ bufferedrwpair_writable(rwpair *self, PyObject *args)
 static PyObject *
 bufferedrwpair_close(rwpair *self, PyObject *args)
 {
+    PyObject *exc = NULL, *val, *tb;
     PyObject *ret = _forward_call(self->writer, &PyId_close, args);
     if (ret == NULL)
-        return NULL;
-    Py_DECREF(ret);
-
-    return _forward_call(self->reader, &PyId_close, args);
+        PyErr_Fetch(&exc, &val, &tb);
+    else
+        Py_DECREF(ret);
+    ret = _forward_call(self->reader, &PyId_close, args);
+    if (exc != NULL) {
+        _PyErr_ChainExceptions(exc, val, tb);
+        Py_CLEAR(ret);
+    }
+    return ret;
 }
 
 static PyObject *

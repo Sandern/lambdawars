@@ -1,6 +1,5 @@
-@rem Used by the buildbot "compile" step.
-cmd /c Tools\buildbot\external-amd64.bat
-call "%VS100COMNTOOLS%\..\..\VC\vcvarsall.bat" x86_amd64
-cmd /c Tools\buildbot\clean-amd64.bat
-
-msbuild PCbuild\pcbuild.sln /p:Configuration=Debug /p:Platform=x64
+@rem Formerly used by the buildbot "compile" step.
+@echo This script is no longer used and may be removed in the future.
+@echo To get the same effect as this script, use
+@echo     PCbuild\build.bat -d -e -k -p x64
+call "%~dp0build.bat" -p x64 %*

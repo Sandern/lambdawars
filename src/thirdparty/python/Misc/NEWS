@@ -2,6 +2,828 @@
 Python News
 +++++++++++
 
+What's New in Python 3.4.4?
+===========================
+
+Release date: 2015/12/20
+
+Windows
+-------
+
+- Issue #25844: Corrected =/== typo potentially leading to crash in launcher.
+
+
+What's New in Python 3.4.4rc1?
+==============================
+
+Release date: 2015/12/06
+
+Core and Builtins
+-----------------
+
+- Issue #25709: Fixed problem with in-place string concatenation and utf-8
+  cache.
+
+- Issue #24097: Fixed crash in object.__reduce__() if slot name is freed inside
+  __getattr__.
+
+- Issue #24731: Fixed crash on converting objects with special methods
+  __bytes__, __trunc__, and __float__ returning instances of subclasses of
+  bytes, int, and float to subclasses of bytes, int, and float correspondingly.
+
+- Issue #25388: Fixed tokenizer crash when processing undecodable source code
+  with a null byte.
+
+- Issue #22995: Default implementation of __reduce__ and __reduce_ex__ now
+  rejects builtin types with not defined __new__.
+
+- Issue #24802: Avoid buffer overreads when int(), float(), compile(), exec()
+  and eval() are passed bytes-like objects.  These objects are not
+  necessarily terminated by a null byte, but the functions assumed they were.
+
+- Issue #24402: Fix input() to prompt to the redirected stdout when
+  sys.stdout.fileno() fails.
+
+- Issue #24806: Prevent builtin types that are not allowed to be subclassed from
+  being subclassed through multiple inheritance.
+
+- Issue #24848: Fixed a number of bugs in UTF-7 decoding of misformed data.
+
+- Issue #25280: Import trace messages emitted in verbose (-v) mode are no
+  longer formatted twice.
+
+- Issue #25003: os.urandom() doesn't use getentropy() on Solaris because
+  getentropy() is blocking, whereas os.urandom() should not block. getentropy()
+  is supported since Solaris 11.3.
+
+- Issue #25182: The stdprinter (used as sys.stderr before the io module is
+  imported at startup) now uses the backslashreplace error handler.
+
+- Issue #24891: Fix a race condition at Python startup if the file descriptor
+  of stdin (0), stdout (1) or stderr (2) is closed while Python is creating
+  sys.stdin, sys.stdout and sys.stderr objects. These attributes are now set
+  to None if the creation of the object failed, instead of raising an OSError
+  exception. Initial patch written by Marco Paolini.
+
+- Issue #21167: NAN operations are now handled correctly when python is
+  compiled with ICC even if -fp-model strict is not specified.
+
+- Issue #4395: Better testing and documentation of binary operators.
+  Patch by Martin Panter.
+
+- Issue #24467: Fixed possible buffer over-read in bytearray. The bytearray
+  object now always allocates place for trailing null byte and it's buffer now
+  is always null-terminated.
+
+- Issue #24115: Update uses of PyObject_IsTrue(), PyObject_Not(),
+  PyObject_IsInstance(), PyObject_RichCompareBool() and _PyDict_Contains()
+  to check for and handle errors correctly.
+
+- Issue #24257: Fixed system error in the comparison of faked
+  types.SimpleNamespace.
+
+- Issue #22939: Fixed integer overflow in iterator object.  Patch by
+  Clement Rouault.
+
+- Issue #23985: Fix a possible buffer overrun when deleting a slice from
+  the front of a bytearray and then appending some other bytes data.
+
+- Issue #24102: Fixed exception type checking in standard error handlers.
+
+- Issue #23757: PySequence_Tuple() incorrectly called the concrete list API
+  when the data was a list subclass.
+
+- Issue #24407: Fix crash when dict is mutated while being updated.
+
+- Issue #24096: Make warnings.warn_explicit more robust against mutation of the
+  warnings.filters list.
+
+- Issue #23996: Avoid a crash when a delegated generator raises an
+  unnormalized StopIteration exception.  Patch by Stefan Behnel.
+
+- Issue #24022: Fix tokenizer crash when processing undecodable source code.
+
+- Issue #23309: Avoid a deadlock at shutdown if a daemon thread is aborted
+  while it is holding a lock to a buffered I/O object, and the main thread
+  tries to use the same I/O object (typically stdout or stderr).  A fatal
+  error is emitted instead.
+
+- Issue #22977: Fixed formatting Windows error messages on Wine.
+  Patch by Martin Panter.
+
+- Issue #23803: Fixed str.partition() and str.rpartition() when a separator
+  is wider then partitioned string.
+
+- Issue #23192: Fixed generator lambdas.  Patch by Bruno Cauet.
+
+- Issue #23629: Fix the default __sizeof__ implementation for variable-sized
+  objects.
+
+- Issue #24044: Fix possible null pointer dereference in list.sort in out of
+  memory conditions.
+
+- Issue #21354: PyCFunction_New function is exposed by python DLL again.
+
+Library
+-------
+
+- Issue #24903: Fix regression in number of arguments compileall accepts when
+  '-d' is specified.  The check on the number of arguments has been dropped
+  completely as it never worked correctly anyway.
+
+- Issue #25764: In the subprocess module, preserve any exception caused by
+  fork() failure when preexec_fn is used.
+
+- Issue #6478: _strptime's regexp cache now is reset after changing timezone
+  with time.tzset().
+
+- Issue #25177: Fixed problem with the mean of very small and very large
+  numbers. As a side effect, statistics.mean and statistics.variance should
+  be significantly faster.
+
+- Issue #25718: Fixed copying object with state with boolean value is false.
+
+- Issue #10131: Fixed deep copying of minidom documents.  Based on patch
+  by Marian Ganisin.
+
+- Issue #25725: Fixed a reference leak in pickle.loads() when unpickling
+  invalid data including tuple instructions.
+
+- Issue #25663: In the Readline completer, avoid listing duplicate global
+  names, and search the global namespace before searching builtins.
+
+- Issue #25688: Fixed file leak in ElementTree.iterparse() raising an error.
+
+- Issue #23914: Fixed SystemError raised by unpickler on broken pickle data.
+
+- Issue #25691: Fixed crash on deleting ElementTree.Element attributes.
+
+- Issue #25624: ZipFile now always writes a ZIP_STORED header for directory
+  entries.  Patch by Dingyuan Wang.
+
+- Issue #25583: Avoid incorrect errors raised by os.makedirs(exist_ok=True)
+  when the OS gives priority to errors such as EACCES over EEXIST.
+
+- Issue #25593: Change semantics of EventLoop.stop() in asyncio.
+
+- Issue #6973: When we know a subprocess.Popen process has died, do
+  not allow the send_signal(), terminate(), or kill() methods to do
+  anything as they could potentially signal a different process.
+
+- Issue #25578: Fix (another) memory leak in SSLSocket.getpeercer().
+
+- Issue #25590: In the Readline completer, only call getattr() once per
+  attribute.
+
+- Issue #25498: Fix a crash when garbage-collecting ctypes objects created
+  by wrapping a memoryview.  This was a regression made in 3.4.3.  Based
+  on patch by Eryksun.
+
+- Issue #18010: Fix the pydoc web server's module search function to handle
+  exceptions from importing packages.
+
+- Issue #25510: fileinput.FileInput.readline() now returns b'' instead of ''
+  at the end if the FileInput was opened with binary mode.
+  Patch by Ryosuke Ito.
+
+- Issue #25530: Disable the vulnerable SSLv3 protocol by default when creating
+  ssl.SSLContext.
+
+- Issue #25569: Fix memory leak in SSLSocket.getpeercert().
+
+- Issue #21827: Fixed textwrap.dedent() for the case when largest common
+  whitespace is a substring of smallest leading whitespace.
+  Based on patch by Robert Li.
+
+- Issue #25471: Sockets returned from accept() shouldn't appear to be
+  nonblocking.
+
+- Issue #25441: asyncio: Raise error from drain() when socket is closed.
+
+- Issue #25411: Improved Unicode support in SMTPHandler through better use of
+  the email package. Thanks to user simon04 for the patch.
+
+- Issue #25380: Fixed protocol for the STACK_GLOBAL opcode in
+  pickletools.opcodes.
+
+- Issue #23972: Updates asyncio datagram create method allowing reuseport
+  and reuseaddr socket options to be set prior to binding the socket.
+  Mirroring the existing asyncio create_server method the reuseaddr option
+  for datagram sockets defaults to True if the O/S is 'posix' (except if the
+  platform is Cygwin). Patch by Chris Laws.
+
+- Issue #25304: Add asyncio.run_coroutine_threadsafe().  This lets you
+  submit a coroutine to a loop from another thread, returning a
+  concurrent.futures.Future.  By Vincent Michel.
+
+- Issue #25319: When threading.Event is reinitialized, the underlying condition
+  should use a regular lock rather than a recursive lock.
+
+- Issue #25232: Fix CGIRequestHandler to split the query from the URL at the
+  first question mark (?) rather than the last. Patch from Xiang Zhang.
+
+- Issue #24657: Prevent CGIRequestHandler from collapsing slashes in the
+  query part of the URL as if it were a path. Patch from Xiang Zhang.
+
+- Issue #22958: Constructor and update method of weakref.WeakValueDictionary
+  now accept the self and the dict keyword arguments.
+
+- Issue #22609: Constructor of collections.UserDict now accepts the self keyword
+  argument.
+
+- Issue #25262. Added support for BINBYTES8 opcode in Python implementation of
+  unpickler.  Highest 32 bits of 64-bit size for BINUNICODE8 and BINBYTES8
+  opcodes no longer silently ignored on 32-bit platforms in C implementation.
+
+- Issue #25034: Fix string.Formatter problem with auto-numbering and
+  nested format_specs. Patch by Anthon van der Neut.
+
+- Issue #25233: Rewrite the guts of asyncio.Queue and
+  asyncio.Semaphore to be more understandable and correct.
+
+- Issue #23600: Default implementation of tzinfo.fromutc() was returning
+  wrong results in some cases.
+
+- Issue #25203: Failed readline.set_completer_delims() no longer left the
+  module in inconsistent state.
+
+- Prevent overflow in _Unpickler_Read.
+
+- Issue #25047: The XML encoding declaration written by Element Tree now
+  respects the letter case given by the user. This restores the ability to
+  write encoding names in uppercase like "UTF-8", which worked in Python 2.
+
+- Issue #19143: platform module now reads Windows version from kernel32.dll to
+  avoid compatibility shims.
+
+- Issue #23517: Fix rounding in fromtimestamp() and utcfromtimestamp() methods
+  of datetime.datetime: microseconds are now rounded to nearest with ties
+  going to nearest even integer (ROUND_HALF_EVEN), instead of being rounding
+  towards zero (ROUND_DOWN). It's important that these methods use the same
+  rounding mode than datetime.timedelta to keep the property:
+  (datetime(1970,1,1) + timedelta(seconds=t)) == datetime.utcfromtimestamp(t).
+  It also the rounding mode used by round(float) for example.
+
+- Issue #24684: socket.socket.getaddrinfo() now calls
+  PyUnicode_AsEncodedString() instead of calling the encode() method of the
+  host, to handle correctly custom string with an encode() method which doesn't
+  return a byte string. The encoder of the IDNA codec is now called directly
+  instead of calling the encode() method of the string.
+
+- Issue #24982: shutil.make_archive() with the "zip" format now adds entries
+  for directories (including empty directories) in ZIP file.
+
+- Issue #24857: Comparing call_args to a long sequence now correctly returns a
+  boolean result instead of raising an exception.  Patch by A Kaptur.
+
+- Issue #25019: Fixed a crash caused by setting non-string key of expat parser.
+  Based on patch by John Leitch.
+
+- Issue #24917: time_strftime() buffer over-read.
+
+- Issue #23144: Make sure that HTMLParser.feed() returns all the data, even
+  when convert_charrefs is True.
+
+- Issue #16180: Exit pdb if file has syntax error, instead of trapping user
+  in an infinite loop.  Patch by Xavier de Gaye.
+
+- Issue #21112: Fix regression in unittest.expectedFailure on subclasses.
+  Patch from Berker Peksag.
+
+- Issue #24931: Instances of subclasses of namedtuples have their own __dict__
+  which breaks the inherited __dict__ property and breaks the _asdict() method.
+  Removed the __dict__ property to prevent the conflict and fixed _asdict().
+
+- Issue #24764: cgi.FieldStorage.read_multi() now ignores the Content-Length
+  header in part headers. Patch written by Peter Landry and reviewed by Pierre
+  Quentel.
+
+- Issue #24774: Fix docstring in http.server.test. Patch from Chiu-Hsiang Hsu.
+
+- Issue #21159: Improve message in configparser.InterpolationMissingOptionError.
+  Patch from Łukasz Langa.
+
+- Issue #23888: Handle fractional time in cookie expiry. Patch by ssh.
+
+- Issue #23004: mock_open() now reads binary data correctly when the type of
+  read_data is bytes.  Initial patch by Aaron Hill.
+
+- Issue #23652: Make it possible to compile the select module against the
+  libc headers from the Linux Standard Base, which do not include some
+  EPOLL macros.  Patch by Matt Frank.
+
+- Issue #22932: Fix timezones in email.utils.formatdate.
+  Patch from Dmitry Shachnev.
+
+- Issue #23779: imaplib raises TypeError if authenticator tries to abort.
+  Patch from Craig Holmquist.
+
+- Issue #23319: Fix ctypes.BigEndianStructure, swap correctly bytes. Patch
+  written by Matthieu Gautier.
+
+- Issue #23254: Document how to close the TCPServer listening socket.
+  Patch from Martin Panter.
+
+- Issue #19450: Update Windows and OS X installer builds to use SQLite 3.8.11.
+
+- Issue #23441: rcompleter now prints a tab character instead of displaying
+  possible completions for an empty word.  Initial patch by Martin Sekera.
+
+- Issue #24735: Fix invalid memory access in
+  itertools.combinations_with_replacement().
+
+- Issue #17527: Add PATCH to wsgiref.validator. Patch from Luca Sbardella.
+
+- Issue #24683: Fixed crashes in _json functions called with arguments of
+  inappropriate type.
+
+- Issue #21697: shutil.copytree() now correctly handles symbolic links that
+  point to directories.  Patch by Eduardo Seabra and Thomas Kluyver.
+
+- Issue #24620: Random.setstate() now validates the value of state last element.
+
+- Issue #22153: Improve unittest docs. Patch from Martin Panter and evilzero.
+
+- Issue #24206: Fixed __eq__ and __ne__ methods of inspect classes.
+
+- Issue #21750: mock_open.read_data can now be read from each instance, as it
+  could in Python 3.3.
+
+- Issue #23247: Fix a crash in the StreamWriter.reset() of CJK codecs.
+
+- Issue #18622: unittest.mock.mock_open().reset_mock would recurse infinitely.
+  Patch from Nicola Palumbo and Laurent De Buyst.
+
+- Issue #24608: chunk.Chunk.read() now always returns bytes, not str.
+
+- Issue #18684: Fixed reading out of the buffer in the re module.
+
+- Issue #24259: tarfile now raises a ReadError if an archive is truncated
+  inside a data segment.
+
+- Issue #24552: Fix use after free in an error case of the _pickle module.
+
+- Issue #24514: tarfile now tolerates number fields consisting of only
+  whitespace.
+
+- Issue #19176: Fixed doctype() related bugs in C implementation of ElementTree.
+  A deprecation warning no longer issued by XMLParser subclass with default
+  doctype() method.  Direct call of doctype() now issues a warning.  Parser's
+  doctype() now is not called if target's doctype() is called.  Based on patch
+  by Martin Panter.
+
+- Issue #20387: Restore semantic round-trip correctness in tokenize/untokenize
+  for tab-indented blocks.
+
+- Issue #24456: Fixed possible buffer over-read in adpcm2lin() and lin2adpcm()
+  functions of the audioop module.
+
+- Issue #24336: The contextmanager decorator now works with functions with
+  keyword arguments called "func" and "self".  Patch by Martin Panter.
+
+- Issue #24489: ensure a previously set C errno doesn't disturb cmath.polar().
+
+- Issue #5633: Fixed timeit when the statement is a string and the setup is not.
+
+- Issue #24326: Fixed audioop.ratecv() with non-default weightB argument.
+  Original patch by David Moore.
+
+- Issue #23840: tokenize.open() now closes the temporary binary file on error
+  to fix a resource warning.
+
+- Issue #24257: Fixed segmentation fault in sqlite3.Row constructor with faked
+  cursor type.
+
+- Issue #22107: tempfile.gettempdir() and tempfile.mkdtemp() now try again
+  when a directory with the chosen name already exists on Windows as well as
+  on Unix.  tempfile.mkstemp() now fails early if parent directory is not
+  valid (not exists or is a file) on Windows.
+
+- Issue #6598: Increased time precision and random number range in
+  email.utils.make_msgid() to strengthen the uniqueness of the message ID.
+
+- Issue #24091: Fixed various crashes in corner cases in C implementation of
+  ElementTree.
+
+- Issue #21931: msilib.FCICreate() now raises TypeError in the case of a bad
+  argument instead of a ValueError with a bogus FCI error number.
+  Patch by Jeffrey Armstrong.
+
+- Issue #23796: peek and read1 methods of BufferedReader now raise ValueError
+  if they called on a closed object. Patch by John Hergenroeder.
+
+- Issue #24521: Fix possible integer overflows in the pickle module.
+
+- Issue #22931: Allow '[' and ']' in cookie values.
+
+- Issue #20274: Remove ignored and erroneous "kwargs" parameters from three
+  METH_VARARGS methods on _sqlite.Connection.
+
+- Issue #24094: Fix possible crash in json.encode with poorly behaved dict
+  subclasses.
+
+- Asyncio issue 222 / PR 231 (Victor Stinner) -- fix @coroutine
+  functions without __name__.
+
+- Issue #9246: On POSIX, os.getcwd() now supports paths longer than 1025 bytes.
+  Patch written by William Orr.
+
+- The keywords attribute of functools.partial is now always a dictionary.
+
+- Issues #24099, #24100, and #24101: Fix free-after-use bug in heapq's siftup
+  and siftdown functions.
+
+- Backport collections.deque fixes from Python 3.5.  Prevents reentrant badness
+  during deletion by deferring the decref until the container has been restored
+  to a consistent state.
+
+- Issue #23008: Fixed resolving attributes with boolean value is False in pydoc.
+
+- Fix asyncio issue 235: LifoQueue and PriorityQueue's put didn't
+  increment unfinished tasks (this bug was introduced in 3.4.3 when
+  JoinableQueue was merged with Queue).
+
+- Issue #23908: os functions now reject paths with embedded null character
+  on Windows instead of silently truncate them.
+
+- Issue #23728: binascii.crc_hqx() could return an integer outside of the range
+  0-0xffff for empty data.
+
+- Issue #23811: Add missing newline to the PyCompileError error message.
+  Patch by Alex Shkop.
+
+- Issue #17898: Fix exception in gettext.py when parsing certain plural forms.
+
+- Issue #22982: Improve BOM handling when seeking to multiple positions of
+  a writable text file.
+
+- Issue #23865: close() methods in multiple modules now are idempotent and more
+  robust at shutdown. If they need to release multiple resources, all are
+  released even if errors occur.
+
+- Issue #23881: urllib.request.ftpwrapper constructor now closes the socket if
+  the FTP connection failed to fix a ResourceWarning.
+
+- Issue #23400: Raise same exception on both Python 2 and 3 if sem_open is not
+  available.  Patch by Davin Potts.
+
+- Issue #15133: _tkinter.tkapp.getboolean() now supports Tcl_Obj and always
+  returns bool.  tkinter.BooleanVar now validates input values (accepted bool,
+  int, str, and Tcl_Obj).  tkinter.BooleanVar.get() now always returns bool.
+
+- Issue #23338: Fixed formatting ctypes error messages on Cygwin.
+  Patch by Makoto Kato.
+
+- Issue #16840: Tkinter now supports 64-bit integers added in Tcl 8.4 and
+  arbitrary precision integers added in Tcl 8.5.
+
+- Issue #23834: Fix socket.sendto(), use the C Py_ssize_t type to store the
+  result of sendto() instead of the C int type.
+
+- Issue #21526: Tkinter now supports new boolean type in Tcl 8.5.
+
+- Issue #23838: linecache now clears the cache and returns an empty result on
+  MemoryError.
+
+- Issue #18473: Fixed 2to3 and 3to2 compatible pickle mappings.  Fixed
+  ambigious reverse mappings.  Added many new mappings.  Import mapping is no
+  longer applied to modules already mapped with full name mapping.
+
+- Issue #23745: The new email header parser now handles duplicate MIME
+  parameter names without error, similar to how get_param behaves.
+
+- Issue #23792: Ignore KeyboardInterrupt when the pydoc pager is active.
+  This mimics the behavior of the standard unix pagers, and prevents
+  pipepager from shutting down while the pager itself is still running.
+
+- Issue #23742: ntpath.expandvars() no longer loses unbalanced single quotes.
+
+- Issue #21802: The reader in BufferedRWPair now is closed even when closing
+  writer failed in BufferedRWPair.close().
+
+- Issue #23671: string.Template now allows to specify the "self" parameter as
+  keyword argument.  string.Formatter now allows to specify the "self" and
+  the "format_string" parameters as keyword arguments.
+
+- Issue #21560: An attempt to write a data of wrong type no longer cause
+  GzipFile corruption.  Original patch by Wolfgang Maier.
+
+- Issue #23647: Increase impalib's MAXLINE to accommodate modern mailbox sizes.
+
+- Issue #23539: If body is None, http.client.HTTPConnection.request now sets
+  Content-Length to 0 for PUT, POST, and PATCH headers to avoid 411 errors from
+  some web servers.
+
+- Issue #22351: The nntplib.NNTP constructor no longer leaves the connection
+  and socket open until the garbage collector cleans them up.  Patch by
+  Martin Panter.
+
+- Issue #23136: _strptime now uniformly handles all days in week 0, including
+  Dec 30 of previous year.  Based on patch by Jim Carroll.
+
+- Issue #23700: Iterator of NamedTemporaryFile now keeps a reference to
+  NamedTemporaryFile instance.  Patch by Bohuslav Kabrda.
+
+- Issue #22903: The fake test case created by unittest.loader when it fails
+  importing a test module is now picklable.
+
+- Issue #23568: Add rdivmod support to MagicMock() objects.
+  Patch by Håkan Lövdahl.
+
+- Issue #23138: Fixed parsing cookies with absent keys or values in cookiejar.
+  Patch by Demian Brecht.
+
+- Issue #23051: multiprocessing.Pool methods imap() and imap_unordered() now
+  handle exceptions raised by an iterator.  Patch by Alon Diamant and Davin
+  Potts.
+
+- Issue #22928: Disabled HTTP header injections in http.client.
+  Original patch by Demian Brecht.
+
+- Issue #23615: Modules bz2, tarfile and tokenize now can be reloaded with
+  imp.reload().  Patch by Thomas Kluyver.
+
+- Issue #23476: In the ssl module, enable OpenSSL's X509_V_FLAG_TRUSTED_FIRST
+  flag on certificate stores when it is available.
+
+- Issue #23576: Avoid stalling in SSL reads when EOF has been reached in the
+  SSL layer but the underlying connection hasn't been closed.
+
+- Issue #23504: Added an __all__ to the types module.
+
+- Issue #20204: Added the __module__ attribute to _tkinter classes.
+
+- Issue #23521: Corrected pure python implementation of timedelta division.
+
+ * Eliminated OverflowError from timedelta * float for some floats;
+ * Corrected rounding in timedlta true division.
+
+- Issue #21619: Popen objects no longer leave a zombie after exit in the with
+  statement if the pipe was broken.  Patch by Martin Panter.
+
+- Issue #6639: Module-level turtle functions no longer raise TclError after
+  closing the window.
+
+- Issues #814253, #9179: Warnings now are raised when group references and
+  conditional group references are used in lookbehind assertions in regular
+  expressions.
+
+- Issue #23215: Multibyte codecs with custom error handlers that ignores errors
+  consumed too much memory and raised SystemError or MemoryError.
+  Original patch by Aleksi Torhamo.
+
+- Issue #5700: io.FileIO() called flush() after closing the file.
+  flush() was not called in close() if closefd=False.
+
+- Issue #23374: Fixed pydoc failure with non-ASCII files when stdout encoding
+  differs from file system encoding (e.g. on Mac OS).
+
+- Issue #23481: Remove RC4 from the SSL module's default cipher list.
+
+- Issue #21548: Fix pydoc.synopsis() and pydoc.apropos() on modules with empty
+  docstrings.
+
+- Issue #22885: Fixed arbitrary code execution vulnerability in the dbm.dumb
+  module.  Original patch by Claudiu Popa.
+
+- Issue #23146: Fix mishandling of absolute Windows paths with forward
+  slashes in pathlib.
+
+- Issue #23421: Fixed compression in tarfile CLI.  Patch by wdv4758h.
+
+- Issue #23367: Fix possible overflows in the unicodedata module.
+
+- Issue #23361: Fix possible overflow in Windows subprocess creation code.
+
+- Issue #23801: Fix issue where cgi.FieldStorage did not always ignore the
+  entire preamble to a multipart body.
+
+- Issue #23310: Fix MagicMock's initializer to work with __methods__, just
+  like configure_mock().  Patch by Kasia Jachim.
+
+- asyncio: New event loop APIs: set_task_factory() and get_task_factory().
+
+- asyncio: async() function is deprecated in favour of ensure_future().
+
+- Issue #23898: Fix inspect.classify_class_attrs() to support attributes
+  with overloaded __eq__ and __bool__.  Patch by Mike Bayer.
+
+- Issue #24298: Fix inspect.signature() to correctly unwrap wrappers
+  around bound methods.
+
+- Issue #23572: Fixed functools.singledispatch on classes with falsy
+  metaclasses.  Patch by Ethan Furman.
+
+IDLE
+----
+
+- Issue 15348: Stop the debugger engine (normally in a user process)
+  before closing the debugger window (running in the IDLE process).
+  This prevents the RuntimeErrors that were being caught and ignored.
+
+- Issue #24455: Prevent IDLE from hanging when a) closing the shell while the
+  debugger is active (15347); b) closing the debugger with the [X] button
+  (15348); and c) activating the debugger when already active (24455).
+  The patch by Mark Roseman does this by making two changes.
+  1. Suspend and resume the gui.interaction method with the tcl vwait
+  mechanism intended for this purpose (instead of root.mainloop & .quit).
+  2. In gui.run, allow any existing interaction to terminate first.
+
+- Change 'The program' to 'Your program' in an IDLE 'kill program?' message
+  to make it clearer that the program referred to is the currently running
+  user program, not IDLE itself.
+
+- Issue #24750: Improve the appearance of the IDLE editor window status bar.
+  Patch by Mark Roseman.
+
+- Issue #25313: Change the handling of new built-in text color themes to better
+  address the compatibility problem introduced by the addition of IDLE Dark.
+  Consistently use the revised idleConf.CurrentTheme everywhere in idlelib.
+
+- Issue #24782: Extension configuration is now a tab in the IDLE Preferences
+  dialog rather than a separate dialog.   The former tabs are now a sorted
+  list.  Patch by Mark Roseman.
+
+- Issue #22726: Re-activate the config dialog help button with some content
+  about the other buttons and the new IDLE Dark theme.
+
+- Issue #24820: IDLE now has an 'IDLE Dark' built-in text color theme.
+  It is more or less IDLE Classic inverted, with a cobalt blue background.
+  Strings, comments, keywords, ... are still green, red, orange, ... .
+  To use it with IDLEs released before November 2015, hit the
+  'Save as New Custom Theme' button and enter a new name,
+  such as 'Custom Dark'.  The custom theme will work with any IDLE
+  release, and can be modified.
+
+- Issue #25224: README.txt is now an idlelib index for IDLE developers and
+  curious users.  The previous user content is now in the IDLE doc chapter.
+  'IDLE' now means 'Integrated Development and Learning Environment'.
+
+- Issue #24820: Users can now set breakpoint colors in
+  Settings -> Custom Highlighting.  Original patch by Mark Roseman.
+
+- Issue #24972: Inactive selection background now matches active selection
+  background, as configured by users, on all systems.  Found items are now
+  always highlighted on Windows.  Initial patch by Mark Roseman.
+
+- Issue #24570: Idle: make calltip and completion boxes appear on Macs
+  affected by a tk regression.  Initial patch by Mark Roseman.
+
+- Issue #24988: Idle ScrolledList context menus (used in debugger)
+  now work on Mac Aqua.  Patch by Mark Roseman.
+
+- Issue #24801: Make right-click for context menu work on Mac Aqua.
+  Patch by Mark Roseman.
+
+- Issue #25173: Associate tkinter messageboxes with a specific widget.
+  For Mac OSX, make them a 'sheet'.  Patch by Mark Roseman.
+
+- Issue #25198: Enhance the initial html viewer now used for Idle Help.
+  * Properly indent fixed-pitch text (patch by Mark Roseman).
+  * Give code snippet a very Sphinx-like light blueish-gray background.
+  * Re-use initial width and height set by users for shell and editor.
+  * When the Table of Contents (TOC) menu is used, put the section header
+  at the top of the screen.
+
+- Issue #25225: Condense and rewrite Idle doc section on text colors.
+
+- Issue #21995: Explain some differences between IDLE and console Python.
+
+- Issue #22820: Explain need for *print* when running file from Idle editor.
+
+- Issue #25224: Doc: augment Idle feature list and no-subprocess section.
+
+- Issue #25219: Update doc for Idle command line options.
+  Some were missing and notes were not correct.
+
+- Issue #24861: Most of idlelib is private and subject to change.
+  Use idleib.idle.* to start Idle. See idlelib.__init__.__doc__.
+
+- Issue #25199: Idle: add synchronization comments for future maintainers.
+
+- Issue #16893: Replace help.txt with help.html for Idle doc display.
+  The new idlelib/help.html is rstripped Doc/build/html/library/idle.html.
+  It looks better than help.txt and will better document Idle as released.
+  The tkinter html viewer that works for this file was written by Mark Roseman.
+  The now unused EditorWindow.HelpDialog class and helt.txt file are deprecated.
+
+- Issue #24199: Deprecate unused idlelib.idlever with possible removal in 3.6.
+
+- Issue #24790: Remove extraneous code (which also create 2 & 3 conflicts).
+
+- Issue #23672: Allow Idle to edit and run files with astral chars in name.
+  Patch by Mohd Sanad Zaki Rizvi.
+
+- Issue 24745: Idle editor default font. Switch from Courier to
+  platform-sensitive TkFixedFont.  This should not affect current customized
+  font selections.  If there is a problem, edit $HOME/.idlerc/config-main.cfg
+  and remove 'fontxxx' entries from [Editor Window].  Patch by Mark Roseman.
+
+- Issue #21192: Idle editor. When a file is run, put its name in the restart bar.
+  Do not print false prompts. Original patch by Adnan Umer.
+
+- Issue #13884: Idle menus. Remove tearoff lines. Patch by Roger Serwy.
+
+- Issue #23184: remove unused names and imports in idlelib.
+  Initial patch by Al Sweigart.
+
+Tests
+-----
+
+- Issue #25616: Tests for OrderedDict are extracted from test_collections
+  into separate file test_ordered_dict.
+
+- Issue #25099: Make test_compileall not fail when an entry on sys.path cannot
+  be written to (commonly seen in administrative installs on Windows).
+
+- Issue #24751: When running regrtest with the ``-w`` command line option,
+  a test run is no longer marked as a failure if all tests succeed when
+  re-run.
+
+- Issue #21520: test_zipfile no longer fails if the word 'bad' appears
+  anywhere in the name of the current directory.
+
+- Issue #23799: Added test.support.start_threads() for running and
+  cleaning up multiple threads.
+
+- Issue #22390: test.regrtest now emits a warning if temporary files or
+  directories are left after running a test.
+
+- Issue #23583: Added tests for standard IO streams in IDLE.
+
+Build
+-----
+
+- Issue #23445: pydebug builds now use "gcc -Og" where possible, to make
+  the resulting executable faster.
+
+- Issue #24603: Update Windows builds to use OpenSSL1.0.2d
+  and OS X 10.5 installer to use OpenSSL 1.0.2e.
+
+C API
+-----
+
+- Issue #23998: PyImport_ReInitLock() now checks for lock allocation error
+
+Documentation
+-------------
+
+- Issue #12067: Rewrite Comparisons section in the Expressions chapter of the
+  language reference. Some of the details of comparing mixed types were
+  incorrect or ambiguous. NotImplemented is only relevant at a lower level
+  than the Expressions chapter. Added details of comparing range() objects,
+  and default behaviour and consistency suggestions for user-defined classes.
+  Patch from Andy Maier.
+
+- Issue #24952: Clarify the default size argument of stack_size() in
+  the "threading" and "_thread" modules. Patch from Mattip.
+
+- Issue #24808: Update the types of some PyTypeObject fields. Patch by
+  Joseph Weston.
+
+- Issue #22812: Fix unittest discovery examples.
+  Patch from Pam McA'Nulty.
+
+- Issue #24129: Clarify the reference documentation for name resolution.
+  This includes removing the assumption that readers will be familiar with the
+  name resolution scheme Python used prior to the introduction of lexical
+  scoping for function namespaces. Patch by Ivan Levkivskyi.
+
+- Issue #20769: Improve reload() docs. Patch by Dorian Pula.
+
+- Issue #23589: Remove duplicate sentence from the FAQ.  Patch by Yongzhi Pan.
+
+- Issue #24729: Correct IO tutorial to match implementation regarding
+  encoding parameter to open function.
+
+- Issue #24351: Clarify what is meant by "identifier" in the context of
+  string.Template instances.
+
+- Issue #22155: Add File Handlers subsection with createfilehandler to tkinter
+  doc.  Remove obsolete example from FAQ.  Patch by Martin Panter.
+
+- Issue #24029: Document the name binding behavior for submodule imports.
+
+- Issue #24077: Fix typo in man page for -I command option: -s, not -S.
+
+Tools/Demos
+-----------
+
+- Issue #25440: Fix output of python-config --extension-suffix.
+
+- Issue #23330: h2py now supports arbitrary filenames in #include.
+
+- Issue #24031: make patchcheck now supports git checkouts, too.
+
+Windows
+-------
+
+- Issue #24306: Sets component ID for launcher to match 3.5 and later
+  to avoid downgrading.
+
+- Issue #25022: Removed very outdated PC/example_nt/ directory.
+
+
 What's New in Python 3.4.3?
 ===========================
 
@@ -69,8 +891,6 @@ Library
 
 - Issue #23366: Fixed possible integer overflow in itertools.combinations.
 
-- Issue #23366: Fixed possible integer overflow in itertools.combinations.
-
 - Issue #23369: Fixed possible integer overflow in
   _json.encode_basestring_ascii.
 
@@ -92,7 +912,7 @@ Library
   __ne__() now works correctly.
 
 - Issue #19996: :class:`email.feedparser.FeedParser` now handles (malformed)
-  headers with no key rather than amusing the body has started.
+  headers with no key rather than assuming the body has started.
 
 - Issue #23248: Update ssl error codes from latest OpenSSL git master.
 
@@ -275,7 +1095,7 @@ Library
   (including empty directories) in ZIP file.
 
 - Issue #22449: In the ssl.SSLContext.load_default_certs, consult the
-  enviromental variables SSL_CERT_DIR and SSL_CERT_FILE on Windows.
+  environmental variables SSL_CERT_DIR and SSL_CERT_FILE on Windows.
 
 - Issue #20076: Added non derived UTF-8 aliases to locale aliases table.
 
@@ -308,10 +1128,10 @@ IDLE
   Changes are written to HOME/.idlerc/config-extensions.cfg.
   Original patch by Tal Einat.
 
-- Issue #16233: A module browser (File : Class Browser, Alt+C) requires a
+- Issue #16233: A module browser (File : Class Browser, Alt+C) requires an
   editor window with a filename.  When Class Browser is requested otherwise,
   from a shell, output window, or 'Untitled' editor, Idle no longer displays
-  an error box.  It now pops up an  Open Module box (Alt+M). If a valid name
+  an error box.  It now pops up an Open Module box (Alt+M). If a valid name
   is entered and a module is opened, a corresponding browser is also opened.
 
 - Issue #4832: Save As to type Python files automatically adds .py to the
@@ -350,6 +1170,8 @@ Tests
 
 - Issue #23345: Prevent test_ssl failures with large OpenSSL patch level
   values (like 0.9.8zc).
+
+- Issue #22289: Prevent test_urllib2net failures due to ftp connection timeout.
 
 Build
 -----
@@ -404,13 +1226,11 @@ Windows
 
 - Issue #22644: The bundled version of OpenSSL has been updated to 1.0.1j.
 
+
 What's New in Python 3.4.2?
 ===========================
 
 Release date: 2014-10-06
-
-Core and Builtins
------------------
 
 Library
 -------
@@ -458,7 +1278,7 @@ Core and Builtins
   engine friendly) error messages when "exec" and "print" are used as
   statements.
 
-- Issue #21642: If the conditional if-else expression, allow an integer written
+- Issue #21642: In the conditional if-else expression, allow an integer written
   with no space between itself and the ``else`` keyword (e.g. ``True if 42else
   False``) to be valid syntax.
 
@@ -562,7 +1382,7 @@ Library
 - Issue #21448: Changed FeedParser feed() to avoid O(N**2) behavior when
   parsing long line.  Original patch by Raymond Hettinger.
 
-- Issue #22184:  The functools LRU Cache decorator factory now gives an earlier
+- Issue #22184: The functools LRU Cache decorator factory now gives an earlier
   and clearer error message when the user forgets the required parameters.
 
 - Issue #17923: glob() patterns ending with a slash no longer match non-dirs on
@@ -604,7 +1424,7 @@ Library
 - Issue #21044: tarfile.open() now handles fileobj with an integer 'name'
   attribute.  Based on patch by Antoine Pietri.
 
-- Issue #21867:  Prevent turtle crash due to invalid undo buffer size.
+- Issue #21867: Prevent turtle crash due to invalid undo buffer size.
 
 - Issue #19076: Don't pass the redundant 'file' argument to self.error().
 
@@ -650,16 +1470,16 @@ Library
 
 - Issue #21491: socketserver: Fix a race condition in child processes reaping.
 
-- Issue #21832:  Require named tuple inputs to be exact strings.
+- Issue #21832: Require named tuple inputs to be exact strings.
 
-- Issue #19145:  The times argument for itertools.repeat now handles
+- Issue #19145: The times argument for itertools.repeat now handles
   negative values the same way for keyword arguments as it does for
   positional arguments.
 
 - Issue #21812: turtle.shapetransform did not tranform the turtle on the
   first call.  (Issue identified and fixed by Lita Cho.)
 
-- Issue #21635:  The difflib SequenceMatcher.get_matching_blocks() method
+- Issue #21635: The difflib SequenceMatcher.get_matching_blocks() method
   cache didn't match the actual result.  The former was a list of tuples
   and the latter was a list of named tuples.
 
@@ -707,7 +1527,7 @@ Library
 
 - Issue #21402: tkinter.ttk now works when default root window is not set.
 
-- Issue #10203: sqlite3.Row now truly supports sequence protocol.  In particulr
+- Issue #10203: sqlite3.Row now truly supports sequence protocol.  In particular
   it supports reverse() and negative indices.  Original patch by Claudiu Popa.
 
 - Issue #18807: If copying (no symlinks) specified for a venv, then the python
@@ -720,7 +1540,7 @@ Library
 - Issue #14710: pkgutil.find_loader() no longer raises an exception when a
   module doesn't exist.
 
-- Issue #21481:  Argparse equality and inequality tests now return
+- Issue #21481: Argparse equality and inequality tests now return
   NotImplemented when comparing to an unknown type.
 
 - Issue #8743: Fix interoperability between set objects and the
@@ -806,7 +1626,7 @@ IDLE
 Tests
 -----
 
-- Issue #22166:  with the assistance of a new internal _codecs._forget_codec
+- Issue #22166: With the assistance of a new internal _codecs._forget_codec
   helping function, test_codecs now clears the encoding caches to avoid the
   appearance of a reference leak
 
@@ -965,7 +1785,7 @@ Core and Builtins
 - Issue #20637: Key-sharing now also works for instance dictionaries of
   subclasses.  Patch by Peter Ingebretson.
 
-- Issue #12546: Allow \x00 to be used as a fill character when using str, int,
+- Issue #12546: Allow ``\x00`` to be used as a fill character when using str, int,
   float, and complex __format__ methods.
 
 - Issue #13598: Modify string.Formatter to support auto-numbering of
@@ -978,7 +1798,7 @@ Library
 - Issue #21088: Bugfix for curses.window.addch() regression in 3.4.0.
   In porting to Argument Clinic, the first two arguments were reversed.
 
-- Issue #21469:  Reduced the risk of false positives in robotparser by
+- Issue #21469: Reduced the risk of false positives in robotparser by
   checking to make sure that robots.txt has been read or does not exist
   prior to returning True in can_fetch().
 
@@ -1033,8 +1853,9 @@ Library
 - Issue #20968: unittest.mock.MagicMock now supports division.
   Patch by Johannes Baiter.
 
-- Fix arbitrary memory access in JSONDecoder.raw_decode with a negative second
-  parameter. Bug reported by Guido Vranken.
+- Issue #21529 (CVE-2014-4616): Fix arbitrary memory access in
+  JSONDecoder.raw_decode with a negative second parameter. Bug reported by Guido
+  Vranken.
 
 - Issue #21169: getpass now handles non-ascii characters that the
   input stream encoding cannot encode by re-encoding using the
@@ -1149,6 +1970,7 @@ Extension Modules
 -----------------
 
 - Issue #21276: posixmodule: Don't define USE_XATTRS on KFreeBSD and the Hurd.
+
 - Issue #21226: Set up modules properly in PyImport_ExecCodeModuleObject
   (and friends).
 
@@ -1796,7 +2618,7 @@ Tools/Demos
   "{dirname}/clinic/{basename}.h".
 
 - Issue #20390: Argument Clinic's "class" directive syntax has been extended
-  with two new required  arguments: "typedef" and "type_object".
+  with two new required arguments: "typedef" and "type_object".
 
 - Issue #20390: Argument Clinic: If __new__ or __init__ functions didn't use
   kwargs (or args), the PyArg_NoKeywords (or PyArg_NoPositional) calls
@@ -1884,6 +2706,7 @@ Build
 
 - Issue #12837: Silence a tautological comparison warning on OS X under Clang in
   socketmodule.c.
+
 
 What's New in Python 3.4.0 Beta 2?
 ==================================
@@ -2113,7 +2936,7 @@ Library
 - Issue #19782: imaplib now supports SSLContext.check_hostname and server name
   indication for TLS/SSL connections.
 
-- Issue 20123: Fix pydoc.synopsis() for "binary" modules.
+- Issue #20123: Fix pydoc.synopsis() for "binary" modules.
 
 - Issue #19834: Support unpickling of exceptions pickled by Python 2.
 
@@ -2259,6 +3082,7 @@ Tools/Demos
 
 - Issue #19976: Argument Clinic METH_NOARGS functions now always
   take two parameters.
+
 
 What's New in Python 3.4.0 Beta 1?
 ==================================
@@ -2705,7 +3529,7 @@ Build
   upgrade pip by default, using the bundled pip provided by the new ensurepip
   module.  A new configure option, --with-ensurepip[=upgrade|install|no], is
   available to override the default ensurepip "--upgrade" option.  The option
-  can also be set with "make [alt]install ENSUREPIP=[upgrade|install\no]".
+  can also be set with "make [alt]install ENSUREPIP=[upgrade|install|no]".
 
 - Issue #19551: PEP 453 - the OS X installer now installs pip by default.
 
@@ -2729,6 +3553,7 @@ Tools/Demos
 
 - Issue #19390: Argument Clinic no longer accepts malformed Python
   and C ids.
+
 
 What's New in Python 3.4.0 Alpha 4?
 ===================================
@@ -2860,10 +3685,10 @@ Library
 - Issue #9548: Add a minimal "_bootlocale" module that is imported by the
   _io module instead of the full locale module.
 
-- Issue #18764: remove the 'print' alias for the PDB 'p' command so that it no
+- Issue #18764: Remove the 'print' alias for the PDB 'p' command so that it no
   longer shadows the print function.
 
-- Issue #19158:  a rare race in BoundedSemaphore could allow .release() too
+- Issue #19158: A rare race in BoundedSemaphore could allow .release() too
   often.
 
 - Issue #15805: Add contextlib.redirect_stdout().
@@ -2873,7 +3698,7 @@ Library
 - Issue #10712: 2to3 has a new "asserts" fixer that replaces deprecated names
   of unittest methods (e.g. failUnlessEqual -> assertEqual).
 
-- Issue #18037: 2to3 now escapes '\u' and '\U' in native strings.
+- Issue #18037: 2to3 now escapes ``'\u'`` and ``'\U'`` in native strings.
 
 - Issue #17839: base64.decodebytes and base64.encodebytes now accept any
   object that exports a 1 dimensional array of bytes (this means the same
@@ -2958,6 +3783,7 @@ Build
   of OPT for special build options.  By setting OPT, some compiler-specific
   options like -fwrapv were overridden and thus not used, which could result
   in broken interpreters when building with clang.
+
 
 What's New in Python 3.4.0 Alpha 3?
 ===================================
@@ -3343,6 +4169,7 @@ Tools/Demos
 - Issue #18922: Now The Lib/smtpd.py and Tools/i18n/msgfmt.py scripts write
   their version strings to stdout, and not to sderr.
 
+
 What's New in Python 3.4.0 Alpha 1?
 ===================================
 
@@ -3538,7 +4365,7 @@ Core and Builtins
 - Issue #5308: Raise ValueError when marshalling too large object (a sequence
   with size >= 2**31), instead of producing illegal marshal data.
 
-- Issue #12983: Bytes literals with invalid \x escape now raise a SyntaxError
+- Issue #12983: Bytes literals with invalid ``\x`` escape now raise a SyntaxError
   and a full traceback including line number.
 
 - Issue #16967: In function definition, evaluate positional defaults before
@@ -3909,9 +4736,10 @@ Library
   loaded X.509 certs, X.509 CA certs and CRLs.
 
 - Issue #18167: cgi.FieldStorage no longer fails to handle multipart/form-data
-  when \r\n appears at end of 65535 bytes without other newlines.
+  when ``\r\n`` appears at end of 65535 bytes without other newlines.
 
 - Issue #18076: Introduce importlib.util.decode_source().
+
 - Issue #18357: add tests for dictview set difference.
   Patch by Fraser Tweedale.
 
@@ -4140,7 +4968,7 @@ Library
 - Issue #17016: Get rid of possible pointer wraparounds and integer overflows
   in the re module.  Patch by Nickolai Zeldovich.
 
-- Issue #16658: add missing return to HTTPConnection.send()
+- Issue #16658: add missing return to HTTPConnection.send().
   Patch by Jeff Knupp.
 
 - Issue #9556: the logging package now allows specifying a time-of-day for a
@@ -4521,8 +5349,9 @@ Library
 
 - Issue #16900: Issue a ResourceWarning when an ssl socket is left unclosed.
 
-- Issue #13899: \A, \Z, and \B now correctly match the A, Z, and B literals
-  when used inside character classes (e.g. '[\A]').  Patch by Matthew Barnett.
+- Issue #13899: ``\A``, ``\Z``, and ``\B`` now correctly match the A, Z,
+  and B literals when used inside character classes (e.g. ``'[\A]'``).
+  Patch by Matthew Barnett.
 
 - Issue #15545: Fix regression in sqlite3's iterdump method where it was
   failing if the connection used a row factory (such as sqlite3.Row) that
@@ -4737,7 +5566,7 @@ Library
 - Issue #16431: Use the type information when constructing a Decimal subtype
   from a Decimal argument.
 
-- Issue #15641: Clean up deprecated classes from importlib
+- Issue #15641: Clean up deprecated classes from importlib.
   Patch by Taras Lyapun.
 
 - Issue #16350: zlib.decompressobj().decompress() now accumulates data from
@@ -5006,7 +5835,7 @@ IDLE
 - Issue #16511: Use default IDLE width and height if config param is not valid.
   Patch Serhiy Storchaka.
 
-- Issue #1207589: Add Cut/Copy/Paste items to IDLE right click Context Menu
+- Issue #1207589: Add Cut/Copy/Paste items to IDLE right click Context Menu.
   Patch by Todd Rovito.
 
 - Issue #16123: IDLE - deprecate running without a subprocess.
@@ -5379,7 +6208,7 @@ Documentation
 
 - Issue #15940: Specify effect of locale on time functions.
 
-- Issue 17538: Document XML vulnerabilties
+- Issue #17538: Document XML vulnerabilties
 
 - Issue #16642: sched.scheduler timefunc initial default is time.monotonic.
   Patch by Ramchandra Apte
@@ -5515,7 +6344,7 @@ Tools/Demos
 - Issue #16549: Make json.tool work again on Python 3 and add tests.
   Initial patch by Berker Peksag and Serhiy Storchaka.
 
-- Issue #13301: use ast.literal_eval() instead of eval() in Tools/i18n/msgfmt.py
+- Issue #13301: use ast.literal_eval() instead of eval() in Tools/i18n/msgfmt.py.
   Patch by Serhiy Storchaka.
 
 Windows
@@ -7481,7 +8310,7 @@ Core and Builtins
   and bytearray.split may now be passed as keyword arguments.
 
 - Issue #13012: The 'keepends' parameter to str.splitlines may now be passed
-  as a keyword argument:  "my_string.splitlines(keepends=True)".  The same
+  as a keyword argument: "my_string.splitlines(keepends=True)".  The same
   change also applies to bytes.splitlines and bytearray.splitlines.
 
 - Issue #7732: Don't open a directory as a file anymore while importing a
@@ -8472,7 +9301,7 @@ Library
   of the text mode (using the locale encoding) to avoid encoding issues.
 
 - Issue #12147: Adjust the new-in-3.2 smtplib.send_message method for better
-  conformance to the RFCs:  correctly handle Sender and Resent- headers.
+  conformance to the RFCs: correctly handle Sender and Resent- headers.
 
 - Issue #12352: Fix a deadlock in multiprocessing.Heap when a block is freed by
   the garbage collector while the Heap lock is held.
@@ -8876,7 +9705,7 @@ Library
   multipart subparts with an 8-bit CTE into unicode instead of preserving the
   bytes.
 
-- Issue #1690608: email.util.formataddr is now RFC 2047 aware:  it now has a
+- Issue #1690608: email.util.formataddr is now RFC 2047 aware: it now has a
   charset parameter that defaults to utf-8 and is used as the charset for RFC
   2047 encoding when the realname contains non-ASCII characters.
 
@@ -9383,7 +10212,7 @@ Tests
 - Issue #13218: Fix test_ssl failures on Debian/Ubuntu.
 
 - Re-enable lib2to3's test_parser.py tests, though with an expected failure
-  (see issue 13125).
+  (see issue #13125).
 
 - Issue #12656: Add tests for IPv6 and Unix sockets to test_asyncore.
 
@@ -9471,7 +10300,7 @@ Tests
   Patch by Garrett Cooper.
 
 - Issue #10736: Fix test_ttk test_widgets failures with Cocoa Tk 8.5.9
-  2.8 +  on Mac OS X.  (Patch by Ronald Oussoren)
+  2.8+ on Mac OS X.  (Patch by Ronald Oussoren)
 
 - Issue #12057: Add tests for ISO 2022 codecs (iso2022_jp, iso2022_jp_2,
   iso2022_kr).

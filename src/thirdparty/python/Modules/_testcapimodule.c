@@ -1516,7 +1516,7 @@ unicode_aswidechar(PyObject *self, PyObject *args)
 
     if (!PyArg_ParseTuple(args, "Un", &unicode, &buflen))
         return NULL;
-    buffer = PyMem_Malloc(buflen * sizeof(wchar_t));
+    buffer = PyMem_New(wchar_t, buflen);
     if (buffer == NULL)
         return PyErr_NoMemory();
 
@@ -1781,6 +1781,18 @@ raise_exception(PyObject *self, PyObject *args)
     PyErr_SetObject(exc, exc_args);
     Py_DECREF(exc_args);
     return NULL;
+}
+
+static PyObject *
+set_errno(PyObject *self, PyObject *args)
+{
+    int new_errno;
+
+    if (!PyArg_ParseTuple(args, "i:set_errno", &new_errno))
+        return NULL;
+
+    errno = new_errno;
+    Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -3208,6 +3220,7 @@ pymarshal_read_object_from_file(PyObject* self, PyObject *args)
 static PyMethodDef TestMethods[] = {
     {"raise_exception",         raise_exception,                 METH_VARARGS},
     {"raise_memoryerror",   (PyCFunction)raise_memoryerror,  METH_NOARGS},
+    {"set_errno",               set_errno,                       METH_VARARGS},
     {"test_config",             (PyCFunction)test_config,        METH_NOARGS},
     {"test_sizeof_c_types",     (PyCFunction)test_sizeof_c_types, METH_NOARGS},
     {"test_datetime_capi",  test_datetime_capi,              METH_NOARGS},

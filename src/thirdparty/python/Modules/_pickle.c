@@ -428,9 +428,7 @@ Pdata_grow(Pdata *self)
     if (new_allocated > PY_SSIZE_T_MAX - allocated)
         goto nomemory;
     new_allocated += allocated;
-    if (new_allocated > (PY_SSIZE_T_MAX / sizeof(PyObject *)))
-        goto nomemory;
-    data = PyMem_REALLOC(data, new_allocated * sizeof(PyObject *));
+    PyMem_RESIZE(data, PyObject *, new_allocated);
     if (data == NULL)
         goto nomemory;
 
@@ -450,8 +448,8 @@ Pdata_grow(Pdata *self)
 static PyObject *
 Pdata_pop(Pdata *self)
 {
-    PickleState *st = _Pickle_GetGlobalState();
     if (Py_SIZE(self) == 0) {
+        PickleState *st = _Pickle_GetGlobalState();
         PyErr_SetString(st->UnpicklingError, "bad pickle data");
         return NULL;
     }
@@ -660,7 +658,7 @@ PyMemoTable_Copy(PyMemoTable *self)
     /* The table we get from _New() is probably smaller than we wanted.
        Free it and allocate one that's the right size. */
     PyMem_FREE(new->mt_table);
-    new->mt_table = PyMem_MALLOC(self->mt_allocated * sizeof(PyMemoEntry));
+    new->mt_table = PyMem_NEW(PyMemoEntry, self->mt_allocated);
     if (new->mt_table == NULL) {
         PyMem_FREE(new);
         PyErr_NoMemory();
@@ -755,7 +753,7 @@ _PyMemoTable_ResizeTable(PyMemoTable *self, Py_ssize_t min_size)
 
     /* Allocate new table. */
     oldtable = self->mt_table;
-    self->mt_table = PyMem_MALLOC(new_size * sizeof(PyMemoEntry));
+    self->mt_table = PyMem_NEW(PyMemoEntry, new_size);
     if (self->mt_table == NULL) {
         self->mt_table = oldtable;
         PyErr_NoMemory();
@@ -1184,6 +1182,13 @@ _Unpickler_Read(UnpicklerObject *self, char **s, Py_ssize_t n)
 {
     Py_ssize_t num_read;
 
+    *s = NULL;
+    if (self->next_read_idx > PY_SSIZE_T_MAX - n) {
+        PickleState *st = _Pickle_GetGlobalState();
+        PyErr_SetString(st->UnpicklingError,
+                        "read would overflow (invalid bytecode)");
+        return -1;
+    }
     if (self->next_read_idx + n <= self->input_len) {
         *s = self->input_buffer + self->next_read_idx;
         self->next_read_idx += n;
@@ -1261,16 +1266,14 @@ static int
 _Unpickler_ResizeMemoList(UnpicklerObject *self, Py_ssize_t new_size)
 {
     Py_ssize_t i;
-    PyObject **memo;
 
     assert(new_size > self->memo_size);
 
-    memo = PyMem_REALLOC(self->memo, new_size * sizeof(PyObject *));
-    if (memo == NULL) {
+    PyMem_RESIZE(self->memo, PyObject *, new_size);
+    if (self->memo == NULL) {
         PyErr_NoMemory();
         return -1;
     }
-    self->memo = memo;
     for (i = self->memo_size; i < new_size; i++)
         self->memo[i] = NULL;
     self->memo_size = new_size;
@@ -1314,7 +1317,7 @@ _Unpickler_MemoPut(UnpicklerObject *self, Py_ssize_t idx, PyObject *value)
 static PyObject **
 _Unpickler_NewMemo(Py_ssize_t new_size)
 {
-    PyObject **memo = PyMem_MALLOC(new_size * sizeof(PyObject *));
+    PyObject **memo = PyMem_NEW(PyObject *, new_size);
     if (memo == NULL) {
         PyErr_NoMemory();
         return NULL;
@@ -3026,6 +3029,7 @@ fix_imports(PyObject **module_name, PyObject **global_name)
         Py_INCREF(fixed_global_name);
         *module_name = fixed_module_name;
         *global_name = fixed_global_name;
+        return 0;
     }
     else if (PyErr_Occurred()) {
         return -1;
@@ -4028,7 +4032,7 @@ version of Python needed to read the pickle produced.
 
 The *file* argument must have a write() method that accepts a single
 bytes argument. It can thus be a file object opened for binary
-writing, a io.BytesIO instance, or any other custom object that meets
+writing, an io.BytesIO instance, or any other custom object that meets
 this interface.
 
 If *fix_imports* is True and protocol is less than 3, pickle will try
@@ -4038,7 +4042,7 @@ to map the new Python 3 names to the old module names used in Python
 
 static int
 _pickle_Pickler___init___impl(PicklerObject *self, PyObject *file, PyObject *protocol, int fix_imports)
-/*[clinic end generated code: output=56e229f3b1f4332f input=b8cdeb7e3f5ee674]*/
+/*[clinic end generated code: output=56e229f3b1f4332f input=4faabdbc763c2389]*/
 {
     _Py_IDENTIFIER(persistent_id);
     _Py_IDENTIFIER(dispatch_table);
@@ -4536,7 +4540,17 @@ calc_binsize(char *bytes, int nbytes)
     int i;
     size_t x = 0;
 
-    for (i = 0; i < nbytes && i < sizeof(size_t); i++) {
+    if (nbytes > (int)sizeof(size_t)) {
+        /* Check for integer overflow.  BINBYTES8 and BINUNICODE8 opcodes
+         * have 64-bit size that can't be represented on 32-bit platform.
+         */
+        for (i = (int)sizeof(size_t); i < nbytes; i++) {
+            if (s[i])
+                return -1;
+        }
+        nbytes = (int)sizeof(size_t);
+    }
+    for (i = 0; i < nbytes; i++) {
         x |= (size_t) s[i] << (8 * i);
     }
 
@@ -4901,15 +4915,14 @@ load_counted_binunicode(UnpicklerObject *self, int nbytes)
 }
 
 static int
-load_tuple(UnpicklerObject *self)
+load_counted_tuple(UnpicklerObject *self, int len)
 {
     PyObject *tuple;
-    Py_ssize_t i;
 
-    if ((i = marker(self)) < 0)
-        return -1;
+    if (Py_SIZE(self->stack) < len)
+        return stack_underflow();
 
-    tuple = Pdata_poptuple(self->stack, i);
+    tuple = Pdata_poptuple(self->stack, Py_SIZE(self->stack) - len);
     if (tuple == NULL)
         return -1;
     PDATA_PUSH(self->stack, tuple, -1);
@@ -4917,24 +4930,14 @@ load_tuple(UnpicklerObject *self)
 }
 
 static int
-load_counted_tuple(UnpicklerObject *self, int len)
+load_tuple(UnpicklerObject *self)
 {
-    PyObject *tuple;
+    Py_ssize_t i;
 
-    tuple = PyTuple_New(len);
-    if (tuple == NULL)
+    if ((i = marker(self)) < 0)
         return -1;
 
-    while (--len >= 0) {
-        PyObject *item;
-
-        PDATA_POP(self->stack, item);
-        if (item == NULL)
-            return -1;
-        PyTuple_SET_ITEM(tuple, len, item);
-    }
-    PDATA_PUSH(self->stack, tuple, -1);
-    return 0;
+    return load_counted_tuple(self, Py_SIZE(self->stack) - i);
 }
 
 static int
@@ -5065,6 +5068,9 @@ load_obj(UnpicklerObject *self)
     if ((i = marker(self)) < 0)
         return -1;
 
+    if (Py_SIZE(self->stack) - i < 1)
+        return stack_underflow();
+
     args = Pdata_poptuple(self->stack, i + 1);
     if (args == NULL)
         return -1;
@@ -5109,8 +5115,10 @@ load_inst(UnpicklerObject *self)
         return -1;
 
     if ((len = _Unpickler_Readline(self, &s)) >= 0) {
-        if (len < 2)
+        if (len < 2) {
+            Py_DECREF(module_name);
             return bad_readline();
+        }
         class_name = PyUnicode_DecodeASCII(s, len - 1, "strict");
         if (class_name != NULL) {
             cls = find_class(self, module_name, class_name);
@@ -5213,10 +5221,10 @@ load_newobj_ex(UnpicklerObject *self)
     if (!PyType_Check(cls)) {
         Py_DECREF(kwargs);
         Py_DECREF(args);
-        Py_DECREF(cls);
         PyErr_Format(st->UnpicklingError,
                      "NEWOBJ_EX class argument must be a type, not %.200s",
                      Py_TYPE(cls)->tp_name);
+        Py_DECREF(cls);
         return -1;
     }
 
@@ -5723,13 +5731,18 @@ do_append(UnpicklerObject *self, Py_ssize_t x)
 static int
 load_append(UnpicklerObject *self)
 {
+    if (Py_SIZE(self->stack) - 1 <= 0)
+        return stack_underflow();
     return do_append(self, Py_SIZE(self->stack) - 1);
 }
 
 static int
 load_appends(UnpicklerObject *self)
 {
-    return do_append(self, marker(self));
+    Py_ssize_t i = marker(self);
+    if (i < 0)
+        return -1;
+    return do_append(self, i);
 }
 
 static int
@@ -5779,7 +5792,10 @@ load_setitem(UnpicklerObject *self)
 static int
 load_setitems(UnpicklerObject *self)
 {
-    return do_setitems(self, marker(self));
+    Py_ssize_t i = marker(self);
+    if (i < 0)
+        return -1;
+    return do_setitems(self, i);
 }
 
 static int
@@ -5789,6 +5805,8 @@ load_additems(UnpicklerObject *self)
     Py_ssize_t mark, len, i;
 
     mark =  marker(self);
+    if (mark < 0)
+        return -1;
     len = Py_SIZE(self->stack);
     if (mark > len || mark <= 0)
         return stack_underflow();
@@ -5962,7 +5980,6 @@ load_mark(UnpicklerObject *self)
 
     if ((self->num_marks + 1) >= self->marks_size) {
         size_t alloc;
-        Py_ssize_t *marks;
 
         /* Use the size_t type to check for overflow. */
         alloc = ((size_t)self->num_marks << 1) + 20;
@@ -5973,15 +5990,14 @@ load_mark(UnpicklerObject *self)
         }
 
         if (self->marks == NULL)
-            marks = (Py_ssize_t *) PyMem_Malloc(alloc * sizeof(Py_ssize_t));
+            self->marks = PyMem_NEW(Py_ssize_t, alloc);
         else
-            marks = (Py_ssize_t *) PyMem_Realloc(self->marks,
-                                                 alloc * sizeof(Py_ssize_t));
-        if (marks == NULL) {
+            PyMem_RESIZE(self->marks, Py_ssize_t, alloc);
+        if (self->marks == NULL) {
+            self->marks_size = 0;
             PyErr_NoMemory();
             return -1;
         }
-        self->marks = marks;
         self->marks_size = (Py_ssize_t)alloc;
     }
 
@@ -6278,20 +6294,21 @@ _pickle_Unpickler_find_class_impl(UnpicklerObject *self, PyObject *module_name, 
         else if (PyErr_Occurred()) {
             return NULL;
         }
-
-        /* Check if the module was renamed. */
-        item = PyDict_GetItemWithError(st->import_mapping_2to3, module_name);
-        if (item) {
-            if (!PyUnicode_Check(item)) {
-                PyErr_Format(PyExc_RuntimeError,
-                             "_compat_pickle.IMPORT_MAPPING values should be "
-                             "strings, not %.200s", Py_TYPE(item)->tp_name);
+        else {
+            /* Check if the module was renamed. */
+            item = PyDict_GetItemWithError(st->import_mapping_2to3, module_name);
+            if (item) {
+                if (!PyUnicode_Check(item)) {
+                    PyErr_Format(PyExc_RuntimeError,
+                                "_compat_pickle.IMPORT_MAPPING values should be "
+                                "strings, not %.200s", Py_TYPE(item)->tp_name);
+                    return NULL;
+                }
+                module_name = item;
+            }
+            else if (PyErr_Occurred()) {
                 return NULL;
             }
-            module_name = item;
-        }
-        else if (PyErr_Occurred()) {
-            return NULL;
         }
     }
 
@@ -6430,7 +6447,7 @@ representation are ignored.
 The argument *file* must have two methods, a read() method that takes
 an integer argument, and a readline() method that requires no
 arguments.  Both methods should return bytes.  Thus *file* can be a
-binary file object opened for reading, a io.BytesIO object, or any
+binary file object opened for reading, an io.BytesIO object, or any
 other custom object that meets this interface.
 
 Optional keyword arguments are *fix_imports*, *encoding* and *errors*,
@@ -6445,7 +6462,7 @@ string instances as bytes objects.
 
 static int
 _pickle_Unpickler___init___impl(UnpicklerObject *self, PyObject *file, int fix_imports, const char *encoding, const char *errors)
-/*[clinic end generated code: output=b9ed1d84d315f3b5 input=30b4dc9e976b890c]*/
+/*[clinic end generated code: output=b9ed1d84d315f3b5 input=04ece661aa884837]*/
 {
     _Py_IDENTIFIER(persistent_load);
 
@@ -6864,7 +6881,7 @@ version of Python needed to read the pickle produced.
 
 The *file* argument must have a write() method that accepts a single
 bytes argument.  It can thus be a file object opened for binary
-writing, a io.BytesIO instance, or any other custom object that meets
+writing, an io.BytesIO instance, or any other custom object that meets
 this interface.
 
 If *fix_imports* is True and protocol is less than 3, pickle will try
@@ -6874,7 +6891,7 @@ to map the new Python 3 names to the old module names used in Python
 
 static PyObject *
 _pickle_dump_impl(PyModuleDef *module, PyObject *obj, PyObject *file, PyObject *protocol, int fix_imports)
-/*[clinic end generated code: output=a606e626d553850d input=e9e5fdd48de92eae]*/
+/*[clinic end generated code: output=a606e626d553850d input=830f8a64cef6f042]*/
 {
     PicklerObject *pickler = _Pickler_New();
 
@@ -6972,7 +6989,7 @@ representation are ignored.
 The argument *file* must have two methods, a read() method that takes
 an integer argument, and a readline() method that requires no
 arguments.  Both methods should return bytes.  Thus *file* can be a
-binary file object opened for reading, a io.BytesIO object, or any
+binary file object opened for reading, an io.BytesIO object, or any
 other custom object that meets this interface.
 
 Optional keyword arguments are *fix_imports*, *encoding* and *errors*,
@@ -6987,7 +7004,7 @@ string instances as bytes objects.
 
 static PyObject *
 _pickle_load_impl(PyModuleDef *module, PyObject *file, int fix_imports, const char *encoding, const char *errors)
-/*[clinic end generated code: output=568c61356c172654 input=da97372e38e510a6]*/
+/*[clinic end generated code: output=568c61356c172654 input=2df7c7a1e6742204]*/
 {
     PyObject *result;
     UnpicklerObject *unpickler = _Unpickler_New();

@@ -816,17 +816,23 @@ bytes_richcompare(PyBytesObject *a, PyBytesObject *b, int op)
     Py_ssize_t len_a, len_b;
     Py_ssize_t min_len;
     PyObject *result;
+    int rc;
 
     /* Make sure both arguments are strings. */
     if (!(PyBytes_Check(a) && PyBytes_Check(b))) {
-        if (Py_BytesWarningFlag && (op == Py_EQ || op == Py_NE) &&
-            (PyObject_IsInstance((PyObject*)a,
-                                 (PyObject*)&PyUnicode_Type) ||
-            PyObject_IsInstance((PyObject*)b,
-                                 (PyObject*)&PyUnicode_Type))) {
-            if (PyErr_WarnEx(PyExc_BytesWarning,
-                        "Comparison between bytes and string", 1))
+        if (Py_BytesWarningFlag && (op == Py_EQ || op == Py_NE)) {
+            rc = PyObject_IsInstance((PyObject*)a,
+                                     (PyObject*)&PyUnicode_Type);
+            if (!rc)
+                rc = PyObject_IsInstance((PyObject*)b,
+                                         (PyObject*)&PyUnicode_Type);
+            if (rc < 0)
                 return NULL;
+            if (rc) {
+                if (PyErr_WarnEx(PyExc_BytesWarning,
+                                 "Comparison between bytes and string", 1))
+                    return NULL;
+            }
         }
         result = Py_NotImplemented;
     }
@@ -2370,18 +2376,6 @@ bytes_fromhex(PyObject *cls, PyObject *args)
     return NULL;
 }
 
-PyDoc_STRVAR(sizeof__doc__,
-"B.__sizeof__() -> size of B in memory, in bytes");
-
-static PyObject *
-bytes_sizeof(PyBytesObject *v)
-{
-    Py_ssize_t res;
-    res = PyBytesObject_SIZE + Py_SIZE(v) * Py_TYPE(v)->tp_itemsize;
-    return PyLong_FromSsize_t(res);
-}
-
-
 static PyObject *
 bytes_getnewargs(PyBytesObject *v)
 {
@@ -2447,13 +2441,11 @@ bytes_methods[] = {
      translate__doc__},
     {"upper", (PyCFunction)stringlib_upper, METH_NOARGS, _Py_upper__doc__},
     {"zfill", (PyCFunction)stringlib_zfill, METH_VARARGS, zfill__doc__},
-    {"__sizeof__", (PyCFunction)bytes_sizeof, METH_NOARGS,
-     sizeof__doc__},
     {NULL,     NULL}                         /* sentinel */
 };
 
 static PyObject *
-str_subtype_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+bytes_subtype_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 static PyObject *
 bytes_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -2468,7 +2460,7 @@ bytes_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     _Py_IDENTIFIER(__bytes__);
 
     if (type != &PyBytes_Type)
-        return str_subtype_new(type, args, kwds);
+        return bytes_subtype_new(type, args, kwds);
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oss:bytes", kwlist, &x,
                                      &encoding, &errors))
         return NULL;
@@ -2695,7 +2687,7 @@ PyBytes_FromObject(PyObject *x)
 }
 
 static PyObject *
-str_subtype_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+bytes_subtype_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
     PyObject *tmp, *pnew;
     Py_ssize_t n;
@@ -2704,7 +2696,7 @@ str_subtype_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
     tmp = bytes_new(&PyBytes_Type, args, kwds);
     if (tmp == NULL)
         return NULL;
-    assert(PyBytes_CheckExact(tmp));
+    assert(PyBytes_Check(tmp));
     n = PyBytes_GET_SIZE(tmp);
     pnew = type->tp_alloc(type, n);
     if (pnew != NULL) {

@@ -698,9 +698,9 @@ deque_remove(dequeobject *deque, PyObject *value)
         if (cmp > 0) {
             PyObject *tgt = deque_popleft(deque, NULL);
             assert (tgt != NULL);
-            Py_DECREF(tgt);
-            if (_deque_rotate(deque, i) == -1)
+            if (_deque_rotate(deque, i))
                 return NULL;
+            Py_DECREF(tgt);
             Py_RETURN_NONE;
         }
         else if (cmp < 0) {
@@ -781,16 +781,16 @@ static int
 deque_del_item(dequeobject *deque, Py_ssize_t i)
 {
     PyObject *item;
+    int rv;
 
     assert (i >= 0 && i < Py_SIZE(deque));
-    if (_deque_rotate(deque, -i) == -1)
+    if (_deque_rotate(deque, -i))
         return -1;
-
     item = deque_popleft(deque, NULL);
+    rv = _deque_rotate(deque, i);
     assert (item != NULL);
     Py_DECREF(item);
-
-    return _deque_rotate(deque, i);
+    return rv;
 }
 
 static int
@@ -1682,7 +1682,7 @@ defdict_init(PyObject *self, PyObject *args, PyObject *kwds)
             newdefault = PyTuple_GET_ITEM(args, 0);
             if (!PyCallable_Check(newdefault) && newdefault != Py_None) {
                 PyErr_SetString(PyExc_TypeError,
-                    "first argument must be callable");
+                    "first argument must be callable or None");
                 return -1;
             }
         }

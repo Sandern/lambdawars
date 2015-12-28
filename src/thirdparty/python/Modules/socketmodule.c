@@ -3366,7 +3366,8 @@ sock_sendto(PySocketSockObject *s, PyObject *args)
     char *buf;
     Py_ssize_t len, arglen;
     sock_addr_t addrbuf;
-    int addrlen, n = -1, flags, timeout;
+    int addrlen, flags, timeout;
+    Py_ssize_t n = -1;
 
     flags = 0;
     arglen = PyTuple_Size(args);
@@ -4126,9 +4127,11 @@ socket_gethostname(PyObject *self, PyObject *unused)
 
     /* MSDN says ERROR_MORE_DATA may occur because DNS allows longer
        names */
-    name = PyMem_Malloc(size * sizeof(wchar_t));
-    if (!name)
+    name = PyMem_New(wchar_t, size);
+    if (!name) {
+        PyErr_NoMemory();
         return NULL;
+    }
     if (!GetComputerNameExW(ComputerNamePhysicalDnsHostname,
                            name,
                            &size))
@@ -5210,9 +5213,7 @@ socket_getaddrinfo(PyObject *self, PyObject *args, PyObject* kwargs)
     if (hobj == Py_None) {
         hptr = NULL;
     } else if (PyUnicode_Check(hobj)) {
-        _Py_IDENTIFIER(encode);
-
-        idna = _PyObject_CallMethodId(hobj, &PyId_encode, "s", "idna");
+        idna = PyUnicode_AsEncodedString(hobj, "idna", NULL);
         if (!idna)
             return NULL;
         assert(PyBytes_Check(idna));
@@ -5266,7 +5267,8 @@ socket_getaddrinfo(PyObject *self, PyObject *args, PyObject* kwargs)
         goto err;
     }
 
-    if ((all = PyList_New(0)) == NULL)
+    all = PyList_New(0);
+    if (all == NULL)
         goto err;
     for (res = res0; res; res = res->ai_next) {
         PyObject *single;

@@ -595,6 +595,9 @@ _parse_object_unicode(PyScannerObject *s, PyObject *pystr, Py_ssize_t idx, Py_ss
     int has_pairs_hook = (s->object_pairs_hook != Py_None);
     Py_ssize_t next_idx;
 
+    if (strict < 0)
+        return NULL;
+
     if (PyUnicode_READY(pystr) == -1)
         return NULL;
 
@@ -940,6 +943,7 @@ scan_once_unicode(PyScannerObject *s, PyObject *pystr, Py_ssize_t idx, Py_ssize_
     void *str;
     int kind;
     Py_ssize_t length;
+    int strict;
 
     if (PyUnicode_READY(pystr) == -1)
         return NULL;
@@ -960,9 +964,10 @@ scan_once_unicode(PyScannerObject *s, PyObject *pystr, Py_ssize_t idx, Py_ssize_
     switch (PyUnicode_READ(kind, str, idx)) {
         case '"':
             /* string */
-            return scanstring_unicode(pystr, idx + 1,
-                PyObject_IsTrue(s->strict),
-                next_idx_ptr);
+            strict = PyObject_IsTrue(s->strict);
+            if (strict < 0)
+                return NULL;
+            return scanstring_unicode(pystr, idx + 1, strict, next_idx_ptr);
         case '{':
             /* object */
             if (Py_EnterRecursiveCall(" while decoding a JSON object "
@@ -1212,15 +1217,24 @@ encoder_init(PyObject *self, PyObject *args, PyObject *kwds)
 
     PyEncoderObject *s;
     PyObject *markers, *defaultfn, *encoder, *indent, *key_separator;
-    PyObject *item_separator, *sort_keys, *skipkeys, *allow_nan;
+    PyObject *item_separator, *sort_keys, *skipkeys;
+    int allow_nan;
 
     assert(PyEncoder_Check(self));
     s = (PyEncoderObject *)self;
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOOOOOOO:make_encoder", kwlist,
-        &markers, &defaultfn, &encoder, &indent, &key_separator, &item_separator,
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OOOOUUOOp:make_encoder", kwlist,
+        &markers, &defaultfn, &encoder, &indent,
+        &key_separator, &item_separator,
         &sort_keys, &skipkeys, &allow_nan))
         return -1;
+
+    if (markers != Py_None && !PyDict_Check(markers)) {
+        PyErr_Format(PyExc_TypeError,
+                     "make_encoder() argument 1 must be dict or None, "
+                     "not %.200s", Py_TYPE(markers)->tp_name);
+        return -1;
+    }
 
     s->markers = markers;
     s->defaultfn = defaultfn;
@@ -1231,7 +1245,7 @@ encoder_init(PyObject *self, PyObject *args, PyObject *kwds)
     s->sort_keys = sort_keys;
     s->skipkeys = skipkeys;
     s->fast_encode = (PyCFunction_Check(s->encoder) && PyCFunction_GetFunction(s->encoder) == (PyCFunction)py_encode_basestring_ascii);
-    s->allow_nan = PyObject_IsTrue(allow_nan);
+    s->allow_nan = allow_nan;
 
     Py_INCREF(s->markers);
     Py_INCREF(s->defaultfn);
@@ -1500,6 +1514,7 @@ encoder_listencode_dict(PyEncoderObject *s, _PyAccu *acc,
     PyObject *items;
     PyObject *item = NULL;
     int skipkeys;
+    int sortkeys;
     Py_ssize_t idx;
 
     if (open_dict == NULL || close_dict == NULL || empty_dict == NULL) {
@@ -1541,41 +1556,19 @@ encoder_listencode_dict(PyEncoderObject *s, _PyAccu *acc,
         */
     }
 
-    if (PyObject_IsTrue(s->sort_keys)) {
-        /* First sort the keys then replace them with (key, value) tuples. */
-        Py_ssize_t i, nitems;
-        items = PyMapping_Keys(dct);
-        if (items == NULL)
-            goto bail;
-        if (!PyList_Check(items)) {
-            PyErr_SetString(PyExc_ValueError, "keys must return list");
-            goto bail;
-        }
-        if (PyList_Sort(items) < 0)
-            goto bail;
-        nitems = PyList_GET_SIZE(items);
-        for (i = 0; i < nitems; i++) {
-            PyObject *key, *value;
-            key = PyList_GET_ITEM(items, i);
-            value = PyDict_GetItem(dct, key);
-            item = PyTuple_Pack(2, key, value);
-            if (item == NULL)
-                goto bail;
-            PyList_SET_ITEM(items, i, item);
-            item = NULL;
-            Py_DECREF(key);
-        }
-    }
-    else {
-        items = PyMapping_Items(dct);
-    }
+    items = PyMapping_Items(dct);
     if (items == NULL)
+        goto bail;
+    sortkeys = PyObject_IsTrue(s->sort_keys);
+    if (sortkeys < 0 || (sortkeys && PyList_Sort(items) < 0))
         goto bail;
     it = PyObject_GetIter(items);
     Py_DECREF(items);
     if (it == NULL)
         goto bail;
     skipkeys = PyObject_IsTrue(s->skipkeys);
+    if (skipkeys < 0)
+        goto bail;
     idx = 0;
     while ((item = PyIter_Next(it)) != NULL) {
         PyObject *encoded, *key, *value;

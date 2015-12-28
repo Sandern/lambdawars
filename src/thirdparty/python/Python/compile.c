@@ -206,7 +206,7 @@ static int compiler_set_qualname(struct compiler *);
 static PyCodeObject *assemble(struct compiler *, int addNone);
 static PyObject *__doc__;
 
-#define COMPILER_CAPSULE_NAME_COMPILER_UNIT "compile.c compiler unit"
+#define CAPSULE_NAME "compile.c compiler unit"
 
 PyObject *
 _Py_Mangle(PyObject *privateobj, PyObject *ident)
@@ -549,7 +549,7 @@ compiler_enter_scope(struct compiler *c, identifier name,
         return 0;
     }
     if (u->u_ste->ste_needs_class_closure) {
-        /* Cook up a implicit __class__ cell. */
+        /* Cook up an implicit __class__ cell. */
         _Py_IDENTIFIER(__class__);
         PyObject *tuple, *name, *zero;
         int res;
@@ -608,7 +608,7 @@ compiler_enter_scope(struct compiler *c, identifier name,
 
     /* Push the old compiler_unit on the stack. */
     if (c->u) {
-        PyObject *capsule = PyCapsule_New(c->u, COMPILER_CAPSULE_NAME_COMPILER_UNIT, NULL);
+        PyObject *capsule = PyCapsule_New(c->u, CAPSULE_NAME, NULL);
         if (!capsule || PyList_Append(c->c_stack, capsule) < 0) {
             Py_XDECREF(capsule);
             compiler_unit_free(u);
@@ -644,7 +644,7 @@ compiler_exit_scope(struct compiler *c)
     n = PyList_GET_SIZE(c->c_stack) - 1;
     if (n >= 0) {
         capsule = PyList_GET_ITEM(c->c_stack, n);
-        c->u = (struct compiler_unit *)PyCapsule_GetPointer(capsule, COMPILER_CAPSULE_NAME_COMPILER_UNIT);
+        c->u = (struct compiler_unit *)PyCapsule_GetPointer(capsule, CAPSULE_NAME);
         assert(c->u);
         /* we are deleting from a list so this really shouldn't fail */
         if (PySequence_DelItem(c->c_stack, n) < 0)
@@ -674,7 +674,7 @@ compiler_set_qualname(struct compiler *c)
         PyObject *mangled, *capsule;
 
         capsule = PyList_GET_ITEM(c->c_stack, stack_size - 1);
-        parent = (struct compiler_unit *)PyCapsule_GetPointer(capsule, COMPILER_CAPSULE_NAME_COMPILER_UNIT);
+        parent = (struct compiler_unit *)PyCapsule_GetPointer(capsule, CAPSULE_NAME);
         assert(parent);
 
         if (u->u_scope_type == COMPILER_SCOPE_FUNCTION || u->u_scope_type == COMPILER_SCOPE_CLASS) {
@@ -1897,12 +1897,12 @@ compiler_lambda(struct compiler *c, expr_ty e)
     c->u->u_kwonlyargcount = asdl_seq_LEN(args->kwonlyargs);
     VISIT_IN_SCOPE(c, expr, e->v.Lambda.body);
     if (c->u->u_ste->ste_generator) {
-        ADDOP_IN_SCOPE(c, POP_TOP);
+        co = assemble(c, 0);
     }
     else {
         ADDOP_IN_SCOPE(c, RETURN_VALUE);
+        co = assemble(c, 1);
     }
-    co = assemble(c, 1);
     qualname = c->u->u_qualname;
     Py_INCREF(qualname);
     compiler_exit_scope(c);
@@ -3330,9 +3330,9 @@ expr_constant(struct compiler *c, expr_ty e)
        BLOCK
    finally:
        if an exception was raised:
-       exc = copy of (exception, instance, traceback)
+           exc = copy of (exception, instance, traceback)
        else:
-       exc = (None, None, None)
+           exc = (None, None, None)
        exit(*exc)
  */
 static int

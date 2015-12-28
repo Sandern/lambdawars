@@ -21,6 +21,9 @@ PATH=PATH;"%steamdir%/SteamApps/common/Alien Swarm/bin"
 target_folder = 'python/lib'
 file_types = ['.py']
 
+# Copy python library
+distutils.dir_util.copy_tree('../python/lib', target_folder)
+
 # Patch target folder
 distutils.dir_util.copy_tree('../../srcpypp/srcpy_patchlib', target_folder)
 

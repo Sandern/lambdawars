@@ -876,7 +876,7 @@ type_call(PyTypeObject *type, PyObject *args, PyObject *kwds)
 #ifdef Py_DEBUG
     /* type_call() must not be called with an exception set,
        because it may clear it (directly or indirectly) and so the
-       caller looses its exception */
+       caller loses its exception */
     assert(!PyErr_Occurred());
 #endif
 
@@ -1937,6 +1937,12 @@ best_base(PyObject *bases)
             if (PyType_Ready(base_i) < 0)
                 return NULL;
         }
+        if (!PyType_HasFeature(base_i, Py_TPFLAGS_BASETYPE)) {
+            PyErr_Format(PyExc_TypeError,
+                         "type '%.100s' is not an acceptable base type",
+                         base_i->tp_name);
+            return NULL;
+        }
         candidate = solid_base(base_i);
         if (winner == NULL) {
             winner = candidate;
@@ -2315,12 +2321,6 @@ type_new(PyTypeObject *metatype, PyObject *args, PyObject *kwds)
     /* Calculate best base, and check that all bases are type objects */
     base = best_base(bases);
     if (base == NULL) {
-        goto error;
-    }
-    if (!PyType_HasFeature(base, Py_TPFLAGS_BASETYPE)) {
-        PyErr_Format(PyExc_TypeError,
-                     "type '%.100s' is not an acceptable base type",
-                     base->tp_name);
         goto error;
     }
 
@@ -3768,8 +3768,10 @@ _PyObject_GetState(PyObject *obj)
                 PyObject *name, *value;
 
                 name = PyList_GET_ITEM(slotnames, i);
+                Py_INCREF(name);
                 value = PyObject_GetAttr(obj, name);
                 if (value == NULL) {
+                    Py_DECREF(name);
                     if (!PyErr_ExceptionMatches(PyExc_AttributeError)) {
                         goto error;
                     }
@@ -3778,6 +3780,7 @@ _PyObject_GetState(PyObject *obj)
                 }
                 else {
                     int err = PyDict_SetItem(slots, name, value);
+                    Py_DECREF(name);
                     Py_DECREF(value);
                     if (err) {
                         goto error;
@@ -3980,6 +3983,12 @@ reduce_4(PyObject *obj)
     PyObject *result;
     _Py_IDENTIFIER(__newobj_ex__);
 
+    if (Py_TYPE(obj)->tp_new == NULL) {
+        PyErr_Format(PyExc_TypeError,
+                     "can't pickle %s objects",
+                     Py_TYPE(obj)->tp_name);
+        return NULL;
+    }
     if (_PyObject_GetNewArguments(obj, &args, &kwargs) < 0) {
         return NULL;
     }
@@ -4046,6 +4055,12 @@ reduce_2(PyObject *obj)
     Py_ssize_t i, n;
     _Py_IDENTIFIER(__newobj__);
 
+    if (Py_TYPE(obj)->tp_new == NULL) {
+        PyErr_Format(PyExc_TypeError,
+                     "can't pickle %s objects",
+                     Py_TYPE(obj)->tp_name);
+        return NULL;
+    }
     if (_PyObject_GetNewArguments(obj, &args, &kwargs) < 0) {
         return NULL;
     }
@@ -4219,7 +4234,7 @@ PyDoc_STRVAR(object_subclasshook_doc,
 
    class object:
        def __format__(self, format_spec):
-       return format(str(self), format_spec)
+           return format(str(self), format_spec)
 */
 static PyObject *
 object_format(PyObject *self, PyObject *args)
@@ -4258,7 +4273,7 @@ object_sizeof(PyObject *self, PyObject *args)
     res = 0;
     isize = self->ob_type->tp_itemsize;
     if (isize > 0)
-        res = Py_SIZE(self->ob_type) * isize;
+        res = Py_SIZE(self) * isize;
     res += self->ob_type->tp_basicsize;
 
     return PyLong_FromSsize_t(res);
@@ -4803,11 +4818,14 @@ PyType_Ready(PyTypeObject *type)
             PyObject *b = PyTuple_GET_ITEM(bases, i);
             if (PyType_Check(b) &&
                 (((PyTypeObject *)b)->tp_flags & Py_TPFLAGS_HEAPTYPE)) {
-                PyErr_Format(PyExc_TypeError,
-                             "type '%.100s' is not dynamically allocated but "
-                             "its base type '%.100s' is dynamically allocated",
-                             type->tp_name, ((PyTypeObject *)b)->tp_name);
-                goto error;
+                char buf[300];
+                PyOS_snprintf(buf, sizeof(buf),
+                              "type '%.100s' is not dynamically allocated but "
+                              "its base type '%.100s' is dynamically allocated",
+                              type->tp_name, ((PyTypeObject *)b)->tp_name);
+                if (PyErr_Warn(PyExc_DeprecationWarning, buf) < 0)
+                    goto error;
+                break;
             }
         }
 

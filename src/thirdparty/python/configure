@@ -711,6 +711,7 @@ CFLAGS
 CC
 EXPORT_MACOSX_DEPLOYMENT_TARGET
 CONFIGURE_MACOSX_DEPLOYMENT_TARGET
+PLATDIR
 SGI_ABI
 _PYTHON_HOST_PLATFORM
 MACHDEP
@@ -3492,6 +3493,9 @@ then
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MACHDEP" >&5
 $as_echo "$MACHDEP" >&6; }
+
+
+PLATDIR=plat-$MACHDEP
 
 # Record the configure-time value of MACOSX_DEPLOYMENT_TARGET,
 # it may influence the way we can build extensions, so distutils
@@ -6283,7 +6287,11 @@ then
 	    if test "$Py_DEBUG" = 'true' ; then
 		# Optimization messes up debuggers, so turn it off for
 		# debug builds.
-		OPT="-g -O0 -Wall $STRICT_PROTO"
+                if "$CC" -v --help 2>/dev/null |grep -- -Og > /dev/null; then
+                    OPT="-g -Og -Wall $STRICT_PROTO"
+                else
+                    OPT="-g -O0 -Wall $STRICT_PROTO"
+                fi
 	    else
 		OPT="-g $WRAP -O3 -Wall $STRICT_PROTO"
 	    fi
@@ -14022,7 +14030,7 @@ LDVERSION='$(VERSION)$(ABIFLAGS)'
 $as_echo "$LDVERSION" >&6; }
 
 
-LIBPL="${prefix}/lib/python${VERSION}/config-${LDVERSION}"
+LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
 
 
 # Check whether right shifting a negative integer extends the sign bit

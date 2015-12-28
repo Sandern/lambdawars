@@ -2256,7 +2256,7 @@ arguments; each contains the subset of the corresponding file descriptors\n\
 that are ready.\n\
 \n\
 *** IMPORTANT NOTICE ***\n\
-On Windows only sockets are supported; on Unix, all file\n\
+On Windows, only sockets are supported; on Unix, all file\n\
 descriptors can be used.");
 
 static PyMethodDef select_methods[] = {
@@ -2274,7 +2274,7 @@ PyDoc_STRVAR(module_doc,
 "This module supports asynchronous I/O on multiple file descriptors.\n\
 \n\
 *** IMPORTANT NOTICE ***\n\
-On Windows only sockets are supported; on Unix, all file descriptors.");
+On Windows, only sockets are supported; on Unix, all file descriptors.");
 
 
 static struct PyModuleDef selectmodule = {
@@ -2372,11 +2372,22 @@ PyInit_select(void)
     PyModule_AddIntMacro(m, EPOLLONESHOT);
 #endif
     /* PyModule_AddIntConstant(m, "EPOLL_RDHUP", EPOLLRDHUP); */
+
+#ifdef EPOLLRDNORM
     PyModule_AddIntMacro(m, EPOLLRDNORM);
+#endif
+#ifdef EPOLLRDBAND
     PyModule_AddIntMacro(m, EPOLLRDBAND);
+#endif
+#ifdef EPOLLWRNORM
     PyModule_AddIntMacro(m, EPOLLWRNORM);
+#endif
+#ifdef EPOLLWRBAND
     PyModule_AddIntMacro(m, EPOLLWRBAND);
+#endif
+#ifdef EPOLLMSG
     PyModule_AddIntMacro(m, EPOLLMSG);
+#endif
 
 #ifdef EPOLL_CLOEXEC
     PyModule_AddIntMacro(m, EPOLL_CLOEXEC);

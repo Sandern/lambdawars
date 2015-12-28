@@ -429,9 +429,9 @@ element_init(PyObject *self, PyObject *args, PyObject *kwds)
 }
 
 LOCAL(int)
-element_resize(ElementObject* self, int extra)
+element_resize(ElementObject* self, Py_ssize_t extra)
 {
-    int size;
+    Py_ssize_t size;
     PyObject* *children;
 
     /* make sure self->children can hold the given number of extra
@@ -453,6 +453,13 @@ element_resize(ElementObject* self, int extra)
          * be safe.
          */
         size = size ? size : 1;
+        if ((size_t)size > PY_SSIZE_T_MAX/sizeof(PyObject*))
+            goto nomemory;
+        if (size > INT_MAX) {
+            PyErr_SetString(PyExc_OverflowError,
+                            "too many children");
+            return -1;
+        }
         if (self->extra->children != self->extra->_children) {
             /* Coverity CID #182 size_error: Allocating 1 bytes to pointer
              * "children", which needs at least 4 bytes. Although it's a
@@ -889,7 +896,7 @@ element_setstate_from_attributes(ElementObject *self,
                                  PyObject *tail,
                                  PyObject *children)
 {
-    Py_ssize_t i, nchildren;
+    int i, nchildren;
 
     if (!tag) {
         PyErr_SetString(PyExc_TypeError, "tag may not be NULL");
@@ -914,11 +921,18 @@ element_setstate_from_attributes(ElementObject *self,
 
     /* Compute 'nchildren'. */
     if (children) {
+        Py_ssize_t size;
         if (!PyList_Check(children)) {
             PyErr_SetString(PyExc_TypeError, "'_children' is not a list");
             return NULL;
         }
-        nchildren = PyList_Size(children);
+        size = PyList_Size(children);
+        /* expat limits nchildren to int */
+        if (size > INT_MAX) {
+            PyErr_SetString(PyExc_OverflowError, "too many children");
+            return NULL;
+        }
+        nchildren = (int)size;
     }
     else {
         nchildren = 0;
@@ -1036,7 +1050,7 @@ static PyObject*
 element_extend(ElementObject* self, PyObject* args)
 {
     PyObject* seq;
-    Py_ssize_t i, seqlen = 0;
+    Py_ssize_t i;
 
     PyObject* seq_in;
     if (!PyArg_ParseTuple(args, "O:extend", &seq_in))
@@ -1051,22 +1065,25 @@ element_extend(ElementObject* self, PyObject* args)
         return NULL;
     }
 
-    seqlen = PySequence_Size(seq);
-    for (i = 0; i < seqlen; i++) {
+    for (i = 0; i < PySequence_Fast_GET_SIZE(seq); i++) {
         PyObject* element = PySequence_Fast_GET_ITEM(seq, i);
-        if (!PyObject_IsInstance(element, (PyObject *)&Element_Type)) {
-            Py_DECREF(seq);
+        Py_INCREF(element);
+        if (!PyObject_TypeCheck(element, (PyTypeObject *)&Element_Type)) {
             PyErr_Format(
                 PyExc_TypeError,
                 "expected an Element, not \"%.200s\"",
                 Py_TYPE(element)->tp_name);
+            Py_DECREF(seq);
+            Py_DECREF(element);
             return NULL;
         }
 
         if (element_add_subelement(self, element) < 0) {
             Py_DECREF(seq);
+            Py_DECREF(element);
             return NULL;
         }
+        Py_DECREF(element);
     }
 
     Py_DECREF(seq);
@@ -1099,11 +1116,16 @@ element_find(ElementObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < self->extra->length; i++) {
         PyObject* item = self->extra->children[i];
-        if (Element_CheckExact(item) &&
-            PyObject_RichCompareBool(((ElementObject*)item)->tag, tag, Py_EQ) == 1) {
-            Py_INCREF(item);
+        int rc;
+        if (!Element_CheckExact(item))
+            continue;
+        Py_INCREF(item);
+        rc = PyObject_RichCompareBool(((ElementObject*)item)->tag, tag, Py_EQ);
+        if (rc > 0)
             return item;
-        }
+        Py_DECREF(item);
+        if (rc < 0)
+            return NULL;
     }
 
     Py_RETURN_NONE;
@@ -1136,14 +1158,24 @@ element_findtext(ElementObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < self->extra->length; i++) {
         ElementObject* item = (ElementObject*) self->extra->children[i];
-        if (Element_CheckExact(item) &&
-            (PyObject_RichCompareBool(item->tag, tag, Py_EQ) == 1)) {
+        int rc;
+        if (!Element_CheckExact(item))
+            continue;
+        Py_INCREF(item);
+        rc = PyObject_RichCompareBool(item->tag, tag, Py_EQ);
+        if (rc > 0) {
             PyObject* text = element_get_text(item);
-            if (text == Py_None)
+            if (text == Py_None) {
+                Py_DECREF(item);
                 return PyUnicode_New(0, 0);
+            }
             Py_XINCREF(text);
+            Py_DECREF(item);
             return text;
         }
+        Py_DECREF(item);
+        if (rc < 0)
+            return NULL;
     }
 
     Py_INCREF(default_value);
@@ -1180,13 +1212,17 @@ element_findall(ElementObject *self, PyObject *args, PyObject *kwds)
 
     for (i = 0; i < self->extra->length; i++) {
         PyObject* item = self->extra->children[i];
-        if (Element_CheckExact(item) &&
-            PyObject_RichCompareBool(((ElementObject*)item)->tag, tag, Py_EQ) == 1) {
-            if (PyList_Append(out, item) < 0) {
-                Py_DECREF(out);
-                return NULL;
-            }
+        int rc;
+        if (!Element_CheckExact(item))
+            continue;
+        Py_INCREF(item);
+        rc = PyObject_RichCompareBool(((ElementObject*)item)->tag, tag, Py_EQ);
+        if (rc != 0 && (rc < 0 || PyList_Append(out, item) < 0)) {
+            Py_DECREF(item);
+            Py_DECREF(out);
+            return NULL;
         }
+        Py_DECREF(item);
     }
 
     return out;
@@ -1403,8 +1439,10 @@ static PyObject*
 element_remove(ElementObject* self, PyObject* args)
 {
     int i;
-
+    int rc;
     PyObject* element;
+    PyObject* found;
+
     if (!PyArg_ParseTuple(args, "O!:remove", &Element_Type, &element))
         return NULL;
 
@@ -1420,11 +1458,14 @@ element_remove(ElementObject* self, PyObject* args)
     for (i = 0; i < self->extra->length; i++) {
         if (self->extra->children[i] == element)
             break;
-        if (PyObject_RichCompareBool(self->extra->children[i], element, Py_EQ) == 1)
+        rc = PyObject_RichCompareBool(self->extra->children[i], element, Py_EQ);
+        if (rc > 0)
             break;
+        if (rc < 0)
+            return NULL;
     }
 
-    if (i == self->extra->length) {
+    if (i >= self->extra->length) {
         /* element is not in children, so raise exception */
         PyErr_SetString(
             PyExc_ValueError,
@@ -1433,13 +1474,13 @@ element_remove(ElementObject* self, PyObject* args)
         return NULL;
     }
 
-    Py_DECREF(self->extra->children[i]);
+    found = self->extra->children[i];
 
     self->extra->length--;
-
     for (; i < self->extra->length; i++)
         self->extra->children[i] = self->extra->children[i+1];
 
+    Py_DECREF(found);
     Py_RETURN_NONE;
 }
 
@@ -1478,18 +1519,19 @@ element_set(ElementObject* self, PyObject* args)
 }
 
 static int
-element_setitem(PyObject* self_, Py_ssize_t index, PyObject* item)
+element_setitem(PyObject* self_, Py_ssize_t index_, PyObject* item)
 {
     ElementObject* self = (ElementObject*) self_;
-    int i;
+    int i, index;
     PyObject* old;
 
-    if (!self->extra || index < 0 || index >= self->extra->length) {
+    if (!self->extra || index_ < 0 || index_ >= self->extra->length) {
         PyErr_SetString(
             PyExc_IndexError,
             "child assignment index out of range");
         return -1;
     }
+    index = (int)index_;
 
     old = self->extra->children[index];
 
@@ -1578,7 +1620,7 @@ element_ass_subscr(PyObject* self_, PyObject* item, PyObject* value)
         Py_ssize_t start, stop, step, slicelen, newlen, cur, i;
 
         PyObject* recycle = NULL;
-        PyObject* seq = NULL;
+        PyObject* seq;
 
         if (!self->extra) {
             if (create_extra(self, NULL) < 0)
@@ -1590,6 +1632,7 @@ element_ass_subscr(PyObject* self_, PyObject* item, PyObject* value)
                 &start, &stop, &step, &slicelen) < 0) {
             return -1;
         }
+        assert(slicelen <= self->extra->length);
 
         if (value == NULL) {
             /* Delete slice */
@@ -1651,27 +1694,27 @@ element_ass_subscr(PyObject* self_, PyObject* item, PyObject* value)
                     (self->extra->length - cur) * sizeof(PyObject *));
             }
 
-            self->extra->length -= slicelen;
+            self->extra->length -= (int)slicelen;
 
             /* Discard the recycle list with all the deleted sub-elements */
             Py_XDECREF(recycle);
             return 0;
         }
-        else {
-            /* A new slice is actually being assigned */
-            seq = PySequence_Fast(value, "");
-            if (!seq) {
-                PyErr_Format(
-                    PyExc_TypeError,
-                    "expected sequence, not \"%.200s\"", Py_TYPE(value)->tp_name
-                    );
-                return -1;
-            }
-            newlen = PySequence_Size(seq);
+
+        /* A new slice is actually being assigned */
+        seq = PySequence_Fast(value, "");
+        if (!seq) {
+            PyErr_Format(
+                PyExc_TypeError,
+                "expected sequence, not \"%.200s\"", Py_TYPE(value)->tp_name
+                );
+            return -1;
         }
+        newlen = PySequence_Size(seq);
 
         if (step !=  1 && newlen != slicelen)
         {
+            Py_DECREF(seq);
             PyErr_Format(PyExc_ValueError,
                 "attempt to assign sequence of size %zd "
                 "to extended slice of size %zd",
@@ -1683,12 +1726,12 @@ element_ass_subscr(PyObject* self_, PyObject* item, PyObject* value)
         /* Resize before creating the recycle bin, to prevent refleaks. */
         if (newlen > slicelen) {
             if (element_resize(self, newlen - slicelen) < 0) {
-                if (seq) {
-                    Py_DECREF(seq);
-                }
+                Py_DECREF(seq);
                 return -1;
             }
         }
+        assert(newlen - slicelen <= INT_MAX - self->extra->length);
+        assert(newlen - slicelen >= -self->extra->length);
 
         if (slicelen > 0) {
             /* to avoid recursive calls to this method (via decref), move
@@ -1696,9 +1739,7 @@ element_ass_subscr(PyObject* self_, PyObject* item, PyObject* value)
                we're done modifying the element */
             recycle = PyList_New(slicelen);
             if (!recycle) {
-                if (seq) {
-                    Py_DECREF(seq);
-                }
+                Py_DECREF(seq);
                 return -1;
             }
             for (cur = start, i = 0; i < slicelen;
@@ -1724,11 +1765,9 @@ element_ass_subscr(PyObject* self_, PyObject* item, PyObject* value)
             self->extra->children[cur] = element;
         }
 
-        self->extra->length += newlen - slicelen;
+        self->extra->length += (int)(newlen - slicelen);
 
-        if (seq) {
-            Py_DECREF(seq);
-        }
+        Py_DECREF(seq);
 
         /* discard the recycle bin, and everything in it */
         Py_XDECREF(recycle);
@@ -1831,6 +1870,12 @@ static int
 element_setattro(ElementObject* self, PyObject* nameobj, PyObject* value)
 {
     char *name = "";
+
+    if (value == NULL) {
+        PyErr_SetString(PyExc_AttributeError,
+            "can't delete attribute");
+        return -1;
+    }
     if (PyUnicode_Check(nameobj))
         name = _PyUnicode_AsString(nameobj);
     if (name == NULL)
@@ -2012,6 +2057,7 @@ elementiter_next(ElementIterObject *it)
      */
     ElementObject *cur_parent;
     Py_ssize_t child_index;
+    int rc;
 
     while (1) {
         /* Handle the case reached in the beginning and end of iteration, where
@@ -2033,14 +2079,22 @@ elementiter_next(ElementIterObject *it)
                 }
 
                 it->root_done = 1;
-                if (it->sought_tag == Py_None ||
-                    PyObject_RichCompareBool(it->root_element->tag,
-                                             it->sought_tag, Py_EQ) == 1) {
+                rc = (it->sought_tag == Py_None);
+                if (!rc) {
+                    rc = PyObject_RichCompareBool(it->root_element->tag,
+                                                  it->sought_tag, Py_EQ);
+                    if (rc < 0)
+                        return NULL;
+                }
+                if (rc) {
                     if (it->gettext) {
                         PyObject *text = element_get_text(it->root_element);
                         if (!text)
                             return NULL;
-                        if (PyObject_IsTrue(text)) {
+                        rc = PyObject_IsTrue(text);
+                        if (rc < 0)
+                            return NULL;
+                        if (rc) {
                             Py_INCREF(text);
                             return text;
                         }
@@ -2072,18 +2126,26 @@ elementiter_next(ElementIterObject *it)
                 PyObject *text = element_get_text(child);
                 if (!text)
                     return NULL;
-                if (PyObject_IsTrue(text)) {
+                rc = PyObject_IsTrue(text);
+                if (rc < 0)
+                    return NULL;
+                if (rc) {
                     Py_INCREF(text);
                     return text;
                 }
-            } else if (it->sought_tag == Py_None ||
-                PyObject_RichCompareBool(child->tag,
-                                         it->sought_tag, Py_EQ) == 1) {
-                Py_INCREF(child);
-                return (PyObject *)child;
+            } else {
+                rc = (it->sought_tag == Py_None);
+                if (!rc) {
+                    rc = PyObject_RichCompareBool(child->tag,
+                                                  it->sought_tag, Py_EQ);
+                    if (rc < 0)
+                        return NULL;
+                }
+                if (rc) {
+                    Py_INCREF(child);
+                    return (PyObject *)child;
+                }
             }
-            else
-                continue;
         }
         else {
             PyObject *tail;
@@ -2103,9 +2165,14 @@ elementiter_next(ElementIterObject *it)
              * this is because itertext() is supposed to only return *inner*
              * text, not text following the element it began iteration with.
              */
-            if (it->parent_stack->parent && PyObject_IsTrue(tail)) {
-                Py_INCREF(tail);
-                return tail;
+            if (it->parent_stack->parent) {
+                rc = PyObject_IsTrue(tail);
+                if (rc < 0)
+                    return NULL;
+                if (rc) {
+                    Py_INCREF(tail);
+                    return tail;
+                }
             }
         }
     }
@@ -2163,20 +2230,21 @@ static PyObject *
 create_elementiter(ElementObject *self, PyObject *tag, int gettext)
 {
     ElementIterObject *it;
-    PyObject *star = NULL;
 
     it = PyObject_GC_New(ElementIterObject, &ElementIter_Type);
     if (!it)
         return NULL;
 
-    if (PyUnicode_Check(tag))
-        star = PyUnicode_FromString("*");
-    else if (PyBytes_Check(tag))
-        star = PyBytes_FromString("*");
-
-    if (star && PyObject_RichCompareBool(tag, star, Py_EQ) == 1)
-        tag = Py_None;
-    Py_XDECREF(star);
+    if (PyUnicode_Check(tag)) {
+        if (PyUnicode_READY(tag) < 0)
+            return NULL;
+        if (PyUnicode_GET_LENGTH(tag) == 1 && PyUnicode_READ_CHAR(tag, 0) == '*')
+            tag = Py_None;
+    }
+    else if (PyBytes_Check(tag)) {
+        if (PyBytes_GET_SIZE(tag) == 1 && *PyBytes_AS_STRING(tag) == '*')
+            tag = Py_None;
+    }
 
     Py_INCREF(tag);
     it->sought_tag = tag;
@@ -2741,7 +2809,7 @@ typedef struct {
 
 } XMLParserObject;
 
-#define XMLParser_CheckExact(op) (Py_TYPE(op) == &XMLParser_Type)
+static PyObject* xmlparser_doctype(XMLParserObject* self, PyObject* args);
 
 /* helpers */
 
@@ -3140,20 +3208,21 @@ expat_start_doctype_handler(XMLParserObject *self,
                                     doctype_name_obj, pubid_obj, sysid_obj);
         Py_CLEAR(res);
     }
-
-    /* Now see if the parser itself has a doctype method. If yes and it's
-     * a subclass, call it but warn about deprecation. If it's not a subclass
-     * (i.e. vanilla XMLParser), do nothing.
-     */
-    parser_doctype = PyObject_GetAttrString(self_pyobj, "doctype");
-    if (parser_doctype) {
-        if (!XMLParser_CheckExact(self_pyobj)) {
-            if (PyErr_WarnEx(PyExc_DeprecationWarning,
-                            "This method of XMLParser is deprecated.  Define"
-                            " doctype() method on the TreeBuilder target.",
-                            1) < 0) {
+    else {
+        /* Now see if the parser itself has a doctype method. If yes and it's
+         * a custom method, call it but warn about deprecation. If it's only
+         * the vanilla XMLParser method, do nothing.
+         */
+        parser_doctype = PyObject_GetAttrString(self_pyobj, "doctype");
+        if (parser_doctype &&
+            !(PyCFunction_Check(parser_doctype) &&
+              PyCFunction_GET_SELF(parser_doctype) == self_pyobj &&
+              PyCFunction_GET_FUNCTION(parser_doctype) ==
+                    (PyCFunction) xmlparser_doctype)) {
+            res = xmlparser_doctype(self, NULL);
+            if (!res)
                 goto clear;
-            }
+            Py_DECREF(res);
             res = PyObject_CallFunction(parser_doctype, "OOO",
                                         doctype_name_obj, pubid_obj, sysid_obj);
             Py_CLEAR(res);
@@ -3477,8 +3546,14 @@ xmlparser_parse_whole(XMLParserObject* self, PyObject* args)
             break;
         }
 
+        if (PyBytes_GET_SIZE(buffer) > INT_MAX) {
+            Py_DECREF(buffer);
+            Py_DECREF(reader);
+            PyErr_SetString(PyExc_OverflowError, "size does not fit in an int");
+            return NULL;
+        }
         res = expat_parse(
-            self, PyBytes_AS_STRING(buffer), PyBytes_GET_SIZE(buffer), 0
+            self, PyBytes_AS_STRING(buffer), (int)PyBytes_GET_SIZE(buffer), 0
             );
 
         Py_DECREF(buffer);
@@ -3506,6 +3581,12 @@ xmlparser_parse_whole(XMLParserObject* self, PyObject* args)
 static PyObject*
 xmlparser_doctype(XMLParserObject *self, PyObject *args)
 {
+    if (PyErr_WarnEx(PyExc_DeprecationWarning,
+                     "This method of XMLParser is deprecated.  Define"
+                     " doctype() method on the TreeBuilder target.",
+                     1) < 0) {
+        return NULL;
+    }
     Py_RETURN_NONE;
 }
 

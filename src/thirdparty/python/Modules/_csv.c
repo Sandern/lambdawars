@@ -1563,7 +1563,7 @@ PyDoc_STRVAR(csv_reader_doc,
 "provided by the dialect.\n"
 "\n"
 "The returned object is an iterator.  Each iteration returns a row\n"
-"of the CSV file (which can span multiple input lines):\n");
+"of the CSV file (which can span multiple input lines).\n");
 
 PyDoc_STRVAR(csv_writer_doc,
 "    csv_writer = csv.writer(fileobj [, dialect='excel']\n"
@@ -1589,7 +1589,7 @@ PyDoc_STRVAR(csv_get_dialect_doc,
 
 PyDoc_STRVAR(csv_register_dialect_doc,
 "Create a mapping from a string name to a dialect class.\n"
-"    dialect = csv.register_dialect(name, dialect)");
+"    dialect = csv.register_dialect(name[, dialect[, **fmtparams]])");
 
 PyDoc_STRVAR(csv_unregister_dialect_doc,
 "Delete the name/dialect mapping associated with a string name.\n"

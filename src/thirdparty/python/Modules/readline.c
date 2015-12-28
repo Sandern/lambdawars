@@ -427,10 +427,11 @@ set_completer_delims(PyObject *self, PyObject *args)
     /* Keep a reference to the allocated memory in the module state in case
        some other module modifies rl_completer_word_break_characters
        (see issue #17289). */
-    free(completer_word_break_characters);
-    completer_word_break_characters = strdup(break_chars);
-    if (completer_word_break_characters) {
-        rl_completer_word_break_characters = completer_word_break_characters;
+    break_chars = strdup(break_chars);
+    if (break_chars) {
+        free(completer_word_break_characters);
+        completer_word_break_characters = break_chars;
+        rl_completer_word_break_characters = break_chars;
         Py_RETURN_NONE;
     }
     else
@@ -1062,8 +1063,6 @@ rlhandler(char *text)
     rl_callback_handler_remove();
 }
 
-extern PyThreadState* _PyOS_ReadlineTState;
-
 static char *
 readline_until_enter_or_signal(const char *prompt, int *signal)
 {
@@ -1196,7 +1195,7 @@ call_readline(FILE *sys_stdin, FILE *sys_stdout, const char *prompt)
         return NULL;
     }
 
-    /* We got an EOF, return a empty string. */
+    /* We got an EOF, return an empty string. */
     if (p == NULL) {
         p = PyMem_RawMalloc(1);
         if (p != NULL)

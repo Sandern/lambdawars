@@ -396,13 +396,29 @@ _PyGen_FetchStopIterationValue(PyObject **pvalue) {
 
     if (PyErr_ExceptionMatches(PyExc_StopIteration)) {
         PyErr_Fetch(&et, &ev, &tb);
+        if (ev) {
+            /* exception will usually be normalised already */
+            if (PyObject_TypeCheck(ev, (PyTypeObject *) et)) {
+                value = ((PyStopIterationObject *)ev)->value;
+                Py_INCREF(value);
+                Py_DECREF(ev);
+            } else if (et == PyExc_StopIteration) {
+                /* avoid normalisation and take ev as value */
+                value = ev;
+            } else {
+                /* normalisation required */
+                PyErr_NormalizeException(&et, &ev, &tb);
+                if (!PyObject_TypeCheck(ev, (PyTypeObject *)PyExc_StopIteration)) {
+                    PyErr_Restore(et, ev, tb);
+                    return -1;
+                }
+                value = ((PyStopIterationObject *)ev)->value;
+                Py_INCREF(value);
+                Py_DECREF(ev);
+            }
+        }
         Py_XDECREF(et);
         Py_XDECREF(tb);
-        if (ev) {
-            value = ((PyStopIterationObject *)ev)->value;
-            Py_INCREF(value);
-            Py_DECREF(ev);
-        }
     } else if (PyErr_Occurred()) {
         return -1;
     }

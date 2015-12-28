@@ -112,7 +112,7 @@ static PyInt16 _st_ulaw2linear16[256] = {
 
 /*
  * linear2ulaw() accepts a 14-bit signed integer and encodes it as u-law data
- * stored in a unsigned char.  This function should only be called with
+ * stored in an unsigned char.  This function should only be called with
  * the data shifted such that it only contains information in the lower
  * 14-bits.
  *
@@ -218,7 +218,7 @@ static PyInt16 _st_alaw2linear16[256] = {
 
 /*
  * linear2alaw() accepts an 13-bit signed integer and encodes it as A-law data
- * stored in a unsigned char.  This function should only be called with
+ * stored in an unsigned char.  This function should only be called with
  * the data shifted such that it only contains information in the lower
  * 13-bits.
  *
@@ -1320,7 +1320,7 @@ audioop_ratecv_impl(PyModuleDef *module, Py_buffer *fragment, int width, int nch
     /* divide weightA and weightB by their greatest common divisor */
     d = gcd(weightA, weightB);
     weightA /= d;
-    weightA /= d;
+    weightB /= d;
 
     if ((size_t)nchannels > PY_SIZE_MAX/sizeof(int)) {
         PyErr_SetString(PyExc_MemoryError,
@@ -1615,22 +1615,29 @@ audioop_lin2adpcm_impl(PyModuleDef *module, Py_buffer *fragment, int width, PyOb
     if (!audioop_check_parameters(fragment->len, width))
         return NULL;
 
-    str = PyBytes_FromStringAndSize(NULL, fragment->len/(width*2));
-    if (str == NULL)
-        return NULL;
-    ncp = (signed char *)PyBytes_AsString(str);
-
     /* Decode state, should have (value, step) */
     if ( state == Py_None ) {
         /* First time, it seems. Set defaults */
         valpred = 0;
         index = 0;
-    } else if (!PyTuple_Check(state)) {
-        PyErr_SetString(PyExc_TypeError, "state must be a tuple or None");
-        goto exit;
-    } else if (!PyArg_ParseTuple(state, "ii", &valpred, &index)) {
-        goto exit;
     }
+    else if (!PyTuple_Check(state)) {
+        PyErr_SetString(PyExc_TypeError, "state must be a tuple or None");
+        return NULL;
+    }
+    else if (!PyArg_ParseTuple(state, "ii", &valpred, &index)) {
+        return NULL;
+    }
+    else if (valpred >= 0x8000 || valpred < -0x8000 ||
+             (size_t)index >= Py_ARRAY_LENGTH(stepsizeTable)) {
+        PyErr_SetString(PyExc_ValueError, "bad state");
+        return NULL;
+    }
+
+    str = PyBytes_FromStringAndSize(NULL, fragment->len/(width*2));
+    if (str == NULL)
+        return NULL;
+    ncp = (signed char *)PyBytes_AsString(str);
 
     step = stepsizeTable[index];
     bufferstep = 1;
@@ -1706,8 +1713,6 @@ audioop_lin2adpcm_impl(PyModuleDef *module, Py_buffer *fragment, int width, PyOb
         bufferstep = !bufferstep;
     }
     rv = Py_BuildValue("(O(ii))", str, valpred, index);
-
-  exit:
     Py_DECREF(str);
     return rv;
 }
@@ -1742,11 +1747,19 @@ audioop_adpcm2lin_impl(PyModuleDef *module, Py_buffer *fragment, int width, PyOb
         /* First time, it seems. Set defaults */
         valpred = 0;
         index = 0;
-    } else if (!PyTuple_Check(state)) {
+    }
+    else if (!PyTuple_Check(state)) {
         PyErr_SetString(PyExc_TypeError, "state must be a tuple or None");
         return NULL;
-    } else if (!PyArg_ParseTuple(state, "ii", &valpred, &index))
+    }
+    else if (!PyArg_ParseTuple(state, "ii", &valpred, &index)) {
         return NULL;
+    }
+    else if (valpred >= 0x8000 || valpred < -0x8000 ||
+             (size_t)index >= Py_ARRAY_LENGTH(stepsizeTable)) {
+        PyErr_SetString(PyExc_ValueError, "bad state");
+        return NULL;
+    }
 
     if (fragment->len > (PY_SSIZE_T_MAX/2)/width) {
         PyErr_SetString(PyExc_MemoryError,

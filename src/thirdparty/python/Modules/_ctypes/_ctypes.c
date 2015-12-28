@@ -463,45 +463,65 @@ KeepRef(CDataObject *target, Py_ssize_t index, PyObject *keep);
 static PyObject *
 CDataType_from_buffer(PyObject *type, PyObject *args)
 {
-    Py_buffer buffer;
+    PyObject *obj;
+    PyObject *mv;
+    PyObject *result;
+    Py_buffer *buffer;
     Py_ssize_t offset = 0;
-    PyObject *result, *mv;
+
     StgDictObject *dict = PyType_stgdict(type);
     assert (dict);
 
-    if (!PyArg_ParseTuple(args, "w*|n:from_buffer", &buffer, &offset))
+    if (!PyArg_ParseTuple(args, "O|n:from_buffer", &obj, &offset))
         return NULL;
+
+    mv = PyMemoryView_FromObject(obj);
+    if (mv == NULL)
+        return NULL;
+
+    buffer = PyMemoryView_GET_BUFFER(mv);
+
+    if (buffer->readonly) {
+        PyErr_SetString(PyExc_TypeError,
+            "underlying buffer is not writable");
+        Py_DECREF(mv);
+        return NULL;
+    }
+
+    if (!PyBuffer_IsContiguous(buffer, 'C')) {
+        PyErr_SetString(PyExc_TypeError,
+            "underlying buffer is not C contiguous");
+        Py_DECREF(mv);
+        return NULL;
+    }
 
     if (offset < 0) {
         PyErr_SetString(PyExc_ValueError,
                         "offset cannot be negative");
-        PyBuffer_Release(&buffer);
+        Py_DECREF(mv);
         return NULL;
     }
-    if (dict->size > buffer.len - offset) {
+
+    if (dict->size > buffer->len - offset) {
         PyErr_Format(PyExc_ValueError,
-                     "Buffer size too small (%zd instead of at least %zd bytes)",
-                     buffer.len, dict->size + offset);
-        PyBuffer_Release(&buffer);
+                     "Buffer size too small "
+                     "(%zd instead of at least %zd bytes)",
+                     buffer->len, dict->size + offset);
+        Py_DECREF(mv);
         return NULL;
     }
 
-    result = PyCData_AtAddress(type, (char *)buffer.buf + offset);
+    result = PyCData_AtAddress(type, (char *)buffer->buf + offset);
     if (result == NULL) {
-        PyBuffer_Release(&buffer);
+        Py_DECREF(mv);
         return NULL;
     }
 
-    mv = PyMemoryView_FromBuffer(&buffer);
-    if (mv == NULL) {
-        PyBuffer_Release(&buffer);
+    if (-1 == KeepRef((CDataObject *)result, -1, mv)) {
+        Py_DECREF(result);
         return NULL;
     }
-    /* Hack the memoryview so that it will release the buffer. */
-    ((PyMemoryViewObject *)mv)->mbuf->master.obj = buffer.obj;
-    ((PyMemoryViewObject *)mv)->view.obj = buffer.obj;
-    if (-1 == KeepRef((CDataObject *)result, -1, mv))
-        result = NULL;
+
     return result;
 }
 
@@ -593,7 +613,7 @@ CDataType_in_dll(PyObject *type, PyObject *args)
 #ifdef __CYGWIN__
 /* dlerror() isn't very helpful on cygwin */
         PyErr_Format(PyExc_ValueError,
-                     "symbol '%s' not found (%s) ",
+                     "symbol '%s' not found",
                      name);
 #else
         PyErr_SetString(PyExc_ValueError, ctypes_dlerror());
@@ -3279,7 +3299,7 @@ PyCFuncPtr_FromDll(PyTypeObject *type, PyObject *args, PyObject *kwds)
 #ifdef __CYGWIN__
 /* dlerror() isn't very helpful on cygwin */
         PyErr_Format(PyExc_AttributeError,
-                     "function '%s' not found (%s) ",
+                     "function '%s' not found",
                      name);
 #else
         PyErr_SetString(PyExc_AttributeError, ctypes_dlerror());
@@ -3862,7 +3882,7 @@ PyCFuncPtr_call(PyCFuncPtrObject *self, PyObject *inargs, PyObject *kwds)
                                                    self,
                                                    callargs,
                                                    NULL);
-        /* If the errcheck funtion failed, return NULL.
+        /* If the errcheck function failed, return NULL.
            If the errcheck function returned callargs unchanged,
            continue normal processing.
            If the errcheck function returned something else,
@@ -4305,8 +4325,11 @@ Array_subscript(PyObject *myself, PyObject *item)
                                               slicelen);
             }
 
-            dest = (wchar_t *)PyMem_Malloc(
-                                    slicelen * sizeof(wchar_t));
+            dest = PyMem_New(wchar_t, slicelen);
+            if (dest == NULL) {
+                PyErr_NoMemory();
+                return NULL;
+            }
 
             for (cur = start, i = 0; i < slicelen;
                  cur += step, i++) {
@@ -4986,7 +5009,7 @@ Pointer_subscript(PyObject *myself, PyObject *item)
                 return PyUnicode_FromWideChar(ptr + start,
                                               len);
             }
-            dest = (wchar_t *)PyMem_Malloc(len * sizeof(wchar_t));
+            dest = PyMem_New(wchar_t, len);
             if (dest == NULL)
                 return PyErr_NoMemory();
             for (cur = start, i = 0; i < len; cur += step, i++) {

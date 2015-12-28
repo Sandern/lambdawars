@@ -207,8 +207,12 @@ _PyImport_ReleaseLock(void)
 void
 _PyImport_ReInitLock(void)
 {
-    if (import_lock != NULL)
+    if (import_lock != NULL) {
         import_lock = PyThread_allocate_lock();
+        if (import_lock == NULL) {
+            Py_FatalError("PyImport_ReInitLock failed to create a new lock");
+        }
+    }
     if (import_lock_level > 1) {
         /* Forked as a side effect of import */
         long me = PyThread_get_thread_ident();
@@ -1412,6 +1416,7 @@ PyImport_ImportModuleLevelObject(PyObject *name, PyObject *given_globals,
     PyObject *globals = NULL;
     PyObject *fromlist = NULL;
     PyInterpreterState *interp = PyThreadState_GET()->interp;
+    int has_from;
 
     /* Make sure to use default values so as to not have
        PyObject_CallMethodObjArgs() truncate the parameter list because of a
@@ -1642,7 +1647,10 @@ PyImport_ImportModuleLevelObject(PyObject *name, PyObject *given_globals,
     }
     /* From now on we don't hold the import lock anymore. */
 
-    if (PyObject_Not(fromlist)) {
+    has_from = PyObject_IsTrue(fromlist);
+    if (has_from < 0)
+        goto error;
+    if (!has_from) {
         if (level == 0 || PyUnicode_GET_LENGTH(name) > 0) {
             PyObject *front = NULL;
             PyObject *partition = NULL;

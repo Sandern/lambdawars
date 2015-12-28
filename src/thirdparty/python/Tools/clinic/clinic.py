@@ -1830,7 +1830,6 @@ __gt__
 __hash__
 __iadd__
 __iand__
-__idivmod__
 __ifloordiv__
 __ilshift__
 __imod__
@@ -4165,7 +4164,7 @@ def main(argv):
             cmdline.print_usage()
             sys.exit(-1)
         for root, dirs, files in os.walk('.'):
-            for rcs_dir in ('.svn', '.git', '.hg', 'build'):
+            for rcs_dir in ('.svn', '.git', '.hg', 'build', 'externals'):
                 if rcs_dir in dirs:
                     dirs.remove(rcs_dir)
             for filename in files:

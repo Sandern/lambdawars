@@ -18,7 +18,6 @@ import asyncore
 import weakref
 import platform
 import functools
-from unittest import mock
 
 ssl = support.import_module("ssl")
 
@@ -65,7 +64,7 @@ BADKEY = data_file("badkey.pem")
 NOKIACERT = data_file("nokia.pem")
 NULLBYTECERT = data_file("nullbytecert.pem")
 
-DHFILE = data_file("dh512.pem")
+DHFILE = data_file("dh1024.pem")
 BYTES_DHFILE = os.fsencode(DHFILE)
 
 
@@ -675,11 +674,11 @@ class ContextTests(unittest.TestCase):
     @skip_if_broken_ubuntu_ssl
     def test_options(self):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-        # OP_ALL | OP_NO_SSLv2 is the default value
-        self.assertEqual(ssl.OP_ALL | ssl.OP_NO_SSLv2,
-                         ctx.options)
-        ctx.options |= ssl.OP_NO_SSLv3
+        # OP_ALL | OP_NO_SSLv2 | OP_NO_SSLv3 is the default value
         self.assertEqual(ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3,
+                         ctx.options)
+        ctx.options |= ssl.OP_NO_TLSv1
+        self.assertEqual(ssl.OP_ALL | ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1,
                          ctx.options)
         if can_clear_options():
             ctx.options = (ctx.options & ~ssl.OP_NO_SSLv2) | ssl.OP_NO_TLSv1
@@ -710,8 +709,9 @@ class ContextTests(unittest.TestCase):
                          "verify_flags need OpenSSL > 0.9.8")
     def test_verify_flags(self):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-        # default value by OpenSSL
-        self.assertEqual(ctx.verify_flags, ssl.VERIFY_DEFAULT)
+        # default value
+        tf = getattr(ssl, "VERIFY_X509_TRUSTED_FIRST", 0)
+        self.assertEqual(ctx.verify_flags, ssl.VERIFY_DEFAULT | tf)
         ctx.verify_flags = ssl.VERIFY_CRL_CHECK_LEAF
         self.assertEqual(ctx.verify_flags, ssl.VERIFY_CRL_CHECK_LEAF)
         ctx.verify_flags = ssl.VERIFY_CRL_CHECK_CHAIN
@@ -2006,7 +2006,8 @@ else:
             context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
             context.verify_mode = ssl.CERT_REQUIRED
             context.load_verify_locations(SIGNING_CA)
-            self.assertEqual(context.verify_flags, ssl.VERIFY_DEFAULT)
+            tf = getattr(ssl, "VERIFY_X509_TRUSTED_FIRST", 0)
+            self.assertEqual(context.verify_flags, ssl.VERIFY_DEFAULT | tf)
 
             # VERIFY_DEFAULT should pass
             server = ThreadedEchoServer(context=server_context, chatty=True)
@@ -2171,17 +2172,17 @@ else:
                             " SSL2 client to SSL23 server test unexpectedly failed:\n %s\n"
                             % str(x))
             if hasattr(ssl, 'PROTOCOL_SSLv3'):
-                try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, True)
+                try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, False)
             try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv23, True)
             try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_TLSv1, True)
 
             if hasattr(ssl, 'PROTOCOL_SSLv3'):
-                try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, True, ssl.CERT_OPTIONAL)
+                try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, False, ssl.CERT_OPTIONAL)
             try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv23, True, ssl.CERT_OPTIONAL)
             try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_TLSv1, True, ssl.CERT_OPTIONAL)
 
             if hasattr(ssl, 'PROTOCOL_SSLv3'):
-                try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, True, ssl.CERT_REQUIRED)
+                try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv3, False, ssl.CERT_REQUIRED)
             try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_SSLv23, True, ssl.CERT_REQUIRED)
             try_protocol_combo(ssl.PROTOCOL_SSLv23, ssl.PROTOCOL_TLSv1, True, ssl.CERT_REQUIRED)
 
@@ -2213,8 +2214,8 @@ else:
             try_protocol_combo(ssl.PROTOCOL_SSLv3, ssl.PROTOCOL_TLSv1, False)
             if no_sslv2_implies_sslv3_hello():
                 # No SSLv2 => client will use an SSLv3 hello on recent OpenSSLs
-                try_protocol_combo(ssl.PROTOCOL_SSLv3, ssl.PROTOCOL_SSLv23, True,
-                                   client_options=ssl.OP_NO_SSLv2)
+                try_protocol_combo(ssl.PROTOCOL_SSLv3, ssl.PROTOCOL_SSLv23,
+                                   False, client_options=ssl.OP_NO_SSLv2)
 
         @skip_if_broken_ubuntu_ssl
         def test_protocol_tlsv1(self):

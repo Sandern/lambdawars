@@ -11,6 +11,7 @@ if hasattr(socket, 'AF_UNIX'):
     __all__.extend(['open_unix_connection', 'start_unix_server'])
 
 from . import coroutines
+from . import compat
 from . import events
 from . import futures
 from . import protocols
@@ -238,6 +239,7 @@ class StreamReaderProtocol(FlowControlMixin, protocols.Protocol):
 
     def eof_received(self):
         self._stream_reader.feed_eof()
+        return True
 
 
 class StreamWriter:
@@ -253,7 +255,7 @@ class StreamWriter:
     def __init__(self, transport, protocol, reader, loop):
         self._transport = transport
         self._protocol = protocol
-        # drain() expects that the reader has a exception() method
+        # drain() expects that the reader has an exception() method
         assert reader is None or isinstance(reader, StreamReader)
         self._reader = reader
         self._loop = loop
@@ -299,6 +301,15 @@ class StreamWriter:
             exc = self._reader.exception()
             if exc is not None:
                 raise exc
+        if self._transport is not None:
+            if self._transport.is_closing():
+                # Yield to the event loop so connection_lost() may be
+                # called.  Without this, _drain_helper() would return
+                # immediately, and code that calls
+                #     write(...); yield from drain()
+                # in a loop would never call connection_lost(), so it
+                # would not see an error when the socket is closed.
+                yield
         yield from self._protocol._drain_helper()
 
 
@@ -318,6 +329,24 @@ class StreamReader:
         self._exception = None
         self._transport = None
         self._paused = False
+
+    def __repr__(self):
+        info = ['StreamReader']
+        if self._buffer:
+            info.append('%d bytes' % len(self._buffer))
+        if self._eof:
+            info.append('eof')
+        if self._limit != _DEFAULT_LIMIT:
+            info.append('l=%d' % self._limit)
+        if self._waiter:
+            info.append('w=%r' % self._waiter)
+        if self._exception:
+            info.append('e=%r' % self._exception)
+        if self._transport:
+            info.append('t=%r' % self._transport)
+        if self._paused:
+            info.append('paused')
+        return '<%s>' % ' '.join(info)
 
     def exception(self):
         return self._exception
@@ -378,6 +407,7 @@ class StreamReader:
             else:
                 self._paused = True
 
+    @coroutine
     def _wait_for_data(self, func_name):
         """Wait until feed_data() or feed_eof() is called."""
         # StreamReader uses a future to link the protocol feed_data() method
@@ -484,3 +514,15 @@ class StreamReader:
             n -= len(block)
 
         return b''.join(blocks)
+
+    if compat.PY35:
+        @coroutine
+        def __aiter__(self):
+            return self
+
+        @coroutine
+        def __anext__(self):
+            val = yield from self.readline()
+            if val == b'':
+                raise StopAsyncIteration
+            return val

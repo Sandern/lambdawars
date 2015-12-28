@@ -556,6 +556,9 @@ then
 fi
 AC_MSG_RESULT($MACHDEP)
 
+AC_SUBST(PLATDIR)
+PLATDIR=plat-$MACHDEP
+
 # Record the configure-time value of MACOSX_DEPLOYMENT_TARGET,
 # it may influence the way we can build extensions, so distutils
 # needs to check it
@@ -1119,7 +1122,11 @@ then
 	    if test "$Py_DEBUG" = 'true' ; then
 		# Optimization messes up debuggers, so turn it off for
 		# debug builds.
-		OPT="-g -O0 -Wall $STRICT_PROTO"
+                if "$CC" -v --help 2>/dev/null |grep -- -Og > /dev/null; then
+                    OPT="-g -Og -Wall $STRICT_PROTO"
+                else
+                    OPT="-g -O0 -Wall $STRICT_PROTO"
+                fi
 	    else
 		OPT="-g $WRAP -O3 -Wall $STRICT_PROTO"
 	    fi
@@ -4108,7 +4115,7 @@ AC_MSG_RESULT($LDVERSION)
 
 dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
 AC_SUBST(PY_ENABLE_SHARED)
-LIBPL="${prefix}/lib/python${VERSION}/config-${LDVERSION}"
+LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
 AC_SUBST(LIBPL)
 
 # Check whether right shifting a negative integer extends the sign bit

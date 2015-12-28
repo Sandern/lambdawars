@@ -1243,7 +1243,7 @@ PyNumber_Long(PyObject *o)
         if (truncated == NULL || PyLong_Check(truncated))
             return truncated;
         /* __trunc__ is specified to return an Integral type,
-           but int() needs to return a int. */
+           but int() needs to return an int. */
         m = truncated->ob_type->tp_as_number;
         if (m == NULL || m->nb_int == NULL) {
             PyErr_Format(
@@ -1264,12 +1264,30 @@ PyNumber_Long(PyObject *o)
         /* The below check is done in PyLong_FromUnicode(). */
         return PyLong_FromUnicodeObject(o, 10);
 
-    if (PyObject_GetBuffer(o, &view, PyBUF_SIMPLE) == 0) {
+    if (PyBytes_Check(o))
         /* need to do extra error checking that PyLong_FromString()
          * doesn't do.  In particular int('9\x005') must raise an
          * exception, not truncate at the null.
          */
-        PyObject *result = _PyLong_FromBytes(view.buf, view.len, 10);
+        return _PyLong_FromBytes(PyBytes_AS_STRING(o),
+                                 PyBytes_GET_SIZE(o), 10);
+
+    if (PyByteArray_Check(o))
+        return _PyLong_FromBytes(PyByteArray_AS_STRING(o),
+                                 PyByteArray_GET_SIZE(o), 10);
+
+    if (PyObject_GetBuffer(o, &view, PyBUF_SIMPLE) == 0) {
+        PyObject *result, *bytes;
+
+        /* Copy to NUL-terminated buffer. */
+        bytes = PyBytes_FromStringAndSize((const char *)view.buf, view.len);
+        if (bytes == NULL) {
+            PyBuffer_Release(&view);
+            return NULL;
+        }
+        result = _PyLong_FromBytes(PyBytes_AS_STRING(bytes),
+                                   PyBytes_GET_SIZE(bytes), 10);
+        Py_DECREF(bytes);
         PyBuffer_Release(&view);
         return result;
     }
@@ -1636,7 +1654,7 @@ PySequence_Tuple(PyObject *v)
         Py_INCREF(v);
         return v;
     }
-    if (PyList_Check(v))
+    if (PyList_CheckExact(v))
         return PyList_AsTuple(v);
 
     /* Get iterator. */

@@ -931,8 +931,8 @@ textiowrapper_init(textio *self, PyObject *args, PyObject *kwds)
         if (self->encoding == NULL) {
           catch_ImportError:
             /*
-             Importing locale can raise a ImportError because of
-             _functools, and locale.getpreferredencoding can raise a
+             Importing locale can raise an ImportError because of
+             _functools, and locale.getpreferredencoding can raise an
              ImportError if _locale is not available.  These will happen
              during module building.
             */
@@ -2042,11 +2042,10 @@ _textiowrapper_decoder_setstate(textio *self, cookie_type *cookie)
 }
 
 static int
-_textiowrapper_encoder_setstate(textio *self, cookie_type *cookie)
+_textiowrapper_encoder_reset(textio *self, int start_of_stream)
 {
     PyObject *res;
-    /* Same as _textiowrapper_decoder_setstate() above. */
-    if (cookie->start_pos == 0 && cookie->dec_flags == 0) {
+    if (start_of_stream) {
         res = PyObject_CallMethodObjArgs(self->encoder, _PyIO_str_reset, NULL);
         self->encoding_start_of_stream = 1;
     }
@@ -2059,6 +2058,14 @@ _textiowrapper_encoder_setstate(textio *self, cookie_type *cookie)
         return -1;
     Py_DECREF(res);
     return 0;
+}
+
+static int
+_textiowrapper_encoder_setstate(textio *self, cookie_type *cookie)
+{
+    /* Same as _textiowrapper_decoder_setstate() above. */
+    return _textiowrapper_encoder_reset(
+        self, cookie->start_pos == 0 && cookie->dec_flags == 0);
 }
 
 static PyObject *
@@ -2128,7 +2135,17 @@ textiowrapper_seek(textio *self, PyObject *args)
         }
 
         res = _PyObject_CallMethodId(self->buffer, &PyId_seek, "ii", 0, 2);
-        Py_XDECREF(cookieObj);
+        Py_CLEAR(cookieObj);
+        if (res == NULL)
+            goto fail;
+        if (self->encoder) {
+            /* If seek() == 0, we are at the start of stream, otherwise not */
+            cmp = PyObject_RichCompareBool(res, _PyIO_zero, Py_EQ);
+            if (cmp < 0 || _textiowrapper_encoder_reset(self, cmp)) {
+                Py_DECREF(res);
+                goto fail;
+            }
+        }
         return res;
     }
     else if (whence != 0) {
@@ -2435,14 +2452,10 @@ fail:
     if (saved_state) {
         PyObject *type, *value, *traceback;
         PyErr_Fetch(&type, &value, &traceback);
-
         res = _PyObject_CallMethodId(self->decoder, &PyId_setstate, "(O)", saved_state);
+        _PyErr_ChainExceptions(type, value, traceback);
         Py_DECREF(saved_state);
-        if (res == NULL)
-            return NULL;
-        Py_DECREF(res);
-
-        PyErr_Restore(type, value, traceback);
+        Py_XDECREF(res);
     }
     return NULL;
 }
