@@ -96,6 +96,7 @@ struct make_holder<N>
 #endif
             BOOST_PP_ENUM_TRAILING_BINARY_PARAMS_Z(1, N, t, a))
         {
+			// Ugly hack for PySource to allocate memory differently for certain classes
 			typedef is_base_of<IClientEntity, typename Holder::value_type> is_IClientEntity;
 			typedef is_base_of<IServerEntity, typename Holder::value_type> is_IServerEntity;
 
