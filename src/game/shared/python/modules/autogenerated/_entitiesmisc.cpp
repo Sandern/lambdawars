@@ -5038,10 +5038,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "IsClearingEntities"
             , (bool ( ::CGlobalEntityList::* )(  ) )( &::CGlobalEntityList::IsClearingEntities ) )    
         .def( 
-            "IsEntityPtr"
-            , (bool ( ::CGlobalEntityList::* )( void * ) )( &::CGlobalEntityList::IsEntityPtr )
-            , ( bp::arg("pTest") ) )    
-        .def( 
             "NextEnt"
             , (::CBaseEntity * ( ::CGlobalEntityList::* )( ::CBaseEntity * ) )( &::CGlobalEntityList::NextEnt )
             , ( bp::arg("pCurrentEnt") )
@@ -6224,10 +6220,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "Int"
             , (int ( ::variant_t::* )(  ) const)( &::variant_t::Int ) )    
         .def( 
-            "Set"
-            , (void ( ::variant_t::* )( ::fieldtype_t,void * ) )( &::variant_t::Set )
-            , ( bp::arg("ftype"), bp::arg("data") ) )    
-        .def( 
             "SetBool"
             , (void ( ::variant_t::* )( bool ) )( &::variant_t::SetBool )
             , ( bp::arg("b") ) )    
@@ -6251,10 +6243,6 @@ BOOST_PYTHON_MODULE(_entitiesmisc){
             "SetInt"
             , (void ( ::variant_t::* )( int ) )( &::variant_t::SetInt )
             , ( bp::arg("val") ) )    
-        .def( 
-            "SetOther"
-            , (void ( ::variant_t::* )( void * ) )( &::variant_t::SetOther )
-            , ( bp::arg("data") ) )    
         .def( 
             "SetPositionVector3D"
             , (void ( ::variant_t::* )( ::Vector const & ) )( &::variant_t::SetPositionVector3D )

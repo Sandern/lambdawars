@@ -3603,25 +3603,6 @@ void register_C_BaseEntity_class(){
                 , ( bp::arg("force")=(bool)(false) ) );
         
         }
-        { //::C_BaseEntity::NetworkStateChanged
-        
-            typedef void ( ::C_BaseEntity::*NetworkStateChanged_function_type )(  ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "NetworkStateChanged"
-                , NetworkStateChanged_function_type( &::C_BaseEntity::NetworkStateChanged ) );
-        
-        }
-        { //::C_BaseEntity::NetworkStateChanged
-        
-            typedef void ( ::C_BaseEntity::*NetworkStateChanged_function_type )( void * ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "NetworkStateChanged"
-                , NetworkStateChanged_function_type( &::C_BaseEntity::NetworkStateChanged )
-                , ( bp::arg("pVar") ) );
-        
-        }
         { //::C_BaseEntity::NetworkStateForceUpdate
         
             typedef void ( ::C_BaseEntity::*NetworkStateForceUpdate_function_type )(  ) ;
@@ -4271,76 +4252,6 @@ void register_C_BaseEntity_class(){
                 , RecordToolMessage_function_type( &::C_BaseEntity::RecordToolMessage ) );
         
         }
-        { //::C_BaseEntity::RecvProxy_CellBits
-        
-            typedef void ( *RecvProxy_CellBits_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellBits"
-                , RecvProxy_CellBits_function_type( &::C_BaseEntity::RecvProxy_CellBits )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
-        { //::C_BaseEntity::RecvProxy_CellOrigin
-        
-            typedef void ( *RecvProxy_CellOrigin_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellOrigin"
-                , RecvProxy_CellOrigin_function_type( &::C_BaseEntity::RecvProxy_CellOrigin )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
-        { //::C_BaseEntity::RecvProxy_CellOriginXY
-        
-            typedef void ( *RecvProxy_CellOriginXY_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellOriginXY"
-                , RecvProxy_CellOriginXY_function_type( &::C_BaseEntity::RecvProxy_CellOriginXY )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
-        { //::C_BaseEntity::RecvProxy_CellOriginZ
-        
-            typedef void ( *RecvProxy_CellOriginZ_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellOriginZ"
-                , RecvProxy_CellOriginZ_function_type( &::C_BaseEntity::RecvProxy_CellOriginZ )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
-        { //::C_BaseEntity::RecvProxy_CellX
-        
-            typedef void ( *RecvProxy_CellX_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellX"
-                , RecvProxy_CellX_function_type( &::C_BaseEntity::RecvProxy_CellX )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
-        { //::C_BaseEntity::RecvProxy_CellY
-        
-            typedef void ( *RecvProxy_CellY_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellY"
-                , RecvProxy_CellY_function_type( &::C_BaseEntity::RecvProxy_CellY )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
-        { //::C_BaseEntity::RecvProxy_CellZ
-        
-            typedef void ( *RecvProxy_CellZ_function_type )( ::CRecvProxyData const *,void *,void * );
-            
-            C_BaseEntity_exposer.def( 
-                "RecvProxy_CellZ"
-                , RecvProxy_CellZ_function_type( &::C_BaseEntity::RecvProxy_CellZ )
-                , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) );
-        
-        }
         { //::C_BaseEntity::RegisterThinkContext
         
             typedef int ( ::C_BaseEntity::*RegisterThinkContext_function_type )( char const * ) ;
@@ -4445,16 +4356,6 @@ void register_C_BaseEntity_class(){
                 "RemoveSolidFlags"
                 , RemoveSolidFlags_function_type( &::C_BaseEntity::RemoveSolidFlags )
                 , ( bp::arg("nFlags") ) );
-        
-        }
-        { //::C_BaseEntity::RemoveVar
-        
-            typedef void ( ::C_BaseEntity::*RemoveVar_function_type )( void *,bool ) ;
-            
-            C_BaseEntity_exposer.def( 
-                "RemoveVar"
-                , RemoveVar_function_type( &::C_BaseEntity::RemoveVar )
-                , ( bp::arg("data"), bp::arg("bAssert")=(bool)(true) ) );
         
         }
         { //::C_BaseEntity::RenderWithViewModels
@@ -6145,13 +6046,6 @@ void register_C_BaseEntity_class(){
         C_BaseEntity_exposer.staticmethod( "PrefetchSound" );
         C_BaseEntity_exposer.staticmethod( "PurgeRemovedEntities" );
         C_BaseEntity_exposer.staticmethod( "PushEnableAbsRecomputations" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellBits" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellOrigin" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellOriginXY" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellOriginZ" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellX" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellY" );
-        C_BaseEntity_exposer.staticmethod( "RecvProxy_CellZ" );
         C_BaseEntity_exposer.staticmethod( "RemoveRecipientsIfNotCloseCaptioning" );
         C_BaseEntity_exposer.staticmethod( "SetAbsQueriesValid" );
         C_BaseEntity_exposer.staticmethod( "SetAllowPrecache" );

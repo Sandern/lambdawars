@@ -668,4 +668,7 @@ extern PyLocalize *g_pylocalize;
 bool	PyIsGameUIVisible();
 VPANEL  PyGetPanel( VGuiPanel_t type );
 
+boost::python::tuple PyInput_GetCursorPos();
+boost::python::tuple PyInput_GetCursorPosition();
+
 #endif // SRCPY_VGUI_H

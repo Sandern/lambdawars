@@ -431,9 +431,6 @@
     <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl_no_pts.hpp">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\boost\python\detail\unwind_type.hpp">
       <Filter>Header Files\detail</Filter>
     </ClInclude>

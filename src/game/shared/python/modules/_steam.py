@@ -185,6 +185,8 @@ class Steam(SemiSharedModuleGenerator):
         cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('GetFriendGamePlayed').exclude()
+        cls.mem_fun('GetClanChatMessage').exclude()
+        cls.mem_fun('GetFriendMessage').exclude()
         
         mb.enum('EFriendRelationship').include()
         mb.enum('EPersonaState').include()
@@ -218,6 +220,10 @@ class Steam(SemiSharedModuleGenerator):
         cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_funs('GetLobbyGameServer').add_transformation(FT.output('punGameServerIP'), FT.output('punGameServerPort'), FT.output('psteamIDGameServer'))
+        
+        cls.mem_fun('GetLobbyDataByIndex').exclude()
+        cls.mem_fun('SendLobbyChatMsg').exclude()
+        cls.mem_fun('GetLobbyChatEntry').exclude()
         
         mb.free_function('PyGetLobbyDataByIndex').include()
         mb.free_function('PySendLobbyChatMsg').include()
@@ -303,6 +309,12 @@ class Steam(SemiSharedModuleGenerator):
         cls.no_init = True
         cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
+        
+        cls.mem_fun('BeginAuthSession').exclude()
+        cls.mem_fun('GetAuthSessionTicket').exclude()
+        cls.mem_fun('GetNextOutgoingPacket').exclude()
+        cls.mem_fun('HandleIncomingPacket').exclude()
+        cls.mem_fun('SendUserConnectAndAuthenticate').exclude()
         
         mb.free_function('PyGameServer_GetAuthSessionTicket').include()
         mb.free_function('PyGameServer_GetAuthSessionTicket').rename('GameServer_GetAuthSessionTicket')
@@ -410,6 +422,14 @@ class Steam(SemiSharedModuleGenerator):
         cls.noncopyable = True
         cls.mem_funs().virtuality = 'not virtual'
         
+        cls.mem_fun('DecompressVoice').exclude()
+        cls.mem_fun('GetAuthSessionTicket').exclude()
+        cls.mem_fun('GetEncryptedAppTicket').exclude()
+        cls.mem_fun('GetVoice').exclude()
+        cls.mem_fun('InitiateGameConnection').exclude()
+        cls.mem_fun('RequestEncryptedAppTicket').exclude()
+        cls.mem_fun('BeginAuthSession').exclude()
+        
         mb.free_function('PySteamUser_GetAuthSessionTicket').include()
         mb.free_function('PySteamUser_GetAuthSessionTicket').rename('SteamUser_GetAuthSessionTicket')
         
@@ -421,6 +441,7 @@ class Steam(SemiSharedModuleGenerator):
         cls.mem_funs().virtuality = 'not virtual'
         cls.mem_fun('GetImageRGBA').exclude()
         cls.mem_fun('GetImageSize').exclude()
+        cls.mem_fun('GetAPICallResult').exclude()
         
         self.ParseMatchmaking(mb)
         self.ParseUserStats(mb)

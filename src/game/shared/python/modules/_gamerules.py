@@ -67,6 +67,8 @@ class GameRules(SemiSharedModuleGenerator):
         mb.mem_funs('ShouldCollide').virtuality = 'not virtual'
         mb.mem_funs('GetAmmoDamage').virtuality = 'not virtual' # Just modify the ammo table when needed...
         
+        mb.mem_funs('NetworkStateChanged').exclude()
+        
         if self.isserver:
             if self.settings.branch == 'source2013':
                 mb.mem_fun('TacticalMissionManagerFactory').exclude()

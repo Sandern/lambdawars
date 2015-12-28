@@ -2224,13 +2224,6 @@ void register_CGameRules_class(){
             , (char const * ( ::CGameRules::* )(  ) )(&::CGameRules::Name)
             , (char const * ( CGameRules_wrapper::* )(  ) )(&CGameRules_wrapper::default_Name) )    
         .def( 
-            "NetworkStateChanged"
-            , (void ( ::CGameRules::* )(  ) )( &::CGameRules::NetworkStateChanged ) )    
-        .def( 
-            "NetworkStateChanged"
-            , (void ( ::CGameRules::* )( void * ) )( &::CGameRules::NetworkStateChanged )
-            , ( bp::arg("pVar") ) )    
-        .def( 
             "NumEntityClasses"
             , (int ( ::CGameRules::* )(  ) const)(&::CGameRules::NumEntityClasses)
             , (int ( CGameRules_wrapper::* )(  ) const)(&CGameRules_wrapper::default_NumEntityClasses) )    

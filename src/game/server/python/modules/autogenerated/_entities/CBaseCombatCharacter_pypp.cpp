@@ -1173,16 +1173,6 @@ void register_CBaseCombatCharacter_class(){
                 , ( bp::arg("info") ) );
         
         }
-        { //::CBaseCombatCharacter::DispatchInteraction
-        
-            typedef bool ( ::CBaseCombatCharacter::*DispatchInteraction_function_type )( int,void *,::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatCharacter_exposer.def( 
-                "DispatchInteraction"
-                , DispatchInteraction_function_type( &::CBaseCombatCharacter::DispatchInteraction )
-                , ( bp::arg("interactionType"), bp::arg("data"), bp::arg("sourceEnt") ) );
-        
-        }
         { //::CBaseCombatCharacter::DoMuzzleFlash
         
             typedef void ( ::CBaseCombatCharacter::*DoMuzzleFlash_function_type )(  ) ;
@@ -1583,16 +1573,6 @@ void register_CBaseCombatCharacter_class(){
                 "GiveAmmo"
                 , GiveAmmo_function_type( &::CBaseCombatCharacter::GiveAmmo )
                 , ( bp::arg("iCount"), bp::arg("szName"), bp::arg("bSuppressSound")=(bool)(false) ) );
-        
-        }
-        { //::CBaseCombatCharacter::HandleInteraction
-        
-            typedef bool ( ::CBaseCombatCharacter::*HandleInteraction_function_type )( int,void *,::CBaseCombatCharacter * ) ;
-            
-            CBaseCombatCharacter_exposer.def( 
-                "HandleInteraction"
-                , HandleInteraction_function_type( &::CBaseCombatCharacter::HandleInteraction )
-                , ( bp::arg("interactionType"), bp::arg("data"), bp::arg("sourceEnt") ) );
         
         }
         { //::CBaseCombatCharacter::HasAlienGibs

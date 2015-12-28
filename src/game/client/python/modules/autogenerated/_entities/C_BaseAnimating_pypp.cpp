@@ -1492,16 +1492,6 @@ void register_C_BaseAnimating_class(){
                 , ( bp::arg("theMins"), bp::arg("theMaxs") ) );
         
         }
-        { //::C_BaseAnimating::GetRenderData
-        
-            typedef bool ( ::C_BaseAnimating::*GetRenderData_function_type )( void *,::ModelDataCategory_t ) ;
-            
-            C_BaseAnimating_exposer.def( 
-                "GetRenderData"
-                , GetRenderData_function_type( &::C_BaseAnimating::GetRenderData )
-                , ( bp::arg("pData"), bp::arg("nCategory") ) );
-        
-        }
         { //::C_BaseAnimating::GetRenderFlags
         
             typedef int ( ::C_BaseAnimating::*GetRenderFlags_function_type )(  ) ;

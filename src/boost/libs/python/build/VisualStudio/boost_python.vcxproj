@@ -41,9 +41,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\../bin-stage\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\..\..\..\lib\public\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\debug-obj\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\../bin-stage\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\..\lib\public\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\release-obj\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -409,7 +409,6 @@
     <ClInclude Include="..\..\..\..\boost\python\detail\translate_exception.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\detail\type_list.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl.hpp" />
-    <ClInclude Include="..\..\..\..\boost\python\detail\type_list_impl_no_pts.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\detail\unwind_type.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\detail\void_ptr.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\detail\void_return.hpp" />

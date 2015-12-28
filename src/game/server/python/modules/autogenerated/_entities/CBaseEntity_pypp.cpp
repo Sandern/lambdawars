@@ -3848,25 +3848,6 @@ void register_CBaseEntity_class(){
                 , ( bp::arg("org"), bp::arg("angles") ) );
         
         }
-        { //::CBaseEntity::NetworkStateChanged
-        
-            typedef void ( ::CBaseEntity::*NetworkStateChanged_function_type )(  ) ;
-            
-            CBaseEntity_exposer.def( 
-                "NetworkStateChanged"
-                , NetworkStateChanged_function_type( &::CBaseEntity::NetworkStateChanged ) );
-        
-        }
-        { //::CBaseEntity::NetworkStateChanged
-        
-            typedef void ( ::CBaseEntity::*NetworkStateChanged_function_type )( void * ) ;
-            
-            CBaseEntity_exposer.def( 
-                "NetworkStateChanged"
-                , NetworkStateChanged_function_type( &::CBaseEntity::NetworkStateChanged )
-                , ( bp::arg("pVar") ) );
-        
-        }
         { //::CBaseEntity::NextMovePeer
         
             typedef ::CBaseEntity * ( ::CBaseEntity::*NextMovePeer_function_type )(  ) ;
@@ -3906,16 +3887,6 @@ void register_CBaseEntity_class(){
                 "OnControls"
                 , OnControls_function_type( &::CBaseEntity::OnControls )
                 , ( bp::arg("pControls") ) );
-        
-        }
-        { //::CBaseEntity::OnEntityEvent
-        
-            typedef void ( ::CBaseEntity::*OnEntityEvent_function_type )( ::EntityEvent_t,void * ) ;
-            
-            CBaseEntity_exposer.def( 
-                "OnEntityEvent"
-                , OnEntityEvent_function_type( &::CBaseEntity::OnEntityEvent )
-                , ( bp::arg("event"), bp::arg("pEventData") ) );
         
         }
         { //::CBaseEntity::OnGroundChanged
@@ -4858,66 +4829,6 @@ void register_CBaseEntity_class(){
                 "SendOnKilledGameEvent"
                 , SendOnKilledGameEvent_function_type( &::CBaseEntity::SendOnKilledGameEvent )
                 , ( bp::arg("info") ) );
-        
-        }
-        { //::CBaseEntity::SendProxy_CellOrigin
-        
-            typedef void ( *SendProxy_CellOrigin_function_type )( ::SendProp const *,void const *,void const *,::DVariant *,int,int );
-            
-            CBaseEntity_exposer.def( 
-                "SendProxy_CellOrigin"
-                , SendProxy_CellOrigin_function_type( &::CBaseEntity::SendProxy_CellOrigin )
-                , ( bp::arg("pProp"), bp::arg("pStruct"), bp::arg("pData"), bp::arg("pOut"), bp::arg("iElement"), bp::arg("objectID") ) );
-        
-        }
-        { //::CBaseEntity::SendProxy_CellOriginXY
-        
-            typedef void ( *SendProxy_CellOriginXY_function_type )( ::SendProp const *,void const *,void const *,::DVariant *,int,int );
-            
-            CBaseEntity_exposer.def( 
-                "SendProxy_CellOriginXY"
-                , SendProxy_CellOriginXY_function_type( &::CBaseEntity::SendProxy_CellOriginXY )
-                , ( bp::arg("pProp"), bp::arg("pStruct"), bp::arg("pData"), bp::arg("pOut"), bp::arg("iElement"), bp::arg("objectID") ) );
-        
-        }
-        { //::CBaseEntity::SendProxy_CellOriginZ
-        
-            typedef void ( *SendProxy_CellOriginZ_function_type )( ::SendProp const *,void const *,void const *,::DVariant *,int,int );
-            
-            CBaseEntity_exposer.def( 
-                "SendProxy_CellOriginZ"
-                , SendProxy_CellOriginZ_function_type( &::CBaseEntity::SendProxy_CellOriginZ )
-                , ( bp::arg("pProp"), bp::arg("pStruct"), bp::arg("pData"), bp::arg("pOut"), bp::arg("iElement"), bp::arg("objectID") ) );
-        
-        }
-        { //::CBaseEntity::SendProxy_CellX
-        
-            typedef void ( *SendProxy_CellX_function_type )( ::SendProp const *,void const *,void const *,::DVariant *,int,int );
-            
-            CBaseEntity_exposer.def( 
-                "SendProxy_CellX"
-                , SendProxy_CellX_function_type( &::CBaseEntity::SendProxy_CellX )
-                , ( bp::arg("pProp"), bp::arg("pStruct"), bp::arg("pData"), bp::arg("pOut"), bp::arg("iElement"), bp::arg("objectID") ) );
-        
-        }
-        { //::CBaseEntity::SendProxy_CellY
-        
-            typedef void ( *SendProxy_CellY_function_type )( ::SendProp const *,void const *,void const *,::DVariant *,int,int );
-            
-            CBaseEntity_exposer.def( 
-                "SendProxy_CellY"
-                , SendProxy_CellY_function_type( &::CBaseEntity::SendProxy_CellY )
-                , ( bp::arg("pProp"), bp::arg("pStruct"), bp::arg("pData"), bp::arg("pOut"), bp::arg("iElement"), bp::arg("objectID") ) );
-        
-        }
-        { //::CBaseEntity::SendProxy_CellZ
-        
-            typedef void ( *SendProxy_CellZ_function_type )( ::SendProp const *,void const *,void const *,::DVariant *,int,int );
-            
-            CBaseEntity_exposer.def( 
-                "SendProxy_CellZ"
-                , SendProxy_CellZ_function_type( &::CBaseEntity::SendProxy_CellZ )
-                , ( bp::arg("pProp"), bp::arg("pStruct"), bp::arg("pData"), bp::arg("pOut"), bp::arg("iElement"), bp::arg("objectID") ) );
         
         }
         { //::CBaseEntity::SetAIAddOn
@@ -6409,12 +6320,6 @@ void register_CBaseEntity_class(){
         CBaseEntity_exposer.staticmethod( "PrefetchScriptSound" );
         CBaseEntity_exposer.staticmethod( "PrefetchSound" );
         CBaseEntity_exposer.staticmethod( "RemoveRecipientsIfNotCloseCaptioning" );
-        CBaseEntity_exposer.staticmethod( "SendProxy_CellOrigin" );
-        CBaseEntity_exposer.staticmethod( "SendProxy_CellOriginXY" );
-        CBaseEntity_exposer.staticmethod( "SendProxy_CellOriginZ" );
-        CBaseEntity_exposer.staticmethod( "SendProxy_CellX" );
-        CBaseEntity_exposer.staticmethod( "SendProxy_CellY" );
-        CBaseEntity_exposer.staticmethod( "SendProxy_CellZ" );
         CBaseEntity_exposer.staticmethod( "SetAbsQueriesValid" );
         CBaseEntity_exposer.staticmethod( "SetAllowPrecache" );
         CBaseEntity_exposer.staticmethod( "SetPredictionPlayer" );

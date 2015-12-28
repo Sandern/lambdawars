@@ -11,6 +11,7 @@
 #include <vgui_controls/Panel.h>
 #include <ienginevgui.h>
 #include <vgui/ISystem.h>
+#include <vgui/IInput.h>
 
 #include "hl2wars_baseminimap.h"
 #include "vgui_video_general.h"
@@ -747,4 +748,18 @@ VPANEL PyGetPanel( VGuiPanel_t type )
 CON_COMMAND(py_debug_panel_count, "Debug command for getting the number of python panels.")
 {
 	Msg("Python Panels: %d\n", g_PythonPanelCount );
+}
+
+boost::python::tuple PyInput_GetCursorPos()
+{
+	int x, y;
+	vgui::input()->GetCursorPos(x, y);
+	return boost::python::make_tuple(x, y);
+}
+
+boost::python::tuple PyInput_GetCursorPosition()
+{
+	int x, y;
+	vgui::input()->GetCursorPosition(x, y);
+	return boost::python::make_tuple(x, y);
 }

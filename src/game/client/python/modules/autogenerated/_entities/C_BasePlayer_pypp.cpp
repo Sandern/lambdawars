@@ -1080,50 +1080,6 @@ void register_C_BasePlayer_class(){
             "GetPlayerName"
             , (::boost::python::api::object ( ::C_BasePlayer::* )(  ) )( &::C_BasePlayer::PyGetPlayerName ) )    
         .def( 
-            "RecvProxy_LocalOriginXY"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_LocalOriginXY )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_LocalOriginZ"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_LocalOriginZ )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_LocalVelocityX"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_LocalVelocityX )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_LocalVelocityY"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_LocalVelocityY )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_LocalVelocityZ"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_LocalVelocityZ )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_NonLocalCellOriginXY"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_NonLocalCellOriginXY )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_NonLocalCellOriginZ"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_NonLocalCellOriginZ )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_NonLocalOriginXY"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_NonLocalOriginXY )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_NonLocalOriginZ"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_NonLocalOriginZ )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_ObserverMode"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_ObserverMode )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
-            "RecvProxy_ObserverTarget"
-            , (void (*)( ::CRecvProxyData const *,void *,void * ))( &::C_BasePlayer::RecvProxy_ObserverTarget )
-            , ( bp::arg("pData"), bp::arg("pStruct"), bp::arg("pOut") ) )    
-        .def( 
             "RemoveFromPlayerSimulationList"
             , (void ( ::C_BasePlayer::* )( ::C_BaseEntity * ) )( &::C_BasePlayer::RemoveFromPlayerSimulationList )
             , ( bp::arg("ent") ) )    
@@ -1444,17 +1400,6 @@ void register_C_BasePlayer_class(){
         .staticmethod( "GetSplitScreenSlotForPlayer" )    
         .staticmethod( "HasAnyLocalPlayer" )    
         .staticmethod( "IsLocalPlayer" )    
-        .staticmethod( "RecvProxy_LocalOriginXY" )    
-        .staticmethod( "RecvProxy_LocalOriginZ" )    
-        .staticmethod( "RecvProxy_LocalVelocityX" )    
-        .staticmethod( "RecvProxy_LocalVelocityY" )    
-        .staticmethod( "RecvProxy_LocalVelocityZ" )    
-        .staticmethod( "RecvProxy_NonLocalCellOriginXY" )    
-        .staticmethod( "RecvProxy_NonLocalCellOriginZ" )    
-        .staticmethod( "RecvProxy_NonLocalOriginXY" )    
-        .staticmethod( "RecvProxy_NonLocalOriginZ" )    
-        .staticmethod( "RecvProxy_ObserverMode" )    
-        .staticmethod( "RecvProxy_ObserverTarget" )    
         .staticmethod( "SetRemoteSplitScreenPlayerViewsAreLocalPlayer" )    
         .add_property( "lifestate", &C_BasePlayer_wrapper::m_lifeState_Get, &C_BasePlayer_wrapper::m_lifeState_Set )    
         .add_property( "takedamage", &C_BasePlayer_wrapper::m_takedamage_Get, &C_BasePlayer_wrapper::m_takedamage_Set )    

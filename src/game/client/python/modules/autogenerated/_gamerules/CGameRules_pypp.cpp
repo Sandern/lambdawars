@@ -580,13 +580,6 @@ void register_CGameRules_class(){
             , (char const * ( ::C_GameRules::* )(  ) )(&::C_GameRules::Name)
             , (char const * ( C_GameRules_wrapper::* )(  ) )(&C_GameRules_wrapper::default_Name) )    
         .def( 
-            "NetworkStateChanged"
-            , (void ( ::C_GameRules::* )(  ) )( &::C_GameRules::NetworkStateChanged ) )    
-        .def( 
-            "NetworkStateChanged"
-            , (void ( ::C_GameRules::* )( void * ) )( &::C_GameRules::NetworkStateChanged )
-            , ( bp::arg("pVar") ) )    
-        .def( 
             "OnNavMeshLoad"
             , (void ( ::C_GameRules::* )(  ) )(&::C_GameRules::OnNavMeshLoad)
             , (void ( C_GameRules_wrapper::* )(  ) )(&C_GameRules_wrapper::default_OnNavMeshLoad) )    

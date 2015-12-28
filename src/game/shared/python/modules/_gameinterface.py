@@ -331,6 +331,8 @@ class GameInterface(SemiSharedModuleGenerator):
             cls = mb.class_('CServerGameDLL')
             cls.include()
             cls.mem_funs().virtuality = 'not virtual'
+            cls.mem_fun('SaveReadFields').exclude()
+            cls.mem_fun('SaveWriteFields').exclude()
             
             if self.settings.branch == 'swarm':
                 cls.mem_fun('FindLaunchOptionByValue').call_policies = call_policies.return_value_policy(call_policies.return_by_value)

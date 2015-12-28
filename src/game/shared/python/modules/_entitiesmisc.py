@@ -195,6 +195,7 @@ class EntitiesMisc(SemiSharedModuleGenerator):
         cls.mem_funs('NotifyRemoveEntity').exclude()
         cls.mem_funs('AddListenerEntity').exclude() # Would require some kind of python version
         cls.mem_funs('RemoveListenerEntity').exclude()
+        cls.mem_funs('IsEntityPtr').exclude() # void pointer
         
         cls.mem_funs('NextEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
         cls.mem_funs('FirstEnt').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
@@ -270,6 +271,9 @@ class EntitiesMisc(SemiSharedModuleGenerator):
                                 '   return inst.Entity() ? inst.Entity()->GetPyHandle() : bp::object();\r\n' + \
                                 '}\r\n' )
         cls.add_registration_code( 'def("Entity", &::variant_t_wrapper::PyEntity)')
+        
+        cls.mem_fun('Set').exclude() # void * argument
+        cls.mem_fun('SetOther').exclude() # void * argument
         
         # Collision
         cls = mb.class_('vcollisionevent_t')

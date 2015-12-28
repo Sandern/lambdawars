@@ -428,694 +428,6 @@ struct WarsVGUIScreen_wrapper : WarsVGUIScreen, bp::wrapper< WarsVGUIScreen > {
 
 };
 
-struct IInput_wrapper : vgui::IInput, bp::wrapper< vgui::IInput > {
-
-    IInput_wrapper()
-    : vgui::IInput()
-      , bp::wrapper< vgui::IInput >(){
-        // null constructor
-        
-    }
-
-    struct ConversionModeItem_wrapper : vgui::IInput::ConversionModeItem, bp::wrapper< vgui::IInput::ConversionModeItem > {
-    
-        ConversionModeItem_wrapper(vgui::IInput::ConversionModeItem const & arg )
-        : vgui::IInput::ConversionModeItem( arg )
-          , bp::wrapper< vgui::IInput::ConversionModeItem >(){
-            // copy constructor
-            
-        }
-    
-        ConversionModeItem_wrapper()
-        : vgui::IInput::ConversionModeItem()
-          , bp::wrapper< vgui::IInput::ConversionModeItem >(){
-            // null constructor
-            
-        }
-    
-        static pyplusplus::containers::static_sized::array_1_t< wchar_t, 128>
-        pyplusplus_menuname_wrapper( ::vgui::IInput::ConversionModeItem & inst ){
-            return pyplusplus::containers::static_sized::array_1_t< wchar_t, 128>( inst.menuname );
-        }
-    
-    };
-
-    struct LanguageItem_wrapper : vgui::IInput::LanguageItem, bp::wrapper< vgui::IInput::LanguageItem > {
-    
-        LanguageItem_wrapper(vgui::IInput::LanguageItem const & arg )
-        : vgui::IInput::LanguageItem( arg )
-          , bp::wrapper< vgui::IInput::LanguageItem >(){
-            // copy constructor
-            
-        }
-    
-        LanguageItem_wrapper()
-        : vgui::IInput::LanguageItem()
-          , bp::wrapper< vgui::IInput::LanguageItem >(){
-            // null constructor
-            
-        }
-    
-        static pyplusplus::containers::static_sized::array_1_t< wchar_t, 128>
-        pyplusplus_menuname_wrapper( ::vgui::IInput::LanguageItem & inst ){
-            return pyplusplus::containers::static_sized::array_1_t< wchar_t, 128>( inst.menuname );
-        }
-    
-        static pyplusplus::containers::static_sized::array_1_t< wchar_t, 4>
-        pyplusplus_shortname_wrapper( ::vgui::IInput::LanguageItem & inst ){
-            return pyplusplus::containers::static_sized::array_1_t< wchar_t, 4>( inst.shortname );
-        }
-    
-    };
-
-    struct SentenceModeItem_wrapper : vgui::IInput::SentenceModeItem, bp::wrapper< vgui::IInput::SentenceModeItem > {
-    
-        SentenceModeItem_wrapper(vgui::IInput::SentenceModeItem const & arg )
-        : vgui::IInput::SentenceModeItem( arg )
-          , bp::wrapper< vgui::IInput::SentenceModeItem >(){
-            // copy constructor
-            
-        }
-    
-        SentenceModeItem_wrapper()
-        : vgui::IInput::SentenceModeItem()
-          , bp::wrapper< vgui::IInput::SentenceModeItem >(){
-            // null constructor
-            
-        }
-    
-        static pyplusplus::containers::static_sized::array_1_t< wchar_t, 128>
-        pyplusplus_menuname_wrapper( ::vgui::IInput::SentenceModeItem & inst ){
-            return pyplusplus::containers::static_sized::array_1_t< wchar_t, 128>( inst.menuname );
-        }
-    
-    };
-
-    virtual bool CandidateListStartsAtOne(  ){
-        bp::override func_CandidateListStartsAtOne = this->get_override( "CandidateListStartsAtOne" );
-        try {
-            return func_CandidateListStartsAtOne(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetAppModalSurface(  ){
-        bp::override func_GetAppModalSurface = this->get_override( "GetAppModalSurface" );
-        try {
-            return func_GetAppModalSurface(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetCalculatedFocus(  ){
-        bp::override func_GetCalculatedFocus = this->get_override( "GetCalculatedFocus" );
-        try {
-            return func_GetCalculatedFocus(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void GetCandidate( int num, wchar_t * dest, int destSizeBytes ){
-        bp::override func_GetCandidate = this->get_override( "GetCandidate" );
-        try {
-            func_GetCandidate( num, dest, destSizeBytes );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetCandidateListCount(  ){
-        bp::override func_GetCandidateListCount = this->get_override( "GetCandidateListCount" );
-        try {
-            return func_GetCandidateListCount(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetCandidateListPageSize(  ){
-        bp::override func_GetCandidateListPageSize = this->get_override( "GetCandidateListPageSize" );
-        try {
-            return func_GetCandidateListPageSize(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetCandidateListPageStart(  ){
-        bp::override func_GetCandidateListPageStart = this->get_override( "GetCandidateListPageStart" );
-        try {
-            return func_GetCandidateListPageStart(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetCandidateListSelectedItem(  ){
-        bp::override func_GetCandidateListSelectedItem = this->get_override( "GetCandidateListSelectedItem" );
-        try {
-            return func_GetCandidateListSelectedItem(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetCurrentIMEHandle(  ){
-        bp::override func_GetCurrentIMEHandle = this->get_override( "GetCurrentIMEHandle" );
-        try {
-            return func_GetCurrentIMEHandle(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::HCursor GetCursorOveride(  ){
-        bp::override func_GetCursorOveride = this->get_override( "GetCursorOveride" );
-        try {
-            return func_GetCursorOveride(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void GetCursorPos( int & x, int & y ) {
-        namespace bpl = boost::python;
-        bpl::override func_GetCursorPos = this->get_override( "GetCursorPos" );
-        if( func_GetCursorPos.ptr() != Py_None ) {
-            bpl::object py_result = bpl::call<bpl::object>( func_GetCursorPos.ptr() );
-            x = boost::python::extract< int >( pyplus_conv::get_out_argument( py_result, "x" ) );
-            y = boost::python::extract< int >( pyplus_conv::get_out_argument( py_result, "y" ) );
-        }
-        else{
-              PyErr_SetString(PyExc_NotImplementedError, "Attempted calling Pure Virtual function that is not implemented :GetCursorPos");
-              boost::python::throw_error_already_set();
-        }
-    }
-    
-    static boost::python::tuple default_GetCursorPos( ::vgui::IInput & inst ){
-        int x2;
-        int y2;
-        if( dynamic_cast< IInput_wrapper * >( boost::addressof( inst ) ) ){
-              PyErr_SetString(PyExc_NotImplementedError, "Attempted calling Pure Virtual function that is not implemented :GetCursorPos");
-              boost::python::throw_error_already_set();
-        }
-        else{
-            inst.GetCursorPos(x2, y2);
-        }
-        return bp::make_tuple( x2, y2 );
-    }
-
-    virtual void GetCursorPosition( int & x, int & y ) {
-        namespace bpl = boost::python;
-        bpl::override func_GetCursorPosition = this->get_override( "GetCursorPosition" );
-        if( func_GetCursorPosition.ptr() != Py_None ) {
-            bpl::object py_result = bpl::call<bpl::object>( func_GetCursorPosition.ptr() );
-            x = boost::python::extract< int >( pyplus_conv::get_out_argument( py_result, "x" ) );
-            y = boost::python::extract< int >( pyplus_conv::get_out_argument( py_result, "y" ) );
-        }
-        else{
-              PyErr_SetString(PyExc_NotImplementedError, "Attempted calling Pure Virtual function that is not implemented :GetCursorPosition");
-              boost::python::throw_error_already_set();
-        }
-    }
-    
-    static boost::python::tuple default_GetCursorPosition( ::vgui::IInput & inst ){
-        int x2;
-        int y2;
-        if( dynamic_cast< IInput_wrapper * >( boost::addressof( inst ) ) ){
-              PyErr_SetString(PyExc_NotImplementedError, "Attempted calling Pure Virtual function that is not implemented :GetCursorPosition");
-              boost::python::throw_error_already_set();
-        }
-        else{
-            inst.GetCursorPosition(x2, y2);
-        }
-        return bp::make_tuple( x2, y2 );
-    }
-
-    virtual int GetEnglishIMEHandle(  ){
-        bp::override func_GetEnglishIMEHandle = this->get_override( "GetEnglishIMEHandle" );
-        try {
-            return func_GetEnglishIMEHandle(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetFocus(  ){
-        bp::override func_GetFocus = this->get_override( "GetFocus" );
-        try {
-            return func_GetFocus(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetIMEConversionModes( ::vgui::IInput::ConversionModeItem * dest, int destcount ){
-        bp::override func_GetIMEConversionModes = this->get_override( "GetIMEConversionModes" );
-        try {
-            return func_GetIMEConversionModes( boost::python::ptr(dest), destcount );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetIMELanguageList( ::vgui::IInput::LanguageItem * dest, int destcount ){
-        bp::override func_GetIMELanguageList = this->get_override( "GetIMELanguageList" );
-        try {
-            return func_GetIMELanguageList( boost::python::ptr(dest), destcount );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void GetIMELanguageName( wchar_t * buf, int unicodeBufferSizeInBytes ){
-        bp::override func_GetIMELanguageName = this->get_override( "GetIMELanguageName" );
-        try {
-            func_GetIMELanguageName( buf, unicodeBufferSizeInBytes );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void GetIMELanguageShortCode( wchar_t * buf, int unicodeBufferSizeInBytes ){
-        bp::override func_GetIMELanguageShortCode = this->get_override( "GetIMELanguageShortCode" );
-        try {
-            func_GetIMELanguageShortCode( buf, unicodeBufferSizeInBytes );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual int GetIMESentenceModes( ::vgui::IInput::SentenceModeItem * dest, int destcount ){
-        bp::override func_GetIMESentenceModes = this->get_override( "GetIMESentenceModes" );
-        try {
-            return func_GetIMESentenceModes( boost::python::ptr(dest), destcount );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void * GetIMEWindow(  ){
-        bp::override func_GetIMEWindow = this->get_override( "GetIMEWindow" );
-        try {
-            return func_GetIMEWindow(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void GetKeyCodeText( ::vgui::KeyCode code, char * buf, int buflen ){
-        bp::override func_GetKeyCodeText = this->get_override( "GetKeyCodeText" );
-        try {
-            func_GetKeyCodeText( code, buf, buflen );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetModalSubTree(  ){
-        bp::override func_GetModalSubTree = this->get_override( "GetModalSubTree" );
-        try {
-            return func_GetModalSubTree(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetMouseCapture(  ){
-        bp::override func_GetMouseCapture = this->get_override( "GetMouseCapture" );
-        try {
-            return func_GetMouseCapture(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetMouseFocus(  ){
-        bp::override func_GetMouseFocus = this->get_override( "GetMouseFocus" );
-        try {
-            return func_GetMouseFocus(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual ::vgui::VPANEL GetMouseOver(  ){
-        bp::override func_GetMouseOver = this->get_override( "GetMouseOver" );
-        try {
-            return func_GetMouseOver(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool GetShouldInvertCompositionString(  ){
-        bp::override func_GetShouldInvertCompositionString = this->get_override( "GetShouldInvertCompositionString" );
-        try {
-            return func_GetShouldInvertCompositionString(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool IsKeyDown( ::vgui::KeyCode code ){
-        bp::override func_IsKeyDown = this->get_override( "IsKeyDown" );
-        try {
-            return func_IsKeyDown( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool IsMouseDown( ::vgui::MouseCode code ){
-        bp::override func_IsMouseDown = this->get_override( "IsMouseDown" );
-        try {
-            return func_IsMouseDown( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnChangeIME( bool forward ){
-        bp::override func_OnChangeIME = this->get_override( "OnChangeIME" );
-        try {
-            func_OnChangeIME( forward );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnChangeIMEByHandle( int handleValue ){
-        bp::override func_OnChangeIMEByHandle = this->get_override( "OnChangeIMEByHandle" );
-        try {
-            func_OnChangeIMEByHandle( handleValue );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnChangeIMEConversionModeByHandle( int handleValue ){
-        bp::override func_OnChangeIMEConversionModeByHandle = this->get_override( "OnChangeIMEConversionModeByHandle" );
-        try {
-            func_OnChangeIMEConversionModeByHandle( handleValue );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnChangeIMESentenceModeByHandle( int handleValue ){
-        bp::override func_OnChangeIMESentenceModeByHandle = this->get_override( "OnChangeIMESentenceModeByHandle" );
-        try {
-            func_OnChangeIMESentenceModeByHandle( handleValue );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMEChangeCandidates(  ){
-        bp::override func_OnIMEChangeCandidates = this->get_override( "OnIMEChangeCandidates" );
-        try {
-            func_OnIMEChangeCandidates(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMECloseCandidates(  ){
-        bp::override func_OnIMECloseCandidates = this->get_override( "OnIMECloseCandidates" );
-        try {
-            func_OnIMECloseCandidates(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMEComposition( int flags ){
-        bp::override func_OnIMEComposition = this->get_override( "OnIMEComposition" );
-        try {
-            func_OnIMEComposition( flags );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMEEndComposition(  ){
-        bp::override func_OnIMEEndComposition = this->get_override( "OnIMEEndComposition" );
-        try {
-            func_OnIMEEndComposition(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMERecomputeModes(  ){
-        bp::override func_OnIMERecomputeModes = this->get_override( "OnIMERecomputeModes" );
-        try {
-            func_OnIMERecomputeModes(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMEShowCandidates(  ){
-        bp::override func_OnIMEShowCandidates = this->get_override( "OnIMEShowCandidates" );
-        try {
-            func_OnIMEShowCandidates(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnIMEStartComposition(  ){
-        bp::override func_OnIMEStartComposition = this->get_override( "OnIMEStartComposition" );
-        try {
-            func_OnIMEStartComposition(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnInputLanguageChanged(  ){
-        bp::override func_OnInputLanguageChanged = this->get_override( "OnInputLanguageChanged" );
-        try {
-            func_OnInputLanguageChanged(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void OnKeyCodeUnhandled( int keyCode ){
-        bp::override func_OnKeyCodeUnhandled = this->get_override( "OnKeyCodeUnhandled" );
-        try {
-            func_OnKeyCodeUnhandled( keyCode );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void RegisterKeyCodeUnhandledListener( ::vgui::VPANEL panel ){
-        bp::override func_RegisterKeyCodeUnhandledListener = this->get_override( "RegisterKeyCodeUnhandledListener" );
-        try {
-            func_RegisterKeyCodeUnhandledListener( panel );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void ReleaseAppModalSurface(  ){
-        bp::override func_ReleaseAppModalSurface = this->get_override( "ReleaseAppModalSurface" );
-        try {
-            func_ReleaseAppModalSurface(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void ReleaseModalSubTree(  ){
-        bp::override func_ReleaseModalSubTree = this->get_override( "ReleaseModalSubTree" );
-        try {
-            func_ReleaseModalSubTree(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetAppModalSurface( ::vgui::VPANEL panel ){
-        bp::override func_SetAppModalSurface = this->get_override( "SetAppModalSurface" );
-        try {
-            func_SetAppModalSurface( panel );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetCandidateListPageStart( int start ){
-        bp::override func_SetCandidateListPageStart = this->get_override( "SetCandidateListPageStart" );
-        try {
-            func_SetCandidateListPageStart( start );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetCandidateWindowPos( int x, int y ){
-        bp::override func_SetCandidateWindowPos = this->get_override( "SetCandidateWindowPos" );
-        try {
-            func_SetCandidateWindowPos( x, y );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetCursorOveride( ::vgui::HCursor cursor ){
-        bp::override func_SetCursorOveride = this->get_override( "SetCursorOveride" );
-        try {
-            func_SetCursorOveride( cursor );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetCursorPos( int x, int y ){
-        bp::override func_SetCursorPos = this->get_override( "SetCursorPos" );
-        try {
-            func_SetCursorPos( x, y );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetIMEWindow( void * hwnd ){
-        bp::override func_SetIMEWindow = this->get_override( "SetIMEWindow" );
-        try {
-            func_SetIMEWindow( hwnd );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetModalSubTree( ::vgui::VPANEL subTree, ::vgui::VPANEL unhandledMouseClickListener, bool restrictMessagesToSubTree=true ){
-        bp::override func_SetModalSubTree = this->get_override( "SetModalSubTree" );
-        try {
-            func_SetModalSubTree( subTree, unhandledMouseClickListener, restrictMessagesToSubTree );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetModalSubTreeReceiveMessages( bool state ){
-        bp::override func_SetModalSubTreeReceiveMessages = this->get_override( "SetModalSubTreeReceiveMessages" );
-        try {
-            func_SetModalSubTreeReceiveMessages( state );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetMouseCapture( ::vgui::VPANEL panel ){
-        bp::override func_SetMouseCapture = this->get_override( "SetMouseCapture" );
-        try {
-            func_SetMouseCapture( panel );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetMouseCaptureEx( ::vgui::VPANEL panel, ::vgui::MouseCode captureStartMouseCode ){
-        bp::override func_SetMouseCaptureEx = this->get_override( "SetMouseCaptureEx" );
-        try {
-            func_SetMouseCaptureEx( panel, captureStartMouseCode );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void SetMouseFocus( ::vgui::VPANEL newMouseFocus ){
-        bp::override func_SetMouseFocus = this->get_override( "SetMouseFocus" );
-        try {
-            func_SetMouseFocus( newMouseFocus );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool ShouldModalSubTreeReceiveMessages(  ) const {
-        bp::override func_ShouldModalSubTreeReceiveMessages = this->get_override( "ShouldModalSubTreeReceiveMessages" );
-        try {
-            return func_ShouldModalSubTreeReceiveMessages(  );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual void UnregisterKeyCodeUnhandledListener( ::vgui::VPANEL panel ){
-        bp::override func_UnregisterKeyCodeUnhandledListener = this->get_override( "UnregisterKeyCodeUnhandledListener" );
-        try {
-            func_UnregisterKeyCodeUnhandledListener( panel );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool WasKeyPressed( ::vgui::KeyCode code ){
-        bp::override func_WasKeyPressed = this->get_override( "WasKeyPressed" );
-        try {
-            return func_WasKeyPressed( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool WasKeyReleased( ::vgui::KeyCode code ){
-        bp::override func_WasKeyReleased = this->get_override( "WasKeyReleased" );
-        try {
-            return func_WasKeyReleased( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool WasKeyTyped( ::vgui::KeyCode code ){
-        bp::override func_WasKeyTyped = this->get_override( "WasKeyTyped" );
-        try {
-            return func_WasKeyTyped( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool WasMouseDoublePressed( ::vgui::MouseCode code ){
-        bp::override func_WasMouseDoublePressed = this->get_override( "WasMouseDoublePressed" );
-        try {
-            return func_WasMouseDoublePressed( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool WasMousePressed( ::vgui::MouseCode code ){
-        bp::override func_WasMousePressed = this->get_override( "WasMousePressed" );
-        try {
-            return func_WasMousePressed( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-    virtual bool WasMouseReleased( ::vgui::MouseCode code ){
-        bp::override func_WasMouseReleased = this->get_override( "WasMouseReleased" );
-        try {
-            return func_WasMouseReleased( code );
-        } catch(bp::error_already_set &) {
-            throw boost::python::error_already_set();
-        }
-    }
-
-};
-
 static boost::python::tuple GetRegistryInteger_7b85c41418413c1905617b15737023e0( ::vgui::ISystem & inst, char const * key ){
     int value2;
     bool result = inst.GetRegistryInteger(key, value2);
@@ -3618,670 +2930,209 @@ BOOST_PYTHON_MODULE(_vgui){
             , (void ( ::WarsVGUIScreen::* )( float,float ) )( &::WarsVGUIScreen::SetWorldSize )
             , ( bp::arg("width"), bp::arg("height") ) );
 
-    { //::vgui::IInput
-        typedef bp::class_< IInput_wrapper, boost::noncopyable > IInput_exposer_t;
-        IInput_exposer_t IInput_exposer = IInput_exposer_t( "IInput" );
-        bp::scope IInput_scope( IInput_exposer );
-        { //::vgui::IInput::ConversionModeItem
-            typedef bp::class_< IInput_wrapper::ConversionModeItem_wrapper > ConversionModeItem_exposer_t;
-            ConversionModeItem_exposer_t ConversionModeItem_exposer = ConversionModeItem_exposer_t( "ConversionModeItem" );
-            bp::scope ConversionModeItem_scope( ConversionModeItem_exposer );
-            ConversionModeItem_exposer.def_readwrite( "active", &vgui::IInput::ConversionModeItem::active );
-            ConversionModeItem_exposer.def_readwrite( "handleValue", &vgui::IInput::ConversionModeItem::handleValue );
-            pyplusplus::containers::static_sized::register_array_1< wchar_t, 128 >( "__array_1_wchar_t_128" );
-            { //vgui::IInput::ConversionModeItem::menuname [variable], type=wchar_t[128]
-            
-                typedef pyplusplus::containers::static_sized::array_1_t< wchar_t, 128> ( *array_wrapper_creator )( ::vgui::IInput::ConversionModeItem & );
-                
-                ConversionModeItem_exposer.add_property( "menuname"
-                    , bp::make_function( array_wrapper_creator(&IInput_wrapper::ConversionModeItem_wrapper::pyplusplus_menuname_wrapper)
-                                        , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-            }
-        }
-        { //::vgui::IInput::LanguageItem
-            typedef bp::class_< IInput_wrapper::LanguageItem_wrapper > LanguageItem_exposer_t;
-            LanguageItem_exposer_t LanguageItem_exposer = LanguageItem_exposer_t( "LanguageItem" );
-            bp::scope LanguageItem_scope( LanguageItem_exposer );
-            LanguageItem_exposer.def_readwrite( "active", &vgui::IInput::LanguageItem::active );
-            LanguageItem_exposer.def_readwrite( "handleValue", &vgui::IInput::LanguageItem::handleValue );
-            { //vgui::IInput::LanguageItem::menuname [variable], type=wchar_t[128]
-            
-                typedef pyplusplus::containers::static_sized::array_1_t< wchar_t, 128> ( *array_wrapper_creator )( ::vgui::IInput::LanguageItem & );
-                
-                LanguageItem_exposer.add_property( "menuname"
-                    , bp::make_function( array_wrapper_creator(&IInput_wrapper::LanguageItem_wrapper::pyplusplus_menuname_wrapper)
-                                        , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-            }
-            pyplusplus::containers::static_sized::register_array_1< wchar_t, 4 >( "__array_1_wchar_t_4" );
-            { //vgui::IInput::LanguageItem::shortname [variable], type=wchar_t[4]
-            
-                typedef pyplusplus::containers::static_sized::array_1_t< wchar_t, 4> ( *array_wrapper_creator )( ::vgui::IInput::LanguageItem & );
-                
-                LanguageItem_exposer.add_property( "shortname"
-                    , bp::make_function( array_wrapper_creator(&IInput_wrapper::LanguageItem_wrapper::pyplusplus_shortname_wrapper)
-                                        , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-            }
-        }
-        { //::vgui::IInput::SentenceModeItem
-            typedef bp::class_< IInput_wrapper::SentenceModeItem_wrapper > SentenceModeItem_exposer_t;
-            SentenceModeItem_exposer_t SentenceModeItem_exposer = SentenceModeItem_exposer_t( "SentenceModeItem" );
-            bp::scope SentenceModeItem_scope( SentenceModeItem_exposer );
-            SentenceModeItem_exposer.def_readwrite( "active", &vgui::IInput::SentenceModeItem::active );
-            SentenceModeItem_exposer.def_readwrite( "handleValue", &vgui::IInput::SentenceModeItem::handleValue );
-            { //vgui::IInput::SentenceModeItem::menuname [variable], type=wchar_t[128]
-            
-                typedef pyplusplus::containers::static_sized::array_1_t< wchar_t, 128> ( *array_wrapper_creator )( ::vgui::IInput::SentenceModeItem & );
-                
-                SentenceModeItem_exposer.add_property( "menuname"
-                    , bp::make_function( array_wrapper_creator(&IInput_wrapper::SentenceModeItem_wrapper::pyplusplus_menuname_wrapper)
-                                        , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-            }
-        }
-        { //::vgui::IInput::CandidateListStartsAtOne
-        
-            typedef bool ( ::vgui::IInput::*CandidateListStartsAtOne_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "CandidateListStartsAtOne"
-                , bp::pure_virtual( CandidateListStartsAtOne_function_type(&::vgui::IInput::CandidateListStartsAtOne) ) );
-        
-        }
-        { //::vgui::IInput::GetAppModalSurface
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetAppModalSurface_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetAppModalSurface"
-                , bp::pure_virtual( GetAppModalSurface_function_type(&::vgui::IInput::GetAppModalSurface) ) );
-        
-        }
-        { //::vgui::IInput::GetCalculatedFocus
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetCalculatedFocus_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCalculatedFocus"
-                , bp::pure_virtual( GetCalculatedFocus_function_type(&::vgui::IInput::GetCalculatedFocus) ) );
-        
-        }
-        { //::vgui::IInput::GetCandidate
-        
-            typedef void ( ::vgui::IInput::*GetCandidate_function_type )( int,wchar_t *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetCandidate"
-                , bp::pure_virtual( GetCandidate_function_type(&::vgui::IInput::GetCandidate) )
-                , ( bp::arg("num"), bp::arg("dest"), bp::arg("destSizeBytes") ) );
-        
-        }
-        { //::vgui::IInput::GetCandidateListCount
-        
-            typedef int ( ::vgui::IInput::*GetCandidateListCount_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCandidateListCount"
-                , bp::pure_virtual( GetCandidateListCount_function_type(&::vgui::IInput::GetCandidateListCount) ) );
-        
-        }
-        { //::vgui::IInput::GetCandidateListPageSize
-        
-            typedef int ( ::vgui::IInput::*GetCandidateListPageSize_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCandidateListPageSize"
-                , bp::pure_virtual( GetCandidateListPageSize_function_type(&::vgui::IInput::GetCandidateListPageSize) ) );
-        
-        }
-        { //::vgui::IInput::GetCandidateListPageStart
-        
-            typedef int ( ::vgui::IInput::*GetCandidateListPageStart_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCandidateListPageStart"
-                , bp::pure_virtual( GetCandidateListPageStart_function_type(&::vgui::IInput::GetCandidateListPageStart) ) );
-        
-        }
-        { //::vgui::IInput::GetCandidateListSelectedItem
-        
-            typedef int ( ::vgui::IInput::*GetCandidateListSelectedItem_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCandidateListSelectedItem"
-                , bp::pure_virtual( GetCandidateListSelectedItem_function_type(&::vgui::IInput::GetCandidateListSelectedItem) ) );
-        
-        }
-        { //::vgui::IInput::GetCurrentIMEHandle
-        
-            typedef int ( ::vgui::IInput::*GetCurrentIMEHandle_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCurrentIMEHandle"
-                , bp::pure_virtual( GetCurrentIMEHandle_function_type(&::vgui::IInput::GetCurrentIMEHandle) ) );
-        
-        }
-        { //::vgui::IInput::GetCursorOveride
-        
-            typedef ::vgui::HCursor ( ::vgui::IInput::*GetCursorOveride_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetCursorOveride"
-                , bp::pure_virtual( GetCursorOveride_function_type(&::vgui::IInput::GetCursorOveride) ) );
-        
-        }
-        { //::vgui::IInput::GetCursorPos
-        
-            typedef boost::python::tuple ( *default_GetCursorPos_function_type )( ::vgui::IInput & );
-            
-            IInput_exposer.def( 
-                "GetCursorPos"
-                , default_GetCursorPos_function_type( &IInput_wrapper::default_GetCursorPos )
-                , ( bp::arg("inst") ) );
-        
-        }
-        { //::vgui::IInput::GetCursorPosition
-        
-            typedef boost::python::tuple ( *default_GetCursorPosition_function_type )( ::vgui::IInput & );
-            
-            IInput_exposer.def( 
-                "GetCursorPosition"
-                , default_GetCursorPosition_function_type( &IInput_wrapper::default_GetCursorPosition )
-                , ( bp::arg("inst") ) );
-        
-        }
-        { //::vgui::IInput::GetEnglishIMEHandle
-        
-            typedef int ( ::vgui::IInput::*GetEnglishIMEHandle_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetEnglishIMEHandle"
-                , bp::pure_virtual( GetEnglishIMEHandle_function_type(&::vgui::IInput::GetEnglishIMEHandle) ) );
-        
-        }
-        { //::vgui::IInput::GetFocus
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetFocus_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetFocus"
-                , bp::pure_virtual( GetFocus_function_type(&::vgui::IInput::GetFocus) ) );
-        
-        }
-        { //::vgui::IInput::GetIMEConversionModes
-        
-            typedef int ( ::vgui::IInput::*GetIMEConversionModes_function_type )( ::vgui::IInput::ConversionModeItem *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetIMEConversionModes"
-                , bp::pure_virtual( GetIMEConversionModes_function_type(&::vgui::IInput::GetIMEConversionModes) )
-                , ( bp::arg("dest"), bp::arg("destcount") ) );
-        
-        }
-        { //::vgui::IInput::GetIMELanguageList
-        
-            typedef int ( ::vgui::IInput::*GetIMELanguageList_function_type )( ::vgui::IInput::LanguageItem *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetIMELanguageList"
-                , bp::pure_virtual( GetIMELanguageList_function_type(&::vgui::IInput::GetIMELanguageList) )
-                , ( bp::arg("dest"), bp::arg("destcount") ) );
-        
-        }
-        { //::vgui::IInput::GetIMELanguageName
-        
-            typedef void ( ::vgui::IInput::*GetIMELanguageName_function_type )( wchar_t *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetIMELanguageName"
-                , bp::pure_virtual( GetIMELanguageName_function_type(&::vgui::IInput::GetIMELanguageName) )
-                , ( bp::arg("buf"), bp::arg("unicodeBufferSizeInBytes") ) );
-        
-        }
-        { //::vgui::IInput::GetIMELanguageShortCode
-        
-            typedef void ( ::vgui::IInput::*GetIMELanguageShortCode_function_type )( wchar_t *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetIMELanguageShortCode"
-                , bp::pure_virtual( GetIMELanguageShortCode_function_type(&::vgui::IInput::GetIMELanguageShortCode) )
-                , ( bp::arg("buf"), bp::arg("unicodeBufferSizeInBytes") ) );
-        
-        }
-        { //::vgui::IInput::GetIMESentenceModes
-        
-            typedef int ( ::vgui::IInput::*GetIMESentenceModes_function_type )( ::vgui::IInput::SentenceModeItem *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetIMESentenceModes"
-                , bp::pure_virtual( GetIMESentenceModes_function_type(&::vgui::IInput::GetIMESentenceModes) )
-                , ( bp::arg("dest"), bp::arg("destcount") ) );
-        
-        }
-        { //::vgui::IInput::GetIMEWindow
-        
-            typedef void * ( ::vgui::IInput::*GetIMEWindow_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetIMEWindow"
-                , bp::pure_virtual( GetIMEWindow_function_type(&::vgui::IInput::GetIMEWindow) )
-                , bp::return_value_policy< bp::return_by_value >() );
-        
-        }
-        { //::vgui::IInput::GetKeyCodeText
-        
-            typedef void ( ::vgui::IInput::*GetKeyCodeText_function_type )( ::vgui::KeyCode,char *,int ) ;
-            
-            IInput_exposer.def( 
-                "GetKeyCodeText"
-                , bp::pure_virtual( GetKeyCodeText_function_type(&::vgui::IInput::GetKeyCodeText) )
-                , ( bp::arg("code"), bp::arg("buf"), bp::arg("buflen") ) );
-        
-        }
-        { //::vgui::IInput::GetModalSubTree
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetModalSubTree_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetModalSubTree"
-                , bp::pure_virtual( GetModalSubTree_function_type(&::vgui::IInput::GetModalSubTree) ) );
-        
-        }
-        { //::vgui::IInput::GetMouseCapture
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetMouseCapture_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetMouseCapture"
-                , bp::pure_virtual( GetMouseCapture_function_type(&::vgui::IInput::GetMouseCapture) ) );
-        
-        }
-        { //::vgui::IInput::GetMouseFocus
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetMouseFocus_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetMouseFocus"
-                , bp::pure_virtual( GetMouseFocus_function_type(&::vgui::IInput::GetMouseFocus) ) );
-        
-        }
-        { //::vgui::IInput::GetMouseOver
-        
-            typedef ::vgui::VPANEL ( ::vgui::IInput::*GetMouseOver_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetMouseOver"
-                , bp::pure_virtual( GetMouseOver_function_type(&::vgui::IInput::GetMouseOver) ) );
-        
-        }
-        { //::vgui::IInput::GetShouldInvertCompositionString
-        
-            typedef bool ( ::vgui::IInput::*GetShouldInvertCompositionString_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "GetShouldInvertCompositionString"
-                , bp::pure_virtual( GetShouldInvertCompositionString_function_type(&::vgui::IInput::GetShouldInvertCompositionString) ) );
-        
-        }
-        { //::vgui::IInput::IsKeyDown
-        
-            typedef bool ( ::vgui::IInput::*IsKeyDown_function_type )( ::vgui::KeyCode ) ;
-            
-            IInput_exposer.def( 
-                "IsKeyDown"
-                , bp::pure_virtual( IsKeyDown_function_type(&::vgui::IInput::IsKeyDown) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::IsMouseDown
-        
-            typedef bool ( ::vgui::IInput::*IsMouseDown_function_type )( ::vgui::MouseCode ) ;
-            
-            IInput_exposer.def( 
-                "IsMouseDown"
-                , bp::pure_virtual( IsMouseDown_function_type(&::vgui::IInput::IsMouseDown) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::OnChangeIME
-        
-            typedef void ( ::vgui::IInput::*OnChangeIME_function_type )( bool ) ;
-            
-            IInput_exposer.def( 
-                "OnChangeIME"
-                , bp::pure_virtual( OnChangeIME_function_type(&::vgui::IInput::OnChangeIME) )
-                , ( bp::arg("forward") ) );
-        
-        }
-        { //::vgui::IInput::OnChangeIMEByHandle
-        
-            typedef void ( ::vgui::IInput::*OnChangeIMEByHandle_function_type )( int ) ;
-            
-            IInput_exposer.def( 
-                "OnChangeIMEByHandle"
-                , bp::pure_virtual( OnChangeIMEByHandle_function_type(&::vgui::IInput::OnChangeIMEByHandle) )
-                , ( bp::arg("handleValue") ) );
-        
-        }
-        { //::vgui::IInput::OnChangeIMEConversionModeByHandle
-        
-            typedef void ( ::vgui::IInput::*OnChangeIMEConversionModeByHandle_function_type )( int ) ;
-            
-            IInput_exposer.def( 
-                "OnChangeIMEConversionModeByHandle"
-                , bp::pure_virtual( OnChangeIMEConversionModeByHandle_function_type(&::vgui::IInput::OnChangeIMEConversionModeByHandle) )
-                , ( bp::arg("handleValue") ) );
-        
-        }
-        { //::vgui::IInput::OnChangeIMESentenceModeByHandle
-        
-            typedef void ( ::vgui::IInput::*OnChangeIMESentenceModeByHandle_function_type )( int ) ;
-            
-            IInput_exposer.def( 
-                "OnChangeIMESentenceModeByHandle"
-                , bp::pure_virtual( OnChangeIMESentenceModeByHandle_function_type(&::vgui::IInput::OnChangeIMESentenceModeByHandle) )
-                , ( bp::arg("handleValue") ) );
-        
-        }
-        { //::vgui::IInput::OnIMEChangeCandidates
-        
-            typedef void ( ::vgui::IInput::*OnIMEChangeCandidates_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnIMEChangeCandidates"
-                , bp::pure_virtual( OnIMEChangeCandidates_function_type(&::vgui::IInput::OnIMEChangeCandidates) ) );
-        
-        }
-        { //::vgui::IInput::OnIMECloseCandidates
-        
-            typedef void ( ::vgui::IInput::*OnIMECloseCandidates_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnIMECloseCandidates"
-                , bp::pure_virtual( OnIMECloseCandidates_function_type(&::vgui::IInput::OnIMECloseCandidates) ) );
-        
-        }
-        { //::vgui::IInput::OnIMEComposition
-        
-            typedef void ( ::vgui::IInput::*OnIMEComposition_function_type )( int ) ;
-            
-            IInput_exposer.def( 
-                "OnIMEComposition"
-                , bp::pure_virtual( OnIMEComposition_function_type(&::vgui::IInput::OnIMEComposition) )
-                , ( bp::arg("flags") ) );
-        
-        }
-        { //::vgui::IInput::OnIMEEndComposition
-        
-            typedef void ( ::vgui::IInput::*OnIMEEndComposition_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnIMEEndComposition"
-                , bp::pure_virtual( OnIMEEndComposition_function_type(&::vgui::IInput::OnIMEEndComposition) ) );
-        
-        }
-        { //::vgui::IInput::OnIMERecomputeModes
-        
-            typedef void ( ::vgui::IInput::*OnIMERecomputeModes_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnIMERecomputeModes"
-                , bp::pure_virtual( OnIMERecomputeModes_function_type(&::vgui::IInput::OnIMERecomputeModes) ) );
-        
-        }
-        { //::vgui::IInput::OnIMEShowCandidates
-        
-            typedef void ( ::vgui::IInput::*OnIMEShowCandidates_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnIMEShowCandidates"
-                , bp::pure_virtual( OnIMEShowCandidates_function_type(&::vgui::IInput::OnIMEShowCandidates) ) );
-        
-        }
-        { //::vgui::IInput::OnIMEStartComposition
-        
-            typedef void ( ::vgui::IInput::*OnIMEStartComposition_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnIMEStartComposition"
-                , bp::pure_virtual( OnIMEStartComposition_function_type(&::vgui::IInput::OnIMEStartComposition) ) );
-        
-        }
-        { //::vgui::IInput::OnInputLanguageChanged
-        
-            typedef void ( ::vgui::IInput::*OnInputLanguageChanged_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "OnInputLanguageChanged"
-                , bp::pure_virtual( OnInputLanguageChanged_function_type(&::vgui::IInput::OnInputLanguageChanged) ) );
-        
-        }
-        { //::vgui::IInput::OnKeyCodeUnhandled
-        
-            typedef void ( ::vgui::IInput::*OnKeyCodeUnhandled_function_type )( int ) ;
-            
-            IInput_exposer.def( 
-                "OnKeyCodeUnhandled"
-                , bp::pure_virtual( OnKeyCodeUnhandled_function_type(&::vgui::IInput::OnKeyCodeUnhandled) )
-                , ( bp::arg("keyCode") ) );
-        
-        }
-        { //::vgui::IInput::RegisterKeyCodeUnhandledListener
-        
-            typedef void ( ::vgui::IInput::*RegisterKeyCodeUnhandledListener_function_type )( ::vgui::VPANEL ) ;
-            
-            IInput_exposer.def( 
-                "RegisterKeyCodeUnhandledListener"
-                , bp::pure_virtual( RegisterKeyCodeUnhandledListener_function_type(&::vgui::IInput::RegisterKeyCodeUnhandledListener) )
-                , ( bp::arg("panel") ) );
-        
-        }
-        { //::vgui::IInput::ReleaseAppModalSurface
-        
-            typedef void ( ::vgui::IInput::*ReleaseAppModalSurface_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "ReleaseAppModalSurface"
-                , bp::pure_virtual( ReleaseAppModalSurface_function_type(&::vgui::IInput::ReleaseAppModalSurface) ) );
-        
-        }
-        { //::vgui::IInput::ReleaseModalSubTree
-        
-            typedef void ( ::vgui::IInput::*ReleaseModalSubTree_function_type )(  ) ;
-            
-            IInput_exposer.def( 
-                "ReleaseModalSubTree"
-                , bp::pure_virtual( ReleaseModalSubTree_function_type(&::vgui::IInput::ReleaseModalSubTree) ) );
-        
-        }
-        { //::vgui::IInput::SetAppModalSurface
-        
-            typedef void ( ::vgui::IInput::*SetAppModalSurface_function_type )( ::vgui::VPANEL ) ;
-            
-            IInput_exposer.def( 
-                "SetAppModalSurface"
-                , bp::pure_virtual( SetAppModalSurface_function_type(&::vgui::IInput::SetAppModalSurface) )
-                , ( bp::arg("panel") ) );
-        
-        }
-        { //::vgui::IInput::SetCandidateListPageStart
-        
-            typedef void ( ::vgui::IInput::*SetCandidateListPageStart_function_type )( int ) ;
-            
-            IInput_exposer.def( 
-                "SetCandidateListPageStart"
-                , bp::pure_virtual( SetCandidateListPageStart_function_type(&::vgui::IInput::SetCandidateListPageStart) )
-                , ( bp::arg("start") ) );
-        
-        }
-        { //::vgui::IInput::SetCandidateWindowPos
-        
-            typedef void ( ::vgui::IInput::*SetCandidateWindowPos_function_type )( int,int ) ;
-            
-            IInput_exposer.def( 
-                "SetCandidateWindowPos"
-                , bp::pure_virtual( SetCandidateWindowPos_function_type(&::vgui::IInput::SetCandidateWindowPos) )
-                , ( bp::arg("x"), bp::arg("y") ) );
-        
-        }
-        { //::vgui::IInput::SetCursorOveride
-        
-            typedef void ( ::vgui::IInput::*SetCursorOveride_function_type )( ::vgui::HCursor ) ;
-            
-            IInput_exposer.def( 
-                "SetCursorOveride"
-                , bp::pure_virtual( SetCursorOveride_function_type(&::vgui::IInput::SetCursorOveride) )
-                , ( bp::arg("cursor") ) );
-        
-        }
-        { //::vgui::IInput::SetCursorPos
-        
-            typedef void ( ::vgui::IInput::*SetCursorPos_function_type )( int,int ) ;
-            
-            IInput_exposer.def( 
-                "SetCursorPos"
-                , bp::pure_virtual( SetCursorPos_function_type(&::vgui::IInput::SetCursorPos) )
-                , ( bp::arg("x"), bp::arg("y") ) );
-        
-        }
-        { //::vgui::IInput::SetIMEWindow
-        
-            typedef void ( ::vgui::IInput::*SetIMEWindow_function_type )( void * ) ;
-            
-            IInput_exposer.def( 
-                "SetIMEWindow"
-                , bp::pure_virtual( SetIMEWindow_function_type(&::vgui::IInput::SetIMEWindow) )
-                , ( bp::arg("hwnd") ) );
-        
-        }
-        { //::vgui::IInput::SetModalSubTree
-        
-            typedef void ( ::vgui::IInput::*SetModalSubTree_function_type )( ::vgui::VPANEL,::vgui::VPANEL,bool ) ;
-            
-            IInput_exposer.def( 
-                "SetModalSubTree"
-                , bp::pure_virtual( SetModalSubTree_function_type(&::vgui::IInput::SetModalSubTree) )
-                , ( bp::arg("subTree"), bp::arg("unhandledMouseClickListener"), bp::arg("restrictMessagesToSubTree")=(bool)(true) ) );
-        
-        }
-        { //::vgui::IInput::SetModalSubTreeReceiveMessages
-        
-            typedef void ( ::vgui::IInput::*SetModalSubTreeReceiveMessages_function_type )( bool ) ;
-            
-            IInput_exposer.def( 
-                "SetModalSubTreeReceiveMessages"
-                , bp::pure_virtual( SetModalSubTreeReceiveMessages_function_type(&::vgui::IInput::SetModalSubTreeReceiveMessages) )
-                , ( bp::arg("state") ) );
-        
-        }
-        { //::vgui::IInput::SetMouseCapture
-        
-            typedef void ( ::vgui::IInput::*SetMouseCapture_function_type )( ::vgui::VPANEL ) ;
-            
-            IInput_exposer.def( 
-                "SetMouseCapture"
-                , bp::pure_virtual( SetMouseCapture_function_type(&::vgui::IInput::SetMouseCapture) )
-                , ( bp::arg("panel") ) );
-        
-        }
-        { //::vgui::IInput::SetMouseCaptureEx
-        
-            typedef void ( ::vgui::IInput::*SetMouseCaptureEx_function_type )( ::vgui::VPANEL,::vgui::MouseCode ) ;
-            
-            IInput_exposer.def( 
-                "SetMouseCaptureEx"
-                , bp::pure_virtual( SetMouseCaptureEx_function_type(&::vgui::IInput::SetMouseCaptureEx) )
-                , ( bp::arg("panel"), bp::arg("captureStartMouseCode") ) );
-        
-        }
-        { //::vgui::IInput::SetMouseFocus
-        
-            typedef void ( ::vgui::IInput::*SetMouseFocus_function_type )( ::vgui::VPANEL ) ;
-            
-            IInput_exposer.def( 
-                "SetMouseFocus"
-                , bp::pure_virtual( SetMouseFocus_function_type(&::vgui::IInput::SetMouseFocus) )
-                , ( bp::arg("newMouseFocus") ) );
-        
-        }
-        { //::vgui::IInput::ShouldModalSubTreeReceiveMessages
-        
-            typedef bool ( ::vgui::IInput::*ShouldModalSubTreeReceiveMessages_function_type )(  ) const;
-            
-            IInput_exposer.def( 
-                "ShouldModalSubTreeReceiveMessages"
-                , bp::pure_virtual( ShouldModalSubTreeReceiveMessages_function_type(&::vgui::IInput::ShouldModalSubTreeReceiveMessages) ) );
-        
-        }
-        { //::vgui::IInput::UnregisterKeyCodeUnhandledListener
-        
-            typedef void ( ::vgui::IInput::*UnregisterKeyCodeUnhandledListener_function_type )( ::vgui::VPANEL ) ;
-            
-            IInput_exposer.def( 
-                "UnregisterKeyCodeUnhandledListener"
-                , bp::pure_virtual( UnregisterKeyCodeUnhandledListener_function_type(&::vgui::IInput::UnregisterKeyCodeUnhandledListener) )
-                , ( bp::arg("panel") ) );
-        
-        }
-        { //::vgui::IInput::WasKeyPressed
-        
-            typedef bool ( ::vgui::IInput::*WasKeyPressed_function_type )( ::vgui::KeyCode ) ;
-            
-            IInput_exposer.def( 
-                "WasKeyPressed"
-                , bp::pure_virtual( WasKeyPressed_function_type(&::vgui::IInput::WasKeyPressed) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::WasKeyReleased
-        
-            typedef bool ( ::vgui::IInput::*WasKeyReleased_function_type )( ::vgui::KeyCode ) ;
-            
-            IInput_exposer.def( 
-                "WasKeyReleased"
-                , bp::pure_virtual( WasKeyReleased_function_type(&::vgui::IInput::WasKeyReleased) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::WasKeyTyped
-        
-            typedef bool ( ::vgui::IInput::*WasKeyTyped_function_type )( ::vgui::KeyCode ) ;
-            
-            IInput_exposer.def( 
-                "WasKeyTyped"
-                , bp::pure_virtual( WasKeyTyped_function_type(&::vgui::IInput::WasKeyTyped) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::WasMouseDoublePressed
-        
-            typedef bool ( ::vgui::IInput::*WasMouseDoublePressed_function_type )( ::vgui::MouseCode ) ;
-            
-            IInput_exposer.def( 
-                "WasMouseDoublePressed"
-                , bp::pure_virtual( WasMouseDoublePressed_function_type(&::vgui::IInput::WasMouseDoublePressed) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::WasMousePressed
-        
-            typedef bool ( ::vgui::IInput::*WasMousePressed_function_type )( ::vgui::MouseCode ) ;
-            
-            IInput_exposer.def( 
-                "WasMousePressed"
-                , bp::pure_virtual( WasMousePressed_function_type(&::vgui::IInput::WasMousePressed) )
-                , ( bp::arg("code") ) );
-        
-        }
-        { //::vgui::IInput::WasMouseReleased
-        
-            typedef bool ( ::vgui::IInput::*WasMouseReleased_function_type )( ::vgui::MouseCode ) ;
-            
-            IInput_exposer.def( 
-                "WasMouseReleased"
-                , bp::pure_virtual( WasMouseReleased_function_type(&::vgui::IInput::WasMouseReleased) )
-                , ( bp::arg("code") ) );
-        
-        }
-    }
+    bp::class_< vgui::IInput, boost::noncopyable >( "IInput", bp::no_init )    
+        .def( 
+            "CandidateListStartsAtOne"
+            , (bool ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::CandidateListStartsAtOne ) )    
+        .def( 
+            "GetAppModalSurface"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetAppModalSurface ) )    
+        .def( 
+            "GetCalculatedFocus"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCalculatedFocus ) )    
+        .def( 
+            "GetCandidate"
+            , (void ( ::vgui::IInput::* )( int,wchar_t *,int ) )( &::vgui::IInput::GetCandidate )
+            , ( bp::arg("num"), bp::arg("dest"), bp::arg("destSizeBytes") ) )    
+        .def( 
+            "GetCandidateListCount"
+            , (int ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCandidateListCount ) )    
+        .def( 
+            "GetCandidateListPageSize"
+            , (int ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCandidateListPageSize ) )    
+        .def( 
+            "GetCandidateListPageStart"
+            , (int ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCandidateListPageStart ) )    
+        .def( 
+            "GetCandidateListSelectedItem"
+            , (int ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCandidateListSelectedItem ) )    
+        .def( 
+            "GetCurrentIMEHandle"
+            , (int ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCurrentIMEHandle ) )    
+        .def( 
+            "GetCursorOveride"
+            , (::vgui::HCursor ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetCursorOveride ) )    
+        .def( 
+            "GetCursorPos"
+            , (void ( ::vgui::IInput::* )( int &,int & ) )( &::vgui::IInput::GetCursorPos )
+            , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "GetCursorPosition"
+            , (void ( ::vgui::IInput::* )( int &,int & ) )( &::vgui::IInput::GetCursorPosition )
+            , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "GetEnglishIMEHandle"
+            , (int ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetEnglishIMEHandle ) )    
+        .def( 
+            "GetFocus"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetFocus ) )    
+        .def( 
+            "GetIMELanguageName"
+            , (void ( ::vgui::IInput::* )( wchar_t *,int ) )( &::vgui::IInput::GetIMELanguageName )
+            , ( bp::arg("buf"), bp::arg("unicodeBufferSizeInBytes") ) )    
+        .def( 
+            "GetKeyCodeText"
+            , (void ( ::vgui::IInput::* )( ::vgui::KeyCode,char *,int ) )( &::vgui::IInput::GetKeyCodeText )
+            , ( bp::arg("code"), bp::arg("buf"), bp::arg("buflen") ) )    
+        .def( 
+            "GetModalSubTree"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetModalSubTree ) )    
+        .def( 
+            "GetMouseCapture"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetMouseCapture ) )    
+        .def( 
+            "GetMouseFocus"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetMouseFocus ) )    
+        .def( 
+            "GetMouseOver"
+            , (::vgui::VPANEL ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetMouseOver ) )    
+        .def( 
+            "GetShouldInvertCompositionString"
+            , (bool ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::GetShouldInvertCompositionString ) )    
+        .def( 
+            "IsKeyDown"
+            , (bool ( ::vgui::IInput::* )( ::vgui::KeyCode ) )( &::vgui::IInput::IsKeyDown )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "IsMouseDown"
+            , (bool ( ::vgui::IInput::* )( ::vgui::MouseCode ) )( &::vgui::IInput::IsMouseDown )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "OnChangeIME"
+            , (void ( ::vgui::IInput::* )( bool ) )( &::vgui::IInput::OnChangeIME )
+            , ( bp::arg("forward") ) )    
+        .def( 
+            "OnChangeIMEByHandle"
+            , (void ( ::vgui::IInput::* )( int ) )( &::vgui::IInput::OnChangeIMEByHandle )
+            , ( bp::arg("handleValue") ) )    
+        .def( 
+            "OnChangeIMEConversionModeByHandle"
+            , (void ( ::vgui::IInput::* )( int ) )( &::vgui::IInput::OnChangeIMEConversionModeByHandle )
+            , ( bp::arg("handleValue") ) )    
+        .def( 
+            "OnChangeIMESentenceModeByHandle"
+            , (void ( ::vgui::IInput::* )( int ) )( &::vgui::IInput::OnChangeIMESentenceModeByHandle )
+            , ( bp::arg("handleValue") ) )    
+        .def( 
+            "OnIMEChangeCandidates"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnIMEChangeCandidates ) )    
+        .def( 
+            "OnIMECloseCandidates"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnIMECloseCandidates ) )    
+        .def( 
+            "OnIMEComposition"
+            , (void ( ::vgui::IInput::* )( int ) )( &::vgui::IInput::OnIMEComposition )
+            , ( bp::arg("flags") ) )    
+        .def( 
+            "OnIMEEndComposition"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnIMEEndComposition ) )    
+        .def( 
+            "OnIMERecomputeModes"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnIMERecomputeModes ) )    
+        .def( 
+            "OnIMEShowCandidates"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnIMEShowCandidates ) )    
+        .def( 
+            "OnIMEStartComposition"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnIMEStartComposition ) )    
+        .def( 
+            "OnInputLanguageChanged"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::OnInputLanguageChanged ) )    
+        .def( 
+            "OnKeyCodeUnhandled"
+            , (void ( ::vgui::IInput::* )( int ) )( &::vgui::IInput::OnKeyCodeUnhandled )
+            , ( bp::arg("keyCode") ) )    
+        .def( 
+            "RegisterKeyCodeUnhandledListener"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL ) )( &::vgui::IInput::RegisterKeyCodeUnhandledListener )
+            , ( bp::arg("panel") ) )    
+        .def( 
+            "ReleaseAppModalSurface"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::ReleaseAppModalSurface ) )    
+        .def( 
+            "ReleaseModalSubTree"
+            , (void ( ::vgui::IInput::* )(  ) )( &::vgui::IInput::ReleaseModalSubTree ) )    
+        .def( 
+            "SetAppModalSurface"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL ) )( &::vgui::IInput::SetAppModalSurface )
+            , ( bp::arg("panel") ) )    
+        .def( 
+            "SetCandidateListPageStart"
+            , (void ( ::vgui::IInput::* )( int ) )( &::vgui::IInput::SetCandidateListPageStart )
+            , ( bp::arg("start") ) )    
+        .def( 
+            "SetCandidateWindowPos"
+            , (void ( ::vgui::IInput::* )( int,int ) )( &::vgui::IInput::SetCandidateWindowPos )
+            , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "SetCursorOveride"
+            , (void ( ::vgui::IInput::* )( ::vgui::HCursor ) )( &::vgui::IInput::SetCursorOveride )
+            , ( bp::arg("cursor") ) )    
+        .def( 
+            "SetCursorPos"
+            , (void ( ::vgui::IInput::* )( int,int ) )( &::vgui::IInput::SetCursorPos )
+            , ( bp::arg("x"), bp::arg("y") ) )    
+        .def( 
+            "SetModalSubTree"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL,::vgui::VPANEL,bool ) )( &::vgui::IInput::SetModalSubTree )
+            , ( bp::arg("subTree"), bp::arg("unhandledMouseClickListener"), bp::arg("restrictMessagesToSubTree")=(bool)(true) ) )    
+        .def( 
+            "SetModalSubTreeReceiveMessages"
+            , (void ( ::vgui::IInput::* )( bool ) )( &::vgui::IInput::SetModalSubTreeReceiveMessages )
+            , ( bp::arg("state") ) )    
+        .def( 
+            "SetMouseCapture"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL ) )( &::vgui::IInput::SetMouseCapture )
+            , ( bp::arg("panel") ) )    
+        .def( 
+            "SetMouseCaptureEx"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL,::vgui::MouseCode ) )( &::vgui::IInput::SetMouseCaptureEx )
+            , ( bp::arg("panel"), bp::arg("captureStartMouseCode") ) )    
+        .def( 
+            "SetMouseFocus"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL ) )( &::vgui::IInput::SetMouseFocus )
+            , ( bp::arg("newMouseFocus") ) )    
+        .def( 
+            "ShouldModalSubTreeReceiveMessages"
+            , (bool ( ::vgui::IInput::* )(  ) const)( &::vgui::IInput::ShouldModalSubTreeReceiveMessages ) )    
+        .def( 
+            "UnregisterKeyCodeUnhandledListener"
+            , (void ( ::vgui::IInput::* )( ::vgui::VPANEL ) )( &::vgui::IInput::UnregisterKeyCodeUnhandledListener )
+            , ( bp::arg("panel") ) )    
+        .def( 
+            "WasKeyPressed"
+            , (bool ( ::vgui::IInput::* )( ::vgui::KeyCode ) )( &::vgui::IInput::WasKeyPressed )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "WasKeyReleased"
+            , (bool ( ::vgui::IInput::* )( ::vgui::KeyCode ) )( &::vgui::IInput::WasKeyReleased )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "WasKeyTyped"
+            , (bool ( ::vgui::IInput::* )( ::vgui::KeyCode ) )( &::vgui::IInput::WasKeyTyped )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "WasMouseDoublePressed"
+            , (bool ( ::vgui::IInput::* )( ::vgui::MouseCode ) )( &::vgui::IInput::WasMouseDoublePressed )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "WasMousePressed"
+            , (bool ( ::vgui::IInput::* )( ::vgui::MouseCode ) )( &::vgui::IInput::WasMousePressed )
+            , ( bp::arg("code") ) )    
+        .def( 
+            "WasMouseReleased"
+            , (bool ( ::vgui::IInput::* )( ::vgui::MouseCode ) )( &::vgui::IInput::WasMouseReleased )
+            , ( bp::arg("code") ) );
 
     { //::vgui::IScheme
         typedef bp::class_< vgui::IScheme, boost::noncopyable > IScheme_exposer_t;
@@ -4513,10 +3364,6 @@ BOOST_PYTHON_MODULE(_vgui){
             "SaveUserConfigFile"
             , (void ( ::vgui::ISystem::* )(  ) )( &::vgui::ISystem::SaveUserConfigFile ) )    
         .def( 
-            "SetClipboardImage"
-            , (void ( ::vgui::ISystem::* )( void *,int,int,int,int ) )( &::vgui::ISystem::SetClipboardImage )
-            , ( bp::arg("pWnd"), bp::arg("x1"), bp::arg("y1"), bp::arg("x2"), bp::arg("y2") ) )    
-        .def( 
             "SetClipboardText"
             , (void ( ::vgui::ISystem::* )( char const *,int ) )( &::vgui::ISystem::SetClipboardText )
             , ( bp::arg("text"), bp::arg("textLen") ) )    
@@ -4596,6 +3443,26 @@ BOOST_PYTHON_MODULE(_vgui){
             "GetPanel"
             , GetPanel_function_type( &::PyGetPanel )
             , ( bp::arg("type") ) );
+    
+    }
+
+    { //::PyInput_GetCursorPos
+    
+        typedef ::boost::python::tuple ( *PyInput_GetCursorPos_function_type )(  );
+        
+        bp::def( 
+            "PyInput_GetCursorPos"
+            , PyInput_GetCursorPos_function_type( &::PyInput_GetCursorPos ) );
+    
+    }
+
+    { //::PyInput_GetCursorPosition
+    
+        typedef ::boost::python::tuple ( *PyInput_GetCursorPosition_function_type )(  );
+        
+        bp::def( 
+            "PyInput_GetCursorPosition"
+            , PyInput_GetCursorPosition_function_type( &::PyInput_GetCursorPosition ) );
     
     }
 

@@ -91,14 +91,25 @@ class VGUI(ClientModuleGenerator):
         # VGUI Input
         cls = mb.class_('IInput')
         cls.include()
-        #cls.mem_funs().virtuality = 'not virtual' 
-        cls.mem_funs('GetCursorPos').add_transformation( FT.output('x'), FT.output('y') )
-        cls.mem_funs('GetCursorPosition').add_transformation( FT.output('x'), FT.output('y') )
-        cls.mem_funs('GetIMEWindow').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
+        cls.mem_funs().virtuality = 'not virtual' 
+        #cls.mem_funs('GetCursorPos').add_transformation( FT.output('x'), FT.output('y') )
+        #cls.mem_funs('GetCursorPosition').add_transformation( FT.output('x'), FT.output('y') )
+        #cls.mem_funs('GetIMEWindow').call_policies = call_policies.return_value_policy(call_policies.return_by_value)
+        cls.mem_fun('GetIMEWindow').exclude()
+        cls.mem_fun('SetIMEWindow').exclude()
+        cls.mem_fun('GetIMEConversionModes').exclude()
+        cls.mem_fun('GetIMELanguageList').exclude()
+        cls.mem_fun('GetIMELanguageShortCode').exclude()
+        cls.mem_fun('GetIMESentenceModes').exclude()
+        
+        cls.classes().exclude()
         
         mb.free_function('input').include()
         mb.free_function('input').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object) 
         mb.free_function('input').rename('vgui_input')
+        
+        mb.free_function('PyInput_GetCursorPos').include()
+        mb.free_function('PyInput_GetCursorPosition').include()
         
         # ISystem
         cls = mb.class_('ISystem')
@@ -111,6 +122,8 @@ class VGUI(ClientModuleGenerator):
         cls.mem_funs('SetRegistryInteger').exclude()
         cls.mem_funs('SetRegistryString').exclude()
         cls.mem_funs('DeleteRegistryKey').exclude()
+        
+        cls.mem_fun('SetClipboardImage').exclude()
         
         # Properly wrap getting a registery string
         mb.add_declaration_code('''static boost::python::tuple GetRegistryString_cc10e70c5f6b49d5963b27442c970b19( ::vgui::ISystem & inst, char const * key ){
@@ -288,5 +301,4 @@ class VGUI(ClientModuleGenerator):
         
         self.ApplyCommonRules(mb)
         
-        mb.mem_funs('GetIMEWindow').include() # IInput, gets excluded by ApplyCommonRules
         

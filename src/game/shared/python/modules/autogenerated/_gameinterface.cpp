@@ -4931,14 +4931,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , (void ( ::CServerGameDLL::* )( ::CSaveRestoreData * ) )( &::CServerGameDLL::SaveGlobalState )
             , ( bp::arg("arg0") ) )    
         .def( 
-            "SaveReadFields"
-            , (void ( ::CServerGameDLL::* )( ::CSaveRestoreData *,char const *,void *,::datamap_t *,::typedescription_t *,int ) )( &::CServerGameDLL::SaveReadFields )
-            , ( bp::arg("arg0"), bp::arg("arg1"), bp::arg("arg2"), bp::arg("arg3"), bp::arg("arg4"), bp::arg("arg5") ) )    
-        .def( 
-            "SaveWriteFields"
-            , (void ( ::CServerGameDLL::* )( ::CSaveRestoreData *,char const *,void *,::datamap_t *,::typedescription_t *,int ) )( &::CServerGameDLL::SaveWriteFields )
-            , ( bp::arg("arg0"), bp::arg("arg1"), bp::arg("arg2"), bp::arg("arg3"), bp::arg("arg4"), bp::arg("arg5") ) )    
-        .def( 
             "ServerActivate"
             , (void ( ::CServerGameDLL::* )( ::edict_t *,int,int ) )( &::CServerGameDLL::ServerActivate )
             , ( bp::arg("pEdictList"), bp::arg("edictCount"), bp::arg("clientMax") ) )    
