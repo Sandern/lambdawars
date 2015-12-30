@@ -252,7 +252,9 @@ class VGUI(ClientModuleGenerator):
             mb.free_function('HudIcons').call_policies = call_policies.return_value_policy(call_policies.reference_existing_object) 
             
         # CHudTexture
-        mb.class_('CHudTexture').include()
+        cls = mb.class_('CHudTexture')
+        cls.include()
+        cls.vars().exclude()
         
     def ParseMisc(self, mb):
         # Include some empty classes

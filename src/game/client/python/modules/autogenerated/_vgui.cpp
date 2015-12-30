@@ -4,8 +4,6 @@
 
 
 
-#include "__array_1.pypp.hpp"
-
 #include "__convenience.pypp.hpp"
 
 #include "__call_policies.pypp.hpp"
@@ -270,39 +268,6 @@ struct CHudElement_wrapper : CHudElement, bp::wrapper< CHudElement > {
     
     bool default_WantsHudLayoutEntry(  ) const  {
         return CHudElement::WantsHudLayoutEntry( );
-    }
-
-};
-
-struct CHudTexture_wrapper : CHudTexture, bp::wrapper< CHudTexture > {
-
-    CHudTexture_wrapper(CHudTexture const & arg )
-    : CHudTexture( arg )
-      , bp::wrapper< CHudTexture >(){
-        // copy constructor
-        
-    }
-
-    CHudTexture_wrapper( )
-    : CHudTexture( )
-      , bp::wrapper< CHudTexture >(){
-        // null constructor
-    
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 64>
-    pyplusplus_szShortName_wrapper( ::CHudTexture & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 64>( inst.szShortName );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< char, 64>
-    pyplusplus_szTextureFile_wrapper( ::CHudTexture & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< char, 64>( inst.szTextureFile );
-    }
-
-    static pyplusplus::containers::static_sized::array_1_t< float, 4>
-    pyplusplus_texCoords_wrapper( ::CHudTexture & inst ){
-        return pyplusplus::containers::static_sized::array_1_t< float, 4>( inst.texCoords );
     }
 
 };
@@ -912,7 +877,7 @@ BOOST_PYTHON_MODULE(_vgui){
             , (void ( ::CHudIcons::* )(  ) )( &::CHudIcons::Shutdown ) );
 
     { //::CHudTexture
-        typedef bp::class_< CHudTexture_wrapper > CHudTexture_exposer_t;
+        typedef bp::class_< CHudTexture > CHudTexture_exposer_t;
         CHudTexture_exposer_t CHudTexture_exposer = CHudTexture_exposer_t( "CHudTexture", bp::init< >() );
         bp::scope CHudTexture_scope( CHudTexture_exposer );
         { //::CHudTexture::DrawSelf
@@ -1023,38 +988,6 @@ BOOST_PYTHON_MODULE(_vgui){
                 , bp::return_self< >() );
         
         }
-        CHudTexture_exposer.def_readwrite( "bPrecached", &CHudTexture::bPrecached );
-        CHudTexture_exposer.def_readwrite( "bRenderUsingFont", &CHudTexture::bRenderUsingFont );
-        CHudTexture_exposer.def_readwrite( "cCharacterInFont", &CHudTexture::cCharacterInFont );
-        CHudTexture_exposer.def_readwrite( "hFont", &CHudTexture::hFont );
-        CHudTexture_exposer.def_readwrite( "rc", &CHudTexture::rc );
-        pyplusplus::containers::static_sized::register_array_1< char, 64 >( "__array_1_char_64" );
-        { //CHudTexture::szShortName [variable], type=char[64]
-        
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 64> ( *array_wrapper_creator )( ::CHudTexture & );
-            
-            CHudTexture_exposer.add_property( "szShortName"
-                , bp::make_function( array_wrapper_creator(&CHudTexture_wrapper::pyplusplus_szShortName_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        { //CHudTexture::szTextureFile [variable], type=char[64]
-        
-            typedef pyplusplus::containers::static_sized::array_1_t< char, 64> ( *array_wrapper_creator )( ::CHudTexture & );
-            
-            CHudTexture_exposer.add_property( "szTextureFile"
-                , bp::make_function( array_wrapper_creator(&CHudTexture_wrapper::pyplusplus_szTextureFile_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        pyplusplus::containers::static_sized::register_array_1< float, 4 >( "__array_1_float_4" );
-        { //CHudTexture::texCoords [variable], type=float[4]
-        
-            typedef pyplusplus::containers::static_sized::array_1_t< float, 4> ( *array_wrapper_creator )( ::CHudTexture & );
-            
-            CHudTexture_exposer.add_property( "texCoords"
-                , bp::make_function( array_wrapper_creator(&CHudTexture_wrapper::pyplusplus_texCoords_wrapper)
-                                    , bp::with_custodian_and_ward_postcall< 0, 1 >() ) );
-        }
-        CHudTexture_exposer.def_readwrite( "textureId", &CHudTexture::textureId );
     }
 
     { //::CPyHudElementHelper
