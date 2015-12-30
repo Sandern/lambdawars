@@ -117,7 +117,7 @@ int g_nInsideDispatchUpdateTransmitState = 0;
 // When this is false, throw an assert in debug when GetAbsAnything is called. Used when hierachy is incomplete/invalid.
 bool CBaseEntity::s_bAbsQueriesValid = true;
 
-ConVar sv_debug_pydestroy( "sv_debug_pydestroy", "0", FCVAR_CHEAT );
+ConVar sv_debug_pydestroy( "sv_debug_pydestroy", "0", FCVAR_CHEAT, "Warns if there is more than 1 reference to a (python) entity upon deletion. This might indicate a memory leak." );
 
 ConVar sv_netvisdist( "sv_netvisdist", "10000", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Test networking visibility distance" );
 ConVar ent_show_contexts( "ent_show_contexts", "0", 0, "Show entity contexts in ent_text display" );
@@ -9054,8 +9054,32 @@ void CBaseEntity::DestroyPyInstance()
 		int count = Py_REFCNT(m_pyInstance.ptr());
 		if( count > 1 ) 
 		{
-			DevMsg(1, "Server: Called Remove on a python entity %s (#%d) instance, while refcount is %d! Memory will not be released until all references are gone!\n",
+			Warning("Server: Called Remove on a python entity %s (#%d) instance, while refcount is %d! Memory will not be released until all references are gone!\n",
 				GetDebugName(), entindex(), count);
+
+			// Write away a backtraced graph of references.
+			// Must have graphviz installed for this.
+			if (sv_debug_pydestroy.GetInt() > 1)
+			{
+				try
+				{
+					char buf[512];
+					V_snprintf(buf, sizeof(buf), "entity_%s_%d_leak_graph.png", GetDebugName(), entindex());
+
+					boost::python::list arguments;
+					arguments.append(m_pyInstance);
+
+					boost::python::dict options;
+					options["filename"] = buf;
+
+					boost::python::object objgraph = SrcPySystem()->Import("objgraph");
+					objgraph.attr("show_backrefs")(*boost::python::tuple(arguments), **options);
+				}
+				catch (boost::python::error_already_set &)
+				{
+					PyErr_Print();
+				}
+			}
 		}
 	}
 

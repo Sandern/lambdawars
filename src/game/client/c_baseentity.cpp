@@ -108,7 +108,7 @@ bool C_BaseEntity::sm_bDisableTouchFuncs = false;	// Disables PhysicsTouch and P
 
 static ConVar  r_drawrenderboxes( "r_drawrenderboxes", "0", FCVAR_CHEAT );  
 
-ConVar  cl_debug_pydestroy( "cl_debug_pydestroy", "0", FCVAR_CHEAT );
+ConVar  cl_debug_pydestroy( "cl_debug_pydestroy", "0", FCVAR_CHEAT, "Warns if there is more than 1 reference to a (python) entity upon deletion. This might indicate a memory leak." );
 static bool g_bAbsRecomputationStack[8];
 static unsigned short g_iAbsRecomputationStackPos = 0;
 
@@ -6650,6 +6650,7 @@ void C_BaseEntity::DestroyPyInstance()
 	m_Particles.StopEmissionAndDestroyImmediately( NULL ); // TEMP
 
 	// Dereference py think functions
+	m_pyHandle = boost::python::object();
 	m_pyTouchMethod = boost::python::object();
 	SetPyThink(boost::python::object());
 	int i;
@@ -6665,8 +6666,32 @@ void C_BaseEntity::DestroyPyInstance()
 		int count = Py_REFCNT(m_pyInstance.ptr());
 		if( count > 1 ) 
 		{
-			DevMsg(1, "Client: Called Remove on a python entity %s (#%d) instance, while refcount is %d! Memory will not be released until all references are gone!\n",
+			Warning("Client: Called Remove on a python entity %s (#%d) instance, while refcount is %d! Memory will not be released until all references are gone!\n",
 				GetDebugName(), entindex(), count);
+
+			// Write away a backtraced graph of references.
+			// Must have graphviz installed for this.
+			if (cl_debug_pydestroy.GetInt() > 1)
+			{
+				try
+				{
+					char buf[512];
+					V_snprintf(buf, sizeof(buf), "c_entity_%s_%d_leak_graph.png", GetDebugName(), entindex());
+
+					boost::python::list arguments;
+					arguments.append(m_pyInstance);
+
+					boost::python::dict options;
+					options["filename"] = buf;
+
+					boost::python::object objgraph = SrcPySystem()->Import("objgraph");
+					objgraph.attr("show_backrefs")(*boost::python::tuple(arguments), **options);
+				}
+				catch (boost::python::error_already_set &)
+				{
+					PyErr_Print();
+				}
+			}
 		}
 	}
 
