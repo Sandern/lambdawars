@@ -34,18 +34,6 @@ C_BaseEntity *ClientClassFactory( boost::python::object cls_type, int entnum, in
 
 	try	
 	{
-#if 0
-		// Safety check. The base implementations must be match, otherwise it can result in incorrect behavior (crashes)
-		int iNetworkType = boost::python::extract<int>(cls_type.attr("GetPyNetworkType")());
-		if( iNetworkType != iType )
-		{
-			char buf[512];
-			V_snprintf( buf, sizeof(buf), "Network type does not match client %d != server %d", iNetworkType, iType );
-			PyErr_SetString(PyExc_Exception, buf );
-			throw boost::python::error_already_set(); 
-		}
-#endif // 0
-
 		// Spawn and initialize the entity
 		boost::python::object inst = cls_type();
 		pResult = boost::python::extract<C_BaseEntity *>( inst );
