@@ -6660,11 +6660,17 @@ void C_BaseEntity::DestroyPyInstance()
 			m_aThinkFunctions.Element(i).m_pyThink = boost::python::object();
 	}
 
-	if( cl_debug_pydestroy.GetBool() )
+
+	// Verify m_pyInstance is the last reference to the object
+	int count = Py_REFCNT(m_pyInstance.ptr());
+	if( count > 1 ) 
 	{
-		// Verify m_pyInstance is the last reference to the object
-		int count = Py_REFCNT(m_pyInstance.ptr());
-		if( count > 1 ) 
+		// Store old class for debugging purposes. Rebind class to DeadEntity to prevent accidental access to methods.
+		// If refcount is 1, then no need to rebind, since nothing has a reference to it.
+		setattr(m_pyInstance, "__oldclass__", m_pyInstance.attr("__class__"));
+		setattr(m_pyInstance, "__class__",  _entities.attr("DeadEntity"));
+
+		if( cl_debug_pydestroy.GetBool() )
 		{
 			Warning("Client: Called Remove on a python entity %s (#%d) instance, while refcount is %d! Memory will not be released until all references are gone!\n",
 				GetDebugName(), entindex(), count);
@@ -6694,8 +6700,6 @@ void C_BaseEntity::DestroyPyInstance()
 			}
 		}
 	}
-
-	setattr(m_pyInstance, "__class__",  _entities.attr("DeadEntity"));
 
 	// Add m_pyInstance to the delete list before dereferencing it
 	// Dereferencing m_pyInstance here might result in direct deletion of the entity
