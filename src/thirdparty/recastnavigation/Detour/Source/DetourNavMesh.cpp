@@ -350,7 +350,7 @@ int dtNavMesh::findConnectingPolys(const float* va, const float* vb,
 	return n;
 }
 
-void dtNavMesh::unconnectExtLinks(dtMeshTile* tile, dtMeshTile* target)
+void dtNavMesh::unconnectLinks(dtMeshTile* tile, dtMeshTile* target)
 {
 	if (!tile || !target) return;
 
@@ -363,13 +363,9 @@ void dtNavMesh::unconnectExtLinks(dtMeshTile* tile, dtMeshTile* target)
 		unsigned int pj = DT_NULL_LINK;
 		while (j != DT_NULL_LINK)
 		{
-			// 0xff seems to be assigned to the side when the connection is between layers at the same tile position.
-			// Not sure why it's skipped, but not doing so may result in invalid links if the tile at that layer position 
-			// is not removed too.
-			if (/*tile->links[j].side != 0xff &&*/
-				decodePolyIdTile(tile->links[j].ref) == targetNum)
+			if (decodePolyIdTile(tile->links[j].ref) == targetNum)
 			{
-				// Revove link.
+				// Remove link.
 				unsigned int nj = tile->links[j].next;
 				if (pj == DT_NULL_LINK)
 					poly->firstLink = nj;
@@ -855,12 +851,7 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 	// Make sure the location is free.
 	if (getTileAt(header->x, header->y, header->layer))
 		return DT_FAILURE;
-
-#ifdef DETOUR_DEBUG_LINKS
-	// Prevalidate
-	validateLinks( header->x, header->y, header->layer );
-#endif // DETOUR_DEBUG_LINKS
-
+		
 	// Allocate a tile.
 	dtMeshTile* tile = 0;
 	if (!lastRef)
@@ -983,10 +974,6 @@ dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
 	if (result)
 		*result = getTileRef(tile);
 	
-#ifdef DETOUR_DEBUG_LINKS
-	validateLinks( tile->header->x, tile->header->y, tile->header->layer );
-#endif // DETOUR_DEBUG_LINKS
-
 	return DT_SUCCESS;
 }
 
@@ -1167,46 +1154,6 @@ bool dtNavMesh::isValidPolyRef(dtPolyRef ref) const
 	return true;
 }
 
-#ifdef DETOUR_DEBUG_LINKS
-// Temporary code for debugging/validating links
-void dtNavMesh::validateLinks( int tileX, int tileY, int tileLayer )
-{
-	static const int MAX_NEIS = 32;
-	dtMeshTile* neis[MAX_NEIS];
-	int nneis;
-
-	nneis = getTilesAt(tileX, tileY, neis, MAX_NEIS);
-	for (int j = 0; j < nneis; ++j)
-	{
-		for (int ji = 0; ji < neis[j]->header->polyCount; ji++ )
-		{
-			const dtPoly* poly = &neis[j]->polys[ji];
-
-			for (unsigned int jj = poly->firstLink; jj != DT_NULL_LINK; jj = neis[j]->links[jj].next)
-			{
-				dtAssert( isValidPolyRef( neis[j]->links[jj].ref ) );
-			}
-		}
-	}
-
-	for (int i = 0; i < 8; ++i)
-	{
-		nneis = getNeighbourTilesAt( tileX, tileY, i, neis, MAX_NEIS);
-		for (int j = 0; j < nneis; ++j) {
-			for (int ji = 0; ji < neis[j]->header->polyCount; ji++ )
-			{
-				const dtPoly* poly = &neis[j]->polys[ji];
-
-				for (unsigned int jj = poly->firstLink; jj != DT_NULL_LINK; jj = neis[j]->links[jj].next)
-				{
-					dtAssert( isValidPolyRef( neis[j]->links[jj].ref ) );
-				}
-			}
-		}
-	}
-}
-#endif // DETOUR_DEBUG_LINKS
-
 /// @par
 ///
 /// This function returns the data for the tile so that, if desired,
@@ -1224,12 +1171,7 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	dtMeshTile* tile = &m_tiles[tileIndex];
 	if (tile->salt != tileSalt)
 		return DT_FAILURE | DT_INVALID_PARAM;
-
-#ifdef DETOUR_DEBUG_LINKS
-	// validate
-	validateLinks( tile->header->x, tile->header->y, tile->header->layer );
-#endif // DETOUR_DEBUG_LINKS
-
+	
 	// Remove tile from hash lookup.
 	int h = computeTileHash(tile->header->x,tile->header->y,m_tileLutMask);
 	dtMeshTile* prev = 0;
@@ -1249,33 +1191,26 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	}
 	
 	// Remove connections to neighbour tiles.
-	// Create connections with neighbour tiles.
 	static const int MAX_NEIS = 32;
 	dtMeshTile* neis[MAX_NEIS];
 	int nneis;
 	
-	// Connect with layers in current tile.
+	// Disconnect from other layers in current tile.
 	nneis = getTilesAt(tile->header->x, tile->header->y, neis, MAX_NEIS);
 	for (int j = 0; j < nneis; ++j)
 	{
 		if (neis[j] == tile) continue;
-		unconnectExtLinks(neis[j], tile);
+		unconnectLinks(neis[j], tile);
 	}
 	
-	// Connect with neighbour tiles.
+	// Disconnect from neighbour tiles.
 	for (int i = 0; i < 8; ++i)
 	{
 		nneis = getNeighbourTilesAt(tile->header->x, tile->header->y, i, neis, MAX_NEIS);
 		for (int j = 0; j < nneis; ++j)
-			unconnectExtLinks(neis[j], tile);
+			unconnectLinks(neis[j], tile);
 	}
-
-#ifdef DETOUR_DEBUG_LINKS
-	int tileX = tile->header->x;
-	int tileY = tile->header->y;
-	int tileLayer = tile->header->layer;
-#endif // DETOUR_DEBUG_LINKS
-
+		
 	// Reset tile.
 	if (tile->flags & DT_TILE_FREE_DATA)
 	{
@@ -1316,11 +1251,6 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	// Add to free list.
 	tile->next = m_nextFree;
 	m_nextFree = tile;
-
-#ifdef DETOUR_DEBUG_LINKS
-	// validate
-	validateLinks( tileX, tileY, tileLayer );
-#endif // DETOUR_DEBUG_LINKS
 
 	return DT_SUCCESS;
 }
