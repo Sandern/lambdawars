@@ -236,7 +236,6 @@ public:
 
 	virtual bool			Init( void );
 	virtual void			Shutdown( void );
-	virtual void			ExtraShutdown( void ); // Shutdown is called before shutting down vgui. This one is after that.
 	virtual void			PostInit();
 	virtual void			LevelInitPreEntity();
 	virtual void			LevelInitPostEntity();

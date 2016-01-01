@@ -225,14 +225,6 @@ extern "C" {
 }
 #endif // WIN32
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CSrcPython::ExtraShutdown( void )
-{
-	ShutdownInterpreter();
-}
-
 static void VSPTCheckForParm( bp::list argv, const char *pParmToCheck )
 {
 	if( CommandLine()->FindParm( pParmToCheck ) == 0 )

@@ -1404,7 +1404,7 @@ void CHLClient::Shutdown( void )
 	}
 
 #ifdef ENABLE_PYTHON
-	SrcPySystem()->ExtraShutdown(); // before vgui, so we delete all python panels first
+	SrcPySystem()->ShutdownInterpreter(); // before vgui, so we delete all python panels first
 #endif // ENABLE_PYTHON
 
 	VGui_Shutdown();

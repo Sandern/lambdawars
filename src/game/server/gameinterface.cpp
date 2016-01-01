@@ -1031,7 +1031,7 @@ void CServerGameDLL::DLLShutdown( void )
 	s_SteamGameServerAPIContext.Clear();	
 
 #ifdef ENABLE_PYTHON
-	SrcPySystem()->ExtraShutdown();
+	SrcPySystem()->ShutdownInterpreter();
 #endif // ENABLE_PYTHON
 
 	DisconnectTier3Libraries();
