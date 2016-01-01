@@ -2849,6 +2849,13 @@ void CBaseEntity::SetPyTouch( boost::python::object touch_method )
 		return;
 	}
 
+	// Can't set anymore when marked for deletion.
+	if( IsMarkedForDeletion() )
+	{
+		DevMsg("Trying to set python touch method after being marked for deletion\n");
+		return;
+	}
+
 	m_pyTouchMethod = touch_method;
 
 	if( m_pyTouchMethod.ptr() != Py_None )
@@ -2876,6 +2883,13 @@ void CBaseEntity::SetPyThink( boost::python::object func, float thinkTime, const
 	if( m_pyInstance.ptr() == Py_None )
 	{
 		Warning("SetPyThink: Can't set think after entity removal!\n");
+		return;
+	}
+
+	// Can't set anymore when marked for deletion.
+	if( IsMarkedForDeletion() )
+	{
+		DevMsg("Trying to set python think method after being marked for deletion\n");
 		return;
 	}
 

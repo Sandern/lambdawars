@@ -9040,7 +9040,7 @@ void CBaseEntity::DestroyPyInstance()
 	// Dereference py think/touch functions
 	m_pyHandle = boost::python::object();
 	m_pyTouchMethod = boost::python::object();
-	SetPyThink(boost::python::object());
+	m_pyThink = boost::python::object();
 	int i;
 	for( i=0; i < m_aThinkFunctions.Count(); i++ )
 	{
