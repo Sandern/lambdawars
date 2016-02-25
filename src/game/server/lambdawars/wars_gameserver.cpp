@@ -594,6 +594,8 @@ void CWarsGameServer::ScheduleShutdown()
 		return;
 	}
 
+	Msg("Game server scheduled shutdown as soon as no players are connected anymore\n");
+
 	if( GetState() == k_EGameServer_Available )
 	{
 		engine->ServerCommand( "exit\n" );
