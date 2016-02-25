@@ -1,4 +1,4 @@
-// Copyright (c) 2015 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2016 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -35,11 +35,11 @@
 #ifndef CEF_INCLUDE_CEF_VERSION_H_
 #define CEF_INCLUDE_CEF_VERSION_H_
 
-#define CEF_VERSION "3.2526.1364.gf6bf57b"
+#define CEF_VERSION "3.2526.1366.g8617e7c"
 #define CEF_VERSION_MAJOR 3
-#define CEF_COMMIT_NUMBER 1364
-#define CEF_COMMIT_HASH "f6bf57b45ec290aad49a0cf4163c81d3447cb94c"
-#define COPYRIGHT_YEAR 2015
+#define CEF_COMMIT_NUMBER 1366
+#define CEF_COMMIT_HASH "8617e7c22c1215e26aff2a594bb1165b8972b9b1"
+#define COPYRIGHT_YEAR 2016
 
 #define CHROME_VERSION_MAJOR 47
 #define CHROME_VERSION_MINOR 0
