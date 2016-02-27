@@ -172,7 +172,10 @@ public:
 	
 	
 private:
-	
+	// Explicitly disabled copy constructor and copy assignment operator.
+	dtTileCache(const dtTileCache&);
+	dtTileCache& operator=(const dtTileCache&);
+
 	enum ObstacleRequestAction
 	{
 		REQUEST_ADD,
