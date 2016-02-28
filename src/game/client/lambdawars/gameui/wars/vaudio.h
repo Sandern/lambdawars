@@ -83,6 +83,7 @@ private:
 	DropDownMenu	*m_drpSoundQuality;
 	DropDownMenu	*m_drpLanguage;
 	DropDownMenu	*m_drpCaptioning;
+	DropDownMenu	*m_drpOrderSounds;
 
 	DropDownMenu	*m_drpVoiceCommunication;
 	DropDownMenu	*m_drpVoiceCommunicationStyle;

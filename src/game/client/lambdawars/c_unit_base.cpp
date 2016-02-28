@@ -26,6 +26,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+ConVar cl_unit_disable_order_sounds( "cl_unit_disable_order_sounds", "0", FCVAR_ARCHIVE | FCVAR_USERINFO, "Disable playing order sounds." );
+
 static ConVar	cl_wars_smooth		( "cl_wars_smooth", "1", 0, "Smooth unit's render origin after prediction errors" );
 static ConVar	cl_wars_smoothtime	( 
 	"cl_wars_smoothtime", 

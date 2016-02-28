@@ -78,6 +78,7 @@ BaseClass(parent, panelName)
 	m_drpSoundQuality = NULL;
 	m_drpLanguage = NULL;
 	m_drpCaptioning = NULL;
+	m_drpOrderSounds = NULL;
 	m_drpVoiceCommunication = NULL;
 	m_sldTransmitVolume = NULL;
 	m_sldRecieveVolume = NULL;
@@ -225,6 +226,12 @@ void Audio::Activate()
 		{
 			pFlyout->SetListener( this );
 		}
+	}
+
+	if ( m_drpOrderSounds )
+	{
+		CGameUIConVarRef unit_disable_order_sounds("cl_unit_disable_order_sounds");
+		m_drpOrderSounds->SetCurrentSelection( unit_disable_order_sounds.GetBool() ? "#L4D360UI_Disabled" : "#L4D360UI_Enabled" );
 	}
 
 	if ( m_drpLanguage )
@@ -475,6 +482,12 @@ void Audio::OnThink()
 	if( !m_drpCaptioning )
 	{
 		m_drpCaptioning = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpCaptioning" ) );
+		needsActivate = true;
+	}
+
+	if( !m_drpOrderSounds )
+	{
+		m_drpOrderSounds = dynamic_cast< DropDownMenu* >( FindChildByName( "DrpOrderSounds" ) );
 		needsActivate = true;
 	}
 
@@ -736,6 +749,16 @@ void Audio::OnCommand(const char *command)
 		CGameUIConVarRef cc_subtitles("cc_subtitles");
 		closecaption.SetValue( 1 );
 		cc_subtitles.SetValue( 0 );
+	}
+	else if( Q_stricmp( "OrderSoundsEnabled", command ) == 0 )
+	{
+		CGameUIConVarRef unit_disable_order_sounds("cl_unit_disable_order_sounds");
+		unit_disable_order_sounds.SetValue( 0 );
+	}
+	else if( Q_stricmp( "OrderSoundsDisabled", command ) == 0 )
+	{
+		CGameUIConVarRef unit_disable_order_sounds("cl_unit_disable_order_sounds");
+		unit_disable_order_sounds.SetValue( 1 );
 	}
 	else if ( StringHasPrefix( command, VIDEO_LANGUAGE_COMMAND_PREFIX ) )
 	{
