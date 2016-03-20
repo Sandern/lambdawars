@@ -117,7 +117,7 @@ int g_nInsideDispatchUpdateTransmitState = 0;
 // When this is false, throw an assert in debug when GetAbsAnything is called. Used when hierachy is incomplete/invalid.
 bool CBaseEntity::s_bAbsQueriesValid = true;
 
-ConVar sv_debug_pydestroy( "sv_debug_pydestroy", "0", FCVAR_CHEAT, "Warns if there is more than 1 reference to a (python) entity upon deletion. This might indicate a memory leak." );
+ConVar sv_debug_pydestroy( "sv_debug_pydestroy", "0", 0, "Warns if there is more than 1 reference to a (python) entity upon deletion. This might indicate a memory leak." );
 
 ConVar sv_netvisdist( "sv_netvisdist", "10000", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Test networking visibility distance" );
 ConVar ent_show_contexts( "ent_show_contexts", "0", 0, "Show entity contexts in ent_text display" );
