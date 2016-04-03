@@ -70,12 +70,9 @@ void CRecastMgr::Reset()
 {
 	m_bLoaded = false;
 
-	for ( int i = m_Meshes.First(); i != m_Meshes.InvalidIndex(); i = m_Meshes.Next(i ) )
-	{
-		CRecastMesh *pMesh = m_Meshes[ i ];
-		pMesh->Reset();
-	}
 	m_Meshes.PurgeAndDeleteElements();
+
+	m_Obstacles.Purge();
 
 #ifndef CLIENT_DLL
 	m_pendingPartialMeshUpdates.Purge();

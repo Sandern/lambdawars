@@ -56,12 +56,6 @@ static ConVar recast_findpath_use_caching( "recast_findpath_use_caching", "1", F
 // Purpose: 
 //-----------------------------------------------------------------------------
 CRecastMesh::CRecastMesh() :
-	m_triareas(0),
-	m_solid(0),
-	m_chf(0),
-	m_cset(0),
-	m_pmesh(0),
-	m_dmesh(0),
 	m_navMesh(0),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),
@@ -296,42 +290,6 @@ void CRecastMesh::Update( float dt )
 bool CRecastMesh::Reset()
 {
 	// Cleanup Nav mesh data
-	if( m_triareas )
-	{
-		delete [] m_triareas;
-		m_triareas = 0;
-	}
-
-	if( m_solid )
-	{
-		rcFreeHeightField(m_solid);
-		m_solid = 0;
-	}
-
-	if( m_chf )
-	{
-		rcFreeCompactHeightfield(m_chf);
-		m_chf = 0;
-	}
-
-	if( m_cset )
-	{
-		rcFreeContourSet(m_cset);
-		m_cset = 0;
-	}
-
-	if( m_pmesh )
-	{
-		rcFreePolyMesh(m_pmesh);
-		m_pmesh = 0;
-	}
-
-	if( m_dmesh )
-	{
-		rcFreePolyMeshDetail(m_dmesh);
-		m_dmesh = 0;
-	}
-
 	if( m_navMesh )
 	{
 		dtFreeNavMesh(m_navMesh);
@@ -380,23 +338,6 @@ void CRecastMesh::DebugRender()
 			}
 		}
 	}
-
-#if 0
-	if( recast_draw_contours.GetBool() && m_cset != NULL )
-	{
-		duDebugDrawContours(&dd, *m_cset);
-	}
-
-	if( recast_draw_polymesh.GetBool() && m_pmesh != NULL )
-	{
-		duDebugDrawPolyMesh(&dd, *m_pmesh);
-	}
-
-	if( recast_draw_polymeshdetail.GetBool() && m_dmesh != NULL )
-	{
-		duDebugDrawPolyMeshDetail(&dd, *m_dmesh);
-	}
-#endif // 0
 
 	if( recast_draw_navmesh.GetBool() )
 	{

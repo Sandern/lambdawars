@@ -86,7 +86,7 @@ public:
 		float &fCellSize, float &fCellHeight, float &fTileSize );
 
 	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
-	virtual bool Reset();
+	bool Reset();
 
 	bool DisableUnreachablePolygons( const CUtlVector< Vector > &samplePositions );
 
@@ -206,13 +206,7 @@ private:
 	CUtlString m_Name;
 	
 	// Data used during build
-	unsigned char* m_triareas;
-	rcHeightfield* m_solid;
-	rcCompactHeightfield* m_chf;
-	rcContourSet* m_cset;
-	rcPolyMesh* m_pmesh;
-	rcConfig m_cfg;	
-	rcPolyMeshDetail* m_dmesh;
+	rcConfig m_cfg;
 
 	struct dtTileCacheAlloc* m_talloc;
 	struct dtTileCacheCompressor* m_tcomp;
