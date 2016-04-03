@@ -30,19 +30,19 @@ struct FastLZCompressor : public dtTileCacheCompressor
 struct LinearAllocator : public dtTileCacheAlloc
 {
 	unsigned char* buffer;
-	int capacity;
-	int top;
-	int high;
+	size_t capacity;
+	size_t top;
+	size_t high;
 	
-	LinearAllocator(const int cap);
+	LinearAllocator(const size_t cap);
 	
 	~LinearAllocator();
 
-	void resize(const int cap);
+	void resize(const size_t cap);
 	
 	virtual void reset();
 	
-	virtual void* alloc(const int size);
+	virtual void* alloc(const size_t size);
 	
 	virtual void free(void* /*ptr*/);
 };

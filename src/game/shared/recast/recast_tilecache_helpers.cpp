@@ -43,7 +43,7 @@ dtStatus FastLZCompressor::decompress(const unsigned char* compressed, const int
 	return *bufferSize < 0 ? DT_FAILURE : DT_SUCCESS;
 }
 
-LinearAllocator::LinearAllocator(const int cap) : buffer(0), capacity(0), top(0), high(0)
+LinearAllocator::LinearAllocator(const size_t cap) : buffer(0), capacity(0), top(0), high(0)
 {
 	resize(cap);
 }
@@ -53,7 +53,7 @@ LinearAllocator::~LinearAllocator()
 	dtFree(buffer);
 }
 
-void LinearAllocator::resize(const int cap)
+void LinearAllocator::resize(const size_t cap)
 {
 	if (buffer) dtFree(buffer);
 	buffer = (unsigned char*)dtAlloc(cap, DT_ALLOC_PERM);
@@ -66,7 +66,7 @@ void LinearAllocator::reset()
 	top = 0;
 }
 	
-void* LinearAllocator::alloc(const int size)
+void* LinearAllocator::alloc(const size_t size)
 {
 	if (!buffer)
 		return 0;
