@@ -6,11 +6,12 @@ Game code can be found at: http://svn.lambdawars.com/ (svn checkout http://svn.l
 ## Overview
 
 ### Recast Navigation
-Recast Navigation mesh is integrated for path finding. In Half-Life 2, NPCs use manual places for path finding. However in a game like
+[Recast Navigation mesh](https://github.com/recastnavigation/recastnavigation) is integrated for path finding. 
+In Half-Life 2, NPCs use manual places for path finding. However in a game like
 Lambda Wars this would quite tedious. Another option earlier used by Lambda Wars was the navigation supplied by Valve (used by Counter-Strike
 and Left 4 Dead). The down-side of that navigation mesh is long generation times, only one mesh for all unit types and being restricted to
 world aligned polygons.
-[The recast navigation meshes](https://www.youtube.com/watch?v=oTYREslZu2s) do not have these restrictions (LW uses 5 different 
+The [recast navigation meshes](https://www.youtube.com/watch?v=oTYREslZu2s) do not have these restrictions (LW uses 5 different 
 generated meshes for different unit types) and meshes are generated within a minute for most of our maps (usually much faster).
 
 ### Chromium Embedded Framework
@@ -27,8 +28,9 @@ to extend entity classes and define new game modes among others. These bindings 
 
 ### Unit Navigator
 The [unit navigator]() is responsible for managing the paths, local obstacle avoidance and event dispatching to the AI (e.g. goal completion). The path finding
-uses recast navigation mesh as described above. The local avoidance is loosely based on [Crowd Flows](http://grail.cs.washington.edu/projects/crowd-flows/), also
-[demo'ed here](https://www.youtube.com/watch?v=4FrqW_DiugI).
+uses recast navigation mesh as described above. The local avoidance for small objects is loosely based on [Crowd Flows](http://grail.cs.washington.edu/projects/crowd-flows/), also
+[demo'ed here](https://www.youtube.com/watch?v=4FrqW_DiugI) in Lambda Wars. Bigger or semi-static objects like buildings are registered on navigation mesh as obstacles, so pathing
+takes them into account.
 
 ### Unit AI
 The unit AI is loosely based on the [AI systems concepts of Left 4 Dead](http://www.valvesoftware.com/publications/2009/ai_systems_of_l4d_mike_booth.pdf).
