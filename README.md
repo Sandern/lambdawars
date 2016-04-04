@@ -27,7 +27,7 @@ to extend entity classes and define new game modes among others. These bindings 
 [PySource SDK 2013](https://github.com/Sandern/py-source-sdk-2013).
 
 ### Unit Navigator
-The [unit navigator]() is responsible for managing the paths, local obstacle avoidance and event dispatching to the AI (e.g. goal completion). The path finding
+The [unit navigator](https://github.com/Sandern/lambdawars/blob/develop/src/game/server/lambdawars/unit_navigator.cpp) is responsible for managing the paths, local obstacle avoidance and event dispatching to the AI (e.g. goal completion). The path finding
 uses recast navigation mesh as described above. The local avoidance for small objects is loosely based on [Crowd Flows](http://grail.cs.washington.edu/projects/crowd-flows/), also
 [demo'ed here](https://www.youtube.com/watch?v=4FrqW_DiugI) in Lambda Wars. Bigger or semi-static objects like buildings are registered on navigation mesh as obstacles, so pathing
 takes them into account.
