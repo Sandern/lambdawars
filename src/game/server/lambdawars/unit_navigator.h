@@ -431,9 +431,6 @@ public:
 	virtual bool		SetGoalInRange( Vector &destination, float maxrange, float minrange=0.0f, float goaltolerance=0.0f, int goalflags=0, bool avoidenemies=true );
 	virtual bool		SetGoalTargetInRange( CBaseEntity *pTarget, float maxrange, float minrange=0.0f, float goaltolerance=0.0f, int goalflags=0, bool avoidenemies=true );
 
-	//bool				SetVectorGoal( const Vector &dir, float targetDist, float minDist = 0, bool fShouldDeflect = false );
-	//virtual bool		SetVectorGoalFromTarget( Vector &destination, float minDist, float goaltolerance=64.0f) { return SetGoal(destination, goaltolerance); }
-
 	virtual void		UpdateGoalInRange( float maxrange, float minrange=0.0f, UnitBasePath *path = NULL );
 	virtual void		UpdateGoalTarget( CBaseEntity *target, UnitBasePath *path = NULL );
 	virtual void		UpdateGoalInfo( void );
@@ -586,8 +583,6 @@ protected:
 	CUtlVector<seed_entry_t> m_Seeds;
 
 	Vector m_vBlockingDirection;
-	//int m_iBlockResolveDirection;
-	//float m_fNextChooseDirection;
 
 	int m_iTestRouteMask;
 

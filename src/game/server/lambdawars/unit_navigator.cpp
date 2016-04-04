@@ -182,10 +182,6 @@ void UnitBaseNavigator::Reset()
 	m_fLastBestDensity = 0.0f;
 	m_fDiscomfortWeight = unit_cost_discomfortweight_start.GetFloat();
 
-#if 0 // TODO: REMOVE
-	m_iBlockResolveDirection = 1;
-	m_fNextChooseDirection = 0;
-#endif // 0
 	m_hAtGoalDependencyEnt = NULL;
 }
 
@@ -498,8 +494,9 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 //-----------------------------------------------------------------------------
 // Purpose: Updates our preferred facing direction.
 //			Defaults to the path direction.
-//			TODO: Weapon shooting code depends on facing direction computed here.
-//				  Make this more robust.
+//			Notes: Weapon shooting code depends on facing direction computed here.
+//				   Furthermore AI should always decide about facing target/direction,
+//				   so don't put game specific logic in here.
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pPathDir )
 {
@@ -532,19 +529,6 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 		VectorAngles(dir, MoveCommand.idealviewangles);
 		UpdateFacingTargetState( GetOuter()->FInAimCone(m_vFacingTargetPos, m_fFacingCone) );
 	}
-#if 0
-	// Face enemy for shooting by default
-	// => Disabled this code, when needed the AI action will already do this. Otherwise introduces
-	//	  bugs because between switching action after a facing action, the unit may try to face
-	//    the enemy again.
-	else if( m_pOuter->GetEnemy() )
-	{
-		Vector dir = m_pOuter->GetEnemy()->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
-		if( bZeroPitch )
-			dir.z = 0;
-		VectorAngles(dir, MoveCommand.idealviewangles);
-	}
-#endif // 0
 	// Face path dir if we are following a path
 	else if( pPathDir ) 
 	{
@@ -647,16 +631,6 @@ void UnitBaseNavigator::CollectConsiderEntities( UnitBaseMoveCommand &MoveComman
 			{
 				if( pEnt == GetPath()->m_hTarget )
 					continue;
-
-				// MAYBE?
-#if 0
-				if( GetPath()->m_iGoalFlags & GF_OWNERISTARGET )
-				{
-					CBaseEntity *pOwnerEntity = pEnt->GetOwnerEntity();
-					if( pOwnerEntity && pOwnerEntity == GetPath()->m_hTarget.Get() )
-						continue;
-				}
-#endif // 0
 			}
 
 			// If specified, don't avoid enemies
@@ -794,24 +768,6 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCom
 	}
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Determine whether the entity can affect our flow our not.
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::ShouldConsiderEntity( CBaseEntity *pEnt )
-{
-	// Shouldn't consider ourself or anything that is not solid.
-	if( pEnt == m_pOuter || !pEnt->IsSolid() )
-		return false;
-
-	// Skip target of our path, otherwise we might not be able to get near.
-	if( pEnt == GetPath()->m_hTarget )
-		return false;
-
-	return true;
-}
-#endif // 0
-
 //-----------------------------------------------------------------------------
 // Purpose: Whether we should add density from nav areas
 //-----------------------------------------------------------------------------
@@ -887,27 +843,6 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 		}
 		else
 		{
-#if 0 // TODO: REMOVE
-			// Add density from nav mesh (don't drop off cliffs when we don't want too)
-			// Note that we don't do this for special waypoints (climbing/dropping/etc)
-			if( ShouldConsiderNavMesh() )
-			{
-				UnitShortestPathCost costFunc(m_pOuter);
-
-				// Add density from nav area
-				// TODO: Check if target area is valid? 
-				CNavArea *pAreaTo = TheNavMesh->GetNavArea( vPos + Vector(0,0,96.0f), 150.0f );
-				if( !pAreaTo /*|| !costFunc.IsAreaValid( pAreaTo )*/ )
-				{
-					float fDensity = THRESHOLD_MAX / 2.0f;
-					fSumDensity += fDensity;
-					Vector vDir = GetAbsOrigin() - vPos;
-					VectorNormalize(vDir);
-					vAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
-				}
-			}
-#endif // 0
-
 			if( m_Seeds.Count() )
 			{
 				float fDist;
@@ -1037,20 +972,6 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	// 3. The "free" non blocked directions
 	float cost = ( unit_cost_distweight.GetFloat() * fDist ) + 
 			 ( m_fDiscomfortWeight * fDensity );
-#if 0 // TODO: REMOVE
-	if( m_vBlockingDirection != vec3_origin )
-	{
-		if( m_fNextChooseDirection < gpGlobals->curtime )
-		{
-			//float fDist1 = (vFinalVelocity.Normalized() - m_vBlockingDirection).Length2D();
-			//float fDist2  = (vFinalVelocity.Normalized() + m_vBlockingDirection).Length2D();
-			m_iBlockResolveDirection = random->RandomInt(0, 1) > 0 ? 1 : -1;
-			m_fNextChooseDirection = gpGlobals->curtime + 5.0f;
-		}
-
-		cost += (vFinalVelocity.Normalized() - (m_vBlockingDirection * m_iBlockResolveDirection)).Length2D() * unit_cost_blockdirweight.GetFloat();
-	}
-#endif // 0
 	return cost;
 }
 
@@ -1443,35 +1364,6 @@ CheckGoalStatus_t UnitBaseNavigator::UpdateGoalAndPath( UnitBaseMoveCommand &Mov
 				}
 			}
 		}
-
-#if 0
-		if( m_fNextAvgDistConsideration < gpGlobals->curtime )
-		{
-			float fAvgDist = CalculateAvgDistHistory();
-			if( fAvgDist != -1 )
-			{
-				if( GetPath()->CurWaypointIsGoal() && m_bUnitArrivedAtSameGoalNearby )
-				{
-					if( m_fLastAvgDist != -1 && fAvgDist > (m_fLastAvgDist + unit_cost_minavg_improvement.GetFloat()) )
-					{
-						GoalStatus = CHS_ATGOAL;
-						if( unit_navigator_debug.GetBool() )
-							DevMsg("#%d: UpdateGoalAndPath: Arrived at goal due no improvement and nearby units arrived with same goal\n", GetOuter()->entindex() );
-					}
-				}
-				m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
-				m_fLastAvgDist = fAvgDist;
-			}
-		}
-		m_DistHistory.AddToTail( dist_entry_t( (m_vLastPosition - GetAbsOrigin()).Length2D(), gpGlobals->curtime ) );
-		
-		if( m_fLastAvgDist != - 1 && m_fLastAvgDist < (MoveCommand.maxspeed * unit_cost_history.GetFloat()) / 2.0 )
-		{
-			m_Seeds.AddToTail( seed_entry_t( GetAbsOrigin().AsVector2D(), gpGlobals->curtime ) );
-			if( unit_navigator_debug.GetBool() )
-				DevMsg("#%d: UpdateGoalAndPath: Added seed due lack of improvement\n", GetOuter()->entindex() );
-		}
-#endif // 0
 	}
 
 
@@ -2086,21 +1978,6 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 	return bResult;
 }
 
-#if 0 // TODO: Not used atm, disabled since need to update for recast
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::SetVectorGoal( const Vector &dir, float targetDist, float minDist, bool fShouldDeflect )
-{
-	Vector result;
-
-	if ( FindVectorGoal( &result, dir, targetDist, minDist ) )
-		return SetGoal( result );
-	
-	return false;
-}
-#endif // 0
-
 //-----------------------------------------------------------------------------
 // Purpose: Update In range path information
 //-----------------------------------------------------------------------------
@@ -2514,57 +2391,6 @@ void UnitBaseNavigator::SetPath( boost::python::object path )
 	m_refPath = path;
 }
 #endif // ENABLE_PYTHON
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void UnitBaseNavigator::CalculateDestinationInRange( Vector *pResult, const Vector &vGoalPos, float minrange, float maxrange)
-{
-	Vector dir;
-	float dist = (vGoalPos - GetAbsOrigin()).Length2D();
-	if( dist < minrange )
-	{
-		dir = GetAbsOrigin() - vGoalPos;
-		VectorNormalize(dir);
-		FindVectorGoal(pResult, dir, minrange);
-	}
-	else if( dist > maxrange )
-	{
-		dir = vGoalPos - GetAbsOrigin();
-		VectorNormalize(dir);
-		FindVectorGoal(pResult, dir, dist-maxrange);
-	}
-	else
-	{
-		*pResult = GetAbsOrigin();
-	}
-}
-
-
-#endif 
-
-#if 0 // TODO: Not used atm, so disabled. Needs to be updated for Recast.
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-bool UnitBaseNavigator::FindVectorGoal( Vector *pResult, const Vector &dir, float targetDist, float minDist )
-{
-	Vector testLoc = GetAbsOrigin() + ( dir * targetDist );
-
-	CNavArea *pArea = TheNavMesh->GetNearestNavArea(testLoc);
-	if( !pArea )
-		return false;
-
-	if( !pArea->Contains(testLoc) ) {
-		pArea->GetClosestPointOnArea(testLoc, pResult);
-		return true;
-	}
-	testLoc.z = pArea->GetZ(testLoc);
-	*pResult = testLoc;
-	return true;
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose:
