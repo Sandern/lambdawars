@@ -59,6 +59,7 @@ From here you can run a few commands:
 - Generate bindings for a single module: python generate_mods -m module_name
 
 ## Compiling shaders (optional)
+The mod comes with a set of custom shaders to support the Fog of War, as well as to integrate the [deferred lighting project](https://www.youtube.com/watch?v=bMjXx-KweIo). The deferred lighting shaders are modified to blend with regular lightmaps. If you don't plan on modifying the shaders, you don't need to follow these steps. The compiled shaders are already included in the repository.
 - Follow: https://developer.valvesoftware.com/wiki/Shader_Authoring
 - Update paths buildsdkshaders_wars.bat
 
