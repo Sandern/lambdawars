@@ -404,6 +404,25 @@ namespace objects
           return 0;
       }
 
+	  // https://mail.python.org/pipermail/cplusplus-sig/2007-November/012716.html
+      static int instance_traverse( PyObject* op, visitproc visit, void* arg )
+      {
+          instance<>* inst = downcast<instance<>>(op);
+          if( inst->dict )
+          {
+              return visit( inst->dict, arg );
+          }
+          return 0;
+      }
+
+      static int instance_clear( PyObject* op )
+      {
+          instance<>* inst = downcast<instance<>>(op);
+          PyObject* tmp = inst->dict;
+          inst->dict = 0;
+          python::xdecref( tmp );
+          return 0;
+      }
   }
 
 
@@ -438,11 +457,11 @@ namespace objects
       0,                                      /* tp_getattro */
       0,                                      /* tp_setattro */
       0,                                      /* tp_as_buffer */
-      Py_TPFLAGS_DEFAULT // | Py_TPFLAGS_HAVE_GC
+      Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC
       | Py_TPFLAGS_BASETYPE,          /* tp_flags */
       0,                                      /* tp_doc */
-      0,                                      /* tp_traverse */
-      0,                                      /* tp_clear */
+      instance_traverse,                      /* tp_traverse */
+      instance_clear,                         /* tp_clear */
       0,                                      /* tp_richcompare */
       offsetof(instance<>,weakrefs),          /* tp_weaklistoffset */
       0,                                      /* tp_iter */
