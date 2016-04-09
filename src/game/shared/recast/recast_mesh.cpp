@@ -217,16 +217,24 @@ bool CRecastMesh::ComputeMeshSettings( const char *name,
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CRecastMesh::Init( const char *name )
+void CRecastMesh::SharedInit(  const char *name )
 {
 	m_Name.Set( name );
 
 	m_navQuery = dtAllocNavMeshQuery();
 	m_navQueryLimitedNodes = dtAllocNavMeshQuery();
 
-	m_talloc = new LinearAllocator(32000);
+	m_talloc = new LinearAllocator( 96000 );
 	m_tcomp = new FastLZCompressor;
 	m_tmproc = new MeshProcess( name );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CRecastMesh::Init( const char *name )
+{
+	SharedInit( name );
 
 	// Shared settings by all
 	ComputeMeshSettings( name, m_agentRadius, m_agentHeight, m_agentMaxClimb, m_agentMaxSlope,
@@ -238,14 +246,7 @@ void CRecastMesh::Init( const char *name )
 //-----------------------------------------------------------------------------
 void CRecastMesh::Init( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope )
 {
-	m_Name.Set( name );
-
-	m_navQuery = dtAllocNavMeshQuery();
-	m_navQueryLimitedNodes = dtAllocNavMeshQuery();
-
-	m_talloc = new LinearAllocator(32000);
-	m_tcomp = new FastLZCompressor;
-	m_tmproc = new MeshProcess( name );
+	SharedInit( name );
 
 	m_agentHeight = agentHeight;
 	m_agentRadius = agentRadius;
@@ -280,7 +281,7 @@ void CRecastMesh::Update( float dt )
 	{
 		Warning("CRecastMesh::Update failed: \n");
 		if( status & DT_OUT_OF_MEMORY )
-			Warning("\tOut of memory\n");
+			Warning("\tOut of memory. Consider increasing LinearAllocator buffer size.\n");
 	}
 }
 

@@ -142,6 +142,9 @@ public:
 	void SetTileSize( float tileSize ) { m_tileSize = tileSize; }
 
 private:
+	void SharedInit(  const char *name );
+
+private:
 	// Result data for path finding
 	typedef struct pathfind_resultdata_t {
 		pathfind_resultdata_t() : cacheValid(false), startRef(0), endRef(0), npolys(0), straightPathOptions(0), nstraightPath(0) {}
