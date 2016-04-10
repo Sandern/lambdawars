@@ -1584,7 +1584,7 @@ void CServerGameDLL::Think( bool finalTick )
 	}
 
 #ifdef ENABLE_PYTHON
-	SrcPySystem()->UpdateRealtimeTickMethods();
+	SrcPySystem()->UpdateRealtime();
 #endif // ENABLE_PYTHON
 
 #ifdef HL2WARS_DLL

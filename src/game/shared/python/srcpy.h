@@ -391,7 +391,7 @@ public:
 	boost::python::list GetRegisteredTickMethods();
 	bool IsTickMethodRegistered( boost::python::object method );
 
-	void UpdateRealtimeTickMethods();
+	void UpdateRealtime();
 
 	void RegisterPerFrameMethod( boost::python::object method );
 	void UnregisterPerFrameMethod( boost::python::object method );
@@ -413,8 +413,9 @@ public:
 	void PostProcessDelayedUpdates( CBaseEntity *pEntity );
 #endif // CLIENT_DLL
 
-private:
-	void					ExecuteAllScriptsInPath( const char *pPath );
+protected:
+	void UpdateRealtimeTickMethods();
+	void ExecuteAllScriptsInPath( const char *pPath );
 
 private:
 	bool m_bPythonRunning;

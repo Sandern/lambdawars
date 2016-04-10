@@ -885,7 +885,7 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 
 	// On the server this is called from CServerGameDLL::Think
 #ifdef CLIENT_DLL
-	UpdateRealtimeTickMethods();
+	UpdateRealtime();
 #endif // CLIENT_DLL
 
 	// Update frame methods
@@ -919,13 +919,36 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
+// Purpose: None-game time based Update function.
+//			Update function is based on game time/frames, and does not run
+//			when the game is paused or not running at all.
 //-----------------------------------------------------------------------------
-void CSrcPython::UpdateRealtimeTickMethods()
+void CSrcPython::UpdateRealtime()
 {
 	if( !IsPythonRunning() )
 		return;
 
+	try 
+	{
+		// This is purely here to allow the Python interpreter run threads.
+		// If no other Python code runs, it will never check threads.
+		// This is mostly the case when in the main menu, where usually no
+		// server side Python code is running.
+		boost::python::exec("pass", mainnamespace, mainnamespace);
+	}
+	catch( bp::error_already_set & ) 
+	{
+		PyErr_Print();
+	}
+
+	UpdateRealtimeTickMethods();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CSrcPython::UpdateRealtimeTickMethods()
+{
 	// Update tick methods
 	int i;
 	for( i = m_methodTickList.Count() - 1; i >= 0 ; i-- )
