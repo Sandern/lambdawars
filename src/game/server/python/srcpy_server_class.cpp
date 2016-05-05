@@ -191,39 +191,6 @@ void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter )
 	}
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: Sends Python network class setup through commands
-//-----------------------------------------------------------------------------
-void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
-{
-	if( !SrcPySystem()->IsPythonRunning() )
-	{
-		DevMsg("FullClientUpdatePyNetworkClsByEdict: Python is not running\n");
-		return;
-	}
-
-	Assert(g_SetupNetworkTablesOnHold == false);
-
-	// Send messages about each server class
-	PyServerClass *p = g_pPyServerClassHead;
-	while( p )
-	{
-		if( p->m_bFree ) {
-			p = p->m_pPyNext;
-			continue;
-		}
-
-		// Send message
-		engine->ClientCommand( pEdict, "rpc %d %s %s\n", p->m_iType,
-			p->m_pNetworkName, p->m_pNetworkedClass->m_pNetworkName);
-		engine->ServerExecute(); // Send immediately to avoid an overflow when having too many
-
-		p = p->m_pPyNext;
-	}
-}
-#endif //0
-
 //-----------------------------------------------------------------------------
 // Purpose: Sends Python network class setup through Steam p2p/loopback
 //			TODO: Test with Steam P2P

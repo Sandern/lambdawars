@@ -74,7 +74,14 @@ public:
 	DECLARE_CLIENTCLASS();
 	DECLARE_PREDICTABLE();
 	DECLARE_INTERPOLATION();
+
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLIENTCLASS( C_BasePlayer );
+// =======================================
+// END PySource Additions
+// =======================================
 
 	C_BasePlayer();
 	virtual			~C_BasePlayer();

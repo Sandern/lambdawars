@@ -487,6 +487,4 @@ extern ConVar func_breakdmg_bullet;
 extern ConVar func_breakdmg_club;
 extern ConVar func_breakdmg_explosive;
 
-
-
 #endif // PROPS_H

@@ -527,9 +527,6 @@ class Entities(SemiSharedModuleGenerator):
                 
             # Apply common rules
             cls.mem_funs('GetServerClass', allow_empty=True).exclude()
-            #cls.mem_funs('GetServerClass', allow_empty=True).call_policies = call_policies.return_internal_reference()
-            
-            #cls.vars('m_pClassSendTable', allow_empty=True).include()
             cls.mem_funs('GetSendTable', allow_empty=True).call_policies = call_policies.return_value_policy(call_policies.reference_existing_object)
             
             excludetypes = [
@@ -837,8 +834,9 @@ class Entities(SemiSharedModuleGenerator):
             mb.mem_funs('GetMaxHealth').exclude() # Use property maxhealth
             #mb.mem_funs('SetModelIndex').exclude()
             
-            # Not interested in SendProxy_ functions
-            mb.mem_funs(lambda decl: decl.name.startswith('SendProxy_')).exclude()
+            if self.settings.branch == 'swarm':
+                # Not interested in SendProxy_ functions
+                mb.mem_funs(lambda decl: decl.name.startswith('SendProxy_')).exclude()
             
             if self.settings.branch == 'swarm':
                 mb.mem_funs('GetEntityNameAsCStr').exclude() # Always use GetEntityName()

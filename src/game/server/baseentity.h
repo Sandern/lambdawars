@@ -25,7 +25,13 @@
 #include "branchingsingleton.h"
 #include "bittools.h"
 
+// =======================================
+// PySource Additions
+// =======================================
 #include "srcpy_server_class.h" // Replaced by stubs if ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 #include "density_weight_map.h"
 #include "hl2wars_shareddefs.h"
@@ -3127,7 +3133,13 @@ class CPointEntity : public CBaseEntity
 {
 public:
 	DECLARE_CLASS( CPointEntity, CBaseEntity );
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLASS( CPointEntity );
+// =======================================
+// END PySource Additions
+// =======================================
 
 	void	Spawn( void );
 	virtual int	ObjectCaps( void ) { return BaseClass::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
@@ -3139,7 +3151,14 @@ private:
 class CServerOnlyEntity : public CBaseEntity
 {
 	DECLARE_CLASS( CServerOnlyEntity, CBaseEntity );
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLASS( CServerOnlyEntity );
+// =======================================
+// END PySource Additions
+// =======================================
+
 public:
 	CServerOnlyEntity() : CBaseEntity( true ) {}
 	
@@ -3150,7 +3169,13 @@ public:
 class CServerOnlyPointEntity : public CServerOnlyEntity
 {
 	DECLARE_CLASS( CServerOnlyPointEntity, CServerOnlyEntity );
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLASS( CServerOnlyPointEntity );
+// =======================================
+// END PySource Additions
+// =======================================
 
 public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );
@@ -3160,7 +3185,13 @@ public:
 class CLogicalEntity : public CServerOnlyEntity
 {
 	DECLARE_CLASS( CLogicalEntity, CServerOnlyEntity );
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYCLASS( CLogicalEntity );
+// =======================================
+// END PySource Additions
+// =======================================
 
 public:
 	virtual bool KeyValue( const char *szKeyName, const char *szValue );

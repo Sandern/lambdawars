@@ -149,7 +149,6 @@
 // =======================================
 #ifdef ENABLE_PYTHON
 #include "srcpy.h"
-#include "srcpy_client_class.h"
 #endif // ENABLE_PYTHON
 // =======================================
 // END PySource Additions

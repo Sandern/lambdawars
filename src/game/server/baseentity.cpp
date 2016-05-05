@@ -9027,7 +9027,7 @@ void CBaseEntity::DestroyPyInstance()
 	// Remove this entity from the ent list (NOTE:  This Makes EHANDLES go NULL)
 	gEntList.RemoveEntity( GetBaseEntity()->GetRefEHandle() );
 
-	// CLOSE NETWORKPROP
+	// CLOSE NETWORKPROP (ensure client side is cleaned up)
 	m_Network.DestroyNetworkProperty();
 
 	// Close collision property

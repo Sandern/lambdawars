@@ -49,7 +49,13 @@ public:
 	DECLARE_PREDICTABLE();
 	// script description
 	DECLARE_ENT_SCRIPTDESC();
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYSERVERCLASS( CBaseFlex );
+// =======================================
+// END PySource Additions
+// =======================================
 
 	// Construction
 						CBaseFlex( void );

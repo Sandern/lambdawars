@@ -310,7 +310,7 @@ void WarsNet_ReceiveEntityClasses( CUtlBuffer &data )
 		char modulePath[PYNETCLS_BUFSIZE];
 		V_strncpy( modulePath, networkName, n );
 
-		// Make sure the client class is imported
+		// Make sure the client module is is imported so the entity class is registered
 		SrcPySystem()->Import( modulePath );
 
 		// Read which client class we are modifying

@@ -255,7 +255,13 @@ public:
 	DECLARE_SERVERCLASS();
 	// script description
 	DECLARE_ENT_SCRIPTDESC();
+// =======================================
+// PySource Additions
+// =======================================
 	DECLARE_PYSERVERCLASS( CBasePlayer );
+// =======================================
+// END PySource Additions
+// =======================================
 
 	CBasePlayer();
 	~CBasePlayer();

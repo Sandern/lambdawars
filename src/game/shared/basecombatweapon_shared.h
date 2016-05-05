@@ -138,11 +138,17 @@ public:
 	DECLARE_NETWORKCLASS();
 	DECLARE_PREDICTABLE();
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef CLIENT_DLL
 	DECLARE_PYCLIENTCLASS( C_BaseCombatWeapon );
 #else
 	DECLARE_PYSERVERCLASS( CBaseCombatWeapon );
 #endif // CLIENT_DLL
+// =======================================
+// END PySource Additions
+// =======================================
 
 							CBaseCombatWeapon();
 	virtual 				~CBaseCombatWeapon();

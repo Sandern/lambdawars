@@ -8,9 +8,15 @@
 #include "iclassmap.h"
 #include "utldict.h"
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	#include "srcpy_entities.h"
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -56,12 +62,18 @@ public:
 	virtual C_BaseEntity	*CreateEntity( const char *mapname );
 	virtual int				GetClassSize( const char *classname );
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 	virtual void			PyAdd( const char *mapname, const char *classname, int size, PyEntityFactory *factory );
 	virtual void			PyRemove( const char *classname );
 	virtual PyEntityFactory* PyGetFactory( const char *classname );
 	virtual PyEntityFactory* PyGetFactoryByMapName( const char *classname );
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 
 private:
 	CUtlDict< classentry_t, unsigned short > m_ClassDict;
@@ -120,6 +132,9 @@ C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 		if ( Q_stricmp( lookup->GetMapName(), mapname ) )
 			continue;
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifndef ENABLE_PYTHON
 		if ( !lookup->factory )
 		{
@@ -146,6 +161,9 @@ C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 #endif
 		}
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
 	}
 
 	return NULL;
@@ -171,6 +189,9 @@ int CClassMap::GetClassSize( const char *classname )
 	return -1;
 }
 
+// =======================================
+// PySource Additions
+// =======================================
 #ifdef ENABLE_PYTHON
 void CClassMap::PyAdd( const char *mapname, const char *classname, int size, PyEntityFactory *factory )
 {
@@ -225,3 +246,6 @@ PyEntityFactory* CClassMap::PyGetFactoryByMapName( const char *mapname )
 	return NULL;
 }
 #endif // ENABLE_PYTHON
+// =======================================
+// END PySource Additions
+// =======================================
