@@ -4901,6 +4901,9 @@ void C_BaseEntity::PostEntityPacketReceived( void )
 	Assert( GetPredictable() );
 	Assert( cl_predict->GetInt() );
 
+	// Always mark as changed
+	AddDataChangeEvent( this, DATA_UPDATE_DATATABLE_CHANGED, &m_DataChangeEventRef );
+
 	// Save networked fields into "original data" store
 	SaveData( "PostEntityPacketReceived", SLOT_ORIGINALDATA, PC_NETWORKED_ONLY );
 #endif
