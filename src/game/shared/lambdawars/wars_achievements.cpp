@@ -276,6 +276,17 @@ class CAchievement_Partisan : public CWarsAchievement
 	}
 	// server fires an event for this achievement, no other code within achievement necessary
 };
-DECLARE_ACHIEVEMENT_ORDER( CAchievement_Partisan, ACHIEVEMENT_WARS_PARTISAN, "WARS_PARTISAN", 5, 160 );
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_Partisan, ACHIEVEMENT_WARS_PARTISAN, "WARS_PARTISAN", 5, 170 );
+
+class CAchievement_MissionWaste : public CWarsAchievement
+{
+	void Init() 
+	{
+		SetFlags( ACH_SAVE_GLOBAL );
+		SetGoal( 1 );
+	}
+	// server fires an event for this achievement, no other code within achievement necessary
+};
+DECLARE_ACHIEVEMENT_ORDER( CAchievement_MissionWaste, ACHIEVEMENT_WARS_MISSION_WASTE, "WARS_MISSION_WASTE", 5, 180 );
 
 #endif
