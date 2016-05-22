@@ -349,7 +349,7 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	UpdateBlockedStatus( MoveCommand, fWaypointDist );
 	if( GoalStatus == CHS_HASGOAL && GetBlockedStatus() == BS_GIVEUP )
 	{
-		Warning("#%d UnitNavigator: Unit is blocked and gives up on goal (%s: pos %.2f %.2f %.2f -> goal %.2f %.2f %.2f!\n", 
+		Warning("#%d UnitNavigator: Unit is blocked and gives up on goal (%s: pos %.2f %.2f %.2f -> goal %.2f %.2f %.2f)!\n", 
 			GetOuter()->entindex(), GetOuter()->GetIUnit()->GetUnitType(), 
 			GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z,
 			GetPath()->m_vGoalPos.x, GetPath()->m_vGoalPos.y, GetPath()->m_vGoalPos.z);
