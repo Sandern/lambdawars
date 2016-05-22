@@ -50,7 +50,7 @@ namespace bp = boost::python;
 // Stubs for Python
 // Py_GetBuildInfo is used by sys.version and platform.python_implementation depends the format. 
 // Don't care too much what it exactly contains.
-const char *Py_GetBuildInfo(void) { return "v3.4.3:374f501f4567, Oct 3 2015, 02:16:59"; }
+const char *Py_GetBuildInfo(void) { return "v3.4.4:374f501f4567, Oct 3 2015, 02:16:59"; }
 const char *_Py_hgversion(void) { return "1"; }
 const char *_Py_hgidentifier(void) { return "srcpy"; }
 #endif
@@ -511,9 +511,12 @@ bool CSrcPython::PostInitInterpreter( bool bStandAloneInterpreter )
 //-----------------------------------------------------------------------------
 bool CSrcPython::PreShutdownInterpreter( bool bIsStandAlone )
 {
-	// Allows actions before shutting down in game code. Mainly needed to ensure
-	// match data is uploaded to server.
-	CallSignalNoArgs( Get("preshutdown", "core.signals", true) );
+	if( !bIsStandAlone )
+	{
+		// Allows actions before shutting down in game code. Mainly needed to ensure
+		// match data is uploaded to server.
+		CallSignalNoArgs( Get("preshutdown", "core.signals", true) );
+	}
 
 	PyErr_Clear(); // Make sure it does not hold any references...
 	GarbageCollect();
