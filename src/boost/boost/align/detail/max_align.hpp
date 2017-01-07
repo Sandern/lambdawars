@@ -11,7 +11,6 @@ http://boost.org/LICENSE_1_0.txt
 
 #include <boost/align/detail/max_size.hpp>
 #include <boost/align/alignment_of.hpp>
-#include <cstddef>
 
 namespace boost {
 namespace alignment {
@@ -19,8 +18,7 @@ namespace detail {
 
 template<class A, class B>
 struct max_align
-    : max_size<alignment_of<A>::value, alignment_of<B>::value>::type {
-};
+    : max_size<alignment_of<A>::value, alignment_of<B>::value> { };
 
 } /* .detail */
 } /* .alignment */

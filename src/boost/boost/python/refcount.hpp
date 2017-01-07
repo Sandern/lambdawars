@@ -27,6 +27,7 @@ inline T* xincref(T* p)
 template <class T>
 inline void decref(T* p)
 {
+    assert( Py_REFCNT(python::upcast<PyObject>(p)) > 0 );
     Py_DECREF(python::upcast<PyObject>(p));
 }
 
