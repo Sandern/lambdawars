@@ -421,6 +421,7 @@ BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	SendPropEHandle		( SENDINFO( m_hSquadUnit ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
 	SendPropEHandle		( SENDINFO( m_hCommander ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
 	SendPropEHandle		( SENDINFO( m_hEnemy ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
+	SendPropEHandle		( SENDINFO( m_hGarrisonedBuilding ), SPROP_ENCODED_AGAINST_TICKCOUNT ),
 
 	SendPropBool( SENDINFO( m_bCrouching ) ),
 	SendPropBool( SENDINFO( m_bClimbing ) ),

@@ -155,6 +155,7 @@ BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_FullTable )
 	RecvPropEHandle		( RECVINFO( m_hSquadUnit ) ),
 	RecvPropEHandle		( RECVINFO( m_hCommander ) ),
 	RecvPropEHandle		( RECVINFO( m_hEnemy ) ),
+	RecvPropEHandle		( RECVINFO( m_hGarrisonedBuilding ) ),
 
 	RecvPropBool( RECVINFO( m_bCrouching ) ),
 	RecvPropBool( RECVINFO( m_bClimbing ) ),

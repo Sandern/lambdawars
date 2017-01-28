@@ -255,7 +255,7 @@ bool CWarsWeapon::WeaponLOSCondition( const Vector &ownerPos, const Vector &targ
 	// FIXME: If we're in a vehicle, we need some sort of way to handle shooting out of them
 
 	// Use the custom LOS trace filter
-	CWarsWeaponLOSFilter traceFilter( pOwner, pTarget, COLLISION_GROUP_BREAKABLE_GLASS );
+	CWarsWeaponLOSFilter traceFilter( pOwner->GetGarrisonedBuilding() ? pOwner->GetGarrisonedBuilding() : pOwner, pTarget, COLLISION_GROUP_BREAKABLE_GLASS );
 	trace_t tr;
 	UTIL_TraceLine( barrelPos, targetPos, MASK_SHOT|MASK_BLOCKLOS, &traceFilter, &tr );
 

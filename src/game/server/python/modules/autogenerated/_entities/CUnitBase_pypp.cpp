@@ -2868,6 +2868,19 @@ void register_CUnitBase_class(){
                 , fset( &::CUnitBase::SetAttackLOSMask ) );
         
         }
+        { //property "garrisoned_building"[fget=::CUnitBase::GetGarrisonedBuilding, fset=::CUnitBase::SetGarrisonedBuilding]
+        
+            typedef ::CUnitBase * ( ::CUnitBase::*fget )(  ) ;
+            typedef void ( ::CUnitBase::*fset )( ::CUnitBase * ) ;
+            
+            CUnitBase_exposer.add_property( 
+                "garrisoned_building"
+                , bp::make_function( 
+                      fget( &::CUnitBase::GetGarrisonedBuilding )
+                    , bp::return_value_policy< bp::return_by_value >() ) 
+                , fset( &::CUnitBase::SetGarrisonedBuilding ) );
+        
+        }
         CUnitBase_exposer.add_property( "lifestate", &CUnitBase_wrapper::m_lifeState_Get, &CUnitBase_wrapper::m_lifeState_Set );
         CUnitBase_exposer.add_property( "takedamage", &CUnitBase_wrapper::m_takedamage_Get, &CUnitBase_wrapper::m_takedamage_Set );
         CUnitBase_exposer.add_property( "skin", &CUnitBase_wrapper::m_nSkin_Get, &CUnitBase_wrapper::m_nSkin_Set );

@@ -341,6 +341,7 @@ public:
 	bool				CheckEnemyLost( bool supressevents = false );
 	void				DispatchEnemyLost( void );
 	virtual bool		PassesDamageFilter( const CTakeDamageInfo &info );
+	void				SetGarrisonedBuilding( CUnitBase *pGarrisonedBuilding );
 
 	// Enemy/attack related
 	virtual bool		HasRangeAttackLOS( const Vector &vTargetPos, CBaseEntity *pTarget = NULL );
@@ -372,6 +373,7 @@ public:
 #endif
 
 	CBaseEntity *		GetEnemy();
+	CUnitBase *			GetGarrisonedBuilding();
 
 	virtual Vector		GetShootEnemyDir( Vector &shootOrigin, bool noisy = true );
 	virtual Vector		BodyTarget( const Vector &posSrc, bool bNoisy = true );
@@ -608,6 +610,7 @@ private:
 	CNetworkHandle( CBaseEntity, m_hSquadUnit );
 	CNetworkHandle (CHL2WarsPlayer, m_hCommander); 	// the player in charge of this unit
 	CNetworkHandle( CBaseEntity, m_hEnemy );
+	CNetworkHandle( CUnitBase, m_hGarrisonedBuilding );
 };
 
 typedef CHandle<CUnitBase> UNITHANDLE;
@@ -621,6 +624,11 @@ inline CBaseEntity *CUnitBase::GetSquad()
 inline CBaseEntity *CUnitBase::GetEnemy()
 {
 	return m_hEnemy.Get();
+}
+
+inline CUnitBase *CUnitBase::GetGarrisonedBuilding()
+{
+	return m_hGarrisonedBuilding;
 }
 
 inline bool CUnitBase::IsCrouching( void )
@@ -716,6 +724,11 @@ inline float CUnitBase::EnemyDistance( CBaseEntity *pEnemy, bool bConsiderSizeUn
 inline void CUnitBase::SetEnemy( CBaseEntity *pEnt )
 {
 	return SetEnemyEx( pEnt );
+}
+
+inline void CUnitBase::SetGarrisonedBuilding( CUnitBase *pGarrisonedBuilding )
+{
+	m_hGarrisonedBuilding = pGarrisonedBuilding;
 }
 
 #ifdef ENABLE_PYTHON

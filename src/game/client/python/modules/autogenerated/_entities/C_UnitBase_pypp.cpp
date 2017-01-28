@@ -2353,6 +2353,17 @@ void register_C_UnitBase_class(){
                 , fget( &::C_UnitBase::IsClimbing ) );
         
         }
+        { //property "garrisoned_building"[fget=::C_UnitBase::GetGarrisonedBuilding]
+        
+            typedef ::C_UnitBase * ( ::C_UnitBase::*fget )(  ) ;
+            
+            C_UnitBase_exposer.add_property( 
+                "garrisoned_building"
+                , bp::make_function( 
+                      fget( &::C_UnitBase::GetGarrisonedBuilding )
+                    , bp::return_value_policy< bp::return_by_value >() )  );
+        
+        }
         C_UnitBase_exposer.add_property( "lifestate", &C_UnitBase_wrapper::m_lifeState_Get, &C_UnitBase_wrapper::m_lifeState_Set );
         C_UnitBase_exposer.add_property( "takedamage", &C_UnitBase_wrapper::m_takedamage_Get, &C_UnitBase_wrapper::m_takedamage_Set );
         C_UnitBase_exposer.add_property( "skin", &C_UnitBase_wrapper::m_nSkin_Get, &C_UnitBase_wrapper::m_nSkin_Set );

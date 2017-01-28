@@ -1523,7 +1523,6 @@ class Entities(SemiSharedModuleGenerator):
         cls.mem_funs('GetAnimState').exclude() 
         self.AddProperty(cls, 'animstate', 'PyGetAnimState', 'SetAnimState')
         
-        #cls.mem_funs('GetEnemy').call_policies = call_policies.return_value_policy(call_policies.return_by_value) 
         mb.mem_funs('GetEnemy').exclude() 
         if self.isclient:
             self.IncludeVarAndRename('m_iMaxHealth', 'maxhealth')
@@ -1535,6 +1534,8 @@ class Entities(SemiSharedModuleGenerator):
             cls.add_property( 'climbing'
                              , cls.mem_fun('IsClimbing'))    
             self.IncludeVarAndRename('m_bUpdateClientAnimations', 'updateclientanimations')
+            
+            self.AddProperty(cls, 'garrisoned_building', 'GetGarrisonedBuilding')
         else:
             cls.mem_funs('GetLastTakeDamageTime').exclude()
             
@@ -1577,6 +1578,8 @@ class Entities(SemiSharedModuleGenerator):
             # LIST OF SERVER FUNCTIONS TO OVERRIDE
             mb.mem_funs('OnFullHealth').virtuality = 'virtual'
             mb.mem_funs('OnLostFullHealth').virtuality = 'virtual'
+            
+            self.AddProperty(cls, 'garrisoned_building', 'GetGarrisonedBuilding', 'SetGarrisonedBuilding')
             
         # CFuncUnit
         cls_name = 'CFuncUnit' if self.isserver else 'C_FuncUnit'

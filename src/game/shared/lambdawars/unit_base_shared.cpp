@@ -679,7 +679,7 @@ void CUnitBase::FireBullets( const FireBulletsInfo_t &info )
 
 	// Skip multiple entities when tracing
 	CWarsBulletsFilter traceFilter( this, COLLISION_GROUP_NONE );
-	traceFilter.SetPassEntity( this ); // Standard pass entity for THIS so that it can be easily removed from the list after passing through a portal
+	traceFilter.SetPassEntity( this->GetGarrisonedBuilding() ? this->GetGarrisonedBuilding() : this ); // Standard pass entity for THIS so that it can be easily removed from the list after passing through a portal
 	traceFilter.AddEntityToIgnore( info.m_pAdditionalIgnoreEnt );
 
 	CShotManipulator Manipulator( info.m_vecDirShooting );
