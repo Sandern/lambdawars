@@ -48,7 +48,7 @@ def creators_affect_on_me( me ):
             return self._get_definition_set( self._creator )
     return impl( me ).affect_creators()
 
-__RE_VALID_IDENTIFIER = re.compile( r"[_a-z]\w*", re.I | re.L | re.U )
+__RE_VALID_IDENTIFIER = re.compile( r"[_a-z]\w*", re.I | re.U )
 def create_valid_name(name):
     """
     creates Python identifier from a string
