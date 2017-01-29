@@ -1071,6 +1071,10 @@ get_data(PyObject *archive, PyObject *toc_entry)
                           &date, &crc)) {
         return NULL;
     }
+    if (data_size < 0) {
+        PyErr_Format(ZipImportError, "negative data size");
+        return NULL;
+    }
 
     fp = _Py_fopen_obj(archive, "rb");
     if (!fp) {
@@ -1111,6 +1115,11 @@ get_data(PyObject *archive, PyObject *toc_entry)
     }
     file_offset += l;           /* Start of file data */
 
+    if (data_size > LONG_MAX - 1) {
+        fclose(fp);
+        PyErr_NoMemory();
+        return NULL;
+    }
     bytes_size = compress == 0 ? data_size : data_size + 1;
     if (bytes_size == 0)
         bytes_size++;
@@ -1127,6 +1136,7 @@ get_data(PyObject *archive, PyObject *toc_entry)
         bytes_read = fread(buf, 1, data_size, fp);
     } else {
         fclose(fp);
+        Py_DECREF(raw_data);
         PyErr_Format(ZipImportError, "can't read Zip file: %R", archive);
         return NULL;
     }

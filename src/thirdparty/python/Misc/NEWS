@@ -2,6 +2,62 @@
 Python News
 +++++++++++
 
+What's New in Python 3.4.5?
+===========================
+
+Release date: 2016-06-26
+
+Tests
+-----
+
+- Issue #26867: Ubuntu's openssl OP_NO_SSLv3 is forced on by default; fix test.
+
+
+What's New in Python 3.4.5rc1?
+==============================
+
+Release date: 2016-06-11
+
+Core and Builtins
+-----------------
+
+- Issue #26478: Fix semantic bugs when using binary operators with dictionary
+  views and tuples.
+
+- Issue #26171: Fix possible integer overflow and heap corruption in
+  zipimporter.get_data().
+
+Library
+-------
+
+- Issue #26556: Update expat to 2.1.1, fixes CVE-2015-1283.
+
+- Fix TLS stripping vulnerability in smptlib, CVE-2016-0772.  Reported by Team
+  Oststrom
+
+- Issue #25939: On Windows open the cert store readonly in ssl.enum_certificates.
+
+- Issue #26012: Don't traverse into symlinks for ** pattern in
+  pathlib.Path.[r]glob().
+
+- Issue #24120: Ignore PermissionError when traversing a tree with
+  pathlib.Path.[r]glob().  Patch by Ulrich Petri.
+
+- Skip getaddrinfo if host is already resolved.
+  Patch by A. Jesse Jiryu Davis.
+
+- Add asyncio.timeout() context manager.
+
+- Issue #26050: Add asyncio.StreamReader.readuntil() method.
+  Patch by Марк Коренберг.
+
+Tests
+-----
+
+- Issue #25940: Changed test_ssl to use self-signed.pythontest.net.  This
+  avoids relying on svn.python.org, which recently changed root certificate.
+
+
 What's New in Python 3.4.4?
 ===========================
 

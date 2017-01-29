@@ -999,7 +999,7 @@ class EventLoopTestsMixin:
         with mock.patch.object(self.loop, 'call_exception_handler'):
             with test_utils.disable_logger():
                 with self.assertRaisesRegex(ssl.SSLError,
-                                            'certificate verify failed '):
+                                            '(?i)certificate.verify.failed '):
                     self.loop.run_until_complete(f_c)
 
             # execute the loop to log the connection error
@@ -1033,7 +1033,7 @@ class EventLoopTestsMixin:
         with mock.patch.object(self.loop, 'call_exception_handler'):
             with test_utils.disable_logger():
                 with self.assertRaisesRegex(ssl.SSLError,
-                                            'certificate verify failed '):
+                                            '(?i)certificate.verify.failed '):
                     self.loop.run_until_complete(f_c)
 
             # execute the loop to log the connection error
@@ -1573,10 +1573,6 @@ class EventLoopTestsMixin:
              'selector': self.loop._selector.__class__.__name__})
 
     def test_sock_connect_address(self):
-        # In debug mode, sock_connect() must ensure that the address is already
-        # resolved (call _check_resolved_address())
-        self.loop.set_debug(True)
-
         addresses = [(socket.AF_INET, ('www.python.org', 80))]
         if support.IPV6_ENABLED:
             addresses.extend((
