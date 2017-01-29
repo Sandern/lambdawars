@@ -848,6 +848,9 @@ void CSrcPython::FrameUpdatePostEntityThink( void )
 	if( !IsPythonRunning() )
 		return;
 
+	// Run an empty statement to ensure Python updates threads
+	Run("pass");
+
 	// Update tick methods
 	int i;
 	for( i = m_methodTickList.Count() - 1; i >= 0 ; i-- )
