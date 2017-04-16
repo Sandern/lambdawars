@@ -471,7 +471,7 @@ private:
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall, SrcCefNavigationType navigationbehavior ) : 
 	m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
-	m_bInitializePingSuccessful(false), m_bWasHidden(false), m_bIgnoreTabKey(false)
+	m_bInitializePingSuccessful(false), m_bWasHidden(false), m_bIgnoreTabKey(false), m_fLastLoadStartTime(0)
 {
 	m_Name = name ? name : "UnknownCefBrowser";
 
@@ -681,6 +681,8 @@ void SrcCefBrowser::OnAfterCreated( void )
 //-----------------------------------------------------------------------------
 void SrcCefBrowser::OnLoadStart( CefRefPtr<CefFrame> frame )
 {
+	m_fLastLoadStartTime = Plat_FloatTime();
+
 #ifdef ENABLE_PYTHON
 	if( !SrcPySystem()->IsPythonRunning() )
 		return;

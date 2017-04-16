@@ -248,6 +248,8 @@ public:
 	virtual void InvalidateLayout( void );
 	void NotifyScreenInfoChanged();
 
+	float GetLastLoadStartTime();
+
 	// Window Methods
 	void SetSize( int wide, int tall );
 	void SetPos( int x, int y );
@@ -372,6 +374,7 @@ private:
 	bool m_bHasFocus;
 
 	float m_fBrowserCreateTime;
+	float m_fLastLoadStartTime;
 	bool m_bInitializePingSuccessful;
 };
 
@@ -393,6 +396,11 @@ inline const char *SrcCefBrowser::GetName()
 inline bool SrcCefBrowser::IsAlphaZeroAt( int x, int y )
 {
 	return GetAlphaAt( x, y ) == 0;
+}
+
+inline float SrcCefBrowser::GetLastLoadStartTime()
+{
+	return m_fLastLoadStartTime;
 }
 
 #endif // SRC_CEF_BROWSER_H

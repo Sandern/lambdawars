@@ -25,6 +25,7 @@
 
 ConVar g_cef_draw("g_cef_draw", "1");
 ConVar g_cef_debug_texture("g_cef_debug_texture", "0");
+ConVar g_cef_loading_text_delay("g_cef_loading_text_delay", "20.0");
 
 //-----------------------------------------------------------------------------
 // Purpose: Find appropiate texture width/height helper
@@ -105,8 +106,6 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
 	if( !renderer )
 		return false;
-
-	//AUTO_LOCK( renderer->GetTextureBufferMutex() );
 #endif // USE_MULTITHREADED_MESSAGELOOP
 
 	m_iWVWide = width;
@@ -162,11 +161,7 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	}
 
 	// Mark full dirty
-	//MarkTextureDirty( 0, 0, m_iWVWide, m_iWVTall );
 	MarkTextureDirty();
-
-	//if( m_MatRef.IsValid() )
-	//	m_MatRef.Shutdown();
 
 	if( g_debug_cef.GetBool() )
 		DevMsg("Cef: initializing material %s...\n", m_MatWebViewName);
@@ -183,8 +178,6 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 	KeyValues *pVMT = new KeyValues("WebView");
 	pVMT->SetString("$basetexture", m_TextureWebViewName);
 	pVMT->SetString("$translucent", "1");
-	//pVMT->SetString("$no_fullbright", "1");
-	//pVMT->SetString("$ignorez", "1");
 
 #if 1
 	// Save to file
@@ -215,36 +208,6 @@ bool SrcCefVGUIPanel::ResizeTexture( int width, int height )
 
 	return true;
 }
-
-#if 0
-// This code could be used to allocate a vtf texture when the render buffer changes
-// and download the texture directly to the vtf using the regenerator.
-// However it's much faster to just directly update through the shader api, bypassing
-// the unnecessary copies (since we don't use mipmaps/frames/etc)
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::AllocateVTFTexture()
-{
-	DeallocateVTFTexture();
-
-	m_pVTFTexture = CreateVTFTexture();
-	m_pVTFTexture->Init( m_iTexWide, m_iTexTall, 1,
-		m_iTexImageFormat, m_iTexFlags, 1 );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::DeallocateVTFTexture()
-{
-	if( !m_pVTFTexture )
-		return;
-
-	DestroyVTFTexture( m_pVTFTexture );
-	m_pVTFTexture = NULL;
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -291,9 +254,6 @@ void SrcCefVGUIPanel::OnThink()
 //-----------------------------------------------------------------------------
 void SrcCefVGUIPanel::Paint()
 {
-	//int iWide, iTall;
-	//GetSize( iWide, iTall );
-
 	CefRefPtr<SrcCefOSRRenderer> renderer = m_pBrowser->GetOSRHandler();
 	if( renderer )
 	{
@@ -418,29 +378,31 @@ void SrcCefVGUIPanel::DrawWebview()
 	}
 	else
 	{
-		// Show loading text
-		wchar_t buf[256];
-		mbstowcs( buf, m_pBrowser->GetName(), sizeof(buf) );
+		// Show loading text if it takes longer than a certain time
+		if (Plat_FloatTime() - m_pBrowser->GetLastLoadStartTime() > g_cef_loading_text_delay.GetFloat()) 
+		{
+			wchar_t buf[256];
+			mbstowcs( buf, m_pBrowser->GetName(), sizeof(buf) );
 
-		wchar_t text[256];
-		V_snwprintf( text, sizeof( text ) / sizeof(wchar_t), L"Loading %ls...", buf );
+			wchar_t text[256];
+			V_snwprintf( text, sizeof( text ) / sizeof(wchar_t), L"Loading %ls...", buf );
 
-		int iTextWide, iTextTall;
-		surface()->GetTextSize( m_hLoadingFont, text, iTextWide, iTextTall );
+			int iTextWide, iTextTall;
+			surface()->GetTextSize( m_hLoadingFont, text, iTextWide, iTextTall );
 
-		vgui::surface()->DrawSetTextFont( m_hLoadingFont );
-		vgui::surface()->DrawSetTextColor( m_Color );
-		vgui::surface()->DrawSetTextPos( (iWide / 2) - (iTextWide / 2), (iTall / 2) - (iTextTall / 2) );
+			vgui::surface()->DrawSetTextFont( m_hLoadingFont );
+			vgui::surface()->DrawSetTextColor( m_Color );
+			vgui::surface()->DrawSetTextPos( (iWide / 2) - (iTextWide / 2), (iTall / 2) - (iTextTall / 2) );
 
-		vgui::surface()->DrawUnicodeString( text );
+			vgui::surface()->DrawUnicodeString( text );
+		}
 
-		// Debug reason
+		// Debug reason why nothing is showing yet
 		if( g_cef_debug_texture.GetBool() )
 		{
 			DevMsg("CEF: not drawing");
 			if( m_iTextureID == -1 )
 				DevMsg(", texture does not exists");
-			//if( m_pTextureRegen->IsDirty() )
 			if( m_bTextureDirty )
 				DevMsg(", texture is dirty");
 			if( !g_cef_draw.GetBool() )
@@ -750,40 +712,6 @@ void SrcCefVGUIPanel::OnMouseWheeled( int delta )
 	// Use the last mouse wheel value from the window proc instead
 	m_pBrowser->GetBrowser()->GetHost()->SendMouseWheelEvent( me, 0, CEFSystem().GetLastMouseWheelDist() );
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::OnKeyCodePressed(vgui::KeyCode code)
-{
-	BaseClass::OnKeyCodePressed( code );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::OnKeyCodeTyped(vgui::KeyCode code)
-{
-	BaseClass::OnKeyCodeTyped( code );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::OnKeyTyped(wchar_t unichar)
-{
-	BaseClass::OnKeyTyped( unichar );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void SrcCefVGUIPanel::OnKeyCodeReleased(vgui::KeyCode code)
-{
-	BaseClass::OnKeyCodeReleased( code );
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
