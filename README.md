@@ -1,7 +1,7 @@
 ## Lambda Wars (based on Alien Swarm SDK).
-Source code of Lambda Wars (http://lambdawars.com/), available on the Steam store: http://steamcommunity.com/app/270370
+Source code of Lambda Wars (https://lambdawars.com/), available on the Steam store: https://steamcommunity.com/app/270370
 
-Game code can be found at: http://svn.lambdawars.com/ (svn checkout http://svn.lambdawars.com/lambdawars/trunk/ lambdawarsdev)
+Game code can be found at: https://svn.lambdawars.com/ (svn checkout https://svn.lambdawars.com/lambdawars/trunk/ lambdawarsdev)
 
 ## Overview
 
@@ -9,7 +9,7 @@ Game code can be found at: http://svn.lambdawars.com/ (svn checkout http://svn.l
 [Recast Navigation mesh](https://github.com/recastnavigation/recastnavigation) is integrated for path finding. 
 In Half-Life 2, NPCs use manual places for path finding. However in a game like
 Lambda Wars this would quite tedious. Another option earlier used by Lambda Wars was the navigation supplied by Valve (used by Counter-Strike
-and Left 4 Dead). The down-side of that navigation mesh is long generation times, only one mesh for all unit types and being restricted to
+and Left 4 Dead). The down-side of that navigation mesh implementation is long generation times, only one mesh for all unit types and being restricted to
 world aligned polygons.
 The [recast navigation meshes](https://www.youtube.com/watch?v=oTYREslZu2s) do not have these restrictions (LW uses 5 different 
 generated meshes for different unit types) and meshes are generated within a minute for most of our maps (usually much faster).
@@ -18,7 +18,7 @@ generated meshes for different unit types) and meshes are generated within a min
 [Chromium Embedded Framework](https://bitbucket.org/chromiumembedded/cef) is integrated to easily develop new UI for Lambda Wars.
 The Chrome developer tools can be used to reload a view ingame and debug parts of the UI.
 CEF is used for the majority of the 
-[main menu](http://svn.lambdawars.com/listing.php?repname=Lambda+Wars&path=%2Ftrunk%2Fui%2Fmenu_next%2F&#a02c1dfbdceec971815a7fcae4eb0e8f1) 
+[main menu](https://svn.lambdawars.com/listing.php?repname=Lambda+Wars&path=%2Ftrunk%2Fui%2Fmenu_next%2F&#a02c1dfbdceec971815a7fcae4eb0e8f1) 
 and smaller parts of the ingame UI.
 
 ### Python bindings
@@ -36,7 +36,7 @@ takes them into account.
 The unit AI is loosely based on the [AI systems concepts of Left 4 Dead](http://www.valvesoftware.com/publications/2009/ai_systems_of_l4d_mike_booth.pdf).
 Units can have one or more behaviors and each behavior defines a set of actions of which one action can be active within the behavior. An action can change 
 or suspend to another action and is fully event driven. The most common actions are defined in 
-[behavior_generic.py](http://svn.lambdawars.com/filedetails.php?repname=Lambda+Wars&path=%2Ftrunk%2Fpython%2Fcore%2Funits%2Fbehavior_generic.py) for Lambda Wars.
+[behavior_generic.py](https://svn.lambdawars.com/filedetails.php?repname=Lambda+Wars&path=%2Ftrunk%2Fpython%2Fcore%2Funits%2Fbehavior_generic.py) for Lambda Wars.
 
 ## Compiling
 Tested with Visual Studio 2013:
@@ -62,9 +62,3 @@ From here you can run a few commands:
 The mod comes with a set of custom shaders to support the Fog of War, as well as to integrate the [deferred lighting project](https://www.youtube.com/watch?v=bMjXx-KweIo). The deferred lighting shaders are modified to blend with regular lightmaps. If you don't plan on modifying the shaders, you don't need to follow these steps. The compiled shaders are already included in the repository.
 - Follow: https://developer.valvesoftware.com/wiki/Shader_Authoring
 - Update paths buildsdkshaders_wars.bat
-
-## License
-Creative Commons Attribution-NonCommercial 3.0 Unported
-Only applies to the new code in the sdk (in particular the code in game/(.*)/(lambdawars|python|cef|recast) folders).
-
-See license.txt
