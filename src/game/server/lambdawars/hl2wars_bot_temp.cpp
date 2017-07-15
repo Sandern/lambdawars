@@ -145,20 +145,6 @@ CON_COMMAND_F( bot_add, "Add a bot.", FCVAR_CHEAT )
 //-----------------------------------------------------------------------------
 void Bot_RunAll( void )
 {
-#if 0
-	for ( int i = 1; i <= gpGlobals->maxClients; i++ )
-	{
-		CHL2WarsPlayer *pPlayer = ToHL2WarsPlayer( UTIL_PlayerByIndex( i ) );
-
-		// Ignore plugin bots
-		if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) && !pPlayer->IsEFlagSet( EFL_PLUGIN_BASED_BOT ) )
-		{
-			CSDKBot *pBot = dynamic_cast< CSDKBot* >( pPlayer );
-			if ( pBot )
-				Bot_Think( pBot );
-		}
-	}
-#endif // 
 }
 
 bool Bot_RunMimicCommand( CUserCmd& cmd )

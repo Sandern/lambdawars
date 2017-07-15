@@ -212,28 +212,6 @@ static char const *s_CloseWindowNames[]={
 	"InfoMessageWindow",
 	"SkipIntro",
 };
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: this is the viewport that contains all the hud elements
-//-----------------------------------------------------------------------------
-class CHudViewport : public CBaseViewport
-{
-private:
-	DECLARE_CLASS_SIMPLE( CHudViewport, CBaseViewport );
-
-protected:
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme )
-	{
-		BaseClass::ApplySchemeSettings( pScheme );
-
-		GetHud().InitColors( pScheme );
-
-		SetPaintBackgroundEnabled( false );
-	}
-
-	virtual void CreateDefaultPanels( void ) { /* don't create any panels yet*/ };
-};
-#endif // 0
 
 //--------------------------------------------------------------------------------------------------------
 
@@ -278,14 +256,6 @@ public:
 				pPanel->SetVisible( false );
 				pPanel->MakePopup( false );
 				pGameUI->SetLoadingBackgroundDialog( pPanel->GetVPanel() );
-
-#if 0
-				// add ASI logo to main menu
-				CSDK_Logo_Panel *pLogo = new CSDK_Logo_Panel( NULL, "ASILogo" );
-				vgui::VPANEL GameUIRoot = enginevgui->GetPanel( PANEL_GAMEUIDLL );
-				pLogo->SetParent( GameUIRoot );
-				g_hLogoPanel = pLogo;
-#endif // 0
 			}		
 		}
 
@@ -560,36 +530,6 @@ void ClientModeSDK::OnColorCorrectionWeightsReset( void )
 	{
 		pNewColorCorrection = pPlayer->GetActiveColorCorrection();
 	}
-
-#if 0
-
-	if ( m_CCFailedHandle != INVALID_CLIENT_CCHANDLE && ASWGameRules() )
-	{
-		m_fFailedCCWeight = Approach( TechMarineFailPanel::s_pTechPanel ? 1.0f : 0.0f, m_fFailedCCWeight, gpGlobals->frametime * ( 1.0f / FAILED_CC_FADE_TIME ) );
-		g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCFailedHandle, m_fFailedCCWeight );
-
-		// If the mission was failed due to a dead tech, disable the environmental color correction in favor of the mission failed color correction
-		if ( m_fFailedCCWeight != 0.0f && m_pCurrentColorCorrection )
-		{
-			m_pCurrentColorCorrection->EnableOnClient( false );
-			m_pCurrentColorCorrection = NULL;
-		}
-	}
-
-	if ( m_CCInfestedHandle != INVALID_CLIENT_CCHANDLE && ASWGameRules() )
-	{
-		C_ASW_Marine *pMarine = C_ASW_Marine::GetLocalMarine();
-		m_fInfestedCCWeight = Approach( pMarine && pMarine->IsInfested() ? 1.0f : 0.0f, m_fInfestedCCWeight, gpGlobals->frametime * ( 1.0f / INFESTED_CC_FADE_TIME ) );
-		g_pColorCorrectionMgr->SetColorCorrectionWeight( m_CCInfestedHandle, m_fInfestedCCWeight );
-
-		// If the mission was failed due to a dead tech, disable the environmental color correction in favor of the mission failed color correction
-		if ( m_fInfestedCCWeight != 0.0f && m_pCurrentColorCorrection )
-		{
-			m_pCurrentColorCorrection->EnableOnClient( false );
-			m_pCurrentColorCorrection = NULL;
-		}
-	}
-#endif // 0
 
 	// Only blend between environmental color corrections if there is no failure/infested-induced color correction
 	if ( pNewColorCorrection != pOldColorCorrection /*&& m_fFailedCCWeight == 0.0f && m_fInfestedCCWeight == 0.0f*/ )

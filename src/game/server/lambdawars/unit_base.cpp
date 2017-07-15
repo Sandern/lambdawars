@@ -377,15 +377,6 @@ void SendProxy_Energy( const SendProp *pProp, const void *pStruct, const void *p
 // Purpose:  Send tables
 //-----------------------------------------------------------------------------
 BEGIN_SEND_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
-	// Send high res version for the commander
-#if 0
-	SendPropVector	(SENDINFO(m_vecOrigin), -1,  SPROP_NOSCALE|SPROP_CHANGES_OFTEN, 0.0f, HIGH_DEFAULT, SendProxy_Origin ),
-
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 0), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesX ),
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 1), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesY ),
-	SendPropAngle( SENDINFO_VECTORELEM(m_angRotation, 2), 13, SPROP_CHANGES_OFTEN, CBaseEntity::SendProxy_AnglesZ ),
-#endif // 0
-
 	// This data is only send to the commander for prediction
 	//SendPropVector		( SENDINFO( m_vecBaseVelocity ), 20, 0, -1000, 1000 ),
 	SendPropFloat		( SENDINFO_VECTORELEM(m_vecVelocity, 0), 32, SPROP_NOSCALE|SPROP_CHANGES_OFTEN|SPROP_ENCODED_AGAINST_TICKCOUNT ),

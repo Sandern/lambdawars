@@ -136,38 +136,9 @@ void CWarsWeapon::PrimaryAttack( void )
 //-----------------------------------------------------------------------------
 void CWarsWeapon::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType )
 {
-#if 0
-	const char* tracer = "ASWUTracer";
-	//if (GetActiveASWWeapon())
-	//	tracer = GetActiveASWWeapon()->GetUTracerType();
-#ifdef CLIENT_DLL
-	CEffectData data;
-	data.m_vOrigin = tr.endpos;
-	data.m_hEntity = this;
-	//data.m_nMaterial = m_iDamageAttributeEffects;
-
-	DispatchEffect( tracer, data );
-#else
-	CRecipientFilter filter;
-	filter.AddAllPlayers();
-	if (gpGlobals->maxClients > 1 && GetCommander())
-	{ 
-		filter.RemoveRecipient(GetCommander());
-	}
-
-	UserMessageBegin( filter, tracer );
-		WRITE_SHORT( entindex() );
-		WRITE_FLOAT( tr.endpos.x );
-		WRITE_FLOAT( tr.endpos.y );
-		WRITE_FLOAT( tr.endpos.z );
-		//WRITE_SHORT( m_iDamageAttributeEffects );
-	MessageEnd();
-#endif
-#else
 #ifdef CLIENT_DLL
 	WarsUTracer( GetOwner(), tr.endpos, m_vTracerColor );
 #endif
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -183,25 +154,6 @@ void CWarsWeapon::GetShootOriginAndDirection( Vector &vShootOrigin, Vector &vSho
 	if( !pUnit )
 		return;
 
-#if 0
-#ifdef CLIENT_DLL
-	if( pUnit->GetCommander() && !ShouldDrawLocalPlayer() )
-	{
-		QAngle vDummy;
-		C_BasePlayer *player = ToBasePlayer( pUnit->GetCommander() );
-		C_BaseViewModel *vm = player ? player->GetViewModel( 0 ) : NULL;
-		if ( vm )
-		{
-			int iAttachment = vm->LookupAttachment( "muzzle" );
-			if ( vm->GetAttachment( iAttachment, vShootOrigin, vDummy ) )
-			{
-				AngleVectors( QAngle(pUnit->m_fEyePitch, pUnit->m_fEyeYaw, 0.0), &vShootDirection );
-				return;
-			}
-		}
-	}
-#endif // CLIENT_DLL
-#endif // 0
 	vShootOrigin = pUnit->Weapon_ShootPosition();
 	AngleVectors( QAngle(pUnit->m_fEyePitch, pUnit->m_fEyeYaw, 0.0), &vShootDirection );
 }
@@ -211,24 +163,6 @@ void CWarsWeapon::GetShootOriginAndDirection( Vector &vShootOrigin, Vector &vSho
 //-----------------------------------------------------------------------------
 void CWarsWeapon::WeaponSound( WeaponSound_t sound_type, float soundtime /* = 0.0f */ )
 {
-#if 0
-	// Limit amount of sounds
-	// Make better fix?
-	// Units spam too many sounds...
-	static float fNextResetTime = -1;
-	static int nSounds = 0;
-	if( fNextResetTime < gpGlobals->curtime )
-	{
-		fNextResetTime = gpGlobals->curtime + 0.1f;
-		nSounds = 0;
-	}
-
-	if( nSounds >= 50 ) {
-		return;
-	}
-
-	nSounds += 1;
-#endif // 0
 	BaseClass::WeaponSound( sound_type, soundtime );
 }
 

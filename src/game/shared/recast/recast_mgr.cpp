@@ -441,25 +441,6 @@ NavObstacleArray_t &CRecastMgr::FindOrCreateObstacle( CBaseEntity *pEntity )
 	return m_Obstacles[idx];
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-dtObstacleRef CRecastMgr::GetObstacleRefForMesh( CBaseEntity *pEntity, int meshIdx )
-{
-	NavObstacleArray_t &obstacles = FindOrCreateObstacle( pEntity );
-
-	for( int i = 0; i < obstacles.obs.Count(); i++ )
-	{
-		if( obstacles.obs.Count() > 0 && obstacles.obs[0].meshIndex == meshIdx )
-		{
-			return obstacles.obs[0].ref;
-		}
-	}
-	return 0;
-}
-#endif // 0
-
 #ifdef CLIENT_DLL
 //-----------------------------------------------------------------------------
 // Purpose: Saves the generated navigation meshes

@@ -1249,14 +1249,6 @@ void UnitAnimState::ComputePoseParam_BodyYaw()
 	bool bIsMoving = vel.Length2D() > MOVING_MINIMUM_SPEED;
 	float flMaxGap = m_AnimConfig.m_flMaxBodyYawDegrees;
 
-	// TOOD: Add support for something like this
-#if 0
-	if ( m_pOuter && m_pOuter->GetCurrentMeleeAttack() )		// don't allow upper body turning when melee attacking
-	{
-		flMaxGap = 0.0f;
-	}
-#endif // 0
-
 	// If we just initialized this guy (maybe he just came into the PVS), then immediately
 	// set his feet in the right direction, otherwise they'll spin around from 0 to the 
 	// right direction every time someone switches spectator targets.

@@ -308,11 +308,6 @@ bool CRecastMesh::Reset()
 
 #ifdef CLIENT_DLL
 ConVar recast_draw_trimeshslope("recast_draw_trimeshslope", "0", FCVAR_CHEAT, "" );
-#if 0
-ConVar recast_draw_contours("recast_draw_contours", "0", FCVAR_CHEAT, "" );
-ConVar recast_draw_polymesh("recast_draw_polymesh", "0", FCVAR_CHEAT, "" );
-ConVar recast_draw_polymeshdetail("recast_draw_polymeshdetail", "0", FCVAR_CHEAT, "" );
-#endif // 0
 ConVar recast_draw_navmesh("recast_draw_navmesh", "0", FCVAR_CHEAT, "" );
 ConVar recast_draw_server("recast_draw_server", "1", FCVAR_CHEAT, "" );
 
@@ -360,16 +355,6 @@ void CRecastMesh::DebugRender()
 		{
 			char m_navMeshDrawFlags = DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST;
 			duDebugDrawNavMeshWithClosedList(&dd, *navMesh, *navQuery, m_navMeshDrawFlags);
-
-#if 0 // TODO: add different draw modes
-			if (m_drawMode != DRAWMODE_NAVMESH_INVIS)
-				duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
-			if (m_drawMode == DRAWMODE_NAVMESH_BVTREE)
-				duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
-			if (m_drawMode == DRAWMODE_NAVMESH_NODES)
-				duDebugDrawNavMeshNodes(&dd, *m_navQuery);
-			duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
-#endif // 0
 		}
 	}
 }

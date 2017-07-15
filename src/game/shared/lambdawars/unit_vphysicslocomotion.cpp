@@ -295,14 +295,6 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 		trace.m_pEnt->SetNavIgnore();
 	}
 
-#if 0
-	// When we are in a solid for whatever reason and can't ignore it, try to unstuck
-	if( trace.startsolid && !(trace.m_pEnt && trace.m_pEnt->AllowNavIgnore()) )
-	{
-		DoUnstuck();
-	}
-#endif // 0
-
 	if( !m_pMotionController )
 	{
 		Vector vecRight;
@@ -316,14 +308,6 @@ void UnitVPhysicsLocomotion::VPhysicsMoveStep()
 
 		pPhysObj->SetVelocity( NULL, &m_vecAngular );
 	}
-
-#if 0
-	Vector curVel, curAngVel;
-	pPhysObj->GetVelocity( &curVel, &curAngVel );
-	engine->Con_NPrintf( 0, "Velocity: %f %f %f (%f)", mv->velocity.x, mv->velocity.y, mv->velocity.z, mv->velocity.Length() );
-	engine->Con_NPrintf( 2, "Cur Velocity: %f %f %f (%f)", curVel.x, curVel.y, curVel.z, curVel.Length() );
-	engine->Con_NPrintf( 3, "Cur Ang Velocity: %f %f %f (%f)", curAngVel.x, curAngVel.y, curAngVel.z, curAngVel.Length() );
-#endif // 0
 
 	// Clear nav ignored entities	
 	for ( i = 0; i < ignoredEntities.Count(); i++ )

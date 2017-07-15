@@ -196,15 +196,6 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 
 	const char *szMode = pKV->GetString( "game/mode", "sdk" );
 
-#if 0
-	char const *szGameMode = pKV->GetString( "game/mode", "" );
-	if ( szGameMode && *szGameMode )
-	{
-		extern ConVar mp_gamemode;
-		mp_gamemode.SetValue( szGameMode );
-	}
-#endif // 0
-
 	// LAUNCH GAME
 	bool bSuccess = false;
 	if ( !V_stricmp( szMode, "sdk" ) )

@@ -121,14 +121,6 @@ extern void RecvProxy_LocalVelocityZ( const CRecvProxyData *pData, void *pStruct
 extern void RecvProxy_SimulationTime( const CRecvProxyData *pData, void *pStruct, void *pOut );
 
 BEGIN_RECV_TABLE_NOBASE( CUnitBase, DT_CommanderExclusive )
-#if 0
-	// Hi res origin and angle
-	RecvPropVector( RECVINFO_NAME( m_vecNetworkOrigin, m_vecOrigin ) ),
-	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[0], m_angRotation[0] ) ),
-	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[1], m_angRotation[1] ) ),
-	RecvPropFloat( RECVINFO_NAME( m_angNetworkAngles[2], m_angRotation[2] ) ),
-#endif // 0
-
 	// Only received by the commander
 	RecvPropVector		( RECVINFO( m_vecBaseVelocity ) ),
 	RecvPropFloat		( RECVINFO(m_vecVelocity[0]), 0, RecvProxy_Unit_LocalVelocityX ),
@@ -346,26 +338,6 @@ const Vector& CUnitBase::GetRenderOrigin( void )
 	//return BaseClass::GetRenderOrigin(); 
 }
 
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CUnitBase::SetupBones( matrix3x4a_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime )
-{
-	// Skip if not in screen. SetupBones is really expensive and we shouldn't need it if not in screen.
-	// Note: Don't do this if pBoneToWorldOut is not NULL, since some functions like ragdolls expect output.
-	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
-	if ( !pBoneToWorldOut && pPlayer && !pPlayer->GetControlledUnit() )
-	{
-		int iX, iY;
-		bool bResult = GetVectorInScreenSpace( GetAbsOrigin(), iX, iY );
-		if ( !bResult || iX < -320 || iX > ScreenWidth()+320 || iY < -320 || iY > ScreenHeight() + 320 )
-			return false;
-	}
-	return BaseClass::SetupBones( pBoneToWorldOut, nMaxBones, boneMask, currentTime );
-}
-#endif // 0
-
 //-----------------------------------------------------------------------------
 // Purpose: Makes the unit play the blink effect (highlights the unit)
 //-----------------------------------------------------------------------------
@@ -395,16 +367,6 @@ ConVar cl_unit_interp_rate( "cl_unit_interp_rate", "0.1", FCVAR_NONE, "Interpola
 //-----------------------------------------------------------------------------
 void CUnitBase::UpdateClientSideAnimation()
 {
-#if 0
-	if( m_fNextSimulationUpdate < gpGlobals->curtime )
-	{
-		m_flOldSimulationTime = m_flSimulationTime;
-		m_flSimulationTime = gpGlobals->curtime;
-		OnLatchInterpolatedVariables( LATCH_SIMULATION_VAR );
-		m_fNextSimulationUpdate = gpGlobals->curtime + cl_unit_interp_rate.GetFloat();
-	}
-#endif // 0
-
 	if( m_bUpdateClientAnimations )
 	{
 		// Yaw and Pitch are updated in UserCmd if the unit has a commander
@@ -635,13 +597,3 @@ void CUnitBase::EstimateAbsVelocity( Vector& vel )
 	vel = GetAbsVelocity();
 #endif // 0
 }
-
-#if 0
-// units require extra interpolation time due to think rate
-ConVar cl_unit_extra_interp( "cl_unit_extra_interp", "0.0", FCVAR_NONE, "Extra interpolation for units." );
-
-float CUnitBase::GetInterpolationAmount( int flags )
-{
-	return BaseClass::GetInterpolationAmount( flags ) + cl_unit_extra_interp.GetFloat();
-}
-#endif // 0 

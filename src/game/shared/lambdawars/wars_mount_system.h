@@ -30,7 +30,6 @@ enum MountApps {
 	NUM_APPS,
 };
 
-void PostProcessDota2( const char *pPath );
 bool HasApp( MountApps app );
 AppStatus GetAppStatus( MountApps app );
 void MountExtraContent();

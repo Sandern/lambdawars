@@ -47,13 +47,6 @@ public:
 	CHL2WarsGameMovement();
 	virtual ~CHL2WarsGameMovement();
 
-#if 0
-	virtual Vector const&	GetPlayerMins( bool ducked ) const;
-	virtual Vector const&	GetPlayerMaxs( bool ducked ) const;
-	virtual const Vector&	GetPlayerMins( void ) const; // uses local player
-	virtual const Vector&	GetPlayerMaxs( void ) const; // uses local player
-#endif // 0
-
 	void PlayerMove( void );
 	virtual void	CheckParameters( void );
 
@@ -95,73 +88,6 @@ CHL2WarsGameMovement::CHL2WarsGameMovement()
 CHL2WarsGameMovement::~CHL2WarsGameMovement()
 {
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : ducked - 
-// Output : const Vector
-//-----------------------------------------------------------------------------
-const Vector& CHL2WarsGameMovement::GetPlayerMins( bool ducked ) const
-{
-	return ducked ? VEC_DUCK_HULL_MIN : VEC_HULL_MIN;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : ducked - 
-// Output : const Vector
-//-----------------------------------------------------------------------------
-const Vector& CHL2WarsGameMovement::GetPlayerMaxs( bool ducked ) const
-{	
-	return ducked ? VEC_DUCK_HULL_MAX : VEC_HULL_MAX;
-}
-
-static Vector g_vWarsHullMins(-128, -128, 0);
-static Vector g_vWarsHullMaxs(128, 128, 96);
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : 
-// Output : const Vector
-//-----------------------------------------------------------------------------
-const Vector& CHL2WarsGameMovement::GetPlayerMins( void ) const
-{
-	if ( player->IsObserver() )
-	{
-		return VEC_OBS_HULL_MIN;	
-	}
-	else
-	{
-		CHL2WarsPlayer *warsplayer = dynamic_cast<CHL2WarsPlayer *>( player );
-		if( warsplayer->IsStrategicModeOn() )
-			return g_vWarsHullMins;
-		else
-			return player->m_Local.m_bDucked  ? VEC_DUCK_HULL_MIN : VEC_HULL_MIN;
-	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : 
-// Output : const Vector
-//-----------------------------------------------------------------------------
-const Vector& CHL2WarsGameMovement::GetPlayerMaxs( void ) const
-{	
-	if ( player->IsObserver() )
-	{
-		return VEC_OBS_HULL_MAX;	
-	}
-	else
-	{
-		CHL2WarsPlayer *warsplayer = dynamic_cast<CHL2WarsPlayer *>( player );
-		if( warsplayer->IsStrategicModeOn() )
-			return g_vWarsHullMaxs;
-		else
-			return player->m_Local.m_bDucked  ? VEC_DUCK_HULL_MAX : VEC_HULL_MAX;
-	}
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -753,23 +679,6 @@ int CHL2WarsGameMovement::TryStrategicMove( Vector *pFirstDest, trace_t *pFirstT
 	{
 		VectorCopy (vec3_origin, mv->m_vecVelocity);
 	}
-
-#if 0
-	// Check if they slammed into a wall
-	float fSlamVol = 0.0f;
-
-	float fLateralStoppingAmount = primal_velocity.Length2D() - mv->m_vecVelocity.Length2D();
-	if ( fLateralStoppingAmount > PLAYER_MAX_SAFE_FALL_SPEED * 2.0f )
-	{
-		fSlamVol = 1.0f;
-	}
-	else if ( fLateralStoppingAmount > PLAYER_MAX_SAFE_FALL_SPEED )
-	{
-		fSlamVol = 0.85f;
-	}
-
-	PlayerRoughLandingEffects( fSlamVol );
-#endif // 0
 
 	return blocked;
 }

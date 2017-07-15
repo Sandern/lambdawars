@@ -242,17 +242,6 @@ Disposition_t CFuncUnit::IRelationType( CBaseEntity *pTarget )
 {
 	if ( pTarget )
 	{
-#if 0
-		// First check for specific relationship with this edict
-		for (int i=0;i<m_Relationship.Count();i++) 
-		{
-			if (pTarget == m_Relationship[i].entity) 
-			{
-				return m_Relationship[i].disposition;
-			}
-		}
-#endif // 0
-
 		// Global relationships between teams
 		return GetPlayerRelationShip( GetOwnerNumber(), pTarget->GetOwnerNumber() );
 	}

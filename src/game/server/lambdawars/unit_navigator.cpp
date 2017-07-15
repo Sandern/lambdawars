@@ -81,7 +81,6 @@ ConVar unit_cost_discomfortweight_growrate("unit_cost_discomfortweight_growrate"
 ConVar unit_cost_discomfortweight_max("unit_cost_discomfortweight_max", "25000.0");
 ConVar unit_cost_history("unit_cost_history", "0.2");
 ConVar unit_cost_minavg_improvement("unit_cost_minavg_improvement", "0.0");
-ConVar unit_cost_nonavareacheck("unit_cost_nonavareacheck", "0", FCVAR_CHEAT, "");
 
 ConVar unit_nogoal_mindiff("unit_nogoal_mindiff", "0.25");
 ConVar unit_nogoal_mindest("unit_nogoal_mindest", "0.4");
@@ -776,18 +775,7 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCom
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::ShouldConsiderNavMesh( void )
 {
-	if( unit_cost_nonavareacheck.GetBool() )
-		return false;
-#if 0 // TODO: update for recast where this is used.
-	// m_bNoNavAreasNearby is set when in BS_STUCK and we can't find anything nearby 
-	// Also don't consider nav meshes when really nearby our goal or when this is a direct path
-	if( GetPath()->m_bIsDirectPath || m_bNoNavAreasNearby || m_fGoalDistance < 32.0f ) 
-		return false;
-	UnitBaseWaypoint *pCurWaypoint = GetPath()->m_pWaypointHead;
-	return TheNavMesh->IsLoaded() && ( !pCurWaypoint || pCurWaypoint->SpecialGoalStatus == CHS_NOGOAL );
-#else
 	return false;
-#endif // 0
 }
 
 //-----------------------------------------------------------------------------
@@ -987,18 +975,6 @@ Vector UnitBaseNavigator::ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBas
 {
 	VPROF_BUDGET( "UnitBaseNavigator::ComputeVelocity", VPROF_BUDGETGROUP_UNITS );
 
-#if 0
-	// Don't go out of "ignore nav areas" mode until we found a valid nav area.
-	if( m_bNoNavAreasNearby )
-	{
-		UnitShortestPathCost costFunc(m_pOuter);
-		CNavArea *pMyArea = TheNavMesh->GetNavArea(m_pOuter->EyePosition(), 150.0f);
-		if( pMyArea && costFunc.IsAreaValid( pMyArea ) )
-		{
-			m_bNoNavAreasNearby = false;
-		}
-	}
-#endif // 0
 	// By default we are moving into the direction of the next waypoint
 	// We now calculate the velocity based on current velocity, flow, density, etc
 	Vector vBestVel, vVelocity;
@@ -1616,94 +1592,16 @@ CheckGoalStatus_t UnitBaseNavigator::MoveUpdateWaypoint( UnitBaseMoveCommand &Mo
 	}
 	else
 	{
-#if 0
-		float fToleranceX = pCurWaypoint->flToleranceX + GetPath()->m_waypointTolerance;
-		float fToleranceY = pCurWaypoint->flToleranceY + GetPath()->m_waypointTolerance;
-
-		if( ( pCurWaypoint->pTo && IsCompleteInArea(pCurWaypoint->pTo, GetAbsOrigin()) ) || 
-			( (fabs(GetAbsOrigin().x - pCurWaypoint->GetPos().x) < fToleranceY) && 
-			(fabs(GetAbsOrigin().y - pCurWaypoint->GetPos().y) < fToleranceX) ) )
-		{
-			// Check special goal status
-			SpecialGoalStatus = pCurWaypoint->SpecialGoalStatus;
-			UnitBaseWaypoint *pNextWaypoint = pCurWaypoint->GetNext();
-
-			if( pNextWaypoint )
-			{
-				if( SpecialGoalStatus == CHS_CLIMB )
-				{
-					Vector end = ComputeWaypointTarget( GetAbsOrigin(), pNextWaypoint );
-
-					// Calculate climb direction.
-					m_fClimbHeight = end.z - pCurWaypoint->GetPos().z;
-					//Msg("%f = %f - %f (end: %f %f %f, tol: %f %f)\n", m_fClimbHeight, end.z, pCurWaypoint->GetPos().z, end.x, end.y, end.z, pNextWaypoint->flToleranceX, pNextWaypoint->flToleranceY);
-					//UnitComputePathDirection2(pCurWaypoint->GetPos(), pNextWaypoint, m_vecClimbDirection);
-					UnitComputePathDirection( pCurWaypoint->GetPos(), pNextWaypoint->GetPos(), m_vecClimbDirection );
-				}
-				else if( SpecialGoalStatus == CHS_EDGEDOWN )
-				{
-					m_fIgnoreNavMeshTime = gpGlobals->curtime + 5.0f;
-				}
-			}
-
-			AdvancePath();
-		}
-#else
 		if( GetAbsOrigin().AsVector2D().DistTo( pCurWaypoint->GetPos().AsVector2D() ) < GetPath()->m_waypointTolerance )
 		{
 			AdvancePath();
 		}
-#endif // 0
 
 	}
 	if( SpecialGoalStatus != CHS_NOGOAL )
 		return SpecialGoalStatus;
 	return CHS_HASGOAL;
 }
-
-#if 0
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-Vector UnitBaseNavigator::ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd )
-{
-	Vector point1, point2, dir;
-
-	//DirectionToVector2D( DirectionLeft(pEnd->navDir), &(dir.AsVector2D()) );
-	//dir.z = 0.0f;
-	// Either from south to north or east to west
-	dir = pEnd->areaSlope;
-
-	const Vector &vWayPos = pEnd->GetPos();
-	if( pEnd->navDir == WEST || pEnd->navDir == EAST )
-	{
-		point1 = vWayPos + dir * pEnd->flToleranceX;
-		point2 = vWayPos + -1 * dir * pEnd->flToleranceX;
-	}
-	else
-	{	point1 = vWayPos + dir * pEnd->flToleranceY;
-		point2 = vWayPos + -1 * dir * pEnd->flToleranceY;
-	}
-
-	if( point1 == point2 )
-		return vWayPos;
-
-	if( pEnd->SpecialGoalStatus == CHS_CLIMBDEST )
-	{
-		if( vWayPos.z - start.z > m_pOuter->m_fMaxClimbHeight )
-		{
-			if( dir.z > 0.0f ) dir *= -1;
-
-			//float fZ = GetAbsOrigin().z
-			//float fAngle = tan( m_pOuter->m_fMaxClimbHeight / pEnd->flToleranceX );
-			//hookPos2 = point2 + point2 * dir * pEnd->flToleranceX / 2.0f;
-		}
-	}
-
-	return UTIL_PointOnLineNearestPoint( point1, point2, start, true ); 
-
-}
-#endif // 0
 
 //-----------------------------------------------------------------------------
 // Purpose: Advances a waypoint.
@@ -1850,14 +1748,6 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 	// Per interval, we expect we at least move a proportion of the max speed we can move.
 	if( m_fBlockedNextPositionCheck < gpGlobals->curtime )
 	{
-#if 0
-		float fDistSqr = (m_vBlockedLastPosition - GetAbsOrigin()).Length2DSqr();
-		float fMaxSpeedSqr = MoveCommand.maxspeed * MoveCommand.maxspeed;
-		float fMinDistMovedSqr = (fMaxSpeedSqr * 3.0f * 3.0f) / 2.0f;
-		m_bBlockedLongDistanceDetected = fDistSqr < fMinDistMovedSqr;
-		m_fBlockedNextPositionCheck = gpGlobals->curtime + 3.0f;
-		m_vBlockedLastPosition = GetAbsOrigin();
-#else
 		// Only perform this check if we have no target or if the target is not moving
 		if( unit_blocked_longdist_check.GetBool() && fWishSpeed > fWishSpeedThreshold && ( !GetPath()->m_hTarget || GetPath()->m_hTarget->GetAbsVelocity().IsLengthLessThan( 10.0f ) ) )
 		{
@@ -1883,7 +1773,6 @@ void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, c
 		}
 
 		m_fBlockedNextPositionCheck = gpGlobals->curtime + 1.0f;
-#endif // 0
 	}
 
 	if( (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f && !m_bBlockedLongDistanceDetected )
@@ -2142,17 +2031,6 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 
 	const Vector &vOrigin = GetAbsOrigin();
 
-#if 0
-	bool bPathReused = false;
-	if( pPath->m_pWaypointHead && (pPath->m_vGoalPos - vDestination).Length2D() < 512.0f &&
-		(pPath->m_pWaypointHead->GetPos() - vOrigin).Length2D() < 512.0f )
-	{
-		// Reuse path
-		bPathReused = true;
-		NavDbgMsg("#%d FindPath: reusing previous path\n", GetOuter()->entindex());
-	}
-#endif // 0
-
 	pPath->m_vStartPosition = vOrigin;
 	pPath->m_iGoalType = goaltype;
 	pPath->m_vGoalPos = vDestination;
@@ -2165,25 +2043,12 @@ bool UnitBaseNavigator::FindPathInternal( UnitBasePath *pPath, int goaltype, con
 	pPath->m_bSuccess = false;
 	pPath->m_bAvoidEnemies = bAvoidEnemies;
 
-#if 0
-	if( !bPathReused )
-	{
-#endif // 0
-		if( pPath->m_iGoalType == GOALTYPE_POSITION ||
-				pPath->m_iGoalType == GOALTYPE_TARGETENT )
-			return DoFindPathToPos( pPath );
-		else if( pPath->m_iGoalType == GOALTYPE_POSITION_INRANGE ||
-				pPath->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
-			return DoFindPathToPosInRange( pPath );
-#if 0
-	}
-	else
-	{
-		// Just need to update the last waypoint
-		pPath->m_pWaypointHead->GetLast()->SetPos(GetPath()->m_vGoalPos);
-		return true;
-	}
-#endif // 0
+	if( pPath->m_iGoalType == GOALTYPE_POSITION ||
+			pPath->m_iGoalType == GOALTYPE_TARGETENT )
+		return DoFindPathToPos( pPath );
+	else if( pPath->m_iGoalType == GOALTYPE_POSITION_INRANGE ||
+			pPath->m_iGoalType == GOALTYPE_TARGETENT_INRANGE )
+		return DoFindPathToPosInRange( pPath );
 
 	return false;
 }

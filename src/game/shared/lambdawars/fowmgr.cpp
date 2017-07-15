@@ -254,34 +254,6 @@ void CFogOfWarMgr::LevelInitPreEntity()
 		cl_fogofwar_updaterate.SetValue( 0.18f );
 	else
 		cl_fogofwar_updaterate.Revert();
-#if 0
-	// Read fog of war color from map resource file
-	ConVarRef mat_fogofwar_r("mat_fogofwar_r");
-	ConVarRef mat_fogofwar_g("mat_fogofwar_g");
-	ConVarRef mat_fogofwar_b("mat_fogofwar_b");
-	ConVarRef mat_fogofwar_a("mat_fogofwar_a");
-
-	char buf[MAX_PATH];
-	V_StripExtension( engine->GetLevelName(), buf, MAX_PATH );
-	Q_snprintf( buf, sizeof( buf ), "%s.res", buf );
-
-	KeyValues *pMapData = new KeyValues("MapData");
-	KeyValues::AutoDelete autodelete( pMapData );
-	if( pMapData->LoadFromFile( filesystem, buf ) )
-	{
-		mat_fogofwar_r.SetValue( pMapData->GetString("fow_r", mat_fogofwar_r.GetDefault()) );
-		mat_fogofwar_g.SetValue( pMapData->GetString("fow_g", mat_fogofwar_g.GetDefault()) );
-		mat_fogofwar_b.SetValue( pMapData->GetString("fow_b", mat_fogofwar_b.GetDefault()) );
-		mat_fogofwar_a.SetValue( pMapData->GetString("fow_a", mat_fogofwar_a.GetDefault()) );
-	}
-	else
-	{
-		mat_fogofwar_r.SetValue( mat_fogofwar_r.GetDefault() );
-		mat_fogofwar_g.SetValue( mat_fogofwar_g.GetDefault() );
-		mat_fogofwar_b.SetValue( mat_fogofwar_b.GetDefault() );
-		mat_fogofwar_a.SetValue( mat_fogofwar_a.GetDefault() );
-	}
-#endif // 0
 #else
 	for( int i = 0; i < MAX_PLAYERS; i++ )
 	{
@@ -1633,14 +1605,6 @@ void CFogOfWarMgr::UpdateShared()
 {
 	VPROF_BUDGET( "CFogOfWarMgr::UpdateShared", VPROF_BUDGETGROUP_FOGOFWAR );
 
-#if 0 // Don't allow this mid game. Just load a new map!
-	if( sv_fogofwar_tilesize.GetInt() != m_nTileSize )
-	{
-		if( m_nTileSize != -1 ) Msg("Fog of war size changed, reallocating arrays...\n");
-		AllocateFogOfWar();
-	}
-#endif // 0
-
 	if( !NeedsUpdate() )
 		return;
 
@@ -2170,22 +2134,6 @@ void CFogOfWarMgr::UpdateVisibility( void )
 		// Detect changes. On the client notify the visibility changed, since we go in or out the fog of war.
 		// On the server update the transmit state, because some entities won't send any info when in the fow.
 #ifdef CLIENT_DLL
-		// TODO: Fading in entities could probably look pretty cool
-#if 0
-		// Change render mode + alpha
-		byte bTargetRenderA = 255 - m_FogOfWarTextureData[FOWINDEX(pEnt->m_iFOWPosX, pEnt->m_iFOWPosY)];
-		if( bTargetRenderA != pEnt->GetRenderAlpha() )
-		{
-			pEnt->SetRenderMode( kRenderTransTexture );
-			pEnt->SetRenderAlpha( 255 - m_FogOfWarTextureData[FOWINDEX(pEnt->m_iFOWPosX, pEnt->m_iFOWPosY)] );
-		}
-		else if( pEnt->GetRenderMode() != kRenderNormal )
-		{
-			pEnt->SetRenderMode( kRenderNormal );
-			pEnt->SetRenderAlpha( 255 );
-		}
-#endif // 0
-
 		infow = m_FogOfWar[FOWINDEX(pEnt->m_iFOWPosX, pEnt->m_iFOWPosY)] < 10;
 		if( infow != pEnt->IsInFOW() )
 		{
