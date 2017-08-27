@@ -85,7 +85,7 @@
       <Culture>0x1409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\..\..\..\..\lib\public\boost_python.lib</OutputFile>
+      <OutputFile>..\..\..\..\..\lib\public\boost_python3.lib</OutputFile>
       <IgnoreSpecificDefaultLibraries>libc;libcd;libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Lib>
     <Bscmake>
