@@ -35,21 +35,63 @@ enum ObstacleState
 	DT_OBSTACLE_REMOVING,
 };
 
+enum ObstacleType
+{
+	DT_OBSTACLE_CYLINDER,
+	DT_OBSTACLE_BOX, // AABB
+	DT_OBSTACLE_ORIENTED_BOX, // OBB
+	DT_OBSTACLE_POLYGON,
+};
+
+struct dtObstacleCylinder
+{
+	float pos[ 3 ];
+	float radius;
+	float height;
+};
+
+struct dtObstacleBox
+{
+	float bmin[ 3 ];
+	float bmax[ 3 ];
+};
+
+struct dtObstacleOrientedBox
+{
+	float center[ 3 ];
+	float halfExtents[ 3 ];
+	float rotAux[ 2 ]; //{ cos(0.5f*angle)*sin(-0.5f*angle); cos(0.5f*angle)*cos(0.5f*angle) - 0.5 }
+};
+
+static const int DT_MAX_CONVEX_HULL_VERTICES = 8;
+
+struct dtObstaclePolygon
+{
+	float pos[ 3 ];
+	float height;
+	float verts[DT_MAX_CONVEX_HULL_VERTICES*3];
+	int nverts;
+};
+
 // Was 8, changed to 16 for Lambda Wars (due some large buildings covering more than 8 tiles)
 static const int DT_MAX_TOUCHED_TILES = 16;
-static const int DT_MAX_CONVEX_HULL_VERTICES = 8;
 struct dtTileCacheObstacle
 {
-	float pos[3], radius, height;
+	union
+	{
+		dtObstacleCylinder cylinder;
+		dtObstacleBox box;
+		dtObstacleOrientedBox orientedBox;
+		dtObstaclePolygon polygonBox;
+	};
+
 	dtCompressedTileRef touched[DT_MAX_TOUCHED_TILES];
 	dtCompressedTileRef pending[DT_MAX_TOUCHED_TILES];
 	unsigned short salt;
+	unsigned char type;
 	unsigned char state;
 	unsigned char ntouched;
 	unsigned char npending;
-	float verts[DT_MAX_CONVEX_HULL_VERTICES*3];
-	// Use nverts == 0 to differentiate between poly or cylinder obstacle
-	int nverts;
 	// optional alternative area id
 	unsigned char areaId;
 	dtTileCacheObstacle* next;
@@ -112,8 +154,18 @@ public:
 	
 	dtStatus removeTile(dtCompressedTileRef ref, unsigned char** data, int* dataSize);
 	
+	// Cylinder obstacle.
 	dtStatus addObstacle(const float* pos, const float radius, const float height, unsigned char areaId, dtObstacleRef* result);
-	dtStatus addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned char areaId, dtObstacleRef* result);
+
+	// Aabb obstacle.
+	dtStatus addBoxObstacle(const float* bmin, const float* bmax, unsigned char areaId, dtObstacleRef* result);
+
+	// Box obstacle: can be rotated in Y.
+	dtStatus addBoxObstacle(const float* center, const float* halfExtents, const float yRadians, unsigned char areaId, dtObstacleRef* result);
+	
+	// Polygon obstacle
+	dtStatus addPolygonObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned char areaId, dtObstacleRef* result);
+
 	dtStatus removeObstacle(const dtObstacleRef ref);
 	
 	dtStatus queryTiles(const float* bmin, const float* bmax,

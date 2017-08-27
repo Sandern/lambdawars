@@ -370,9 +370,10 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float radius, const fl
 	memset(ob, 0, sizeof(dtTileCacheObstacle));
 	ob->salt = salt;
 	ob->state = DT_OBSTACLE_PROCESSING;
-	dtVcopy(ob->pos, pos);
-	ob->radius = radius;
-	ob->height = height;
+	ob->type = DT_OBSTACLE_CYLINDER;
+	dtVcopy(ob->cylinder.pos, pos);
+	ob->cylinder.radius = radius;
+	ob->cylinder.height = height;
 	ob->areaId = areaId;
 	
 	ObstacleRequest* req = &m_reqs[m_nreqs++];
@@ -386,8 +387,84 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float radius, const fl
 	return DT_SUCCESS;
 }
 
-// Add polygon obstacle
-dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned char areaId, dtObstacleRef* result)
+dtStatus dtTileCache::addBoxObstacle(const float* bmin, const float* bmax, unsigned char areaId, dtObstacleRef* result)
+{
+	if (m_nreqs >= MAX_REQUESTS)
+		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
+	
+	dtTileCacheObstacle* ob = 0;
+	if (m_nextFreeObstacle)
+	{
+		ob = m_nextFreeObstacle;
+		m_nextFreeObstacle = ob->next;
+		ob->next = 0;
+	}
+	if (!ob)
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
+	
+	unsigned short salt = ob->salt;
+	memset(ob, 0, sizeof(dtTileCacheObstacle));
+	ob->salt = salt;
+	ob->state = DT_OBSTACLE_PROCESSING;
+	ob->type = DT_OBSTACLE_BOX;
+	dtVcopy(ob->box.bmin, bmin);
+	dtVcopy(ob->box.bmax, bmax);
+
+	ob->areaId = areaId;
+
+	ObstacleRequest* req = &m_reqs[m_nreqs++];
+	memset(req, 0, sizeof(ObstacleRequest));
+	req->action = REQUEST_ADD;
+	req->ref = getObstacleRef(ob);
+	
+	if (result)
+		*result = req->ref;
+	
+	return DT_SUCCESS;
+}
+
+dtStatus dtTileCache::addBoxObstacle(const float* center, const float* halfExtents, const float yRadians, unsigned char areaId, dtObstacleRef* result)
+{
+	if (m_nreqs >= MAX_REQUESTS)
+		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
+
+	dtTileCacheObstacle* ob = 0;
+	if (m_nextFreeObstacle)
+	{
+		ob = m_nextFreeObstacle;
+		m_nextFreeObstacle = ob->next;
+		ob->next = 0;
+	}
+	if (!ob)
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
+
+	unsigned short salt = ob->salt;
+	memset(ob, 0, sizeof(dtTileCacheObstacle));
+	ob->salt = salt;
+	ob->state = DT_OBSTACLE_PROCESSING;
+	ob->type = DT_OBSTACLE_ORIENTED_BOX;
+	dtVcopy(ob->orientedBox.center, center);
+	dtVcopy(ob->orientedBox.halfExtents, halfExtents);
+
+	float coshalf= cosf(0.5f*yRadians);
+	float sinhalf = sinf(-0.5f*yRadians);
+	ob->orientedBox.rotAux[0] = coshalf*sinhalf;
+	ob->orientedBox.rotAux[1] = coshalf*coshalf - 0.5f;
+
+	ob->areaId = areaId;
+
+	ObstacleRequest* req = &m_reqs[m_nreqs++];
+	memset(req, 0, sizeof(ObstacleRequest));
+	req->action = REQUEST_ADD;
+	req->ref = getObstacleRef(ob);
+
+	if (result)
+		*result = req->ref;
+
+	return DT_SUCCESS;
+}
+
+dtStatus dtTileCache::addPolygonObstacle(const float* pos, const float* convexHullVertices, int numConvexHullVertices, const float height, unsigned char areaId, dtObstacleRef* result)
 {
 	if (m_nreqs >= MAX_REQUESTS)
 		return DT_FAILURE | DT_BUFFER_TOO_SMALL;
@@ -406,13 +483,13 @@ dtStatus dtTileCache::addObstacle(const float* pos, const float* convexHullVerti
 	memset(ob, 0, sizeof(dtTileCacheObstacle));
 	ob->salt = salt;
 	ob->state = DT_OBSTACLE_PROCESSING;
-	dtVcopy(ob->pos, pos);
-	ob->radius = 0.f;   // 0 means obstacle is a polygon instead of cylinder
-	ob->height = height;
-	ob->nverts = numConvexHullVertices;
-	for (int i = 0; i < ob->nverts; i++)
+	ob->type = DT_OBSTACLE_POLYGON;
+	dtVcopy(ob->polygonBox.pos, pos);
+	ob->polygonBox.height = height;
+	ob->polygonBox.nverts = numConvexHullVertices;
+	for (int i = 0; i < ob->polygonBox.nverts; i++)
 	{
-		dtVcopy(&ob->verts[i*3], &convexHullVertices[i*3]);
+		dtVcopy(&ob->polygonBox.verts[i*3], &convexHullVertices[i*3]);
 	}
 	ob->areaId = areaId;
     
@@ -649,21 +726,26 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 			continue;
 		if (contains(ob->touched, ob->ntouched, ref))
 		{
-#if defined(ORIGINAL_RECAST_CODE)
-            dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-                               ob->pos, ob->radius, ob->height, 0);
-#else
-			if (ob->radius != 0)
+			if (ob->type == DT_OBSTACLE_CYLINDER)
 			{
 				dtMarkCylinderArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-								ob->pos, ob->radius, ob->height, ob->areaId);
+							    ob->cylinder.pos, ob->cylinder.radius, ob->cylinder.height, ob->areaId);
 			}
-			else
+			else if (ob->type == DT_OBSTACLE_BOX)
+			{
+				dtMarkBoxArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+					ob->box.bmin, ob->box.bmax, 0);
+			}
+			else if (ob->type == DT_OBSTACLE_ORIENTED_BOX)
+			{
+				dtMarkBoxArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
+					ob->orientedBox.center, ob->orientedBox.halfExtents, ob->orientedBox.rotAux, 0);
+			}
+			else if (ob->type == DT_OBSTACLE_POLYGON)
 			{
 				dtMarkPolyArea(*bc.layer, tile->header->bmin, m_params.cs, m_params.ch,
-								ob->verts, ob->nverts, ob->areaId);
+								ob->polygonBox.verts, ob->polygonBox.nverts, ob->areaId);
 			}
-#endif
 		}
 	}
 	
@@ -674,7 +756,7 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 	
 	bc.lcset = dtAllocTileCacheContourSet(m_talloc);
 	if (!bc.lcset)
-		return status;
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
 	status = dtBuildTileCacheContours(m_talloc, *bc.layer, walkableClimbVx,
 									  m_params.maxSimplificationError, *bc.lcset);
 	if (dtStatusFailed(status))
@@ -682,7 +764,7 @@ dtStatus dtTileCache::buildNavMeshTile(const dtCompressedTileRef ref, dtNavMesh*
 	
 	bc.lmesh = dtAllocTileCachePolyMesh(m_talloc);
 	if (!bc.lmesh)
-		return status;
+		return DT_FAILURE | DT_OUT_OF_MEMORY;
 	status = dtBuildTileCachePolyMesh(m_talloc, *bc.lcset, *bc.lmesh);
 	if (dtStatusFailed(status))
 		return status;
@@ -757,51 +839,60 @@ void dtTileCache::calcTightTileBounds(const dtTileCacheLayerHeader* header, floa
 
 void dtTileCache::getObstacleBounds(const struct dtTileCacheObstacle* ob, float* bmin, float* bmax) const
 {
-#if 0
-	bmin[0] = ob->pos[0] - ob->radius;
-	bmin[1] = ob->pos[1];
-	bmin[2] = ob->pos[2] - ob->radius;
-	bmax[0] = ob->pos[0] + ob->radius;
-	bmax[1] = ob->pos[1] + ob->height;
-	bmax[2] = ob->pos[2] + ob->radius;	
-#else
-  if(ob->nverts == 0)
-  {
-    // Cylinderical obstacles
-    bmin[0] = ob->pos[0] - ob->radius;
-    bmin[1] = ob->pos[1];
-    bmin[2] = ob->pos[2] - ob->radius;
-    bmax[0] = ob->pos[0] + ob->radius;
-    bmax[1] = ob->pos[1] + ob->height;
-    bmax[2] = ob->pos[2] + ob->radius;
-  }
-  else
-  {
-    // Convex hull obstacles
-    dtVcopy(bmin, ob->verts);
-    dtVcopy(bmax, ob->verts);
+	if (ob->type == DT_OBSTACLE_CYLINDER)
+	{
+		const dtObstacleCylinder &cl = ob->cylinder;
 
-    bmax[1] = bmin[1] + ob->height;
-    for (int i = 1; i < ob->nverts; i++)
-    {
-      if (ob->verts[i*3] < bmin[0])
-      {
-        bmin[0] = ob->verts[i*3];
-      }
-      else if (ob->verts[i*3] > bmax[0])
-      {
-        bmax[0] = ob->verts[i*3];
-      }
+		bmin[0] = cl.pos[0] - cl.radius;
+		bmin[1] = cl.pos[1];
+		bmin[2] = cl.pos[2] - cl.radius;
+		bmax[0] = cl.pos[0] + cl.radius;
+		bmax[1] = cl.pos[1] + cl.height;
+		bmax[2] = cl.pos[2] + cl.radius;
+	}
+	else if (ob->type == DT_OBSTACLE_BOX)
+	{
+		dtVcopy(bmin, ob->box.bmin);
+		dtVcopy(bmax, ob->box.bmax);
+	}
+	else if (ob->type == DT_OBSTACLE_ORIENTED_BOX)
+	{
+		const dtObstacleOrientedBox &orientedBox = ob->orientedBox;
 
-      if (ob->verts[i*3+2] < bmin[2])
-      {
-        bmin[2] = ob->verts[i*3+2];
-      }
-      else if (ob->verts[i*3+2] > bmax[2])
-      {
-        bmax[2] = ob->verts[i*3+2];
-      }
-    }
-  }
-#endif // 0
+		float maxr = 1.41f*dtMax(orientedBox.halfExtents[0], orientedBox.halfExtents[2]);
+		bmin[0] = orientedBox.center[0] - maxr;
+		bmax[0] = orientedBox.center[0] + maxr;
+		bmin[1] = orientedBox.center[1] - orientedBox.halfExtents[1];
+		bmax[1] = orientedBox.center[1] + orientedBox.halfExtents[1];
+		bmin[2] = orientedBox.center[2] - maxr;
+		bmax[2] = orientedBox.center[2] + maxr;
+	}
+	else if (ob->type == DT_OBSTACLE_POLYGON)
+	{
+		// Convex hull obstacles
+		dtVcopy(bmin, ob->polygonBox.verts);
+		dtVcopy(bmax, ob->polygonBox.verts);
+
+		bmax[1] = bmin[1] + ob->polygonBox.height;
+		for (int i = 1; i < ob->polygonBox.nverts; i++)
+		{
+			if (ob->polygonBox.verts[i*3] < bmin[0])
+			{
+				bmin[0] = ob->polygonBox.verts[i*3];
+			}
+			else if (ob->polygonBox.verts[i*3] > bmax[0])
+			{
+				bmax[0] = ob->polygonBox.verts[i*3];
+			}
+
+			if (ob->polygonBox.verts[i*3+2] < bmin[2])
+			{
+				bmin[2] = ob->polygonBox.verts[i*3+2];
+			}
+			else if (ob->polygonBox.verts[i*3+2] > bmax[2])
+			{
+				bmax[2] = ob->polygonBox.verts[i*3+2];
+			}
+		}
+	}
 }

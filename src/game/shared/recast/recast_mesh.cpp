@@ -1093,7 +1093,7 @@ dtObstacleRef CRecastMesh::AddTempObstacle( const Vector &vPos, const Vector *co
 	}
 
 	dtObstacleRef result;
-	status = m_tileCache->addObstacle( pos, verts, numConvexHull, height, areaId, &result );
+	status = m_tileCache->addPolygonObstacle( pos, verts, numConvexHull, height, areaId, &result );
 	if( !dtStatusSucceed( status ) )
 	{
 		if( status & DT_BUFFER_TOO_SMALL )
