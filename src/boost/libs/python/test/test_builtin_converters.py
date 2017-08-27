@@ -77,7 +77,7 @@ False
     test unsigned long values which don't fit in a signed long.
     strip any 'L' characters in case the platform has > 32 bit longs
 
->>> hex(rewrap_value_unsigned_long(0x80000001L)).replace('L','')
+>>> hex(rewrap_value_unsigned_long(long(0x80000001))).replace('L','')
 '0x80000001'
 
 >>> rewrap_value_long_long(42) == 42
@@ -135,6 +135,9 @@ True
 
 >>> print(rewrap_value_wstring(u'yo, wassup?'))
 yo, wassup?
+
+>>> print(rewrap_value_wstring(u'\U0001f4a9'))
+\U0001f4a9
 
    test that overloading on unicode works:
 
@@ -282,6 +285,10 @@ Check that classic classes also work
 
 >>> assert return_null_handle() is None
 """
+
+import sys
+if (sys.version_info.major >= 3):
+    long = int
 
 def run(args = None):
     import sys

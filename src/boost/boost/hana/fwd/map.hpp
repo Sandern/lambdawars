@@ -2,7 +2,7 @@
 @file
 Forward declares `boost::hana::map`.
 
-@copyright Louis Dionne 2013-2016
+@copyright Louis Dionne 2013-2017
 Distributed under the Boost Software License, Version 1.0.
 (See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
  */
@@ -17,13 +17,16 @@ Distributed under the Boost Software License, Version 1.0.
 #include <boost/hana/fwd/insert.hpp>
 #include <boost/hana/fwd/keys.hpp>
 
-#include <utility>
-
 
 BOOST_HANA_NAMESPACE_BEGIN
     //! Tag representing `hana::map`s.
     //! @relates hana::map
     struct map_tag { };
+
+    namespace detail {
+        template <typename ...Pairs>
+        struct make_map_type;
+    }
 
     //! @ingroup group-datatypes
     //! Basic associative container requiring unique, `Comparable` and
@@ -42,7 +45,7 @@ BOOST_HANA_NAMESPACE_BEGIN
     //! - the fact that `hana::map<Pairs...>` is, or is not, a dependent type
     //!
     //! In particular, the last point is very important; `hana::map<Pairs...>`
-    //! is only a shortcut for
+    //! is basically equivalent to
     //! @code
     //!     decltype(hana::make_pair(std::declval<Pairs>()...))
     //! @endcode
@@ -106,6 +109,14 @@ BOOST_HANA_NAMESPACE_BEGIN
         template <typename ...P>
         explicit constexpr map(P&& ...pairs);
 
+        //! Assign a map to another map __with the exact same type__. Only
+        //! exists when all the elements of the map are copy-assignable.
+        constexpr map& operator=(map const& other);
+
+        //! Move-assign a map to another map __with the exact same type__.
+        //! Only exists when all the elements of the map are move-assignable.
+        constexpr map& operator=(map&& other);
+
         //! Equivalent to `hana::equal`
         template <typename X, typename Y>
         friend constexpr auto operator==(X&& x, Y&& y);
@@ -120,7 +131,7 @@ BOOST_HANA_NAMESPACE_BEGIN
     };
 #else
     template <typename ...Pairs>
-    using map = decltype(hana::make<map_tag>(std::declval<Pairs>()...));
+    using map = typename detail::make_map_type<Pairs...>::type;
 #endif
 
     //! Function object for creating a `hana::map`.
@@ -244,6 +255,126 @@ BOOST_HANA_NAMESPACE_BEGIN
         return tag-dispatched;
     };
 #endif
+
+    //! Returns the union of two maps.
+    //! @relates hana::map
+    //!
+    //! Given two maps `xs` and `ys`, `hana::union_(xs, ys)` is a new map
+    //! containing all the elements of `xs` and all the elements of `ys`,
+    //! without duplicates. If both `xs` and `ys` contain an element with the
+    //! same `key`, the one in `ys` is taken. Functionally,
+    //! `hana::union_(xs, ys)` is equivalent to
+    //! @code
+    //! hana::fold_left(xs, ys, hana::insert)
+    //! @endcode
+    //!
+    //! @param xs, ys
+    //! The two maps to compute the union of.
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/map/union.cpp
+#ifdef BOOST_HANA_DOXYGEN_INVOKED
+    constexpr auto union_ = [](auto&& xs, auto&& ys) {
+        return tag-dispatched;
+    };
+#endif
+
+    //! Returns the intersection of two maps.
+    //! @relates hana::map
+    //!
+    //! Given two maps `xs` and `ys`, `intersection(xs, ys)` is a new map
+    //! containing exactly those (key, value) pairs from xs, for which key
+    //! is present in `ys`.
+    //! In other words, the following holds for any object `pair(k, v)`:
+    //! @code
+    //!     pair(k, v) ^in^ intersection(xs, ys) if and only if (k, v) ^in^ xs && k ^in^ keys(ys)
+    //! @endcode
+    //!
+    //!
+    //! @note
+    //! This function is not commutative, i.e. `intersection(xs, ys)` is not
+    //! necessarily the same as `intersection(ys, xs)`. Indeed, the set of keys
+    //! in `intersection(xs, ys)` is always the same as the set of keys in
+    //! `intersection(ys, xs)`, but the value associated to each key may be
+    //! different. `intersection(xs, ys)` contains values present in `xs`, and
+    //! `intersection(ys, xs)` contains values present in `ys`.
+    //!
+    //!
+    //! @param xs, ys
+    //! Two maps to intersect.
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/map/intersection.cpp
+#ifdef BOOST_HANA_DOXYGEN_INVOKED
+    constexpr auto intersection = [](auto&& xs, auto&& ys) {
+        return tag-dispatched;
+    };
+#endif
+
+    //! Returns the difference of two maps.
+    //! @relates hana::map
+    //!
+    //! Given two maps `xs` and `ys`, `difference(xs, ys)` is a new map
+    //! containing exactly those (key, value) pairs from xs, for which key
+    //! is not present in `keys(ys)`.
+    //! In other words, the following holds for any object `pair(k, v)`:
+    //! @code
+    //!     pair(k, v) ^in^ difference(xs, ys) if and only if (k, v) ^in^ xs && k ^not in^ keys(ys)
+    //! @endcode
+    //!
+    //!
+    //! @note
+    //! This function is not commutative, i.e. `difference(xs, ys)` is not
+    //! necessarily the same as `difference(ys, xs)`.
+    //! Indeed, consider the case where `xs` is empty and `ys` isn't.
+    //! In that case, `difference(xs, ys)` is empty, but `difference(ys, xs)`
+    //! is equal to `ys`.
+    //! For symmetric version of this operation, see `symmetric_difference`.
+    //!
+    //!
+    //! @param xs, ys
+    //! Two maps to compute the difference of.
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/map/intersection.cpp
+#ifdef BOOST_HANA_DOXYGEN_INVOKED
+    constexpr auto difference = [](auto&& xs, auto&& ys) {
+        return tag-dispatched;
+    };
+#endif
+
+    //! Returns the symmetric set-theoretic difference of two maps.
+    //! @relates hana::map
+    //!
+    //! Given two sets `xs` and `ys`, `symmetric_difference(xs, ys)` is a new
+    //! map containing all the elements of `xs` whose keys are not contained in `keys(ys)`,
+    //! and all the elements of `ys` whose keys are not contained in `keys(xs)`. The
+    //! symmetric difference of two maps satisfies the following:
+    //! @code
+    //!     symmetric_difference(xs, ys) == union_(difference(xs, ys), difference(ys, xs))
+    //! @endcode
+    //!
+    //!
+    //! @param xs, ys
+    //! Two maps to compute the symmetric difference of.
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/map/symmetric_difference.cpp
+#ifdef BOOST_HANA_DOXYGEN_INVOKED
+constexpr auto symmetric_difference = [](auto&& xs, auto&& ys) {
+        return tag-dispatched;
+    };
+#endif
+
+
 BOOST_HANA_NAMESPACE_END
 
 #endif // !BOOST_HANA_FWD_MAP_HPP

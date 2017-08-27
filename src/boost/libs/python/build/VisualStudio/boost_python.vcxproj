@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4086CE3F-2EFA-4029-8F04-D20576718A12}</ProjectGuid>
     <RootNamespace>boost_python</RootNamespace>
+    <ProjectName>boost_python3</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -128,7 +129,7 @@
       <Culture>0x1409</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>..\..\..\..\..\lib\public\boost_python.lib</OutputFile>
+      <OutputFile>..\..\..\..\..\lib\public\boost_python3.lib</OutputFile>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Lib>
     <Bscmake>
@@ -234,12 +235,6 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <ClCompile Include="..\..\src\numeric.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="..\..\src\object_operators.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -338,7 +333,6 @@
     <ClInclude Include="..\..\..\..\boost\python\manage_new_object.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\module.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\module_init.hpp" />
-    <ClInclude Include="..\..\..\..\boost\python\numeric.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\object.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\object_attributes.hpp" />
     <ClInclude Include="..\..\..\..\boost\python\object_call.hpp" />
