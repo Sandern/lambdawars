@@ -59,7 +59,6 @@ public:
 void FullClientUpdatePyNetworkCls( CBasePlayer *pPlayer );
 void FullClientUpdatePyNetworkClsByFilter( IRecipientFilter &filter );
 void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict );
-void FullClientUpdatePyNetworkClsByEdict2( edict_t *pEdict );
 
 // Implement a networkable python class. Used to determine the right recv/send tables
 #define DECLARE_PYSERVERCLASS( name )													\

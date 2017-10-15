@@ -14,7 +14,7 @@
 #include "iplayeranimstate.h"
 #include "unit_baseanimstate.h"
 #include "studio.h"
-#include "sequence_transitioner.h"
+#include "sequence_Transitioner.h"
 
 #ifdef ENABLE_PYTHON
 	#include "srcpy_boostpython.h"

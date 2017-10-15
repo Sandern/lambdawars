@@ -17,8 +17,8 @@
 #endif
 
 #ifndef ENABLE_PYTHON
-	#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name )
-	#define DECLARE_PYCLIENTCLASS( name, networkType )
+	#define IMPLEMENT_PYCLIENTCLASS_SYSTEM( name, network_name, table, fallback_class_name )
+	#define DECLARE_PYCLIENTCLASS( name )
 	#define DECLARE_PYCLASS( name )
 #else
 
@@ -30,7 +30,7 @@ class NetworkedClass;
 // Forward declaration
 class PyClientClassBase;
 
-// Class head 
+// Class head F
 extern PyClientClassBase *g_pPyClientClassHead;
 
 namespace DT_BaseEntity

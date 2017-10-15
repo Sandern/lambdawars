@@ -23,7 +23,9 @@ public:
 	C_EntityFlame( void );
 	virtual ~C_EntityFlame( void );
 
+#ifdef HL2WARS_DLL
 	static C_EntityFlame	*Create( CBaseEntity *pTarget, float flLifetime, float flSize = 0.0f );
+#endif // HL2WARS_DLL
 
 	virtual bool	Simulate( void );
 	virtual void	UpdateOnRemove( void );

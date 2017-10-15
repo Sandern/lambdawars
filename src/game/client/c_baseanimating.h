@@ -20,7 +20,7 @@
 // Shared activities
 #include "ai_activity.h"
 #include "animationlayer.h"
-#include "sequence_transitioner.h"
+#include "sequence_Transitioner.h"
 #include "bone_accessor.h"
 #include "bone_merge_cache.h"
 #include "ragdoll_shared.h"

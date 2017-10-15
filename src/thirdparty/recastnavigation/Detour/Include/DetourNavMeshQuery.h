@@ -324,7 +324,7 @@ public:
 	dtStatus findNearestPoly(const float* center, const float* halfExtents,
 							 const dtQueryFilter* filter,
 							 dtPolyRef* nearestRef, float* nearestPt, 
-							 const float* testPt) const;
+							 const float* testPt = NULL) const;
 	
 	/// Finds polygons that overlap the search box.
 	///  @param[in]		center		The center of the search box. [(x, y, z)]

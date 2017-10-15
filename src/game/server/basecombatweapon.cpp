@@ -27,10 +27,6 @@
 #include "iservervehicle.h"
 #include "func_break.h"
 
-#ifdef HL2WARS_DLL
-	#include "unit_base_shared.h"
-#endif // HL2WARS_DLL
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

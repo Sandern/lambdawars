@@ -13,7 +13,7 @@
 
 #include "iplayeranimstate.h"
 #include "studio.h"
-#include "sequence_transitioner.h"
+#include "sequence_Transitioner.h"
 
 #ifdef CLIENT_DLL
 	class C_BaseAnimatingOverlay;
