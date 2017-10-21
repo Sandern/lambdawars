@@ -125,7 +125,7 @@ CefRefPtr<CefV8Value> DictionaryValueToV8Value( RenderBrowser *pBrowser, const C
 			CefDictionaryValue::KeyList keys;
 			src->GetKeys( keys );
 
-			CefRefPtr<CefV8Value> v = CefV8Value::CreateObject( NULL );
+			CefRefPtr<CefV8Value> v = CefV8Value::CreateObject( NULL, NULL );
 			if( v )
 			{
 				for( size_t i = 0; i < keys.size(); i++ )
@@ -196,7 +196,7 @@ CefRefPtr<CefV8Value> ListValueToV8Value( RenderBrowser *pBrowser, const CefRefP
 			CefDictionaryValue::KeyList keys;
 			src->GetKeys( keys );
 
-			CefRefPtr<CefV8Value> v = CefV8Value::CreateObject( NULL );
+			CefRefPtr<CefV8Value> v = CefV8Value::CreateObject( NULL, NULL );
 			if( v )
 			{
 				for( size_t i = 0; i < keys.size(); i++ )

@@ -26,7 +26,6 @@
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
 #include "include/cef_frame.h"
-#include "include/cef_runnable.h"
 #include "include/cef_client.h"
 #endif // PYPP_GENERATION
 

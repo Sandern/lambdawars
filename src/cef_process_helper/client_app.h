@@ -23,7 +23,7 @@ public:
 	// CefApp
 	virtual void OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line );
 
-	virtual void OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar );
+	virtual void OnRegisterCustomSchemes( CefRawPtr<CefSchemeRegistrar> registrar );
 
 	// Messages from/to main process
 	virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,

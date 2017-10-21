@@ -34,7 +34,6 @@
 #include "include/cef_app.h"
 #include "include/cef_browser.h"
 #include "include/cef_frame.h"
-#include "include/cef_runnable.h"
 #include "include/cef_client.h"
 #include "include/cef_sandbox_win.h"
 
@@ -153,7 +152,7 @@ private:
 
 	virtual void OnBeforeCommandLineProcessing( const CefString& process_type, CefRefPtr<CefCommandLine> command_line );
 
-	virtual void OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar);
+	virtual void OnRegisterCustomSchemes( CefRawPtr<CefSchemeRegistrar> registrar);
 
 private:
 	IMPLEMENT_REFCOUNTING( ClientApp );
@@ -214,11 +213,11 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar)
+void ClientApp::OnRegisterCustomSchemes( CefRawPtr<CefSchemeRegistrar> registrar)
 {
-	registrar->AddCustomScheme( "avatar", true, false, false );
-	registrar->AddCustomScheme( "vtf", false /* Not a standard url */, false, false );
-	registrar->AddCustomScheme( "local", true, false, false );
+	registrar->AddCustomScheme( "avatar", true, false, false, false, false, false );
+	registrar->AddCustomScheme( "vtf", false /* Not a standard url */, false, false, false, false, false );
+	registrar->AddCustomScheme( "local", true, false, false, false, false, false );
 }
 
 //-----------------------------------------------------------------------------

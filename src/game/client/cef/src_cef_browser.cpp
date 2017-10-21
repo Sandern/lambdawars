@@ -497,7 +497,7 @@ SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFram
 	m_CefClientHandler = new CefClientHandler( this, navigationbehavior, name );
 
     CefWindowInfo info;
-	info.SetAsWindowless( /*CEFSystem().GetMainWindow()*/ NULL, true );
+	info.SetAsWindowless( /*CEFSystem().GetMainWindow()*/ NULL );
 
 	m_CefClientHandler->SetOSRHandler( new SrcCefOSRRenderer( this, true ) );
 	

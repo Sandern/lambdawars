@@ -141,7 +141,7 @@ bool RenderBrowser::CreateGlobalObject( CefString identifier, CefString name )
 	// Retrieve the context's window object.
 	CefRefPtr<CefV8Value> object = m_Context->GetGlobal();
 
-	CefRefPtr<CefV8Value> newobject = CefV8Value::CreateObject( NULL );
+	CefRefPtr<CefV8Value> newobject = CefV8Value::CreateObject( NULL, NULL );
 
 	// Add the "newobject" object to the "window" object.
 	object->SetValue(name, newobject, V8_PROPERTY_ATTRIBUTE_NONE);
@@ -223,7 +223,7 @@ bool RenderBrowser::ExecuteJavascriptWithResult( CefString identifier, CefString
 	// Execute code
 	CefRefPtr<CefV8Value> retval;
 	CefRefPtr<CefV8Exception> exception;
-	if( !m_Context->Eval( code, retval, exception ) )
+	if( !m_Context->Eval( code, "", 0, retval, exception ) )
 	{
 		m_Context->Exit();
 		return false;
@@ -250,7 +250,7 @@ void RenderBrowser::CallFunction(	CefRefPtr<CefV8Value> object,
 					CefString& exception,
 					CefRefPtr<CefV8Value> callback )
 {
-	CefRefPtr<CefBase> user_data = object->GetUserData();
+	CefRefPtr<CefBaseRefCounted> user_data = object->GetUserData();
 	if( !user_data )
 	{
 		exception = CefString( "Failed to call js bound function %ls" + object->GetFunctionName().ToString() );

@@ -13,7 +13,7 @@ class ClientApp;
 
 #define INVALID_IDENTIFIER -1
 
-class WarsCefUserData : public CefBase 
+class WarsCefUserData : public CefBaseRefCounted 
 {
 public:
 	WarsCefUserData() {}
@@ -55,7 +55,7 @@ public:
 };
 
 // Browsers representation on render process (maintains js objects)
-class RenderBrowser : public CefBase
+class RenderBrowser : public CefBaseRefCounted
 {
 public:
 	RenderBrowser( CefRefPtr<CefBrowser> browser, CefRefPtr<ClientApp> clientApp );

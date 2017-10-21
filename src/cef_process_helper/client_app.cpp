@@ -166,11 +166,11 @@ void ClientApp::OnBeforeCommandLineProcessing( const CefString& process_type, Ce
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void ClientApp::OnRegisterCustomSchemes( CefRefPtr<CefSchemeRegistrar> registrar)
+void ClientApp::OnRegisterCustomSchemes( CefRawPtr<CefSchemeRegistrar> registrar)
 {
-	registrar->AddCustomScheme("avatar", true, false, false);
-	registrar->AddCustomScheme("vtf", false /* Not a standard url */, false, false);
-	registrar->AddCustomScheme("local", true, false, false);
+	registrar->AddCustomScheme("avatar", true, false, false, false, false, false);
+	registrar->AddCustomScheme("vtf", false /* Not a standard url */, false, false, false, false, false);
+	registrar->AddCustomScheme("local", true, false, false, false, false, false);
 }
 
 //-----------------------------------------------------------------------------
