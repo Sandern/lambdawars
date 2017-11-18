@@ -471,7 +471,7 @@ private:
 SrcCefBrowser::SrcCefBrowser( const char *name, const char *pURL, int renderFrameRate, int wide, int tall, SrcCefNavigationType navigationbehavior ) : 
 	m_bPerformLayout(true), m_bVisible(false), m_pPanel(NULL),
 	m_bGameInputEnabled(false), m_bUseMouseCapture(false), m_bPassMouseTruIfAlphaZero(false), m_bHasFocus(false), m_CefClientHandler(NULL),
-	m_bInitializePingSuccessful(false), m_bWasHidden(false), m_bIgnoreTabKey(false), m_fLastLoadStartTime(0)
+	m_fLastTriedPingTime(-1), m_bInitializePingSuccessful(false), m_bWasHidden(false), m_bIgnoreTabKey(false), m_fLastLoadStartTime(0)
 {
 	m_Name = name ? name : "UnknownCefBrowser";
 
@@ -629,7 +629,7 @@ void SrcCefBrowser::Think( void )
 		if( !m_CefClientHandler->IsInitialized() || m_CefClientHandler->GetLastPingTime() == -1 )
 		{
 			float fLifeTime = Plat_FloatTime() - m_fBrowserCreateTime;
-			if( fLifeTime > 15.0f )
+			if( fLifeTime > 60.0f )
 			{
 				Error( "Could not launch browser helper process. \n\n"
 						"This is usually caused by security software blocking the process from launching. "
@@ -637,6 +637,10 @@ void SrcCefBrowser::Think( void )
 						"Your security software might also temporary block the process for scanning. "
 						"In this case just relaunch the game. "
 				);
+			}
+			else if ( Plat_FloatTime() - m_fLastTriedPingTime > 1.0f )
+			{
+				Ping();
 			}
 		}
 		else
@@ -902,7 +906,7 @@ bool SrcCefBrowser::IsKeyBoardInputEnabled()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose:
+// Purpose: For overriding by implementations
 //-----------------------------------------------------------------------------
 int SrcCefBrowser::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
@@ -1389,6 +1393,11 @@ void SrcCefBrowser::Ping()
 	CefRefPtr<CefListValue> val = CefListValue::Create();
 	args->SetList(0, val);
 	GetBrowser()->SendProcessMessage(PID_RENDERER, message);
+
+	m_fLastTriedPingTime = Plat_FloatTime();
+
+	if( g_debug_cef.GetBool() )
+		DevMsg( "#%d %s: SrcCefBrowser::Ping\n", GetBrowser()->GetIdentifier(), GetName() );
 }
 
 //-----------------------------------------------------------------------------

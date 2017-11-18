@@ -374,6 +374,10 @@ private:
 
 	float m_fBrowserCreateTime;
 	float m_fLastLoadStartTime;
+
+	// Last time browser tried ping
+	float m_fLastTriedPingTime;
+	// If a ping was successfull
 	bool m_bInitializePingSuccessful;
 };
 
