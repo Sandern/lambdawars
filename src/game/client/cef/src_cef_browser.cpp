@@ -21,6 +21,8 @@
 
 #include "vgui/ISystem.h"
 
+#include "include/wrapper/cef_helpers.h"
+
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
 
@@ -197,6 +199,8 @@ void CefClientHandler::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
 //-----------------------------------------------------------------------------
 void CefClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) 
 {
+	CEF_REQUIRE_UI_THREAD();
+
 	if( !m_pSrcBrowser )
 		return;
 
@@ -631,12 +635,21 @@ void SrcCefBrowser::Think( void )
 			float fLifeTime = Plat_FloatTime() - m_fBrowserCreateTime;
 			if( fLifeTime > 60.0f )
 			{
-				Error( "Could not launch browser helper process. \n\n"
-						"This is usually caused by security software blocking the process from launching. "
-						"Please check your security software and unblock \"lambdawars_browser.exe\". \n\n"
-						"Your security software might also temporary block the process for scanning. "
-						"In this case just relaunch the game. "
-				);
+				if ( m_CefClientHandler->GetLastPingTime() == -1 )
+				{
+					Error( "Could not launch browser helper process. \n\n"
+							"This is usually caused by security software blocking the process from launching. "
+							"Please check your security software and unblock \"lambdawars_browser.exe\". \n\n"
+							"Your security software might also temporary block the process for scanning. "
+							"In this case just relaunch the game. "
+					);
+				}
+				else
+				{
+					Error( "Creating web view failed\n\n"
+							"Contact a developer in case this happens"	
+					);
+				}
 			}
 			else if ( Plat_FloatTime() - m_fLastTriedPingTime > 1.0f )
 			{
