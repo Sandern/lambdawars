@@ -229,7 +229,7 @@ src/materialsystem/stdshaders/NIL
 
 # Ignore certain libraries
 src/lib/public/shaderlib.lib
-src/lib/public/boost_python.lib
+src/lib/public/boost_python3.lib
 src/lib/public/python34.lib
 src/lib/public/python34_d.lib
 src/lib/public/libcef_d.lib
