@@ -3953,14 +3953,12 @@
     <Library Include="..\..\lib\public\vstdlib.lib">
       <Filter>Link Libraries</Filter>
     </Library>
-    <Library Include="..\..\thirdparty\python\PCbuild\_socket.lib">
-      <Filter>Link Libraries</Filter>
-    </Library>
     <Library Include="..\..\lib\public\unicodedata.lib">
       <Filter>Link Libraries</Filter>
     </Library>
     <Library Include="..\..\lib\public\_ctypes.lib">
       <Filter>Link Libraries</Filter>
     </Library>
+    <Library Include="..\..\lib\public\_socket.lib" />
   </ItemGroup>
 </Project>
