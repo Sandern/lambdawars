@@ -181,7 +181,7 @@ void CServerGameDLL::ApplyGameSettings( KeyValues *pKV )
 	DevMsg( "GameInterface reservation payload:\n" );
 	KeyValuesDumpAsDevMsg( pKV );
 
-	if( !g_bOfflineGame && !(V_stricmp( COM_GetModDirectory(), "lambdawarsdev" ) == 0) )
+	if( !g_bOfflineGame )
 	{
 		// Vitaliy: Disable cheats as part of reservation in case they were enabled (unless we are on Steam Beta)
 		if ( sv_force_transmit_ents.IsFlagSet( FCVAR_DEVELOPMENTONLY ) &&	// any convar with FCVAR_DEVELOPMENTONLY flag will be sufficient here
