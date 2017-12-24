@@ -187,13 +187,14 @@ private:
     detail::terminated_hook                             terminated_hook_{};
     detail::worker_hook                                 worker_hook_{};
     fiber_properties                                *   properties_{ nullptr };
-    std::chrono::steady_clock::time_point               tp_{ (std::chrono::steady_clock::time_point::max)() };
     boost::context::continuation                        c_{};
+    std::chrono::steady_clock::time_point               tp_;
     type                                                type_;
     launch                                              policy_;
 
     context( std::size_t initial_count, type t, launch policy) noexcept :
         use_count_{ initial_count },
+        tp_{ (std::chrono::steady_clock::time_point::max)() },
         type_{ t },
         policy_{ policy } {
     }
@@ -423,9 +424,9 @@ private:
             auto arg = std::move( arg_);
             c.resume();
 #if defined(BOOST_NO_CXX17_STD_APPLY)
-           boost::context::detail::apply( std::move( fn_), std::move( arg_) );
+           boost::context::detail::apply( std::move( fn), std::move( arg) );
 #else
-           std::apply( std::move( fn_), std::move( arg_) );
+           std::apply( std::move( fn), std::move( arg) );
 #endif
         }
         // terminate context

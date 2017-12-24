@@ -12,7 +12,8 @@
 #   pragma once
 #endif
 
-#include <boost/stacktrace/detail/push_options.pp>
+#include <boost/detail/winapi/config.hpp>
+#include <boost/stacktrace/detail/push_options.h>
 
 #ifdef BOOST_INTEL
 #   pragma warning(push)
@@ -195,7 +196,7 @@ BOOST_FORCEINLINE std::size_t safe_dump_to(std::size_t skip, std::size_t max_dep
 #   pragma warning(pop)
 #endif
 
-#include <boost/stacktrace/detail/pop_options.pp>
+#include <boost/stacktrace/detail/pop_options.h>
 
 #if !defined(BOOST_STACKTRACE_LINK) || defined(BOOST_STACKTRACE_INTERNAL_BUILD_LIBS)
 #   if defined(BOOST_STACKTRACE_USE_NOOP)
@@ -207,7 +208,7 @@ BOOST_FORCEINLINE std::size_t safe_dump_to(std::size_t skip, std::size_t max_dep
 #       else
 #           include <boost/stacktrace/detail/safe_dump_posix.ipp>
 #       endif
-#       if defined(BOOST_WINDOWS) && !defined(BOOST_GCC)
+#       if defined(BOOST_WINDOWS) && !defined(BOOST_WINAPI_IS_MINGW) // MinGW does not provide RtlCaptureStackBackTrace. MinGW-w64 does.
 #           include <boost/stacktrace/detail/collect_msvc.ipp>
 #       else
 #           include <boost/stacktrace/detail/collect_unwind.ipp>
