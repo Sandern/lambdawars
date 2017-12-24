@@ -253,6 +253,9 @@ void FullClientUpdatePyNetworkClsByEdict( edict_t *pEdict )
 // Debugging
 CON_COMMAND_F( print_py_serverclass_list, "Print server class list", 0)
 {
+	if (!UTIL_IsCommandIssuedByServerAdmin())
+		return;
+
 	if ( !g_pPyServerClassHead )
 		return;
 

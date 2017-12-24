@@ -351,7 +351,7 @@ void HookPyNetworkCls()
 }
 
 // Debugging
-CON_COMMAND_F( print_py_clientclass_list, "Print client class list", 0 )
+CON_COMMAND_F( print_py_clientclass_list, "Print client class list", FCVAR_CHEAT )
 {
 	if ( !g_pPyClientClassHead )
 		return;

@@ -1581,9 +1581,9 @@ bool CSrcPython::IsPerFrameMethodRegistered( boost::python::object method )
 // Purpose: 
 //-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
-CON_COMMAND( py_runfile, "Run a python script")
+CON_COMMAND_F( py_runfile, "Run a python script", FCVAR_CHEAT )
 #else
-CON_COMMAND_F( cl_py_runfile, "Run a python script", FCVAR_CHEAT)
+CON_COMMAND_F( cl_py_runfile, "Run a python script", FCVAR_CHEAT )
 #endif // CLIENT_DLL
 {
 	if( !SrcPySystem()->IsPythonRunning() )
@@ -1599,7 +1599,7 @@ CON_COMMAND_F( cl_py_runfile, "Run a python script", FCVAR_CHEAT)
 // Purpose: 
 //-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
-CON_COMMAND( spy, "Run a string on the python interpreter")
+CON_COMMAND_F( spy, "Run a string on the python interpreter", FCVAR_CHEAT )
 #else
 CON_COMMAND_F( cpy, "Run a string on the python interpreter", FCVAR_CHEAT)
 #endif // CLIENT_DLL
@@ -1614,9 +1614,9 @@ CON_COMMAND_F( cpy, "Run a string on the python interpreter", FCVAR_CHEAT)
 }
 
 #ifndef CLIENT_DLL
-CON_COMMAND( py_restart, "Restarts the Python interpreter on the Server")
+CON_COMMAND_F( py_restart, "Restarts the Python interpreter on the Server", FCVAR_CHEAT )
 #else
-CON_COMMAND_F( cl_py_restart, "Restarts the Python interpreter on the Client", FCVAR_CHEAT)
+CON_COMMAND_F( cl_py_restart, "Restarts the Python interpreter on the Client", FCVAR_CHEAT )
 #endif // CLIENT_DLL
 {
 	if( !SrcPySystem()->IsPythonRunning() )
@@ -1740,7 +1740,7 @@ static int PyModuleAutocomplete( char const *partial, char commands[ COMMAND_COM
 // Purpose: 
 //-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
-CON_COMMAND_F_COMPLETION( py_import, "Import a python module", 0, PyModuleAutocomplete )
+CON_COMMAND_F_COMPLETION( py_import, "Import a python module", FCVAR_CHEAT, PyModuleAutocomplete )
 #else
 CON_COMMAND_F_COMPLETION( cl_py_import, "Import a python module", FCVAR_CHEAT, PyModuleAutocomplete )
 #endif // CLIENT_DLL
@@ -1760,7 +1760,7 @@ CON_COMMAND_F_COMPLETION( cl_py_import, "Import a python module", FCVAR_CHEAT, P
 // Purpose: 
 //-----------------------------------------------------------------------------
 #ifndef CLIENT_DLL
-CON_COMMAND_F_COMPLETION( py_reload, "Reload a python module", 0, PyModuleAutocomplete )
+CON_COMMAND_F_COMPLETION( py_reload, "Reload a python module", FCVAR_CHEAT, PyModuleAutocomplete )
 #else
 CON_COMMAND_F_COMPLETION( cl_py_reload, "Reload a python module", FCVAR_CHEAT, PyModuleAutocomplete )
 #endif // CLIENT_DLL
