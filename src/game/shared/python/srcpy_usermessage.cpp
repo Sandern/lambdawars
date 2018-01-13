@@ -56,7 +56,7 @@ void PyFillWriteElement( pywrite &w, bp::object data )
 	else if( datatype == builtins.attr("float") )
 	{
 		w.type = PYTYPE_FLOAT;
-		w.writefloat = boost::python::extract<float>(data);
+		w.writefloat = boost::python::extract<double>(data);
 	}
 	else if( datatype == builtins.attr("str") )
 	{

@@ -82,6 +82,11 @@ CefRefPtr<CefV8Value> DictionaryValueToV8Value( RenderBrowser *pBrowser, const C
 	// Keep in sync with ListValueToV8Value!
 	switch( args->GetType( key ) )
 	{
+		case VTYPE_NULL:
+		{
+			ret = CefV8Value::CreateNull();
+			break;
+		}
 		case VTYPE_INT:
 		{
 			ret = CefV8Value::CreateInt( args->GetInt( key ) );
@@ -153,6 +158,11 @@ CefRefPtr<CefV8Value> ListValueToV8Value( RenderBrowser *pBrowser, const CefRefP
 	// Keep in sync with DictionaryValueToV8Value!
 	switch( args->GetType( idx ) )
 	{
+		case VTYPE_NULL:
+		{
+			ret = CefV8Value::CreateNull();
+			break;
+		}
 		case VTYPE_INT:
 		{
 			ret = CefV8Value::CreateInt( args->GetInt( idx ) );
@@ -219,8 +229,6 @@ CefRefPtr<CefV8Value> ListValueToV8Value( RenderBrowser *pBrowser, const CefRefP
 
 void ListValueToV8ValueList( RenderBrowser *pBrowser, const CefRefPtr<CefListValue> args, CefV8ValueList& arguments )
 {
-	int idx = 0;
-
 	arguments.clear();
 
 	size_t n = args->GetSize();

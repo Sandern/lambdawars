@@ -71,7 +71,7 @@ void PySingleToCefValueList( boost::python::object value, CefListValue *result, 
 	}
 	else if( valuetype == builtins.attr("float") )
 	{
-		result->SetDouble( i, boost::python::extract<float>(value) );
+		result->SetDouble( i, boost::python::extract<double>(value) );
 	}
 	else if( valuetype == builtins.attr("str") )
 	{
@@ -249,7 +249,7 @@ CefRefPtr<CefDictionaryValue> PyToCefDictionaryValue( boost::python::object d )
 		}
 		else if( valuetype == builtins.attr("float") )
 		{
-			result->SetDouble( cefkey, boost::python::extract<float>(value) );
+			result->SetDouble( cefkey, boost::python::extract<double>(value) );
 		}
 		else if( valuetype == builtins.attr("str") )
 		{
