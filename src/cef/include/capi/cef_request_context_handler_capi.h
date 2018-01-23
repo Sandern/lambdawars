@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Marshall A. Greenblatt. All rights reserved.
+// Copyright (c) 2018 Marshall A. Greenblatt. All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@
 // by hand. See the translator.README.txt file in the tools directory for
 // more information.
 //
-// $hash=9359e227c9d534c9c612d2ede790136461836501$
+// $hash=52978f64fe2a612c05fc42a91ec53df6ff42079d$
 //
 
 #ifndef CEF_INCLUDE_CAPI_CEF_REQUEST_CONTEXT_HANDLER_CAPI_H_
@@ -48,6 +48,8 @@
 extern "C" {
 #endif
 
+struct _cef_request_context_t;
+
 ///
 // Implement this structure to provide handler implementations. The handler
 // instance will not be released until all objects related to the context have
@@ -58,6 +60,14 @@ typedef struct _cef_request_context_handler_t {
   // Base structure.
   ///
   cef_base_ref_counted_t base;
+
+  ///
+  // Called on the browser process UI thread immediately after the request
+  // context has been initialized.
+  ///
+  void(CEF_CALLBACK* on_request_context_initialized)(
+      struct _cef_request_context_handler_t* self,
+      struct _cef_request_context_t* request_context);
 
   ///
   // Called on the browser process IO thread to retrieve the cookie manager. If
