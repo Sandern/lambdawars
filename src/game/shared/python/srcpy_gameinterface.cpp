@@ -8,6 +8,7 @@
 #include "cbase.h"
 #include "srcpy_gameinterface.h"
 #include "srcpy.h"
+#include "animation.h"
 
 #include "utldict.h"
 
@@ -589,11 +590,32 @@ PyVEngineServer *pyengine = &pypyengine;
 #endif // CLIENT_DLL
 
 // Model_t/modelinfo
-boost::python::tuple PyVModelInfo::GetModelBounds(model_t *pModel)
+static bool GetModelBoundsActivityBased( model_t *pModel, Activity preferredAct, Vector &mins, Vector &maxs )
+{
+	if ( preferredAct == ACT_INVALID )
+		return false;
+
+	CStudioHdr studioHdr( modelinfo->GetStudiomodel( pModel ), mdlcache );
+	if ( !studioHdr.IsValid() )
+		return false;
+
+	int seq = ::SelectWeightedSequence( &studioHdr, preferredAct );
+	if ( seq == -1 )
+		return false;
+
+	::ExtractBbox( &studioHdr, seq, mins, maxs );
+	return true;
+}
+
+boost::python::tuple PyVModelInfo::GetModelBounds( model_t *pModel, Activity preferredAct )
 {
 	Vector mins, maxs;
-	if( modelinfo )
+
+	if ( !GetModelBoundsActivityBased( pModel, preferredAct, mins, maxs ) )
+	{
 		modelinfo->GetModelBounds( pModel, mins, maxs );
+	}
+
 	return boost::python::make_tuple( mins, maxs );
 }
 
@@ -615,30 +637,6 @@ model_t *PyVModelInfo::FindOrLoadModel( const char *name )
 	}
 
 	return (model_t *)modelinfo->FindOrLoadModel( name );
-}
-
-boost::python::object PyVModelInfo::GetStudioModel( model_t *model )
-{
-	if( model == NULL )
-	{
-		PyErr_SetString(PyExc_Exception, "model cannot be None" );
-		throw boost::python::error_already_set(); 
-		return boost::python::object();
-	}
-	 
-	const studiohdr_t *pStudioHDR_t = modelinfo->GetStudiomodel( model );
-	if( !pStudioHDR_t )
-	{
-		return boost::python::object();
-	}
-
-	boost::python::object studiohdr = SrcPySystem()->Import("_animation").attr("CStudioHdr")();
-	CStudioHdr *pStudioHDR = boost::python::extract< CStudioHdr * >( studiohdr );
-	if( pStudioHDR )
-	{
-		pStudioHDR->Init( pStudioHDR_t );
-	}
-	return studiohdr;
 }
 
 static PyVModelInfo pypymodelinfo;

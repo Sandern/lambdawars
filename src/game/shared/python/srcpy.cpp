@@ -483,14 +483,16 @@ bool CSrcPython::PostInitInterpreter( bool bStandAloneInterpreter )
 	// skip them since they can have side effects.
 	if( !bStandAloneInterpreter )
 	{
+		Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
+		_entitiesmisc = Import("_entitiesmisc"); // Import before _gameinterface (register converters)
+
 		srcmgr = Import("srcmgr");
 
 		types = Import("types");
 		collections = Import("collections");
 		steam = Import("steam");
-		Run( "import sound" ); // Import _sound before _entitiesmisc (register converters)
+		
 		Run( "import _entitiesmisc" );
-		_entitiesmisc = Import("_entitiesmisc");
 		Run( "import _entities" );
 		_entities = Import("_entities");
 		unit_helper = Import("unit_helper");

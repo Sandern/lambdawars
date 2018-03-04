@@ -2595,8 +2595,8 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetModelBounds"
-            , (::boost::python::tuple ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetModelBounds )
-            , ( bp::arg("pModel") ) )    
+            , (::boost::python::tuple ( ::PyVModelInfo::* )( ::model_t *,::Activity ) )( &::PyVModelInfo::GetModelBounds )
+            , ( bp::arg("pModel"), bp::arg("preferredAct")=::ACT_INVALID ) )    
         .def( 
             "GetModelIndex"
             , (int ( ::PyVModelInfo::* )( char const * ) )( &::PyVModelInfo::GetModelIndex )
@@ -2604,10 +2604,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( 
             "GetModelName"
             , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetModelName )
-            , ( bp::arg("model") ) )    
-        .def( 
-            "GetStudioModel"
-            , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetStudioModel )
             , ( bp::arg("model") ) );
 
     { //::lump_t
@@ -5592,8 +5588,8 @@ BOOST_PYTHON_MODULE(_gameinterface){
             , bp::return_value_policy< bp::return_by_value >() )    
         .def( 
             "GetModelBounds"
-            , (::boost::python::tuple ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetModelBounds )
-            , ( bp::arg("pModel") ) )    
+            , (::boost::python::tuple ( ::PyVModelInfo::* )( ::model_t *,::Activity ) )( &::PyVModelInfo::GetModelBounds )
+            , ( bp::arg("pModel"), bp::arg("preferredAct")=::ACT_INVALID ) )    
         .def( 
             "GetModelIndex"
             , (int ( ::PyVModelInfo::* )( char const * ) )( &::PyVModelInfo::GetModelIndex )
@@ -5601,10 +5597,6 @@ BOOST_PYTHON_MODULE(_gameinterface){
         .def( 
             "GetModelName"
             , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetModelName )
-            , ( bp::arg("model") ) )    
-        .def( 
-            "GetStudioModel"
-            , (::boost::python::api::object ( ::PyVModelInfo::* )( ::model_t * ) )( &::PyVModelInfo::GetStudioModel )
             , ( bp::arg("model") ) );
 
     bp::class_< edict_t >( "edict_t" );

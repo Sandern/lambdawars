@@ -747,11 +747,9 @@ class PyVModelInfo
 public:
 	inline model_t *			GetModel( int modelindex ) { return (model_t *)modelinfo->GetModel(modelindex); }
 	inline int					GetModelIndex( const char *name ) { return modelinfo->GetModelIndex(name); }
-	boost::python::tuple		GetModelBounds( model_t *pModel );
+	boost::python::tuple		GetModelBounds( model_t *pModel, Activity preferredAct = ACT_INVALID );
 	boost::python::object		GetModelName( model_t *model );
 	model_t *					FindOrLoadModel( const char *name );
-
-	boost::python::object		GetStudioModel( model_t *model );
 };
 extern PyVModelInfo *pymodelinfo;
 
