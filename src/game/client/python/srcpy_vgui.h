@@ -69,22 +69,6 @@ public:
 	virtual PyObject *GetPySelf() const = 0;
 
 public:
-    /*void RegMessageMethod( const char *message, boost::python::object method, int numParams=0, 
-           const char *nameFirstParam="", int typeFirstParam=DATATYPE_VOID, 
-           const char *nameSecondParam="", int typeSecondParam=DATATYPE_VOID ) { 
-           py_message_entry_t entry;
-           entry.method = method;
-           entry.numParams = numParams;
-           entry.firstParamName = nameFirstParam;
-           entry.firstParamSymbol = KeyValuesSystem()->GetSymbolForString(nameFirstParam);
-           entry.firstParamType = typeFirstParam;
-           entry.secondParamName = nameSecondParam;
-           entry.secondParamSymbol = KeyValuesSystem()->GetSymbolForString(nameSecondParam);
-           entry.secondParamType = typeSecondParam;
-    
-           m_PyMessageMap.Insert(message, entry);
-    }*/
-
 	CUtlDict<py_message_entry_t, short> &GetPyMessageMap() { return m_PyMessageMap; }
 	void ClearPyMessageMap() { m_PyMessageMap.Purge(); }
 
@@ -117,7 +101,6 @@ public:
 protected:
 	CUtlDict<py_message_entry_t, short> m_PyMessageMap;
 
-	//CallBuffer_t m_PaintBorderCallBuffer;
 	CallBuffer_t m_PaintCallBuffer;
 	CallBuffer_t m_PaintBackgroundCallBuffer;
 };
