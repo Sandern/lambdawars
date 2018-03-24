@@ -754,9 +754,10 @@ void CHL2WarsInput::MouseMove ( int nSlot, CUserCmd *cmd )
 	VectorITransform( vCamMin, matAngles, vCamMin );
 	VectorITransform( vCamMax, matAngles, vCamMax );
 
+	// Update camera settings when needed, but don't do this when frozen. Frozen may be the case when the player's camera is controlled by a point_viewcontrol.
 	float fCamLimitTol = cl_strategic_cam_limits_tol.GetFloat();
 	Vector limits( 0.0f, fabs( vCamMin.y ) + fCamLimitTol, fabs( vCamMax.z ) + fCamLimitTol );
-	if( !VectorsAreEqual( limits, pPlayer->GetCamLimits(), 0.017f ) ) // Tolerance of 1 degree
+	if( !(pPlayer->GetFlags() & FL_FROZEN) && !VectorsAreEqual( limits, pPlayer->GetCamLimits(), 0.017f ) ) // Tolerance of 1 degree
 	{
 		pPlayer->SetCamLimits( limits );
 		cl_strategic_cam_limits.SetValue( VarArgs( "%.2f %.2f %.2f", 0.0f, limits.y, limits.z ) );
