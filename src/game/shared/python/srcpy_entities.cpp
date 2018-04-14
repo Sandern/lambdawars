@@ -508,6 +508,7 @@ boost::python::dict PyReadDataDesc( CBaseEntity *entity )
 					catch( bp::error_already_set & ) // Can happen due decode errors
 					{
 						Warning( "PyReadDataDesc: error while reading key %s\n", pField->externalName );
+						PyErr_Print();
 						datadesc[key] = bp::object( "<unknown>" );
 					}
 				}
