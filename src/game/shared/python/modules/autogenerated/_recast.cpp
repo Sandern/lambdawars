@@ -84,14 +84,6 @@ BOOST_PYTHON_MODULE(_recast){
             , (bool ( ::CRecastMgr::* )( ::C_BaseEntity *,float,float ) )( &::CRecastMgr::AddEntRadiusObstacle )
             , ( bp::arg("pEntity"), bp::arg("radius"), bp::arg("height") ) )    
         .def( 
-            "FindBestMeshForEntity"
-            , (int ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::FindBestMeshForEntity )
-            , ( bp::arg("pEntity") ) )    
-        .def( 
-            "FindBestMeshForRadiusHeight"
-            , (int ( ::CRecastMgr::* )( float,float ) )( &::CRecastMgr::FindBestMeshForRadiusHeight )
-            , ( bp::arg("radius"), bp::arg("height") ) )    
-        .def( 
             "FindBestMeshNameForEntity"
             , (char const * ( ::CRecastMgr::* )( ::C_BaseEntity * ) )( &::CRecastMgr::FindBestMeshNameForEntity )
             , ( bp::arg("pEntity") ) )    
@@ -99,15 +91,6 @@ BOOST_PYTHON_MODULE(_recast){
             "FindBestMeshNameForRadiusHeight"
             , (char const * ( ::CRecastMgr::* )( float,float ) )( &::CRecastMgr::FindBestMeshNameForRadiusHeight )
             , ( bp::arg("radius"), bp::arg("height") ) )    
-        .def( 
-            "FindMeshIndex"
-            , (int ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::FindMeshIndex )
-            , ( bp::arg("name") ) )    
-        .def( 
-            "GetMesh"
-            , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
-            , ( bp::arg("index") )
-            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )
@@ -249,14 +232,6 @@ BOOST_PYTHON_MODULE(_recast){
             , (bool ( ::CRecastMgr::* )( bool ) )( &::CRecastMgr::Build )
             , ( bp::arg("loadDefaultMeshes")=(bool)(true) ) )    
         .def( 
-            "FindBestMeshForEntity"
-            , (int ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::FindBestMeshForEntity )
-            , ( bp::arg("pEntity") ) )    
-        .def( 
-            "FindBestMeshForRadiusHeight"
-            , (int ( ::CRecastMgr::* )( float,float ) )( &::CRecastMgr::FindBestMeshForRadiusHeight )
-            , ( bp::arg("radius"), bp::arg("height") ) )    
-        .def( 
             "FindBestMeshNameForEntity"
             , (char const * ( ::CRecastMgr::* )( ::CBaseEntity * ) )( &::CRecastMgr::FindBestMeshNameForEntity )
             , ( bp::arg("pEntity") ) )    
@@ -264,15 +239,6 @@ BOOST_PYTHON_MODULE(_recast){
             "FindBestMeshNameForRadiusHeight"
             , (char const * ( ::CRecastMgr::* )( float,float ) )( &::CRecastMgr::FindBestMeshNameForRadiusHeight )
             , ( bp::arg("radius"), bp::arg("height") ) )    
-        .def( 
-            "FindMeshIndex"
-            , (int ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::FindMeshIndex )
-            , ( bp::arg("name") ) )    
-        .def( 
-            "GetMesh"
-            , (::CRecastMesh * ( ::CRecastMgr::* )( int ) )( &::CRecastMgr::GetMesh )
-            , ( bp::arg("index") )
-            , bp::return_value_policy< bp::reference_existing_object >() )    
         .def( 
             "GetMesh"
             , (::CRecastMesh * ( ::CRecastMgr::* )( char const * ) )( &::CRecastMgr::GetMesh )

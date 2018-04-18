@@ -90,7 +90,7 @@ void UnitBaseSense::UpdateRememberedSeen()
 	// Nearest is used by enemy selection, so do full test
 	if( !m_hNearestEnemy || !TestEntity( m_hNearestEnemy ) || m_pOuter->IRelationType( m_hNearestEnemy ) != D_HT )
 	{
-		CRecastMesh *pMesh = m_pOuter ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) ) : RecastMgr().GetMesh( DEFAULT_SENSE_MESH );
+		CRecastMesh *pMesh = m_pOuter ? RecastMgr().FindBestMeshForEntity( m_pOuter ) : RecastMgr().GetMesh( DEFAULT_SENSE_MESH );
 
 		int iAttackPriority;
 		float fBestEnemyDist = MAX_COORD_FLOAT*MAX_COORD_FLOAT;
@@ -212,7 +212,7 @@ int UnitBaseSense::LookForUnits( int iDistance )
 	if( !m_bEnabled )
 		return CountSeen();
 
-	CRecastMesh *pMesh = m_pOuter ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) ) : RecastMgr().GetMesh( DEFAULT_SENSE_MESH );
+	CRecastMesh *pMesh = m_pOuter ? RecastMgr().FindBestMeshForEntity( m_pOuter ) : RecastMgr().GetMesh( DEFAULT_SENSE_MESH );
 
 	const Vector &origin = GetOuter()->GetAbsOrigin();
 	distSqr = iDistance * iDistance;

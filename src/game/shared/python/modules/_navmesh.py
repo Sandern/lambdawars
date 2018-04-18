@@ -23,8 +23,6 @@ class NavMesh(SemiSharedModuleGenerator):
         mb.free_function('RandomNavAreaPositionWithin').include()
         mb.free_function('DestroyAllNavAreas').include()
         
-        mb.free_function('GetNavAreaAt').include()
-        mb.free_function('NavIsAreaFlat').include()
         mb.free_function('NavTestAreaWalkable').include()
         
         mb.free_function('GetHidingSpotsInRadius').include()

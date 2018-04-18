@@ -289,35 +289,6 @@ static int rasterizeTileLayers(BuildContext* ctx, CMapMesh* geom,
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CRecastMesh::IsPolyReachable( const CUtlVector< Vector > &sampleOrigins, const Vector &vPolyCenter )
-{
-	for( int i = 0; i < sampleOrigins.Count(); i++ )
-	{
-		if( FindPathDistance( sampleOrigins[i] + Vector(0, 0, 8), vPolyCenter + Vector(0, 0, 8) ) > 0 )
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-#if 0
-static Vector CalcPolyCenter( const dtMeshTile* tile, const dtPoly *p )
-{
-	Vector center( 0, 0, 0 );
-	for( int i = 0; i < p->vertCount; i++ )
-	{
-		float* v = &tile->verts[p->verts[i]*3];
-		center += Vector( v[0], v[2], v[1] );
-	}
-	center /= p->vertCount;
-	return center;
-}
-#endif // 0
-
-//-----------------------------------------------------------------------------
 // Purpose: Marks polygons as disabled based on a number of sample points and
 //			writes back the data, removing any empty tiles.
 //-----------------------------------------------------------------------------

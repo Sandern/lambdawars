@@ -55,8 +55,6 @@ class Recast(SemiSharedModuleGenerator):
         
         cls.mem_funs('IsMeshLoaded').include()
         cls.mem_funs('FindMeshIndex').include()
-        cls.mem_funs('FindBestMeshForRadiusHeight').include()
-        cls.mem_funs('FindBestMeshForEntity').include()
         cls.mem_funs('FindBestMeshNameForRadiusHeight').include()
         cls.mem_funs('FindBestMeshNameForEntity').include()
         

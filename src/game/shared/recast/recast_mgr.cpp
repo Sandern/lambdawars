@@ -164,26 +164,9 @@ CRecastMesh *CRecastMgr::GetMesh( int index )
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-int CRecastMgr::FindMeshIndex( const char *name )
-{
-	return m_Meshes.Find( name );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-bool CRecastMgr::IsMeshLoaded( const char *name )
-{
-	CRecastMesh *pMesh = GetMesh( name );
-	return pMesh != NULL && pMesh->IsLoaded();
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Determines best nav mesh radius/height
 //-----------------------------------------------------------------------------
-int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
+CRecastMesh *CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
 {
 	int bestIdx = -1;
 	float fBestRadiusDiff = 0;
@@ -212,17 +195,34 @@ int CRecastMgr::FindBestMeshForRadiusHeight( float radius, float height )
 			fBestHeightDiff = fHeightDiff;
 		}
 	}
-	return bestIdx;
+	return GetMesh( bestIdx );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Determines best nav mesh for entity
 //-----------------------------------------------------------------------------
-int CRecastMgr::FindBestMeshForEntity( CBaseEntity *pEntity )
+CRecastMesh *CRecastMgr::FindBestMeshForEntity( CBaseEntity *pEntity )
 {
 	if( !pEntity )
-		return -1;
+		return NULL;
 	return FindBestMeshForRadiusHeight( pEntity->CollisionProp()->BoundingRadius2D(), pEntity->CollisionProp()->OBBSize().z );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+int CRecastMgr::FindMeshIndex( const char *name )
+{
+	return m_Meshes.Find( name );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+bool CRecastMgr::IsMeshLoaded( const char *name )
+{
+	CRecastMesh *pMesh = GetMesh( name );
+	return pMesh != NULL && pMesh->IsLoaded();
 }
 
 //-----------------------------------------------------------------------------
@@ -230,8 +230,7 @@ int CRecastMgr::FindBestMeshForEntity( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 const char *CRecastMgr::FindBestMeshNameForRadiusHeight( float radius, float height )
 {
-	int idx = FindBestMeshForRadiusHeight( radius, height );
-	CRecastMesh *pMesh = GetMesh( idx );
+	CRecastMesh *pMesh = FindBestMeshForRadiusHeight( radius, height );
 	return pMesh ? pMesh->GetName() : NULL;
 }
 
@@ -240,8 +239,7 @@ const char *CRecastMgr::FindBestMeshNameForRadiusHeight( float radius, float hei
 //-----------------------------------------------------------------------------
 const char *CRecastMgr::FindBestMeshNameForEntity( CBaseEntity *pEntity )
 {
-	int idx = FindBestMeshForEntity( pEntity );
-	CRecastMesh *pMesh = GetMesh( idx );
+	CRecastMesh *pMesh = FindBestMeshForEntity( pEntity );
 	return pMesh ? pMesh->GetName() : NULL;
 }
 
@@ -468,6 +466,23 @@ void CRecastMgr::DebugRender()
 }
 #endif // CLIENT_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: Prints list of navigation meshes
+//-----------------------------------------------------------------------------
+void CRecastMgr::DebugListMeshes()
+{
+	int idx = m_Meshes.First();
+	while( m_Meshes.IsValidIndex( idx ) )
+	{
+		CRecastMesh *pMesh = m_Meshes.Element(idx);
+		Msg( "%d: %s (agent radius: %f, height: %f, climb: %f, slope: %f, cell size: %f, cell height: %f)\n", idx, 
+			pMesh->GetName(),
+			pMesh->GetAgentRadius(), pMesh->GetAgentHeight(), pMesh->GetAgentMaxClimb(), pMesh->GetAgentMaxSlope(),
+			pMesh->GetCellSize(), pMesh->GetCellHeight());
+		idx = m_Meshes.Next( idx );
+	}
+}
+
 #ifndef CLIENT_DLL
 CON_COMMAND_F( recast_loadmapmesh, "", FCVAR_CHEAT )
 {
@@ -527,17 +542,7 @@ CON_COMMAND_F( cl_recast_listmeshes, "", FCVAR_CHEAT )
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
 #endif // CLIENT_DLL
-	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
-	int idx = meshes.First();
-	while( meshes.IsValidIndex( idx ) )
-	{
-		CRecastMesh *pMesh = meshes.Element(idx);
-		Msg( "%d: %s (agent radius: %f, height: %f, climb: %f, slope: %f, cell size: %f, cell height: %f)\n", idx, 
-			pMesh->GetName(),
-			pMesh->GetAgentRadius(), pMesh->GetAgentHeight(), pMesh->GetAgentMaxClimb(), pMesh->GetAgentMaxSlope(),
-			pMesh->GetCellSize(), pMesh->GetCellHeight());
-		idx = meshes.Next( idx );
-	}
+	s_RecastMgr.DebugListMeshes();
 }
 
 #ifndef CLIENT_DLL
@@ -554,91 +559,3 @@ CON_COMMAND_F( recast_readd_phys_props, "", FCVAR_CHEAT )
 	}
 }
 #endif // CLIENT_DLL
-
-#if 0
-#ifndef CLIENT_DLL
-CON_COMMAND_F( recast_addobstacle, "", FCVAR_CHEAT )
-#else
-CON_COMMAND_F( cl_recast_addobstacle, "", FCVAR_CHEAT )
-#endif // CLIENT_DLL
-{
-#ifndef CLIENT_DLL
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-#endif // CLIENT_DLL
-
-#ifndef CLIENT_DLL
-	CHL2WarsPlayer *pPlayer = dynamic_cast<CHL2WarsPlayer *>( UTIL_GetCommandClient() );
-#else
-	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
-#endif // CLIENT_DLL
-	if( !pPlayer )
-	{
-		return;
-	}
-
-	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
-	for ( int i = meshes.First(); i != meshes.InvalidIndex(); i = meshes.Next(i ) )
-	{
-		CRecastMesh *pMesh = meshes[ i ];
-		float radius = args.ArgC() > 1 ? atof( args[1] ) : 64.0f;
-		float height = args.ArgC() > 2 ? atof( args[2] ) : 96.0f;
-		pMesh->AddTempObstacle( pPlayer->GetMouseData().m_vEndPos, radius, height );
-	}
-
-#ifndef CLIENT_DLL
-	engine->ClientCommand( pPlayer->edict(), "cl_recast_addobstacle %s %s\n", args[1], args[2] );
-#endif // CLIENT_DLL
-}
-
-#ifndef CLIENT_DLL
-CON_COMMAND_F( recast_addobstacle_poly, "", FCVAR_CHEAT )
-#else
-CON_COMMAND_F( cl_recast_addobstacle_poly, "", FCVAR_CHEAT )
-#endif // CLIENT_DLL
-{
-#ifndef CLIENT_DLL
-	if ( !UTIL_IsCommandIssuedByServerAdmin() )
-		return;
-#endif // CLIENT_DLL
-
-#ifndef CLIENT_DLL
-	CHL2WarsPlayer *pPlayer = dynamic_cast<CHL2WarsPlayer *>( UTIL_GetCommandClient() );
-#else
-	C_HL2WarsPlayer *pPlayer = C_HL2WarsPlayer::GetLocalHL2WarsPlayer();
-#endif // CLIENT_DLL
-	if( !pPlayer )
-	{
-		return;
-	}
-
-	CUtlDict< CRecastMesh *, int > &meshes = s_RecastMgr.GetMeshes();
-	for ( int i = meshes.First(); i != meshes.InvalidIndex(); i = meshes.Next(i ) )
-	{
-		CRecastMesh *pMesh = meshes[ i ];
-		float radius = args.ArgC() > 1 ? atof( args[1] ) : 64.0f;
-		float height = args.ArgC() > 2 ? atof( args[2] ) : 96.0f;
-
-		const Vector &vPos = pPlayer->GetMouseData().m_vEndPos;
-
-		// Random polygon obstacle, maybe non-convex
-		int nverts = (int)floorf(rand() / 32768.f * 6.f) + 3;
-		CUtlVector< Vector > verts( 0, nverts );
-		verts.SetCount( nverts );
-		float angleSteps = 6.2831853f/nverts;
-		for (int i = 0; i < nverts; i++)
-		{
-			float angle = angleSteps * i;
-			verts[i].x = vPos[0] + sinf(angle) * radius;
-			verts[i].y = vPos[1] + cosf(angle) * radius;
-			verts[i].z = vPos[2];
-		}
-
-		pMesh->AddTempObstacle( vPos, verts.Base(), verts.Count(), height );
-	}
-
-#ifndef CLIENT_DLL
-	engine->ClientCommand( pPlayer->edict(), "cl_recast_addobstacle_poly %s %s\n", args[1], args[2] );
-#endif // CLIENT_DLL
-}
-#endif // 0

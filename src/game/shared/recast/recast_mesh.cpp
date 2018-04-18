@@ -329,8 +329,8 @@ void CRecastMesh::DebugRender()
 			if( pMapMesh && pMapMesh->GetNorms() )
 			{
 				duDebugDrawTriMeshSlope(&dd, pMapMesh->GetVerts(), pMapMesh->GetNumVerts(),
-										pMapMesh->GetTris(), pMapMesh->GetNorms(), pMapMesh->GetNumTris(),
-										m_agentMaxSlope, texScale);
+					pMapMesh->GetTris(), pMapMesh->GetNorms(), pMapMesh->GetNumTris(),
+					m_agentMaxSlope, texScale);
 			}
 		}
 	}
@@ -354,6 +354,7 @@ void CRecastMesh::DebugRender()
 		if( navMesh != NULL && navQuery != NULL )
 		{
 			char m_navMeshDrawFlags = DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST;
+
 			duDebugDrawNavMeshWithClosedList(&dd, *navMesh, *navQuery, m_navMeshDrawFlags);
 		}
 	}

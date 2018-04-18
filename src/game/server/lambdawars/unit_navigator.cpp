@@ -2137,8 +2137,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildLocalPath( UnitBasePath *pPath, const 
 //-----------------------------------------------------------------------------
 CRecastMesh *UnitBaseNavigator::GetNavMesh()
 {
-	int idx = RecastMgr().FindBestMeshForEntity( m_pOuter );
-	return RecastMgr().GetMesh( idx );
+	return RecastMgr().FindBestMeshForEntity( m_pOuter );
 }
 
 //-----------------------------------------------------------------------------

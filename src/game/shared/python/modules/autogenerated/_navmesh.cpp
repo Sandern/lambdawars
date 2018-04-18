@@ -71,28 +71,6 @@ BOOST_PYTHON_MODULE(_navmesh){
     
     }
 
-    { //::GetNavAreaAt
-    
-        typedef int ( *GetNavAreaAt_function_type )( ::Vector const &,float );
-        
-        bp::def( 
-            "GetNavAreaAt"
-            , GetNavAreaAt_function_type( &::GetNavAreaAt )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f ) );
-    
-    }
-
-    { //::NavIsAreaFlat
-    
-        typedef bool ( *NavIsAreaFlat_function_type )( ::Vector const &,::Vector const &,float,::C_UnitBase * );
-        
-        bp::def( 
-            "NavIsAreaFlat"
-            , NavIsAreaFlat_function_type( &::NavIsAreaFlat )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("flattol")=6.99999988079071044921875e-1f, bp::arg("unit")=bp::object() ) );
-    
-    }
-
     { //::NavMeshAvailable
     
         typedef bool ( *NavMeshAvailable_function_type )(  );
@@ -225,28 +203,6 @@ BOOST_PYTHON_MODULE(_navmesh){
             "GetHidingSpotsInRadius"
             , GetHidingSpotsInRadius_function_type( &::GetHidingSpotsInRadius )
             , ( bp::arg("pos"), bp::arg("radius"), bp::arg("unit")=bp::object(), bp::arg("sort")=(bool)(true), bp::arg("sortpos")=bp::object() ) );
-    
-    }
-
-    { //::GetNavAreaAt
-    
-        typedef int ( *GetNavAreaAt_function_type )( ::Vector const &,float );
-        
-        bp::def( 
-            "GetNavAreaAt"
-            , GetNavAreaAt_function_type( &::GetNavAreaAt )
-            , ( bp::arg("pos"), bp::arg("beneathlimit")=1.2e+2f ) );
-    
-    }
-
-    { //::NavIsAreaFlat
-    
-        typedef bool ( *NavIsAreaFlat_function_type )( ::Vector const &,::Vector const &,float,::CUnitBase * );
-        
-        bp::def( 
-            "NavIsAreaFlat"
-            , NavIsAreaFlat_function_type( &::NavIsAreaFlat )
-            , ( bp::arg("mins"), bp::arg("maxs"), bp::arg("flattol")=6.99999988079071044921875e-1f, bp::arg("unit")=bp::object() ) );
     
     }
 

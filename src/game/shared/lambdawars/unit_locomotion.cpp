@@ -1706,7 +1706,7 @@ void UnitBaseLocomotion::DoUnstuck()
 	bool bFoundPosition = false;
 	if( RecastMgr().HasMeshes() )
 	{
-		CRecastMesh *pMesh = RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( m_pOuter ) );
+		CRecastMesh *pMesh = RecastMgr().FindBestMeshForEntity( m_pOuter );
 		if( pMesh )
 		{
 			Vector vClosestPoint = pMesh->ClosestPointOnMesh( mv->origin, 256.0f, 128.0f );

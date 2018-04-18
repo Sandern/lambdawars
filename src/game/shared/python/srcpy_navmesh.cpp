@@ -50,7 +50,7 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, float maxdist, CBas
 	if( g_pynavmesh_debug.GetInt() > 1 )
 		DevMsg("NavMeshGetPathDistance: maxdist: %f, unit: %d, fBeneathLimit: %f\n", maxdist, pUnit, fBeneathLimit);
 
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	CRecastMesh *pMesh = pUnit ? RecastMgr().FindBestMeshForEntity( pUnit ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
 		return 0;
 
@@ -62,7 +62,7 @@ float NavMeshGetPathDistance( Vector &vStart, Vector &vGoal, float maxdist, CBas
 //-----------------------------------------------------------------------------
 Vector NavMeshGetPositionNearestNavArea( const Vector &pos, float beneathlimit, float maxradius, CBaseEntity *pUnit )
 {
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	CRecastMesh *pMesh = pUnit ? RecastMgr().FindBestMeshForEntity( pUnit ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
 		return vec3_origin;
 
@@ -116,7 +116,7 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBas
 	Vector center = (maxs - mins) / 2.0f;
 	float radius = maxs.AsVector2D().DistTo(mins.AsVector2D());
 
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	CRecastMesh *pMesh = pUnit ? RecastMgr().FindBestMeshForEntity( pUnit ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
 		return vec3_origin;
 
@@ -157,36 +157,12 @@ Vector RandomNavAreaPositionWithin( const Vector &mins, const Vector &maxs, CBas
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-int GetNavAreaAt( const Vector &pos, float beneathlimit )
-{
-	CUnitBase *pUnit = NULL;
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
-	if( !pMesh )
-		return 0;
-	return pMesh->GetPolyRef( pos, beneathlimit );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Tests if polys overlapping the bounds are within the flat tolerance.
-//-----------------------------------------------------------------------------
-bool NavIsAreaFlat( const Vector &mins, const Vector &maxs, float fFlatTol, CUnitBase *pUnit )
-{
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
-	if( !pMesh )
-		return false;
-
-	return pMesh->IsAreaFlat( (maxs + mins) / 2.0f, (maxs - mins) / 2.0f, fFlatTol );
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Test if area is walkable. Simplified test for now by just checking
 //			if raycast from corners succeeds.
 //-----------------------------------------------------------------------------
 bool NavTestAreaWalkable( const Vector &origin, const Vector &mins, const Vector &maxs, CUnitBase *pUnit )
 {
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	CRecastMesh *pMesh = pUnit ? RecastMgr().FindBestMeshForEntity( pUnit ) : RecastMgr().GetMesh( DEFAULT_MESH );
 	if( !pMesh )
 		return false;
 
@@ -234,7 +210,7 @@ public:
 	{
 		m_fRadius = fRadius;
 
-		m_pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+		m_pMesh = pUnit ? RecastMgr().FindBestMeshForEntity( pUnit ) : RecastMgr().GetMesh( DEFAULT_MESH );
 		if( m_pMesh && !m_pMesh->IsLoaded() )
 			m_pMesh = NULL;
 
@@ -360,7 +336,7 @@ boost::python::list GetHidingSpotsInRadius( const Vector &pos, float radius, CUn
 		coverSpots.Sort( CoverCompare );
 	}
 
-	CRecastMesh *pMesh = pUnit ? RecastMgr().GetMesh( RecastMgr().FindBestMeshForEntity( pUnit ) ) : RecastMgr().GetMesh( DEFAULT_MESH );
+	CRecastMesh *pMesh = pUnit ? RecastMgr().FindBestMeshForEntity( pUnit ) : RecastMgr().GetMesh( DEFAULT_MESH );
 
 	// Python return result
 	float fRequiredNavRadius = coverspot_required_nav_radius.GetFloat();

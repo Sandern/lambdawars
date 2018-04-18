@@ -173,6 +173,5 @@ CRecastMesh *UnitBaseAirNavigator::GetNavMesh()
 			return pMesh;
 	}
 
-	int idx = RecastMgr().FindMeshIndex( "air" );
-	return RecastMgr().GetMesh( idx );
+	return RecastMgr().GetMesh( "air" );
 }

@@ -58,19 +58,15 @@ public:
 	
 	// Accessors for Units
 	bool HasMeshes();
-	CRecastMesh *GetMesh( int index );
 	CRecastMesh *GetMesh( const char *name );
+	CRecastMesh *FindBestMeshForRadiusHeight( float radius, float height );
+	CRecastMesh *FindBestMeshForEntity( CBaseEntity *pEntity );
 	bool IsMeshLoaded( const char *name );
-	int FindMeshIndex( const char *name );
-	CUtlDict< CRecastMesh *, int > &GetMeshes();
-
-	int FindBestMeshForRadiusHeight( float radius, float height );
-	int FindBestMeshForEntity( CBaseEntity *pEntity );
 
 	const char *FindBestMeshNameForRadiusHeight( float radius, float height );
 	const char *FindBestMeshNameForEntity( CBaseEntity *pEntity );
 
-	// Used for debugging purposes on client
+	// Used for debugging purposes on client. Don't use for anything else!
 	virtual dtNavMesh* GetNavMesh( const char *meshName );
 	virtual dtNavMeshQuery* GetNavMeshQuery( const char *meshName );
 	virtual IMapMesh* GetMapMesh();
@@ -97,14 +93,18 @@ public:
 	virtual bool AddEntRadiusObstacle( CBaseEntity *pEntity, float radius, float height );
 	virtual bool AddEntBoxObstacle( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, float height );
 	virtual bool RemoveEntObstacles( CBaseEntity *pEntity );
-	//dtObstacleRef GetObstacleRefForMesh( CBaseEntity *pEntity, int meshIdx );
 
 	// Debug
 #ifdef CLIENT_DLL
 	void DebugRender();
 #endif // CLIENT_DLL
 
-protected:
+	void DebugListMeshes();
+
+private:
+	CRecastMesh *GetMesh( int index );
+	int FindMeshIndex( const char *name );
+
 #ifndef CLIENT_DLL
 	const char *GetFilename( void ) const;
 	virtual bool BuildMesh( CMapMesh *m_pMapMesh, const char *name );
@@ -134,11 +134,6 @@ private:
 };
 
 CRecastMgr &RecastMgr();
-
-inline CUtlDict< CRecastMesh *, int > &CRecastMgr::GetMeshes()
-{
-	return m_Meshes;
-}
 
 inline bool CRecastMgr::HasMeshes()
 {

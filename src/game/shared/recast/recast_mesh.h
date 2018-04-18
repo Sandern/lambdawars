@@ -76,28 +76,21 @@ public:
 	void Init( const char *name, float agentRadius, float agentHeight, float agentMaxClimb, float agentMaxSlope );
 	bool IsLoaded();
 
-	virtual void PostLoad();
-
-	virtual void Update( float dt );
-
-	// Load/build 
 	static bool ComputeMeshSettings( const char *pMeshName, 
 		float &fAgentRadius, float &fAgentHeight, float &fAgentMaxClimb, float &fAgentMaxSlope,
 		float &fCellSize, float &fCellHeight, float &fTileSize );
 
+	virtual void Update( float dt );
+
+	// Load/build 
 	virtual bool Load( CUtlBuffer &fileBuffer, CMapMesh *pMapMesh = NULL );
 	bool Reset();
-
-	bool DisableUnreachablePolygons( const CUtlVector< Vector > &samplePositions );
 
 #ifndef CLIENT_DLL
 	virtual bool Build( CMapMesh *pMapMesh );
 	virtual bool Save( CUtlBuffer &fileBuffer );
 
 	virtual bool RebuildPartial( CMapMesh *pMapMesh, const Vector &vMins, const Vector &vMaxs );
-
-	bool IsPolyReachable( const CUtlVector< Vector > &sampleOrigins, const Vector &vPolyCenter );
-	bool RemoveUnreachablePoly( CMapMesh *pMapMesh );
 #endif // CLIENT_DLL
 
 #ifdef CLIENT_DLL
@@ -124,10 +117,11 @@ public:
 	dtObstacleRef AddTempObstacle( const Vector &vPos, const Vector *convexHull, const int numConvexHull, float height, unsigned char areaId );
 	bool RemoveObstacle( const dtObstacleRef ref );
 
-	// Accessors
+	// Accessors for debugging purposes only
 	dtNavMesh *GetNavMesh() { return m_navMesh; }
 	dtNavMeshQuery *GetNavMeshQuery() { return m_navQuery; }
 
+	// Accessors for intended unit radius and height using this mesh
 	float GetAgentRadius() { return m_agentRadius; }
 	float GetAgentHeight() { return m_agentHeight; }
 	float GetAgentMaxClimb() { return m_agentMaxClimb; }
@@ -142,7 +136,13 @@ public:
 	void SetTileSize( float tileSize ) { m_tileSize = tileSize; }
 
 private:
+	virtual void PostLoad();
+
 	void SharedInit(  const char *name );
+
+	// Building
+	bool DisableUnreachablePolygons( const CUtlVector< Vector > &samplePositions );
+	bool RemoveUnreachablePoly( CMapMesh *pMapMesh );
 
 private:
 	// Result data for path finding
