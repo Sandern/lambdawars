@@ -338,6 +338,14 @@ int CSprite::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 			return pViewModel->ShouldTransmit( pInfo );
 		}
 	}
+
+#ifdef HL2WARS_DLL
+	// Full check in case we have the fow flag to not send data
+	if( (GetFOWFlags() & FOWFLAG_NOTRANSMIT) != 0)
+	{
+		return SetTransmitState( FL_EDICT_FULLCHECK );
+	}
+#endif // HL2WARS_DLL
 	
 	return FL_EDICT_ALWAYS;
 }
