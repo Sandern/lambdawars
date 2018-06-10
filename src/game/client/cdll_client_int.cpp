@@ -1237,6 +1237,11 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CGlobalVarsBase *pGloba
 
 	g_pSLShaderSystem =  (IShaderSystem*)appSystemFactory( SHADERSYSTEM_INTERFACE_VERSION, NULL );
 	g_pShaderAPI = (IShaderAPI*)appSystemFactory( SHADERAPI_INTERFACE_VERSION, NULL );
+
+	// Slam cl_cloud_settings to 0. Lambda Wars stores rts config in a separate file and only uses config.cfg for fps config.
+	// Also the cloud storage will cause a conflict with a future version that stores the rts config in config.cfg.
+	ConVarRef cl_cloud_settings("cl_cloud_settings");
+	cl_cloud_settings.SetValue( 0 );
 #endif // HL2WARS_DLL
 
 	if ( !CommandLine()->CheckParm( "-noscripting") )
