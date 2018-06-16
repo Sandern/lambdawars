@@ -108,13 +108,14 @@ void DispatchEffectToCallback( const char *pEffectName, const CEffectData &m_Eff
 			// If the name matches, call it
 			if ( V_strnicmp( pReg->m_EffectName, pEffectName, sizeof( pReg->m_EffectName ) ) == 0 )
 			{
+				g_pPrecacheSystem->LimitResourceAccess( DISPATCH_EFFECT, pEffectName );
+
 				try {
-					 g_pPrecacheSystem->LimitResourceAccess( DISPATCH_EFFECT, pEffectName );
 					 pReg->m_pyMethod( m_EffectData );
-					 g_pPrecacheSystem->EndLimitedResourceAccess( );
 				} catch(...) {
 					PyErr_Print();
 				}
+				g_pPrecacheSystem->EndLimitedResourceAccess( );
 				return;
 			}
 		}
