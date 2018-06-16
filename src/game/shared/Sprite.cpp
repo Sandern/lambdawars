@@ -340,10 +340,17 @@ int CSprite::ShouldTransmit( const CCheckTransmitInfo *pInfo )
 	}
 
 #ifdef HL2WARS_DLL
-	// Full check in case we have the fow flag to not send data
-	if( (GetFOWFlags() & FOWFLAG_NOTRANSMIT) != 0)
+	CBaseEntity *pRecipientEntity = CBaseEntity::Instance( pInfo->m_pClientEnt );
+
+	Assert( pRecipientEntity->IsPlayer() );
+	
+	CBasePlayer *pRecipientPlayer = static_cast<CBasePlayer*>( pRecipientEntity );
+
+	// Wars: Don't send when in the fow for the recv player, otherwise it might drag the parented entity
+	// into being transmitted as well.
+	if( !FOWShouldTransmit( pRecipientPlayer ) ) 
 	{
-		return SetTransmitState( FL_EDICT_FULLCHECK );
+		return FL_EDICT_DONTSEND;
 	}
 #endif // HL2WARS_DLL
 	
