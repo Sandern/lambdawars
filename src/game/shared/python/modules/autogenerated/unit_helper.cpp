@@ -5785,25 +5785,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitBaseNavigator_exposer_t UnitBaseNavigator_exposer = UnitBaseNavigator_exposer_t( "UnitBaseNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitBaseNavigator_scope( UnitBaseNavigator_exposer );
         bp::implicitly_convertible< bp::api::object, UnitBaseNavigator >();
-        { //::UnitBaseNavigator::CalcMove
-        
-            typedef void ( ::UnitBaseNavigator::*CalcMove_function_type )( ::UnitBaseMoveCommand &,::QAngle,float ) ;
-            
-            UnitBaseNavigator_exposer.def( 
-                "CalcMove"
-                , CalcMove_function_type( &::UnitBaseNavigator::CalcMove )
-                , ( bp::arg("MoveCommand"), bp::arg("angles"), bp::arg("speed") ) );
-        
-        }
-        { //::UnitBaseNavigator::ClearLimitPosition
-        
-            typedef void ( ::UnitBaseNavigator::*ClearLimitPosition_function_type )(  ) ;
-            
-            UnitBaseNavigator_exposer.def( 
-                "ClearLimitPosition"
-                , ClearLimitPosition_function_type( &::UnitBaseNavigator::ClearLimitPosition ) );
-        
-        }
         { //::UnitBaseNavigator::DrawDebugInfo
         
             typedef void ( ::UnitBaseNavigator::*DrawDebugInfo_function_type )(  ) ;
@@ -5839,26 +5820,6 @@ BOOST_PYTHON_MODULE(unit_helper){
             UnitBaseNavigator_exposer.def( 
                 "GetGoalDistance"
                 , GetGoalDistance_function_type( &::UnitBaseNavigator::GetGoalDistance ) );
-        
-        }
-        { //::UnitBaseNavigator::LimitPosition
-        
-            typedef void ( ::UnitBaseNavigator::*LimitPosition_function_type )( ::Vector const &,float ) ;
-            
-            UnitBaseNavigator_exposer.def( 
-                "LimitPosition"
-                , LimitPosition_function_type( &::UnitBaseNavigator::LimitPosition )
-                , ( bp::arg("pos"), bp::arg("radius") ) );
-        
-        }
-        { //::UnitBaseNavigator::RegenerateConsiderList
-        
-            typedef void ( ::UnitBaseNavigator::*RegenerateConsiderList_function_type )( ::UnitBaseMoveCommand &,::Vector &,::CheckGoalStatus_t ) ;
-            
-            UnitBaseNavigator_exposer.def( 
-                "RegenerateConsiderList"
-                , RegenerateConsiderList_function_type( &::UnitBaseNavigator::RegenerateConsiderList )
-                , ( bp::arg("MoveCommand"), bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
         
         }
         { //::UnitBaseNavigator::Reset
@@ -5939,6 +5900,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("maxrange"), bp::arg("minrange")=0.0f, bp::arg("path")=bp::object() ) );
         
         }
+        { //::UnitBaseNavigator::UpdateGoalInfo
+        
+            typedef void ( ::UnitBaseNavigator::*UpdateGoalInfo_function_type )(  ) ;
+            
+            UnitBaseNavigator_exposer.def( 
+                "UpdateGoalInfo"
+                , UpdateGoalInfo_function_type( &::UnitBaseNavigator::UpdateGoalInfo ) );
+        
+        }
         { //::UnitBaseNavigator::UpdateGoalTarget
         
             typedef void ( ::UnitBaseNavigator::*UpdateGoalTarget_function_type )( ::CBaseEntity *,::UnitBasePath * ) ;
@@ -5961,6 +5931,7 @@ BOOST_PYTHON_MODULE(unit_helper){
         }
         UnitBaseNavigator_exposer.def_readwrite( "noavoid", &UnitBaseNavigator::m_bNoAvoid );
         UnitBaseNavigator_exposer.def_readwrite( "nopathvelocity", &UnitBaseNavigator::m_bNoPathVelocity );
+        UnitBaseNavigator_exposer.def_readwrite( "no_slow_down_to_target", &UnitBaseNavigator::m_bNoSlowDownToTarget );
         UnitBaseNavigator_exposer.def_readwrite( "facingcone", &UnitBaseNavigator::m_fFacingCone );
         UnitBaseNavigator_exposer.def_readwrite( "idealyawtolerance", &UnitBaseNavigator::m_fIdealYawTolerance );
         UnitBaseNavigator_exposer.def_readwrite( "forcegoalvelocity", &UnitBaseNavigator::m_vForceGoalVelocity );
@@ -6724,36 +6695,6 @@ BOOST_PYTHON_MODULE(unit_helper){
         UnitVehicleNavigator_exposer_t UnitVehicleNavigator_exposer = UnitVehicleNavigator_exposer_t( "UnitVehicleNavigator", bp::init< bp::api::object >(( bp::arg("outer") )) );
         bp::scope UnitVehicleNavigator_scope( UnitVehicleNavigator_exposer );
         bp::implicitly_convertible< bp::api::object, UnitVehicleNavigator >();
-        { //::UnitVehicleNavigator::CalcMove
-        
-            typedef void ( ::UnitVehicleNavigator::*CalcMove_function_type )( ::UnitBaseMoveCommand &,::QAngle,float ) ;
-            
-            UnitVehicleNavigator_exposer.def( 
-                "CalcMove"
-                , CalcMove_function_type( &::UnitVehicleNavigator::CalcMove )
-                , ( bp::arg("MoveCommand"), bp::arg("angles"), bp::arg("speed") ) );
-        
-        }
-        { //::UnitVehicleNavigator::CalcNeededDistanceForTurn
-        
-            typedef float ( ::UnitVehicleNavigator::*CalcNeededDistanceForTurn_function_type )( ::UnitBaseMoveCommand &,float ) ;
-            
-            UnitVehicleNavigator_exposer.def( 
-                "CalcNeededDistanceForTurn"
-                , CalcNeededDistanceForTurn_function_type( &::UnitVehicleNavigator::CalcNeededDistanceForTurn )
-                , ( bp::arg("MoveCommand"), bp::arg("turn") ) );
-        
-        }
-        { //::UnitVehicleNavigator::ComputeConsiderDensAndDirs
-        
-            typedef void ( ::UnitVehicleNavigator::*ComputeConsiderDensAndDirs_function_type )( ::UnitBaseMoveCommand &,::Vector &,::CheckGoalStatus_t ) ;
-            
-            UnitVehicleNavigator_exposer.def( 
-                "ComputeConsiderDensAndDirs"
-                , ComputeConsiderDensAndDirs_function_type( &::UnitVehicleNavigator::ComputeConsiderDensAndDirs )
-                , ( bp::arg("MoveCommand"), bp::arg("vPathDir"), bp::arg("GoalStatus") ) );
-        
-        }
         { //::UnitVehicleNavigator::UpdateIdealAngles
         
             typedef void ( ::UnitVehicleNavigator::*UpdateIdealAngles_function_type )( ::UnitBaseMoveCommand &,::Vector * ) ;

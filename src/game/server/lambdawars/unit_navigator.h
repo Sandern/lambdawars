@@ -211,7 +211,7 @@ public:
 		m_bSuccess = src.m_bSuccess;
 		m_bIsDirectPath = src.m_bIsDirectPath;
 		m_iFlags = src.m_iFlags;
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		m_fnCustomLOSCheck = src.m_fnCustomLOSCheck;
 #endif // ENABLE_PYTHON
 
@@ -344,7 +344,7 @@ public:
 	bool m_bSuccess; // Can be queried after path completion by other components
 	bool m_bIsDirectPath;
 	int m_iFlags;
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	boost::python::object m_fnCustomLOSCheck; // Allows using a custom Python based los check
 	boost::python::object m_pathContext; // Allows setting a context for this path. Could be anything.
 #endif // ENABLE_PYTHON
@@ -362,70 +362,21 @@ class UnitBaseNavigator : public UnitComponent
 public:
 	friend class CUnitBase;
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	UnitBaseNavigator( boost::python::object outer );
 #endif // ENABLE_PYTHON
 
 	// Core
 	virtual void		Reset();
 	virtual void		StopMoving();
-	void				DispatchOnNavComplete();
-	void				DispatchOnNavFailed();
-	void				DispatchOnNavAtGoal();
-	void				DispatchOnNavLostGoal();
 	virtual void		Update( UnitBaseMoveCommand &mv );
-	virtual void		UpdateFacingTargetState( bool bIsFacing );
 	virtual void		UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vector *pathdir = NULL );
-	virtual void		UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus );
-	virtual void		CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle angles, float speed );
-
-	// flow stuff
 	float				GetDensityMultiplier();
-	const Vector &		GetWishVelocity() { return m_vLastWishVelocity; }
-
-	virtual float		GetEntityBoundingRadius( CBaseEntity *pEnt );
-	virtual void		RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll = false );
-	//virtual bool		ShouldConsiderEntity( CBaseEntity *pEnt );
-	virtual bool		ShouldConsiderNavMesh( void );
-
-	
-	virtual void		CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll = false );
-	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
-	virtual bool		IsEntityNavIgnored( UnitBaseMoveCommand &MoveCommand, CBaseEntity *pEnt );
-
-	virtual float		ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCommand &MoveCommand );
-	float				GetEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
-
-	float				ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
-								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist, float &fDensity );
-	Vector				ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist );
-
-	float				CalculateAvgDistHistory();
-
-	// Path updating
-	virtual CheckGoalStatus_t UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fWaypointDist );
-	virtual bool		IsInRangeGoal( UnitBaseMoveCommand &MoveCommand );
-	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
-	//Vector				ComputeWaypointTarget( const Vector &start, UnitBaseWaypoint *pEnd );
-	virtual void		AdvancePath();
-	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
-	virtual float		ComputeWaypointDistanceAndDir( Vector &vPathDir );
-
-	//virtual bool		IsCompleteInArea( CNavArea *pArea, const Vector &vPos );
-	//virtual bool		TestRouteEnd( UnitBaseWaypoint *pWaypoint );
-	//virtual bool		TestRoute( const Vector &vStartPos, const Vector &vEndPos );
 
 	int					GetTestRouteMask();
 	void				SetTestRouteMask( int mask );
 
-	bool				TestNearbyUnitsWithSameGoal( UnitBaseMoveCommand &MoveCommand );
-
-	BlockedStatus_t		GetBlockedStatus( void );
-	virtual void		ResetBlockedStatus( void );
-	virtual void		UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, const float &fWaypointDist );
-
 	// Goals
-	CheckGoalStatus_t	GetGoalStatus();
 	virtual bool		SetGoal( Vector &destination, float goaltolerance=64.0f, int goalflags=0, bool avoidenemies=true );
 	virtual bool		SetGoalTarget( CBaseEntity *pTarget, float goaltolerance=64.0f, int goalflags=0, bool avoidenemies=true );
 	virtual bool		SetGoalInRange( Vector &destination, float maxrange, float minrange=0.0f, float goaltolerance=0.0f, int goalflags=0, bool avoidenemies=true );
@@ -436,23 +387,14 @@ public:
 	virtual void		UpdateGoalInfo( void );
 	virtual float		GetGoalDistance( void );
 
-	CHandle<CUnitBase>	GetAtGoalDependencyEnt( void ) { return m_hAtGoalDependencyEnt; }
-
 	// Path finding
-	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
-									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
-	virtual bool		DoFindPathToPos( UnitBasePath *pPath );
-	virtual bool		DoFindPathToPosInRange( UnitBasePath *pPath );
-	virtual bool		DoFindPathToPos();
-	virtual bool		DoFindPathToPosInRange();
-
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	virtual boost::python::object FindPathAsResult( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
 									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
 #endif // ENABLE_PYTHON
 
 	// Getters/Setters for path
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	void SetPath( boost::python::object path );
 	inline boost::python::object PyGetPath() { return m_refPath; }
 #endif // ENABLE_PYTHON
@@ -466,29 +408,77 @@ public:
 	const Vector &		GetFacingTargetPos();
 	void				SetFacingTargetPos( Vector &vFacingTargetPos );
 
-	// Misc
-	//void				CalculateDestinationInRange( Vector *pResult, const Vector &vGoalPos, float minrange, float maxrange);
-	//bool				FindVectorGoal( Vector *pResult, const Vector &dir, float targetDist, float minDist=0 );
-	static void			CalculateDeflection( const Vector &start, const Vector &dir, const Vector &normal, Vector *pResult );
-
-	void				LimitPosition( const Vector &pos, float radius );
-	void				ClearLimitPosition( void );
-
 	// Debug
 	virtual void		DrawDebugRouteOverlay();	
 	virtual void		DrawDebugInfo();
 
 protected:
+	void				DispatchOnNavComplete();
+	void				DispatchOnNavFailed();
+	void				DispatchOnNavAtGoal();
+	void				DispatchOnNavLostGoal();
+
+	virtual void		UpdateFacingTargetState( bool bIsFacing );
+	virtual void		UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus );
+	virtual void		CalcMove( UnitBaseMoveCommand &MoveCommand, QAngle angles, float speed );
+
+	// Flow logic related
+	const Vector &		GetWishVelocity() { return m_vLastWishVelocity; }
+
+	virtual float		GetEntityBoundingRadius( CBaseEntity *pEnt );
+	virtual void		RegenerateConsiderList( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll = false );
+	virtual bool		ShouldConsiderNavMesh( void );
+
+	virtual void		CollectConsiderEntities( UnitBaseMoveCommand &MoveCommand, CheckGoalStatus_t GoalStatus, bool bForceIncludeAll = false );
+	virtual void		ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, CheckGoalStatus_t GoalStatus );
+	virtual bool		IsEntityNavIgnored( UnitBaseMoveCommand &MoveCommand, CBaseEntity *pEnt );
+
+	virtual float		ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCommand &MoveCommand );
+	float				GetEntityDensity( const Vector &vPos, CBaseEntity *pEnt );
+
+	float				ComputeUnitCost( int iPos, Vector *pFinalVelocity, CheckGoalStatus_t GoalStatus, 
+								UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist, float &fDensity );
+	Vector				ComputeVelocity( CheckGoalStatus_t GoalStatus, UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, const float &fWaypointDist );
+
+	float				CalculateAvgDistHistory();
+
 	virtual	void		InsertSeed( const Vector &vPos );
+
+	// Path updating
+	virtual CheckGoalStatus_t UpdateGoalAndPath( UnitBaseMoveCommand &MoveCommand, Vector &vPathDir, float &fWaypointDist );
+	virtual bool		IsInRangeGoal( UnitBaseMoveCommand &MoveCommand );
+	virtual CheckGoalStatus_t	MoveUpdateWaypoint( UnitBaseMoveCommand &MoveCommand );
+	virtual void		AdvancePath();
+	virtual bool		UpdateReactivePath( bool bNoRecomputePath = false );
+	virtual float		ComputeWaypointDistanceAndDir( Vector &vPathDir );
+
+	bool				TestNearbyUnitsWithSameGoal( UnitBaseMoveCommand &MoveCommand );
+
+	BlockedStatus_t		GetBlockedStatus( void );
+	virtual void		ResetBlockedStatus( void );
+	virtual void		UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, const float &fWaypointDist );
+
+	// Goals
+	CheckGoalStatus_t	GetGoalStatus();
+	CHandle<CUnitBase>	GetAtGoalDependencyEnt( void ) { return m_hAtGoalDependencyEnt; }
+
+	// Path finding
+	virtual bool		FindPath( int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
+									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
+	virtual bool		DoFindPathToPos( UnitBasePath *pPath );
+	virtual bool		DoFindPathToPosInRange( UnitBasePath *pPath );
+	virtual bool		DoFindPathToPos();
+	virtual bool		DoFindPathToPosInRange();
 
 	// Route buiding
 	virtual CRecastMesh *GetNavMesh();
 	virtual bool		FindPathInternal( UnitBasePath *pPath, int goaltype, const Vector &vDestination, float fGoalTolerance, int goalflags=0, float fMinRange=0.0f, float fMaxRange=0.0f, 
 									CBaseEntity *pTarget=NULL, bool bAvoidEnemies=true );
 	virtual UnitBaseWaypoint *	BuildLocalPath( UnitBasePath *pPath, const Vector &pos );
-	//virtual UnitBaseWaypoint *	BuildWayPointsFromRoute( UnitBasePath *pPath, CNavArea *goalArea, UnitBaseWaypoint *pWayPoint, int prevdir=-1 );
 	virtual UnitBaseWaypoint *	BuildNavAreaPath( UnitBasePath *pPath, const Vector &pos );
 	virtual UnitBaseWaypoint *	BuildRoute( UnitBasePath *pPath );
+
+	Vector						ComputePathVelocity( const UnitBaseMoveCommand &MoveCommand, const Vector &vPathDir, float fDist );
 
 public:
 	// Facing settings
@@ -503,6 +493,9 @@ public:
 
 	// Override move in path direction behavior
 	bool m_bNoPathVelocity;
+
+	// Don't slow down when nearing target entity
+	bool m_bNoSlowDownToTarget;
 
 protected:
 	CheckGoalStatus_t m_LastGoalStatus;
@@ -520,7 +513,7 @@ private:
 	// Path and goal variables
 	// =============================
 	UnitBasePath *m_pPath;
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	boost::python::object m_refPath;
 #endif // ENABLE_PYTHON
 	float m_fGoalDistance;
@@ -539,7 +532,6 @@ private:
 	bool m_bLowVelocityDetectionActive;
 
 	float m_fLastPathRecomputation;
-	//float m_fNextReactivePathUpdate;
 	bool m_bReactivePathBlocked;
 	float m_fReactivePathBlockedStartTime;
 	float m_fNextAllowPathRecomputeTime;
@@ -573,7 +565,6 @@ protected:
 	};
 	CUtlVector<dist_entry_t> m_DistHistory;
 	float m_fNextAvgDistConsideration;
-	float m_fLastAvgDist;
 
 	struct seed_entry_t {
 		seed_entry_t( Vector2D vPos, float fTimeStamp ) : m_vPos(vPos), m_fTimeStamp(fTimeStamp) {}
@@ -593,11 +584,6 @@ private:
 	// Climbing
 	float m_fClimbHeight;
 	Vector m_vecClimbDirection;
-
-	// Position limiting
-	bool m_bLimitPositionActive;
-	Vector m_vLimitPositionCenter;
-	float m_fLimitPositionRadius;
 
 	// Debug variables
 	Vector m_vDebugVelocity;
@@ -665,18 +651,6 @@ inline void UnitBaseNavigator::SetFacingTargetPos( Vector &vFacingTargetPos )
 {
 	m_vFacingTargetPos = vFacingTargetPos;
 	m_bFacingFaceTarget = false;
-}
-
-inline void UnitBaseNavigator::LimitPosition( const Vector &pos, float radius )
-{
-	m_bLimitPositionActive = true;
-	m_vLimitPositionCenter = pos;
-	m_fLimitPositionRadius = radius;
-}
-
-inline void UnitBaseNavigator::ClearLimitPosition( void )
-{
-	m_bLimitPositionActive = false;
 }
 
 //-----------------------------------------------------------------------------

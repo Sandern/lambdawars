@@ -49,7 +49,7 @@
 #include "recast/recast_mgr.h"
 #include "recast/recast_mesh.h"
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	#include "srcpy.h"
 #endif // ENABLE_PYTHON
 
@@ -127,7 +127,7 @@ UnitBaseWaypoint *	UnitBaseWaypoint::GetLast()
 	return pCurr;
 }
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -144,9 +144,9 @@ UnitBaseNavigator::UnitBaseNavigator( boost::python::object outer )
 	m_vFacingTargetPos = vec3_origin;
 	m_bFacingFaceTarget = false;
 	m_bNoAvoid = false;
+	m_bNoSlowDownToTarget = false;
 	m_bNoNavAreasNearby = false;
 	m_fNextAllowPathRecomputeTime = 0.0f;
-	m_bLimitPositionActive = false;
 	m_iTestRouteMask = MASK_SOLID;
 	m_iConsiderSize = 0;
 	m_iUsedTestDirections = 0;
@@ -176,7 +176,6 @@ void UnitBaseNavigator::Reset()
 	ResetBlockedStatus();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
-	m_fLastAvgDist = -1;
 
 	m_fLastBestDensity = 0.0f;
 	m_fDiscomfortWeight = unit_cost_discomfortweight_start.GetFloat();
@@ -189,7 +188,7 @@ void UnitBaseNavigator::Reset()
 //-----------------------------------------------------------------------------
 void UnitBaseNavigator::StopMoving()
 {
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	boost::python::object path = m_refPath;
 	UnitBasePath *pPath = m_pPath;
 	GetPath()->m_iGoalType = GOALTYPE_NONE; // Just clear goal, so we can reuse it if needed
@@ -212,7 +211,7 @@ void UnitBaseNavigator::DispatchOnNavComplete()
 	GetPath()->m_bSuccess = true;
 	Reset();
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 		"OnNavComplete"
@@ -229,7 +228,7 @@ void UnitBaseNavigator::DispatchOnNavFailed()
 	GetPath()->m_iGoalType = GOALTYPE_NONE; 
 	Reset();
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 		"OnNavFailed"
@@ -253,7 +252,7 @@ void UnitBaseNavigator::DispatchOnNavAtGoal()
 	if( unit_navigator_debug.GetBool() )
 		DevMsg("#%d UnitNavigator: At goal, but marked as \"no clear\". Dispatching success one time (OnNavAtGoal).\n", GetOuter()->entindex());
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 		"OnNavAtGoal"
@@ -271,7 +270,7 @@ void UnitBaseNavigator::DispatchOnNavLostGoal()
 	if( unit_navigator_debug.GetBool() )
 		DevMsg("#%d UnitNavigator: Was at goal, but lost it. Dispatching lost (OnNavLostGoal).\n", GetOuter()->entindex());
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	SrcPySystem()->Run<const char *>( 
 		SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 		"OnNavLostGoal"
@@ -292,7 +291,7 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	// Check goal and update path
 	Vector vPathDir;
 	float fWaypointDist;
-	CheckGoalStatus_t GoalStatus;
+	CheckGoalStatus_t goalStatus;
 
 	// Allow the AI to override the desired goal velocity
 	// TODO: Functions badly and causes a lot of confusing logic due other checks. Should be separated in a better way.
@@ -300,33 +299,27 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	{
 		vPathDir = m_vForceGoalVelocity;
 		fWaypointDist = VectorNormalize( vPathDir ) + 1000.0f;
-		GoalStatus = CHS_HASGOAL;
+		goalStatus = CHS_HASGOAL;
 		// Pass true for dirty hack for Manhack, should always include all units when considering.
-		RegenerateConsiderList( MoveCommand, vPathDir, GoalStatus, true );
+		RegenerateConsiderList( MoveCommand, vPathDir, goalStatus, true );
 		UpdateGoalInfo();
 	}
 	else
 	{
-		GoalStatus = UpdateGoalAndPath( MoveCommand, vPathDir, fWaypointDist );
+		goalStatus = UpdateGoalAndPath( MoveCommand, vPathDir, fWaypointDist );
 	}
 
 	// Compute velocity. Dont' do this if we are at our goal position, unless a goal velocity is forced.
-	if( GoalStatus != CHS_ATGOAL || (GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX) )
+	if( goalStatus != CHS_ATGOAL || (GetPath()->m_iGoalFlags & GF_ATGOAL_RELAX) )
 	{
-		if( !m_bNoAvoid || GoalStatus == CHS_NOGOAL )
+		if( !m_bNoAvoid || goalStatus == CHS_NOGOAL )
 		{
 			// Compute our wish velocity based on the flow velocity and path velocity (if any)
-			m_vLastWishVelocity = ComputeVelocity( GoalStatus, MoveCommand, vPathDir, fWaypointDist );
+			m_vLastWishVelocity = ComputeVelocity( goalStatus, MoveCommand, vPathDir, fWaypointDist );
 		}
 		else
 		{
-			float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
-
-			// Desire full speed when not near the final goal
-			if( (fWaypointDist-MoveCommand.stopdistance) <= fMaxTravelDist )
-				m_vLastWishVelocity = ((fWaypointDist-MoveCommand.stopdistance)/MoveCommand.interval) * vPathDir;
-			else
-				m_vLastWishVelocity = MoveCommand.maxspeed * vPathDir;
+			m_vLastWishVelocity = ComputePathVelocity( MoveCommand, vPathDir, fWaypointDist );
 		}
 	}
 	else
@@ -335,33 +328,30 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 	}
 
 	// Finally update the move command
-	float fSpeed;
-	Vector vDir;
-
-	vDir = m_vLastWishVelocity;
-	fSpeed = VectorNormalize(vDir);
+	Vector vDir = m_vLastWishVelocity;
+	float fSpeed = VectorNormalize(vDir);
 
 	QAngle vAngles;
 	VectorAngles( vDir, vAngles );
 	CalcMove( MoveCommand, vAngles, fSpeed );
 
 	UpdateBlockedStatus( MoveCommand, fWaypointDist );
-	if( GoalStatus == CHS_HASGOAL && GetBlockedStatus() == BS_GIVEUP )
+	if( goalStatus == CHS_HASGOAL && GetBlockedStatus() == BS_GIVEUP )
 	{
 		Warning("#%d UnitNavigator: Unit is blocked and gives up on goal (%s: pos %.2f %.2f %.2f -> goal %.2f %.2f %.2f)!\n", 
 			GetOuter()->entindex(), GetOuter()->GetIUnit()->GetUnitType(), 
 			GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z,
 			GetPath()->m_vGoalPos.x, GetPath()->m_vGoalPos.y, GetPath()->m_vGoalPos.z);
-		GoalStatus = CHS_FAILED;
+		goalStatus = CHS_FAILED;
 	}
 
 	// Update the ideal angles after calculating the movement
 	// UpdateIdealAngles may dispatch an event and the ai may clear the movement in this.
 	// TODO: Consider splitting the event dispatch code into UpdateGoalStatus, keeping all
 	// event dispatching together.
-	UpdateIdealAngles( MoveCommand, (GoalStatus == CHS_HASGOAL) ? &vPathDir : NULL );
+	UpdateIdealAngles( MoveCommand, (goalStatus == CHS_HASGOAL) ? &vPathDir : NULL );
 
-	UpdateGoalStatus( MoveCommand, GoalStatus );
+	UpdateGoalStatus( MoveCommand, goalStatus );
 
 	if( unit_navigator_debug_show.GetBool() )
 	{
@@ -387,7 +377,6 @@ void UnitBaseNavigator::Update( UnitBaseMoveCommand &MoveCommand )
 		engine->Con_NPrintf( offset++, "m_fLastWaypointDistance: %f", m_fLastWaypointDistance );
 		engine->Con_NPrintf( offset++, "m_bLowVelocityDetectionActive: %d", m_bLowVelocityDetectionActive );
 		engine->Con_NPrintf( offset++, "m_bNoPathVelocity: %d", m_bNoPathVelocity );
-		engine->Con_NPrintf( offset++, "m_bLimitPositionActive: %d", m_bLimitPositionActive );
 		engine->Con_NPrintf( offset++, "(gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f: %d", (gpGlobals->curtime - m_fLowVelocityStartTime) < 1.0f );
 	}
 }
@@ -413,7 +402,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 		}
 	}
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 	boost::python::object curPath = m_refPath;
 #endif // ENABLE_PYTHO
 	
@@ -457,7 +446,7 @@ void UnitBaseNavigator::UpdateGoalStatus( UnitBaseMoveCommand &MoveCommand, Chec
 		// Dispatch climb event to AI, so it can start the climb code
 		if( unit_navigator_debug.GetBool() )
 			DevMsg("#%d UnitNavigator: Encounter climb obstacle. Dispatching OnStartClimb.\n", GetOuter()->entindex());
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		SrcPySystem()->Run<const char *, float, Vector>( 
 			SrcPySystem()->Get("DispatchEvent", GetOuter()->GetPyInstance() ), 
 			"OnStartClimb", m_fClimbHeight, m_vecClimbDirection
@@ -473,7 +462,7 @@ void UnitBaseNavigator::UpdateFacingTargetState( bool bIsFacing )
 {
 	if( bIsFacing != m_bFacingFaceTarget )
 	{
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		if( bIsFacing )
 		{
 			SrcPySystem()->Run<const char *>( 
@@ -747,8 +736,6 @@ void UnitBaseNavigator::ComputeConsiderDensAndDirs( UnitBaseMoveCommand &MoveCom
 		float fRotate = 45.0f;
 		j = 0;
 		int jmax = GetBlockedStatus() >= BS_LITTLE ? 7 : 4; // Do full scan in case we are stuck
-		if( m_bLimitPositionActive )
-			jmax = 1;
 
 		while( j < jmax && ( GetBlockedStatus() != BS_NONE || m_Seeds.Count() || fTotalDensity > 0.01f ) )
 		{
@@ -858,22 +845,6 @@ float UnitBaseNavigator::ComputeDensityAndAvgVelocity( int iPos, UnitBaseMoveCom
 		}
 	}
 
-	// If our position is limited, make the density very high outside our limited radius
-	if( m_bLimitPositionActive )
-	{
-		float fDistSqr2D = m_vLimitPositionCenter.AsVector2D().DistToSqr( vPos.AsVector2D() );
-		float fDistSqrMax = m_fLimitPositionRadius * m_fLimitPositionRadius;
-		//if( fDistSqr2D > fDistSqrMax )
-		{
-			float fDensity = THRESHOLD_MAX * (fDistSqr2D / fDistSqrMax) / 2.0f;
-			//engine->Con_NPrintf( iPos, "iPos: %d, Density: %f, dist: %f", iPos, fDensity, m_vLimitPositionCenter.AsVector2D().DistTo( m_vTestPositions[iPos].AsVector2D() ));
-			fSumDensity += fDensity;
-			Vector vDir = m_vLimitPositionCenter - GetAbsOrigin();
-			VectorNormalize(vDir);
-			vAvgVelocity += fDensity * vDir * MoveCommand.maxspeed;
-		}
-	}
-
 	// Average the velocity
 	// FIXME: Find out why the avg is sometimes invalid
 	if( fSumDensity < FLT_EPSILON || !vAvgVelocity.IsValid() )
@@ -910,18 +881,8 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	const Vector &vAvgVelocity = m_vAverageVelocities[ iPos ];
 
 	// Compute path speed
-	if( !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ) {
-		// Desire full speed when not near the final goal
-		float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
-		if( (fWaypointDist-MoveCommand.stopdistance) <= fMaxTravelDist )
-			vPathVelocity = ((fWaypointDist-MoveCommand.stopdistance)/MoveCommand.interval) * m_vTestDirections[iPos];
-		else
-			vPathVelocity = MoveCommand.maxspeed * m_vTestDirections[iPos];
-	}
-	else
-	{	
-		vPathVelocity = vec3_origin;
-	}
+	vPathVelocity = !m_bNoPathVelocity && GoalStatus != CHS_NOGOAL && GoalStatus != CHS_ATGOAL ?
+		ComputePathVelocity( MoveCommand, m_vTestDirections[iPos], fWaypointDist ) : vec3_origin;
 
 	// Compute flow speed
 	vFlowVelocity = vAvgVelocity;
@@ -964,6 +925,19 @@ float UnitBaseNavigator::ComputeUnitCost( int iPos, Vector *pFinalVelocity, Chec
 	float cost = ( unit_cost_distweight.GetFloat() * fDist ) + 
 			 ( m_fDiscomfortWeight * fDensity );
 	return cost;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+Vector UnitBaseNavigator::ComputePathVelocity( const UnitBaseMoveCommand &MoveCommand, const Vector &vPathDir, float fDist )
+{
+	float fMaxTravelDist = MoveCommand.maxspeed * MoveCommand.interval;
+
+	// Desire full speed when not near the final goal
+	// unless navigator is configured to not slow down towards a target entity
+	return (fDist - MoveCommand.stopdistance) <= fMaxTravelDist && (!m_bNoSlowDownToTarget || GetPath()->m_iGoalType != GOALTYPE_TARGETENT) ?
+		((fDist - MoveCommand.stopdistance) / MoveCommand.interval) * vPathDir : MoveCommand.maxspeed * vPathDir;
 }
 
 //-----------------------------------------------------------------------------
@@ -1434,7 +1408,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		if( (GetPath()->m_iGoalFlags & GF_NOLOSREQUIRED) == 0 )
 		{
 			// Check LOS
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 			if( GetPath()->m_fnCustomLOSCheck.ptr() != Py_None )
 			{
 				try
@@ -1502,7 +1476,7 @@ bool UnitBaseNavigator::IsInRangeGoal( UnitBaseMoveCommand &MoveCommand )
 		{
 			Vector vTestPos = GetPath()->m_vGoalPos;
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 			if( GetPath()->m_fnCustomLOSCheck.ptr() != Py_None )
 			{
 				try
@@ -1611,7 +1585,6 @@ void UnitBaseNavigator::AdvancePath()
 	GetPath()->Advance();
 
 	m_fNextAvgDistConsideration = gpGlobals->curtime + unit_cost_history.GetFloat();
-	m_fLastAvgDist = -1;
 
 	// FIXME: When recomputing the path due being blocked, we will automatically advance path
 	// while we might still be blocked. Disabled for now..
@@ -1719,7 +1692,7 @@ void UnitBaseNavigator::ResetBlockedStatus()
 void UnitBaseNavigator::UpdateBlockedStatus( UnitBaseMoveCommand &MoveCommand, const float &fWaypointDist )
 {
 	// Blocked status update only means something if we have a goal
-	if( m_bNoPathVelocity || m_LastGoalStatus != CHS_HASGOAL || m_bLimitPositionActive )
+	if( m_bNoPathVelocity || m_LastGoalStatus != CHS_HASGOAL )
 	{
 		m_BlockedStatus = BS_NONE;
 		return;
@@ -1820,7 +1793,7 @@ bool UnitBaseNavigator::SetGoalTarget( CBaseEntity *pTarget, float goaltolerance
 {
 	if( !pTarget )
 	{
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		PyErr_SetString(PyExc_Exception, "SetGoalTarget: target is None" );
 		throw boost::python::error_already_set(); 
 #endif // ENABLE_PYTHON
@@ -1839,6 +1812,11 @@ bool UnitBaseNavigator::SetGoalTarget( CBaseEntity *pTarget, float goaltolerance
 //-----------------------------------------------------------------------------
 bool UnitBaseNavigator::SetGoalInRange( Vector &destination, float maxrange, float minrange, float goaltolerance, int goalflags, bool avoidenemies )
 {
+	// Shortcut to SetGoal if maxrange is 0
+	if ( maxrange == 0) {
+		return SetGoal( destination, goaltolerance, goalflags, avoidenemies );
+	}
+
 	bool bResult = FindPath( GOALTYPE_POSITION_INRANGE, destination, goaltolerance, goalflags, minrange, maxrange, NULL, avoidenemies );
 	if( !bResult )
 	{
@@ -1854,11 +1832,16 @@ bool UnitBaseNavigator::SetGoalTargetInRange( CBaseEntity *pTarget, float maxran
 {
 	if( !pTarget )
 	{
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		PyErr_SetString(PyExc_Exception, "SetGoalTargetInRange: target is None" );
 		throw boost::python::error_already_set(); 
 #endif // ENABLE_PYTHON
 		return false;
+	}
+
+	// Shortcut to SetGoalTarget if maxrange is 0
+	if ( maxrange == 0) {
+		return SetGoalTarget( pTarget, goaltolerance, goalflags, avoidenemies );
 	}
 
 	// Find a path
@@ -1880,7 +1863,7 @@ void UnitBaseNavigator::UpdateGoalInRange( float maxrange, float minrange, UnitB
 
 	if( pPath->m_iGoalType != GOALTYPE_POSITION_INRANGE && pPath->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
 	{
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		PyErr_SetString(PyExc_Exception, "UnitBaseNavigator::UpdateGoalInRange: Invalid goal type" );
 		throw boost::python::error_already_set(); 
 #else
@@ -1903,7 +1886,7 @@ void UnitBaseNavigator::UpdateGoalTarget( CBaseEntity *pTarget, UnitBasePath *pP
 
 	if( pPath->m_iGoalType != GOALTYPE_TARGETENT && pPath->m_iGoalType != GOALTYPE_TARGETENT_INRANGE )
 	{
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 		PyErr_SetString(PyExc_Exception, "UnitBaseNavigator::UpdateGoalTarget: Invalid goal type" );
 		throw boost::python::error_already_set(); 
 #else
@@ -2090,7 +2073,7 @@ bool UnitBaseNavigator::FindPath( int goaltype, const Vector &vDestination, floa
 	return false;
 }
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 //-----------------------------------------------------------------------------
 // Purpose: Creates, builds and finds a new path and returns it as result.
 //-----------------------------------------------------------------------------
@@ -2239,7 +2222,7 @@ UnitBaseWaypoint *UnitBaseNavigator::BuildRoute( UnitBasePath *pPath )
 	return NULL;
 }
 
-#ifdef ENABLE_PYTHON
+#if defined(ENABLE_PYTHON) && defined(SRCPY_MOD_ENTITIES)
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
@@ -2258,17 +2241,6 @@ void UnitBaseNavigator::SetPath( boost::python::object path )
 	m_refPath = path;
 }
 #endif // ENABLE_PYTHON
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-void UnitBaseNavigator::CalculateDeflection( const Vector &start, const Vector &dir, const Vector &normal, Vector *pResult )
-{
-	Vector temp;
-	CrossProduct( dir, normal, temp );
-	CrossProduct( normal, temp, *pResult );
-	VectorNormalize( *pResult );
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Draw the list of waypoints for debugging

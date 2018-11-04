@@ -54,6 +54,7 @@ basesymbols = [
     'HL2WARS_DLL',
     'ENABLE_CEF',
     'ENABLE_PYTHON',
+    'SRCPY_MOD_ENTITIES',
 ]
 
 baseincludes = [
