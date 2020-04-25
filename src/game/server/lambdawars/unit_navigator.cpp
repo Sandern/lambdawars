@@ -506,7 +506,14 @@ void UnitBaseNavigator::UpdateIdealAngles( UnitBaseMoveCommand &MoveCommand, Vec
 	}
 	else if( m_hFacingTarget ) 
 	{
-		Vector dir = m_hFacingTarget->BodyTarget( GetLocalOrigin() ) - vFacingOrigin;
+		Vector targetBodyPos = m_hFacingTarget->BodyTarget( GetLocalOrigin() );
+		if (m_hFacingTarget->IsUnit()) {
+			// Add in the move speed to get a better facing estimate. In an ideal world this wouldn't be needed,
+			// but the AI only updates at rates of 1/10 or 1/20, which can cause issues by lagging behind the facing target.
+			targetBodyPos += m_hFacingTarget->GetSmoothedVelocity() * MoveCommand.interval;
+		}
+
+		Vector dir = targetBodyPos - vFacingOrigin;
 		if( bZeroPitch )
 			dir.z = 0;
 		VectorAngles(dir, MoveCommand.idealviewangles);
