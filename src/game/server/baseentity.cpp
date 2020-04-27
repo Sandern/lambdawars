@@ -3936,14 +3936,22 @@ void CBaseEntity::OnRestore()
 #ifdef ENABLE_PYTHON
 	if( GetPyInstance().ptr() != Py_None )
 	{
-		if( m_iszPyThinkMethodName != NULL_STRING )
+		try
 		{
-			SetPyThink( GetPyInstance().attr( STRING( m_iszPyThinkMethodName ) ) );
-		}
+			if( m_iszPyThinkMethodName != NULL_STRING )
+			{
+				SetPyThink( GetPyInstance().attr( STRING( m_iszPyThinkMethodName ) ) );
+			}
 
-		if( m_iszPyTouchMethodName != NULL_STRING )
+			if( m_iszPyTouchMethodName != NULL_STRING )
+			{
+				SetPyTouch( GetPyInstance().attr( STRING( m_iszPyTouchMethodName ) ) );
+			}
+        }
+		catch( boost::python::error_already_set & ) 
 		{
-			SetPyTouch( GetPyInstance().attr( STRING( m_iszPyTouchMethodName ) ) );
+			Warning("Failed to restore think or touch method of entity %d, classname %s:\n", entindex(), GetClassname());
+			PyErr_Print();
 		}
 	}
 #endif // ENABLE_PYTHON

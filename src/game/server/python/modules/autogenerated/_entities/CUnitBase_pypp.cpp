@@ -625,6 +625,25 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
         return CUnitBase::PassesDamageFilter( info );
     }
 
+    virtual int Restore( ::IRestore & restore ) {
+        PY_OVERRIDE_CHECK( CUnitBase, Restore )
+        PY_OVERRIDE_LOG( _entities, CUnitBase, Restore )
+        bp::override func_Restore = this->get_override( "Restore" );
+        if( func_Restore.ptr() != Py_None )
+            try {
+                return func_Restore( boost::ref(restore) );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                return this->CUnitBase::Restore( restore );
+            }
+        else
+            return this->CUnitBase::Restore( restore );
+    }
+    
+    int default_Restore( ::IRestore & restore ) {
+        return CUnitBase::Restore( restore );
+    }
+
     virtual void Select( ::CHL2WarsPlayer * pPlayer, bool bTriggerOnSel=true ) {
         PY_OVERRIDE_CHECK( CUnitBase, Select )
         PY_OVERRIDE_LOG( _entities, CUnitBase, Select )
@@ -1193,25 +1212,6 @@ struct CUnitBase_wrapper : CUnitBase, bp::wrapper< CUnitBase > {
     
     virtual void default_PostOnNewModel(  ){
         CBaseAnimating::PyPostOnNewModel( );
-    }
-
-    virtual int Restore( ::IRestore & restore ) {
-        PY_OVERRIDE_CHECK( CBaseCombatCharacter, Restore )
-        PY_OVERRIDE_LOG( _entities, CBaseCombatCharacter, Restore )
-        bp::override func_Restore = this->get_override( "Restore" );
-        if( func_Restore.ptr() != Py_None )
-            try {
-                return func_Restore( boost::ref(restore) );
-            } catch(bp::error_already_set &) {
-                PyErr_Print();
-                return this->CBaseCombatCharacter::Restore( restore );
-            }
-        else
-            return this->CBaseCombatCharacter::Restore( restore );
-    }
-    
-    int default_Restore( ::IRestore & restore ) {
-        return CBaseCombatCharacter::Restore( restore );
     }
 
     virtual bool ShouldGib( ::CTakeDamageInfo const & info ) {
@@ -2115,6 +2115,18 @@ void register_CUnitBase_class(){
                 , ( bp::arg("pEntity") ) );
         
         }
+        { //::CUnitBase::Restore
+        
+            typedef int ( ::CUnitBase::*Restore_function_type )( ::IRestore & ) ;
+            typedef int ( CUnitBase_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
+            
+            CUnitBase_exposer.def( 
+                "Restore"
+                , Restore_function_type(&::CUnitBase::Restore)
+                , default_Restore_function_type(&CUnitBase_wrapper::default_Restore)
+                , ( bp::arg("restore") ) );
+        
+        }
         { //::CUnitBase::Select
         
             typedef void ( ::CUnitBase::*Select_function_type )( ::CHL2WarsPlayer *,bool ) ;
@@ -2659,18 +2671,6 @@ void register_CUnitBase_class(){
             CUnitBase_exposer.def( 
                 "PostOnNewModel"
                 , PostOnNewModel_function_type( &CUnitBase_wrapper::default_PostOnNewModel ) );
-        
-        }
-        { //::CBaseCombatCharacter::Restore
-        
-            typedef int ( ::CBaseCombatCharacter::*Restore_function_type )( ::IRestore & ) ;
-            typedef int ( CUnitBase_wrapper::*default_Restore_function_type )( ::IRestore & ) ;
-            
-            CUnitBase_exposer.def( 
-                "Restore"
-                , Restore_function_type(&::CBaseCombatCharacter::Restore)
-                , default_Restore_function_type(&CUnitBase_wrapper::default_Restore)
-                , ( bp::arg("restore") ) );
         
         }
         { //::CBaseCombatCharacter::ShouldGib

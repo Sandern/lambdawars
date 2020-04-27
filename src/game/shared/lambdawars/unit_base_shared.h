@@ -186,6 +186,7 @@ public:
 	virtual void OnChangeOwnerNumberInternal( int old_owner_number );
 
 	virtual void Spawn( void );
+	virtual int	Restore( IRestore &restore );
 	virtual void OnRestore( void );
 
 #ifndef CLIENT_DLL

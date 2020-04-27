@@ -1914,7 +1914,7 @@ int CRestore::PyReadAll( boost::python::object instance )
 				}
 				catch( boost::python::error_already_set & )
 				{
-					Msg( "Skipping reading field %s due error in restore:\n", m_pData->StringFromSymbol( header.symbol ) );
+					Msg( "Skipping reading field %s due error in restore of entity \"%s\":\n", m_pData->StringFromSymbol( header.symbol ), pName );
 					PyErr_Print();
 
 					m_pData->Seek( curPos );
