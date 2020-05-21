@@ -1903,6 +1903,14 @@ void UnitBaseNavigator::UpdateGoalTarget( CBaseEntity *pTarget, UnitBasePath *pP
 	}
 
 	pPath->m_hTarget = pTarget;
+
+	// The old goal was lost. Make sure that it goes through the goal events again
+	// so dependent event handlers can update based on the new target.
+	if (m_LastGoalStatus == CHS_ATGOAL) 
+	{
+		m_LastGoalStatus = CHS_HASGOAL;
+		DispatchOnNavLostGoal();
+	}
 }
 
 //-----------------------------------------------------------------------------
