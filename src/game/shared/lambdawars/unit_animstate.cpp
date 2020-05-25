@@ -141,7 +141,7 @@ UnitAnimState::UnitAnimState(boost::python::object outer, UnitAnimConfig &animco
 	m_iCurrent8WayCrouchIdleSequence = -1;
 
 	m_eCurrentMainSequenceActivity = ACT_IDLE;
-	m_nSpecificMainActivity = ACT_INVALID;
+	m_nSpecificMainActivity = m_nActiveSpecificMainActivity = ACT_INVALID;
 	m_bSpecMainUseCustomPlaybackrate = false;
 	m_fSpecMainPlaybackRate = 1.0f;
 	m_flLastAnimationStateClearTime = 0.0f;
@@ -353,6 +353,10 @@ void UnitAnimState::RestartMainSequence()
 	if ( m_nSpecificMainActivity != ACT_INVALID )
 	{
 		MDLCACHE_CRITICAL_SECTION();
+
+		CheckSpecificActivityInterrupted();
+
+		m_nActiveSpecificMainActivity = m_nSpecificMainActivity;
 		if ( pUnit->GetSequenceActivity( pUnit->GetSequence() ) != m_nSpecificMainActivity )
 		{
 			pUnit->ResetSequence( SelectWeightedSequence( m_nSpecificMainActivity ) );
@@ -506,16 +510,27 @@ Activity UnitAnimState::CalcMainActivity()
 	return idealActivity;
 }
 
+void UnitAnimState::CheckSpecificActivityInterrupted() 
+{
+	if ( m_nActiveSpecificMainActivity == ACT_INVALID || m_nActiveSpecificMainActivity == m_nSpecificMainActivity ) return;
+
+	Activity interruptedActivity = m_nActiveSpecificMainActivity;
+	m_nActiveSpecificMainActivity = m_nSpecificMainActivity; // Set to m_nSpecificMainActivity in case logic triggered by event triggered RestartMainSequence
+	OnInterruptSpecificActivity( interruptedActivity );
+}
+
 void UnitAnimState::EndSpecificActivity()
 {
 	// NOTE: OnEndSpecificActivity might directly set a new specific main act, so check that.
 	//		 Also prefer that one above the returned act (if any).
 	m_bSpecMainUseCustomPlaybackrate = false;
 	Activity iOldSpecificMainActivity = m_nSpecificMainActivity;
-	m_nSpecificMainActivity = ACT_INVALID;
+	m_nSpecificMainActivity = m_nActiveSpecificMainActivity = ACT_INVALID;
 	Activity iNewSpecificMainActvity = OnEndSpecificActivity( iOldSpecificMainActivity );
-	if( m_nSpecificMainActivity == ACT_INVALID )
-		m_nSpecificMainActivity = iNewSpecificMainActvity;
+	if( m_nSpecificMainActivity == ACT_INVALID ) 
+	{
+		m_nSpecificMainActivity = m_nActiveSpecificMainActivity = iNewSpecificMainActvity;
+	}
 }
 
 void UnitAnimState::ComputeMainSequence()
@@ -537,6 +552,9 @@ void UnitAnimState::ComputeMainSequence()
 	// Hook to force playback of a specific requested full-body sequence
 	if ( m_nSpecificMainActivity != ACT_INVALID )
 	{
+		CheckSpecificActivityInterrupted();
+		m_nActiveSpecificMainActivity = m_nSpecificMainActivity;
+
 		if ( pOuter->GetSequenceActivity( pOuter->GetSequence() ) != m_nSpecificMainActivity )
 		{
 			int iSeq = SelectWeightedSequence( m_nSpecificMainActivity );
@@ -560,6 +578,7 @@ void UnitAnimState::ComputeMainSequence()
 		if( m_nSpecificMainActivity != ACT_INVALID )
 		{
 			pOuter->ResetSequence( SelectWeightedSequence( m_nSpecificMainActivity ) );
+			m_nActiveSpecificMainActivity = m_nSpecificMainActivity;
 			if( pOuter->GetSequence() == -1 )
 			{
 				EndSpecificActivity();
@@ -575,10 +594,8 @@ void UnitAnimState::ComputeMainSequence()
 	// Export to our outer class..
 	int animDesired = SelectWeightedSequence( TranslateActivity(idealActivity) );
 
-#if !defined( HL1_CLIENT_DLL ) && !defined ( HL1_DLL )
 	if ( pOuter->GetSequenceActivity( pOuter->GetSequence() ) == pOuter->GetSequenceActivity( animDesired ) )
 		return;
-#endif
 
 	if ( animDesired < 0 )
 		 animDesired = 0;

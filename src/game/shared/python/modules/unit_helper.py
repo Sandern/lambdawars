@@ -112,7 +112,8 @@ class UnitHelper(SemiSharedModuleGenerator):
                          , cls.member_function('SetAimLayerSequence') )
         
         cls.member_function('OnEndSpecificActivity').virtuality = 'virtual'
-
+        cls.member_function('OnInterruptSpecificActivity').virtuality = 'virtual'
+        
         cls.member_function('GetCustomSpecificActPlaybackRate').exclude()
         cls.member_function('SetCustomSpecificActPlaybackRate').exclude()
         cls.add_property( 'specmainactplaybackrate'

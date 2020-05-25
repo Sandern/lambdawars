@@ -146,6 +146,9 @@ public:
 
 	// This is called after a specific sequence is done. Can return a new specific sequence.
 	virtual Activity OnEndSpecificActivity( Activity specificactivity ) { return ACT_INVALID; } 
+	// This is called when the active specific activity is interrupted by another specific activity.
+	// OnEndSpecificActivity won't be reached.
+	virtual void OnInterruptSpecificActivity( Activity specificactivity ) {} 
 
 	void SetCustomSpecificActPlaybackRate( float playbackrate );
 	float GetCustomSpecificActPlaybackRate() { return m_fSpecMainPlaybackRate; }
@@ -249,6 +252,7 @@ protected:
 									float fBlendIn=0.15f, float fBlendOut=0.15f, bool bMoveBlend = false, 
 									float fPlaybackRate=1.0f, bool bUpdateCycle = true );
 
+	void				CheckSpecificActivityInterrupted();
 	void				EndSpecificActivity();
 
 protected:
@@ -369,6 +373,8 @@ public:
 	float			m_fForceAirActEndTime;
 
 private:
+	Activity		m_nActiveSpecificMainActivity;
+
 	string_t m_sAimLayerSequence;
 	
 	TranslateActivityMap *m_pActivityMap;

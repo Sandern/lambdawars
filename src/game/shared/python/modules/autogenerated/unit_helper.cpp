@@ -217,6 +217,25 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
         return UnitAnimState::OnEndSpecificActivity( specificactivity );
     }
 
+    virtual void OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        PY_OVERRIDE_CHECK( UnitAnimState, OnInterruptSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnInterruptSpecificActivity )
+        bp::override func_OnInterruptSpecificActivity = this->get_override( "OnInterruptSpecificActivity" );
+        if( func_OnInterruptSpecificActivity.ptr() != Py_None )
+            try {
+                func_OnInterruptSpecificActivity( specificactivity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+            }
+        else
+            this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+    }
+    
+    void default_OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+    }
+
     void ResetGroundSpeed(  ){
         UnitAnimState::ResetGroundSpeed(  );
     }
@@ -366,6 +385,25 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
     
     ::Activity default_OnEndSpecificActivity( ::Activity specificactivity ) {
         return UnitAnimState::OnEndSpecificActivity( specificactivity );
+    }
+
+    virtual void OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        PY_OVERRIDE_CHECK( UnitAnimState, OnInterruptSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnInterruptSpecificActivity )
+        bp::override func_OnInterruptSpecificActivity = this->get_override( "OnInterruptSpecificActivity" );
+        if( func_OnInterruptSpecificActivity.ptr() != Py_None )
+            try {
+                func_OnInterruptSpecificActivity( specificactivity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+            }
+        else
+            this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+    }
+    
+    void default_OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        UnitAnimState::OnInterruptSpecificActivity( specificactivity );
     }
 
     virtual void OnNewModel(  ) {
@@ -1503,6 +1541,18 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("specificactivity") ) );
         
         }
+        { //::UnitAnimState::OnInterruptSpecificActivity
+        
+            typedef void ( ::UnitAnimState::*OnInterruptSpecificActivity_function_type )( ::Activity ) ;
+            typedef void ( UnitAnimState_wrapper::*default_OnInterruptSpecificActivity_function_type )( ::Activity ) ;
+            
+            UnitAnimState_exposer.def( 
+                "OnInterruptSpecificActivity"
+                , OnInterruptSpecificActivity_function_type(&::UnitAnimState::OnInterruptSpecificActivity)
+                , default_OnInterruptSpecificActivity_function_type(&UnitAnimState_wrapper::default_OnInterruptSpecificActivity)
+                , ( bp::arg("specificactivity") ) );
+        
+        }
         { //::UnitAnimState::ResetGroundSpeed
         
             typedef void ( UnitAnimState_wrapper::*ResetGroundSpeed_function_type )(  ) ;
@@ -1786,6 +1836,11 @@ BOOST_PYTHON_MODULE(unit_helper){
             "OnEndSpecificActivity"
             , (::Activity ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnEndSpecificActivity)
             , (::Activity ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnEndSpecificActivity)
+            , ( bp::arg("specificactivity") ) )    
+        .def( 
+            "OnInterruptSpecificActivity"
+            , (void ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnInterruptSpecificActivity)
+            , (void ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnInterruptSpecificActivity)
             , ( bp::arg("specificactivity") ) )    
         .def( 
             "OnNewModel"
@@ -2994,6 +3049,25 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
         return UnitAnimState::OnEndSpecificActivity( specificactivity );
     }
 
+    virtual void OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        PY_OVERRIDE_CHECK( UnitAnimState, OnInterruptSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnInterruptSpecificActivity )
+        bp::override func_OnInterruptSpecificActivity = this->get_override( "OnInterruptSpecificActivity" );
+        if( func_OnInterruptSpecificActivity.ptr() != Py_None )
+            try {
+                func_OnInterruptSpecificActivity( specificactivity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+            }
+        else
+            this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+    }
+    
+    void default_OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+    }
+
     void ResetGroundSpeed(  ){
         UnitAnimState::ResetGroundSpeed(  );
     }
@@ -3143,6 +3217,25 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
     
     ::Activity default_OnEndSpecificActivity( ::Activity specificactivity ) {
         return UnitAnimState::OnEndSpecificActivity( specificactivity );
+    }
+
+    virtual void OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        PY_OVERRIDE_CHECK( UnitAnimState, OnInterruptSpecificActivity )
+        PY_OVERRIDE_LOG( unit_helper, UnitAnimState, OnInterruptSpecificActivity )
+        bp::override func_OnInterruptSpecificActivity = this->get_override( "OnInterruptSpecificActivity" );
+        if( func_OnInterruptSpecificActivity.ptr() != Py_None )
+            try {
+                func_OnInterruptSpecificActivity( specificactivity );
+            } catch(bp::error_already_set &) {
+                PyErr_Print();
+                this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+            }
+        else
+            this->UnitAnimState::OnInterruptSpecificActivity( specificactivity );
+    }
+    
+    void default_OnInterruptSpecificActivity( ::Activity specificactivity ) {
+        UnitAnimState::OnInterruptSpecificActivity( specificactivity );
     }
 
     virtual void OnNewModel(  ) {
@@ -4913,6 +5006,18 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , ( bp::arg("specificactivity") ) );
         
         }
+        { //::UnitAnimState::OnInterruptSpecificActivity
+        
+            typedef void ( ::UnitAnimState::*OnInterruptSpecificActivity_function_type )( ::Activity ) ;
+            typedef void ( UnitAnimState_wrapper::*default_OnInterruptSpecificActivity_function_type )( ::Activity ) ;
+            
+            UnitAnimState_exposer.def( 
+                "OnInterruptSpecificActivity"
+                , OnInterruptSpecificActivity_function_type(&::UnitAnimState::OnInterruptSpecificActivity)
+                , default_OnInterruptSpecificActivity_function_type(&UnitAnimState_wrapper::default_OnInterruptSpecificActivity)
+                , ( bp::arg("specificactivity") ) );
+        
+        }
         { //::UnitAnimState::ResetGroundSpeed
         
             typedef void ( UnitAnimState_wrapper::*ResetGroundSpeed_function_type )(  ) ;
@@ -5196,6 +5301,11 @@ BOOST_PYTHON_MODULE(unit_helper){
             "OnEndSpecificActivity"
             , (::Activity ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnEndSpecificActivity)
             , (::Activity ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnEndSpecificActivity)
+            , ( bp::arg("specificactivity") ) )    
+        .def( 
+            "OnInterruptSpecificActivity"
+            , (void ( ::UnitAnimState::* )( ::Activity ) )(&::UnitAnimState::OnInterruptSpecificActivity)
+            , (void ( UnitAnimStateEx_wrapper::* )( ::Activity ) )(&UnitAnimStateEx_wrapper::default_OnInterruptSpecificActivity)
             , ( bp::arg("specificactivity") ) )    
         .def( 
             "OnNewModel"
