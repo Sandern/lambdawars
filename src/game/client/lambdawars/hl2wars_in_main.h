@@ -96,6 +96,8 @@ private:
 	int						m_iLastPosY;
 	int						m_iDeltaX;
 	int						m_iDeltaY;
+	float					m_fLastPlayerCameraSettingsUpdateTime;
+
 
 	// Middle mouse dragging
 	bool					m_bWasMiddleMousePressed;
