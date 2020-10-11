@@ -337,7 +337,8 @@ int UnitBaseSense::LookForUnits( int iDistance )
 			if( otherDist > distSqr )
 				continue;
 
-			if( !TestEntity( pEntOther ) || ( pEntOther->IsUnit() && !TestUnit( pEntOther->MyUnitPointer() ) ) )
+			CUnitBase *pUnitOther = pEntOther->MyUnitPointer();
+			if( !TestEntity( pEntOther ) || ( pUnitOther && !TestUnit( pUnitOther ) ) )
 				continue;
 
 			if( GetOuter()->m_Relationship[i].disposition == D_HT )
