@@ -124,13 +124,13 @@ class CWarsBulletsFilter : public CTraceFilterSimpleList
 {
 	DECLARE_CLASS( CWarsBulletsFilter, CTraceFilterSimpleList );
 public:
-	CWarsBulletsFilter( CUnitBase *pUnit, int collisionGroup ) : CTraceFilterSimpleList( collisionGroup ), m_pUnit(pUnit)
+	CWarsBulletsFilter( CBaseEntity *pEdict, int collisionGroup ) : CTraceFilterSimpleList( collisionGroup ), m_pEdict(pEdict)
 	{
 	}
 
 	virtual bool ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask );
 private:
-	CUnitBase *m_pUnit;
+	CBaseEntity *m_pEdict;
 };
 
 

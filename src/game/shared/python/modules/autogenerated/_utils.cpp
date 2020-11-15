@@ -816,8 +816,8 @@ struct CTraceFilterWorldOnly_wrapper : CTraceFilterWorldOnly, bp::wrapper< CTrac
 
 struct CWarsBulletsFilter_wrapper : CWarsBulletsFilter, bp::wrapper< CWarsBulletsFilter > {
 
-    CWarsBulletsFilter_wrapper(::C_UnitBase * pUnit, int collisionGroup )
-    : CWarsBulletsFilter( pUnit, collisionGroup )
+    CWarsBulletsFilter_wrapper(::C_BaseEntity * pEdict, int collisionGroup )
+    : CWarsBulletsFilter( pEdict, collisionGroup )
       , bp::wrapper< CWarsBulletsFilter >(){
         // constructor
     
@@ -1189,7 +1189,7 @@ BOOST_PYTHON_MODULE(_utils){
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
             , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
 
-    bp::class_< CWarsBulletsFilter_wrapper, bp::bases< CTraceFilterSimpleList >, boost::noncopyable >( "CWarsBulletsFilter", bp::init< C_UnitBase *, int >(( bp::arg("pUnit"), bp::arg("collisionGroup") )) )    
+    bp::class_< CWarsBulletsFilter_wrapper, bp::bases< CTraceFilterSimpleList >, boost::noncopyable >( "CWarsBulletsFilter", bp::init< C_BaseEntity *, int >(( bp::arg("pEdict"), bp::arg("collisionGroup") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CWarsBulletsFilter::* )( ::IHandleEntity *,int ) )(&::CWarsBulletsFilter::ShouldHitEntity)
@@ -3591,8 +3591,8 @@ struct CTraceFilterWorldOnly_wrapper : CTraceFilterWorldOnly, bp::wrapper< CTrac
 
 struct CWarsBulletsFilter_wrapper : CWarsBulletsFilter, bp::wrapper< CWarsBulletsFilter > {
 
-    CWarsBulletsFilter_wrapper(::CUnitBase * pUnit, int collisionGroup )
-    : CWarsBulletsFilter( pUnit, collisionGroup )
+    CWarsBulletsFilter_wrapper(::CBaseEntity * pEdict, int collisionGroup )
+    : CWarsBulletsFilter( pEdict, collisionGroup )
       , bp::wrapper< CWarsBulletsFilter >(){
         // constructor
     
@@ -3970,7 +3970,7 @@ BOOST_PYTHON_MODULE(_utils){
             , (bool ( CTraceFilterWorldOnly_wrapper::* )( ::IHandleEntity *,int ) )(&CTraceFilterWorldOnly_wrapper::default_ShouldHitEntity)
             , ( bp::arg("pServerEntity"), bp::arg("contentsMask") ) );
 
-    bp::class_< CWarsBulletsFilter_wrapper, bp::bases< CTraceFilterSimpleList >, boost::noncopyable >( "CWarsBulletsFilter", bp::init< CUnitBase *, int >(( bp::arg("pUnit"), bp::arg("collisionGroup") )) )    
+    bp::class_< CWarsBulletsFilter_wrapper, bp::bases< CTraceFilterSimpleList >, boost::noncopyable >( "CWarsBulletsFilter", bp::init< CBaseEntity *, int >(( bp::arg("pEdict"), bp::arg("collisionGroup") )) )    
         .def( 
             "ShouldHitEntity"
             , (bool ( ::CWarsBulletsFilter::* )( ::IHandleEntity *,int ) )(&::CWarsBulletsFilter::ShouldHitEntity)

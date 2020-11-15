@@ -45,6 +45,24 @@ ConVar unit_debugfirebullets("unit_debugfirebullets", "0", FCVAR_CHEAT, "");
 #endif // CLIENT_DLL
 
 //-----------------------------------------------------------------------------
+// Purpose: Weapons ignore other weapons when LOS tracing
+//-----------------------------------------------------------------------------
+bool CWarsBulletsFilter::ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
+{
+	CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
+	if ( !pEntity )
+		return false;
+
+	IUnit *pUnit = pEntity->GetIUnit();
+	if( pUnit && pUnit->AreAttacksPassable(m_pEdict) && (!m_pEdict->GetIUnit() || m_pEdict->GetIUnit()->GetCommander() == NULL) )
+	{
+		return false;
+	}
+
+	return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
 CUnit_Manager g_Unit_Manager;
@@ -619,24 +637,6 @@ void CUnitBase::DoMuzzleFlash()
 	}
 
 	BaseClass::DoMuzzleFlash();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Weapons ignore other weapons when LOS tracing
-//-----------------------------------------------------------------------------
-bool CWarsBulletsFilter::ShouldHitEntity( IHandleEntity *pServerEntity, int contentsMask )
-{
-	CBaseEntity *pEntity = EntityFromEntityHandle( pServerEntity );
-	if ( !pEntity )
-		return false;
-
-	IUnit *pUnit = pEntity->GetIUnit();
-	if( pUnit && pUnit->AreAttacksPassable(m_pUnit) && m_pUnit->GetCommander() == NULL )
-	{
-		return false;
-	}
-
-	return BaseClass::ShouldHitEntity( pServerEntity, contentsMask );
 }
 
 //-----------------------------------------------------------------------------

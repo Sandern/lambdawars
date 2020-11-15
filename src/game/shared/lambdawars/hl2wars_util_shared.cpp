@@ -55,9 +55,11 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 	Vector vecApex = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5;
 	vecApex.z += 0.5 * flGravity * (time * 0.5) * (time * 0.5);
 
+	CWarsBulletsFilter traceFilter( pEdict, iCollisionGroup );
+	traceFilter.SetPassEntity( pEdict->MyUnitPointer() && pEdict->MyUnitPointer()->GetGarrisonedBuilding() ? pEdict->MyUnitPointer()->GetGarrisonedBuilding() : pEdict );
 
 	trace_t tr;
-	UTIL_TraceLine( vecSpot1, vecApex, MASK_SOLID, pEdict, iCollisionGroup, &tr );
+	UTIL_TraceLine( vecSpot1, vecApex, MASK_SOLID, &traceFilter, &tr );
 	if (tr.fraction != 1.0)
 	{
 		// fail!
