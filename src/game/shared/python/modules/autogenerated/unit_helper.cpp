@@ -166,6 +166,10 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     
     }
 
+    void CheckSpecificActivityInterrupted(  ){
+        UnitAnimState::CheckSpecificActivityInterrupted(  );
+    }
+
     void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
         UnitAnimState::ComputePoseParam_BodyPitch( pStudioHdr );
     }
@@ -326,6 +330,10 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
     
     void default_Update( float eyeYaw, float eyePitch ) {
         UnitAnimStateEx::Update( eyeYaw, eyePitch );
+    }
+
+    void CheckSpecificActivityInterrupted(  ){
+        UnitAnimState::CheckSpecificActivityInterrupted(  );
     }
 
     void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
@@ -1302,6 +1310,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , CanTheUnitMove_function_type( &::UnitAnimState::CanTheUnitMove ) );
         
         }
+        { //::UnitAnimState::CheckSpecificActivityInterrupted
+        
+            typedef void ( UnitAnimState_wrapper::*CheckSpecificActivityInterrupted_function_type )(  ) ;
+            
+            UnitAnimState_exposer.def( 
+                "CheckSpecificActivityInterrupted"
+                , CheckSpecificActivityInterrupted_function_type( &UnitAnimState_wrapper::CheckSpecificActivityInterrupted ) );
+        
+        }
         { //::UnitAnimState::ClearAnimationLayers
         
             typedef void ( ::UnitAnimState::*ClearAnimationLayers_function_type )(  ) ;
@@ -1794,6 +1811,9 @@ BOOST_PYTHON_MODULE(unit_helper){
             , (void ( ::UnitAnimStateEx::* )( float,float ) )(&::UnitAnimStateEx::Update)
             , (void ( UnitAnimStateEx_wrapper::* )( float,float ) )(&UnitAnimStateEx_wrapper::default_Update)
             , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) )    
+        .def( 
+            "CheckSpecificActivityInterrupted"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::CheckSpecificActivityInterrupted) )    
         .def( 
             "ComputePoseParam_BodyPitch"
             , (void ( UnitAnimStateEx_wrapper::* )( ::CStudioHdr * ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_BodyPitch)
@@ -2998,6 +3018,10 @@ struct UnitAnimState_wrapper : UnitAnimState, bp::wrapper< UnitAnimState > {
     
     }
 
+    void CheckSpecificActivityInterrupted(  ){
+        UnitAnimState::CheckSpecificActivityInterrupted(  );
+    }
+
     void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
         UnitAnimState::ComputePoseParam_BodyPitch( pStudioHdr );
     }
@@ -3158,6 +3182,10 @@ struct UnitAnimStateEx_wrapper : UnitAnimStateEx, bp::wrapper< UnitAnimStateEx >
     
     void default_Update( float eyeYaw, float eyePitch ) {
         UnitAnimStateEx::Update( eyeYaw, eyePitch );
+    }
+
+    void CheckSpecificActivityInterrupted(  ){
+        UnitAnimState::CheckSpecificActivityInterrupted(  );
     }
 
     void ComputePoseParam_BodyPitch( ::CStudioHdr * pStudioHdr ){
@@ -4767,6 +4795,15 @@ BOOST_PYTHON_MODULE(unit_helper){
                 , CanTheUnitMove_function_type( &::UnitAnimState::CanTheUnitMove ) );
         
         }
+        { //::UnitAnimState::CheckSpecificActivityInterrupted
+        
+            typedef void ( UnitAnimState_wrapper::*CheckSpecificActivityInterrupted_function_type )(  ) ;
+            
+            UnitAnimState_exposer.def( 
+                "CheckSpecificActivityInterrupted"
+                , CheckSpecificActivityInterrupted_function_type( &UnitAnimState_wrapper::CheckSpecificActivityInterrupted ) );
+        
+        }
         { //::UnitAnimState::ClearAnimationLayers
         
             typedef void ( ::UnitAnimState::*ClearAnimationLayers_function_type )(  ) ;
@@ -5259,6 +5296,9 @@ BOOST_PYTHON_MODULE(unit_helper){
             , (void ( ::UnitAnimStateEx::* )( float,float ) )(&::UnitAnimStateEx::Update)
             , (void ( UnitAnimStateEx_wrapper::* )( float,float ) )(&UnitAnimStateEx_wrapper::default_Update)
             , ( bp::arg("eyeYaw"), bp::arg("eyePitch") ) )    
+        .def( 
+            "CheckSpecificActivityInterrupted"
+            , (void ( UnitAnimStateEx_wrapper::* )(  ) )(&UnitAnimStateEx_wrapper::CheckSpecificActivityInterrupted) )    
         .def( 
             "ComputePoseParam_BodyPitch"
             , (void ( UnitAnimStateEx_wrapper::* )( ::CStudioHdr * ) )(&UnitAnimStateEx_wrapper::ComputePoseParam_BodyPitch)
