@@ -258,9 +258,9 @@ class project_reader_t:
                 decls = reader.read_string( header )
             namespaces.append( decls )
         self.logger.debug( "Flushing cache... " )
-        start_time = time.clock()
+        start_time = time.perf_counter()
         self.__dcache.flush()
-        self.logger.debug( "Cache has been flushed in %.1f secs" % ( time.clock() - start_time ) )
+        self.logger.debug( "Cache has been flushed in %.1f secs" % ( time.perf_counter() - start_time ) )
         answer = []
         self.logger.debug( "Joining namespaces ..." )
         for file_nss in namespaces:

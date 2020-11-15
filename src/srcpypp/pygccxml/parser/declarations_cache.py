@@ -158,9 +158,9 @@ class file_cache_t( cache_base_t ):
         cache_file_obj = open( file_name, 'rb' )
         try:
             file_cache_t.logger.info( 'Loading cache file "%s".' % file_name )
-            start_time = time.clock()
+            start_time = time.perf_counter()
             cache = pickle.load( cache_file_obj )
-            file_cache_t.logger.debug( "Cache file has been loaded in %.1f secs"%( time.clock() - start_time ) )
+            file_cache_t.logger.debug( "Cache file has been loaded in %.1f secs"%( time.perf_counter() - start_time ) )
             file_cache_t.logger.debug( "Found cache in file: [%s]  entries: %s"
                                % ( file_name, len( list(cache.keys()) ) ) )
         except Exception as error:

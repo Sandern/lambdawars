@@ -57,12 +57,12 @@ class ctypes_module_builder_t(module_builder.module_builder_t):
             gccxml_config = parser.gccxml_configuration_t()
         if None is compilation_mode:
             compilation_mode = parser.COMPILATION_MODE.FILE_BY_FILE
-        start_time = time.clock()
+        start_time = time.perf_counter()
         self.logger.debug( 'parsing files - started' )
         reader = parser.project_reader_t( gccxml_config, cache, decl_wrappers.dwfactory_t() )
         decls = reader.read_files( files, compilation_mode )
 
-        self.logger.debug( 'parsing files - done( %f seconds )' % ( time.clock() - start_time ) )
+        self.logger.debug( 'parsing files - done( %f seconds )' % ( time.perf_counter() - start_time ) )
 
         return decls_package.matcher.get_single( decls_package.namespace_matcher_t( name='::' )
                                                  , decls )
