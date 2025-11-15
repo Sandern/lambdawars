@@ -268,7 +268,7 @@ int	CHudWeaponSelection::KeyInput( int down, ButtonCode_t keynum, const char *ps
 	{
 		V_snprintf( buf, 8, "slot%d", i+1 );
 
-		if( m_iSlotDoublePressed == i && !down && V_strncmp( buf, pszCurrentBinding, 6 ) == 0 )
+		if( pszCurrentBinding && m_iSlotDoublePressed == i && !down && V_strncmp( buf, pszCurrentBinding, 6 ) == 0 )
 		{
 			pPlayer->CamFollowEntity( NULL );
 			m_iSlotDoublePressed = -1;
