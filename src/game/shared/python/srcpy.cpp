@@ -164,6 +164,11 @@ extern void AppendServerModules();
 #endif // CLIENT_DLL
 extern void AppendSharedModules();
 
+#if defined( CLIENT_DLL ) && defined( HL2WARS_DLL )
+// Hand-written module, see wars_settings_python.cpp
+extern "C" __declspec(dllexport) PYINIT_DECL(_gamesettings)();
+#endif // CLIENT_DLL && HL2WARS_DLL
+
 extern struct _inittab *PyImport_Inittab;
 extern struct _inittab _PySourceImport_Inittab[];
 
@@ -187,6 +192,9 @@ CSrcPython::CSrcPython()
 	AppendServerModules();
 #endif // CLIENT_DLL
 	AppendSharedModules();
+#if defined( CLIENT_DLL ) && defined( HL2WARS_DLL )
+	APPEND_MODULE( _gamesettings )
+#endif // CLIENT_DLL && HL2WARS_DLL
 
 	PyImport_FrozenModules = _PyImport_FrozenModules;
 

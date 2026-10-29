@@ -50,6 +50,8 @@ public:
 	void ResetLanguage();
 
 	static const char* GetUpdatedAudioLanguage() { return m_pchUpdatedAudioLanguage; }
+	// Used by the settings page of the menu (wars_settings_python.cpp)
+	static void SetUpdatedAudioLanguage( const char *pchLanguage ) { m_pchUpdatedAudioLanguage = pchLanguage; }
 
 protected:
 	virtual void Activate();

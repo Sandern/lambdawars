@@ -1670,6 +1670,9 @@
     <ClCompile Include="lambdawars\c_wars_fx.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
+    <ClCompile Include="lambdawars\wars_settings_python.cpp">
+      <Filter>Source Files\wars</Filter>
+    </ClCompile>
     <ClCompile Include="lambdawars\videocfgext.cpp">
       <Filter>Source Files\wars</Filter>
     </ClCompile>
